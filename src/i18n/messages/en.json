@@ -22,15 +22,32 @@
   },
   "nav": {
     "home": "Home",
-    "imageGeneration": "Image Generation",
-    "videoGeneration": "Video Generation",
+    "generationTools": "Generation Tools",
+    "imageGeneration": "AI Image",
+    "imageGenerationDesc": "Text-to-Image and Image-to-Image",
+    "videoGeneration": "AI Video",
+    "videoGenerationDesc": "Text-to-Video and Image-to-Video",
+    "batchImageGeneration": "Batch Images",
+    "batchImageGenerationDesc": "Batch image generation",
+    "batchVideoGeneration": "Batch Videos",
+    "batchVideoGenerationDesc": "Batch video generation",
     "batchGeneration": "Batch Generation",
     "assets": "Assets",
     "dashboard": "Dashboard",
     "login": "Login",
     "signup": "Sign Up",
     "logout": "Logout",
-    "getStarted": "Get Started Free"
+    "getStarted": "Get Started Free",
+    "footerDescription": "Providing high-quality AI image and video generation services for e-commerce businesses",
+    "footerProduct": "Product",
+    "footerResources": "Resources",
+    "footerCompany": "Company",
+    "footerDocs": "Documentation",
+    "footerPricing": "Pricing",
+    "footerAbout": "About Us",
+    "footerContact": "Contact",
+    "footerPrivacy": "Privacy Policy",
+    "footerTerms": "Terms of Service"
   },
   "hero": {
     "title": "Product visuals that",
@@ -61,6 +78,72 @@
     "step3Title": "Preview & Download",
     "step3Desc": "Preview generated results, batch download or one-click publish to e-commerce platforms"
   },
+  "features": {
+    "badge": "Key Features",
+    "title": "Everything you need to create",
+    "titleHighlight": "stunning product visuals",
+    "subtitle": "Our AI-powered platform combines cutting-edge technology with intuitive design to help you create professional product images and videos in minutes, not days.",
+    "batch": {
+      "badge": "Batch Generation",
+      "title": "Batch image and video generation at scale",
+      "description": "Upload Excel/CSV files to generate hundreds of product images and videos simultaneously. Perfect for e-commerce businesses that need to create content for large product catalogs.",
+      "benefit1": {
+        "title": "Excel/CSV batch upload",
+        "desc": "Upload spreadsheets with product data and generate content in bulk"
+      },
+      "benefit2": {
+        "title": "One-click publishing",
+        "desc": "Automatically publish generated content to e-commerce platforms"
+      },
+      "benefit3": {
+        "title": "Time-saving automation",
+        "desc": "Reduce manual work from days to minutes with automated workflows"
+      },
+      "statLabel": "Batch size",
+      "statValue": "1000+",
+      "alt": "Batch Generation"
+    },
+    "brand": {
+      "badge": "Brand Analysis",
+      "title": "AI-powered brand tone analysis",
+      "description": "Our advanced AI analyzes your brand's website and product information to understand your brand tone, style, and messaging. This ensures every generated image and video perfectly matches your brand identity.",
+      "benefit1": {
+        "title": "Automatic brand detection",
+        "desc": "AI analyzes your website to understand brand colors, style, and tone"
+      },
+      "benefit2": {
+        "title": "Enhanced prompts",
+        "desc": "Automatically optimize prompts based on brand analysis and product selling points"
+      },
+      "benefit3": {
+        "title": "Consistent brand voice",
+        "desc": "Ensure all generated content aligns with your brand identity"
+      },
+      "statLabel": "Accuracy",
+      "statValue": "95%+",
+      "alt": "Brand Analysis"
+    },
+    "quality": {
+      "badge": "High Quality & Creativity",
+      "title": "Professional quality with creative freedom",
+      "description": "Generate stunning, high-resolution images and videos that rival professional photography. Our AI models produce creative, unique content that stands out from the competition.",
+      "benefit1": {
+        "title": "4K resolution output",
+        "desc": "Generate ultra-high quality images and videos suitable for any use case"
+      },
+      "benefit2": {
+        "title": "Creative AI models",
+        "desc": "Access to cutting-edge AI models for maximum creativity and visual appeal"
+      },
+      "benefit3": {
+        "title": "Multiple styles & formats",
+        "desc": "Choose from various artistic styles, aspect ratios, and video formats"
+      },
+      "statLabel": "Quality score",
+      "statValue": "9.5/10",
+      "alt": "High Quality & Creativity"
+    }
+  },
   "showcase": {
     "title": "Showcase Gallery",
     "subtitle": "View our high-quality generated content"
@@ -81,13 +164,98 @@
     "download": "Download",
     "share": "Share"
   },
+  "videoGeneration": {
+    "subtitle": "Create professional e-commerce product videos. Supports Text-to-Video and Image-to-Video modes.",
+    "brandAnalysisOptional": "Brand Analysis (Optional)",
+    "enterWebsiteUrl": "Enter company website URL",
+    "analysisResult": "Analysis Result:",
+    "style": "Style",
+    "colorPalette": "Color Palette",
+    "productSellingPointsOptional": "Product Selling Points (Optional)",
+    "productSellingPointsPlaceholder": "e.g., High quality, fast charging, long battery life",
+    "videoStyle": "Video Style",
+    "videoStyles": {
+      "spoken-script": "Spoken Script",
+      "product-comparison": "Product Comparison",
+      "narrative-comedy": "Narrative/Comedy",
+      "360-showcase": "360° Showcase",
+      "product-demo": "Product Demo"
+    }
+  },
   "batchGeneration": {
     "title": "Batch Generation",
+    "titleImage": "Batch Image Generation",
+    "titleVideo": "Batch Video Generation",
     "subtitle": "Upload Excel/CSV files to batch generate images and videos, and automatically publish to e-commerce platforms",
+    "subtitleImage": "Upload Excel/CSV files to batch generate product images",
+    "subtitleVideo": "Upload Excel/CSV files to batch generate product videos",
+    "generationMode": "Generation Mode",
+    "aspectRatio": "Aspect Ratio",
+    "imageStyle": "Image Style",
+    "videoStyle": "Video Style",
     "downloadTemplate": "Download Template",
     "downloadExcel": "Download Excel Template",
     "downloadCSV": "Download CSV Template",
-    "uploadFile": "Upload Batch File",
+    "uploadFile": "Upload File",
+    "clickToUpload": "Click to upload or drag and drop files",
+    "fileTypes": "CSV or Excel files (.csv, .xlsx, .xls)",
+    "fileSelected": "File selected",
+    "validating": "Validating...",
+    "reselectFile": "Reselect File",
+    "validationErrors": "Validation Errors",
+    "row": "Row",
+    "moreErrors": "more errors",
+    "dataPreview": "Data Preview",
+    "rows": "rows",
+    "recoveredFromCache": "Data recovered from cache",
+    "enhanceAllPrompts": "Enhance All Prompts",
+    "selectAll": "Select All",
+    "deselectAll": "Deselect All",
+    "generating": "Generating...",
+    "startBatchGeneration": "Start Batch Generation",
+    "rowsSelected": "rows selected",
+    "enhanced": "enhanced",
+    "downloadResults": "Download Results",
+    "summary": "Generation Summary",
+    "total": "Total",
+    "completed": "Completed",
+    "generatingStatus": "Generating",
+    "failed": "Failed",
+    "overallProgress": "Overall Progress",
+    "completedPercentage": "completed",
+    "completionRate": "Completion Rate",
+    "statusDistribution": "Status Distribution",
+    "waiting": "Waiting",
+    "preview": "Preview",
+    "previewTitle": "Preview",
+    "rowNumber": "Row",
+    "browserNotSupportVideo": "Your browser does not support video playback",
+    "generationFailed": "Generation failed",
+    "batchGenerationFailed": "Batch generation failed",
+    "downloadTemplateFailed": "Failed to download template",
+    "uploadCSVOrExcel": "Please upload CSV or Excel files",
+    "pleaseSelectFile": "Please select a file first",
+    "uploadFailed": "Upload failed",
+    "t2i": "Text-to-Image",
+    "i2i": "Image-to-Image",
+    "t2v": "Text-to-Video",
+    "i2v": "Image-to-Video",
+    "aspectRatio1:1": "1:1 (Square)",
+    "aspectRatio16:9": "16:9 (Landscape)",
+    "aspectRatio9:16": "9:16 (Portrait)",
+    "aspectRatio4:3": "4:3",
+    "aspectRatio3:4": "3:4",
+    "enhance": "Enhance",
+    "enhancePrompt": "Enhance Prompt",
+    "enhancePromptPlaceholder": "Click the button on the right to enhance Prompt, or enter manually",
+    "enhancePromptFailed": "Prompt enhancement failed",
+    "noPromptToEnhance": "No Prompt to enhance",
+    "productName": "Product Name",
+    "productDescription": "Product Description",
+    "originalPrompt": "Original Prompt",
+    "generationComplete": "Generation Complete",
+    "downloadAllResults": "Download All Results",
+    "download": "Download",
     "startProcessing": "Start Batch Processing",
     "uploading": "Uploading...",
     "instructions": "Instructions",
@@ -118,6 +286,8 @@
     "generateNew": "Generate New Content",
     "searchPlaceholder": "Search prompts...",
     "filterType": "Filter Type",
+    "all": "All",
+    "download": "Download",
     "noAssets": "No Assets",
     "noAssetsDesc": "Start generating your first content",
     "noAssetsSearch": "No matching assets found",

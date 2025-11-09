@@ -1,9 +1,10 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
+import { CheckinDropdown } from '@/components/rewards/checkin-dropdown';
 import { LanguageSwitcher } from '@/components/widget/language-switcher';
 import { useAuthStore } from '@/store/auth-store';
-import { ArrowRight, Menu, Sparkles, X } from 'lucide-react';
+import { ArrowRight, Menu, X } from 'lucide-react';
 import { motion } from 'motion/react';
 import { useTranslations } from 'next-intl';
 import { Link, usePathname } from '@/i18n/navigation';
@@ -26,18 +27,16 @@ export function LandingHeader() {
       <div className="container mx-auto px-6 py-4">
         <div className="flex items-center justify-between relative">
           <motion.div
-            className="flex items-center gap-3 relative z-10"
+            className="flex items-center relative z-10"
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
           >
-            <Link href="/" className="flex items-center gap-3">
-              <div className="relative">
-                <div className="absolute inset-0 bg-gradient-to-br from-violet-600 to-fuchsia-600 rounded-xl blur-lg opacity-50" />
-                <div className="relative bg-gradient-to-br from-violet-600 to-fuchsia-600 p-2.5 rounded-xl">
-                  <Sparkles className="size-5 text-white" />
-                </div>
-              </div>
-              <span className="text-slate-900 font-semibold">Viecom</span>
+            <Link href="/" className="flex items-center">
+              <img 
+                src="/brandlogo4.png" 
+                alt="Viecom Logo" 
+                style={{ height: '64px', width: '218px', objectFit: 'contain' }}
+              />
             </Link>
           </motion.div>
 
@@ -62,14 +61,14 @@ export function LandingHeader() {
               className="text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors cursor-pointer relative z-10"
               prefetch={true}
             >
-              批量生图
+              {t('batchImageGeneration')}
             </Link>
             <Link
               href="/batch-video-generation"
               className="text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors cursor-pointer relative z-10"
               prefetch={true}
             >
-              批量生视频
+              {t('batchVideoGeneration')}
             </Link>
             <Link
               href="/assets"
@@ -85,10 +84,10 @@ export function LandingHeader() {
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
           >
-            <LanguageSwitcher />
             {!mounted ? (
               // Show default state during SSR to prevent hydration mismatch
               <>
+                <LanguageSwitcher />
                 <Link href="/login">
                   <Button variant="ghost" size="sm" className="hidden sm:inline-flex">
                     {t('login')}
@@ -102,13 +101,18 @@ export function LandingHeader() {
                 </Link>
               </>
             ) : isAuthenticated ? (
-              <Link href="/dashboard">
-                <Button className="bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-700 hover:to-fuchsia-700 text-white shadow-lg shadow-violet-500/25">
-                  {t('dashboard')}
-                </Button>
-              </Link>
+              <>
+                <CheckinDropdown />
+                <LanguageSwitcher />
+                <Link href="/dashboard">
+                  <Button className="bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-700 hover:to-fuchsia-700 text-white shadow-lg shadow-violet-500/25">
+                    {t('dashboard')}
+                  </Button>
+                </Link>
+              </>
             ) : (
               <>
+                <LanguageSwitcher />
                 <Link href="/login">
                   <Button variant="ghost" size="sm" className="hidden sm:inline-flex">
                     {t('login')}
@@ -163,14 +167,14 @@ export function LandingHeader() {
                 className="px-3 py-2 rounded-md text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-colors cursor-pointer"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
-                批量生图
+                {t('batchImageGeneration')}
               </Link>
               <Link
                 href="/batch-video-generation"
                 className="px-3 py-2 rounded-md text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-colors cursor-pointer"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
-                批量生视频
+                {t('batchVideoGeneration')}
               </Link>
               <Link
                 href="/assets"

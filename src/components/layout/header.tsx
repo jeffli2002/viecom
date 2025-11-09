@@ -18,6 +18,7 @@ import {
   NavigationMenuList,
   NavigationMenuTrigger,
 } from '@/components/ui/navigation-menu';
+import { CheckinDropdown } from '@/components/rewards/checkin-dropdown';
 import { LanguageSwitcher } from '@/components/widget/language-switcher';
 import { routing } from '@/i18n/routing';
 import { useAuthStore } from '@/store/auth-store';
@@ -26,7 +27,6 @@ import {
   Image as ImageIcon,
   LogOut,
   Menu,
-  Sparkles,
   User,
   Video,
   X,
@@ -48,30 +48,30 @@ export function Header() {
 
   const navItems = [
     {
-      title: '生成工具',
+      title: t('generationTools'),
       items: [
         {
-          title: '图片生成',
+          title: t('imageGeneration'),
           href: '/image-generation',
-          description: 'Text-to-Image 和 Image-to-Image',
+          description: t('imageGenerationDesc'),
           icon: ImageIcon,
         },
         {
-          title: '视频生成',
+          title: t('videoGeneration'),
           href: '/video-generation',
-          description: 'Text-to-Video 和 Image-to-Video',
+          description: t('videoGenerationDesc'),
           icon: Video,
         },
         {
-          title: '批量生图',
+          title: t('batchImageGeneration'),
           href: '/batch-image-generation',
-          description: '批量生成图片',
+          description: t('batchImageGenerationDesc'),
           icon: FileSpreadsheet,
         },
         {
-          title: '批量生视频',
+          title: t('batchVideoGeneration'),
           href: '/batch-video-generation',
-          description: '批量生成视频',
+          description: t('batchVideoGenerationDesc'),
           icon: FileSpreadsheet,
         },
       ],
@@ -82,9 +82,12 @@ export function Header() {
     <header className="sticky top-0 z-50 w-full border-b border-gray-200/50 bg-white/80 backdrop-blur-apple supports-[backdrop-filter]:bg-white/60 dark:border-gray-800/50 dark:bg-gray-900/80 dark:supports-[backdrop-filter]:bg-gray-900/60">
       <div className="container flex h-16 items-center justify-between">
         {/* Logo */}
-        <Link href="/" className="flex items-center space-x-2">
-          <Sparkles className="h-6 w-6 text-primary" />
-          <span className="text-xl font-bold">Viecom</span>
+        <Link href="/" className="flex items-center">
+          <img 
+            src="/brandlogo4.png" 
+            alt="Viecom Logo" 
+            style={{ height: '64px', width: '218px', objectFit: 'contain' }}
+          />
         </Link>
 
         {/* Desktop Navigation */}
@@ -135,9 +138,10 @@ export function Header() {
 
         {/* User Menu / Auth Buttons */}
         <div className="flex items-center space-x-4">
-          <LanguageSwitcher />
           {isAuthenticated && user ? (
             <>
+              <CheckinDropdown />
+              <LanguageSwitcher />
               <Link href="/dashboard">
                 <Button variant="ghost" size="sm">
                   {t('dashboard')}
@@ -177,16 +181,19 @@ export function Header() {
               </DropdownMenu>
             </>
           ) : (
-            <div className="flex items-center space-x-2">
-              <Link href="/login">
-                <Button variant="ghost" size="sm">
-                  {t('login')}
-                </Button>
-              </Link>
-              <Link href="/signup">
-                <Button size="sm">{t('signup')}</Button>
-              </Link>
-            </div>
+            <>
+              <LanguageSwitcher />
+              <div className="flex items-center space-x-2">
+                <Link href="/login">
+                  <Button variant="ghost" size="sm">
+                    {t('login')}
+                  </Button>
+                </Link>
+                <Link href="/signup">
+                  <Button size="sm">{t('signup')}</Button>
+                </Link>
+              </div>
+            </>
           )}
 
           {/* Mobile Menu Button */}
@@ -221,7 +228,7 @@ export function Header() {
               className="block px-3 py-2 rounded-md hover:bg-accent"
               onClick={() => setIsMobileMenuOpen(false)}
             >
-              资产库
+              {t('assets')}
             </Link>
           </div>
         </div>

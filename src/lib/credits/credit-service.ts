@@ -12,7 +12,15 @@ export type CreditTransactionType =
   | 'admin_adjust'
   | 'freeze'
   | 'unfreeze';
-export type CreditTransactionSource = 'subscription' | 'api_call' | 'admin' | 'storage' | 'bonus';
+export type CreditTransactionSource =
+  | 'subscription'
+  | 'api_call'
+  | 'admin'
+  | 'storage'
+  | 'bonus'
+  | 'checkin'
+  | 'referral'
+  | 'social_share';
 
 export interface CreditTransaction {
   id: string;

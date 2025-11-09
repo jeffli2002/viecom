@@ -34,7 +34,7 @@ export function HowItWorks() {
 
       <div className="container relative">
         <div className="mb-16 text-center">
-          <h2 className="mb-4 font-bold text-3xl tracking-tight sm:text-4xl md:text-5xl">
+          <h2 className="mb-4 font-bold tracking-tight" style={{ fontSize: 'clamp(1.875rem, 5vw, 3.75rem)' }}>
             {t('title')}
           </h2>
           <p className="mx-auto max-w-2xl text-lg text-muted-foreground md:text-xl">

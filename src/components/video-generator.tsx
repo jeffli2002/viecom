@@ -32,6 +32,7 @@ import {
   X,
 } from 'lucide-react';
 import { useSearchParams } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { useEffect, useRef, useState } from 'react';
 
 interface GenerationResult {
@@ -44,6 +45,7 @@ interface GenerationResult {
 type GenerationMode = 'text-to-video' | 'image-to-video';
 
 export default function VideoGenerator() {
+  const t = useTranslations('videoGeneration');
   const searchParams = useSearchParams();
   const initialMode = (searchParams?.get('mode') as GenerationMode) || 'text-to-video';
 
@@ -364,7 +366,8 @@ export default function VideoGenerator() {
         onClose={closeUpgradePrompt}
         type="videoGeneration"
       />
-      <div className="grid gap-8 lg:grid-cols-2">
+      <div className="mx-auto max-w-7xl space-y-6">
+        <div className="grid gap-8 lg:grid-cols-2">
         <div className="space-y-6">
           <Card className="p-6">
             <div className="mb-6 space-y-4">
@@ -539,7 +542,7 @@ export default function VideoGenerator() {
               {/* Optional: Brand Context */}
               <div className="rounded-lg border border-gray-200 bg-gray-50 p-4">
                 <div className="mb-3 flex items-center justify-between">
-                  <Label className="font-medium text-gray-700 text-sm">品牌分析（可选）</Label>
+                  <Label className="font-medium text-gray-700 text-sm">{t('brandAnalysisOptional')}</Label>
                   <button
                     onClick={() => setUseBrandContext(!useBrandContext)}
                     className={`h-5 w-9 rounded-full transition-colors ${
@@ -557,7 +560,7 @@ export default function VideoGenerator() {
                   <div className="space-y-3">
                     <div className="flex gap-2">
                       <Input
-                        placeholder="输入公司网站URL"
+                        placeholder={t('enterWebsiteUrl')}
                         value={websiteUrl}
                         onChange={(e) => setWebsiteUrl(e.target.value)}
                         className="flex-1"
@@ -576,9 +579,9 @@ export default function VideoGenerator() {
                     </div>
                     {brandAnalysis && (
                       <div className="rounded-md bg-white p-3 text-xs">
-                        <p className="font-medium">分析结果：</p>
-                        <p>风格: {brandAnalysis.styleKeywords.join(', ')}</p>
-                        <p>色调: {brandAnalysis.colorPalette.join(', ')}</p>
+                        <p className="font-medium">{t('analysisResult')}</p>
+                        <p>{t('style')}: {brandAnalysis.styleKeywords.join(', ')}</p>
+                        <p>{t('colorPalette')}: {brandAnalysis.colorPalette.join(', ')}</p>
                       </div>
                     )}
                   </div>
@@ -587,9 +590,9 @@ export default function VideoGenerator() {
 
               {/* Product Selling Points */}
               <div className="space-y-2">
-                <Label className="font-light text-gray-700 text-sm">产品卖点（可选）</Label>
+                <Label className="font-light text-gray-700 text-sm">{t('productSellingPointsOptional')}</Label>
                 <Input
-                  placeholder="例如：高质量，快速充电，长续航"
+                  placeholder={t('productSellingPointsPlaceholder')}
                   value={productSellingPoints}
                   onChange={(e) => setProductSellingPoints(e.target.value)}
                 />
@@ -597,7 +600,7 @@ export default function VideoGenerator() {
 
               {/* Video Style Selection */}
               <div className="space-y-2">
-                <Label className="font-light text-gray-700 text-sm">视频风格</Label>
+                <Label className="font-light text-gray-700 text-sm">{t('videoStyle')}</Label>
                 <Select value={videoStyle} onValueChange={setVideoStyle}>
                   <SelectTrigger className="border-gray-200 font-light">
                     <SelectValue />
@@ -605,7 +608,7 @@ export default function VideoGenerator() {
                   <SelectContent>
                     {VIDEO_STYLES.map((style) => (
                       <SelectItem key={style.id} value={style.id} title={style.description}>
-                        {style.displayName}
+                        {t(`videoStyles.${style.id}`)}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -732,6 +735,7 @@ export default function VideoGenerator() {
             )}
           </Card>
         </div>
+      </div>
       </div>
     </>
   );

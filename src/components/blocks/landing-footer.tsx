@@ -1,66 +1,108 @@
 'use client';
 
-import { Sparkles } from 'lucide-react';
 import { Link } from '@/i18n/navigation';
+import { useTranslations } from 'next-intl';
 
 export function LandingFooter() {
+  const t = useTranslations('nav');
+  
   return (
-    <footer className="bg-slate-950 text-slate-400 py-12 px-6">
-      <div className="container mx-auto">
-        <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-          <div className="flex items-center gap-3">
-            <div className="relative">
-              <div className="absolute inset-0 bg-gradient-to-br from-violet-600 to-fuchsia-600 rounded-xl blur-lg opacity-50" />
-              <div className="relative bg-gradient-to-br from-violet-600 to-fuchsia-600 p-2.5 rounded-xl">
-                <Sparkles className="size-5 text-white" />
-              </div>
+    <footer className="border-t border-gray-200/50 bg-white dark:border-gray-800/50 dark:bg-gray-50">
+      <div className="container py-16 md:py-20">
+        <div className="grid grid-cols-1 gap-8 md:grid-cols-4">
+          {/* Brand */}
+          <div className="space-y-4">
+            <div className="flex items-center">
+              <img 
+                src="/brandlogo4.png" 
+                alt="Viecom Logo" 
+                style={{ height: '64px', width: '218px', objectFit: 'contain' }}
+              />
             </div>
-            <span className="text-white font-semibold">Viecom</span>
+            <p className="text-sm text-muted-foreground">
+              {t('footerDescription') || '为电商企业提供高质量的AI图片和视频生成服务'}
+            </p>
           </div>
-          <div className="flex flex-wrap items-center justify-center gap-6 text-sm">
-            <Link
-              href="/image-generation"
-              className="text-slate-400 hover:text-white transition-colors"
-            >
-              图片生成
-            </Link>
-            <Link
-              href="/video-generation"
-              className="text-slate-400 hover:text-white transition-colors"
-            >
-              视频生成
-            </Link>
-            <Link
-              href="/batch-image-generation"
-              className="text-slate-400 hover:text-white transition-colors"
-            >
-              批量生图
-            </Link>
-            <Link
-              href="/batch-video-generation"
-              className="text-slate-400 hover:text-white transition-colors"
-            >
-              批量生视频
-            </Link>
-            <Link href="/assets" className="text-slate-400 hover:text-white transition-colors">
-              资产库
-            </Link>
-            <Link href="/pricing" className="text-slate-400 hover:text-white transition-colors">
-              定价
-            </Link>
-            <Link href="/about" className="text-slate-400 hover:text-white transition-colors">
-              关于我们
-            </Link>
-            <Link href="/privacy" className="text-slate-400 hover:text-white transition-colors">
-              隐私政策
-            </Link>
-            <Link href="/terms" className="text-slate-400 hover:text-white transition-colors">
-              服务条款
-            </Link>
+
+          {/* Product */}
+          <div>
+            <h3 className="mb-4 text-sm font-semibold">{t('footerProduct') || '产品'}</h3>
+            <ul className="space-y-2 text-sm">
+              <li>
+                <Link href="/image-generation" className="text-muted-foreground hover:text-primary">
+                  {t('imageGeneration')}
+                </Link>
+              </li>
+              <li>
+                <Link href="/video-generation" className="text-muted-foreground hover:text-primary">
+                  {t('videoGeneration')}
+                </Link>
+              </li>
+              <li>
+                <Link href="/batch-image-generation" className="text-muted-foreground hover:text-primary">
+                  {t('batchImageGeneration')}
+                </Link>
+              </li>
+              <li>
+                <Link href="/batch-video-generation" className="text-muted-foreground hover:text-primary">
+                  {t('batchVideoGeneration')}
+                </Link>
+              </li>
+            </ul>
           </div>
-          <p className="text-sm text-slate-500">
-            © {new Date().getFullYear()} Viecom. Crafted with AI ✨
-          </p>
+
+          {/* Resources */}
+          <div>
+            <h3 className="mb-4 text-sm font-semibold">{t('footerResources') || '资源'}</h3>
+            <ul className="space-y-2 text-sm">
+              <li>
+                <Link href="/assets" className="text-muted-foreground hover:text-primary">
+                  {t('assets')}
+                </Link>
+              </li>
+              <li>
+                <Link href="/docs" className="text-muted-foreground hover:text-primary">
+                  {t('footerDocs') || '文档'}
+                </Link>
+              </li>
+              <li>
+                <Link href="/pricing" className="text-muted-foreground hover:text-primary">
+                  {t('footerPricing') || '定价'}
+                </Link>
+              </li>
+            </ul>
+          </div>
+
+          {/* Company */}
+          <div>
+            <h3 className="mb-4 text-sm font-semibold">{t('footerCompany') || '公司'}</h3>
+            <ul className="space-y-2 text-sm">
+              <li>
+                <Link href="/about" className="text-muted-foreground hover:text-primary">
+                  {t('footerAbout') || '关于我们'}
+                </Link>
+              </li>
+              <li>
+                <Link href="/contact" className="text-muted-foreground hover:text-primary">
+                  {t('footerContact') || '联系我们'}
+                </Link>
+              </li>
+              <li>
+                <Link href="/privacy" className="text-muted-foreground hover:text-primary">
+                  {t('footerPrivacy') || '隐私政策'}
+                </Link>
+              </li>
+              <li>
+                <Link href="/terms" className="text-muted-foreground hover:text-primary">
+                  {t('footerTerms') || '服务条款'}
+                </Link>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <div className="mt-12 border-t pt-8 text-center text-sm text-muted-foreground">
+          <p>© {new Date().getFullYear()} Viecom. All rights reserved.</p>
         </div>
       </div>
     </footer>

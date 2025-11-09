@@ -1,7 +1,8 @@
-import { getModelCost } from '@/config/credits.config';
+import { creditsConfig, getModelCost } from '@/config/credits.config';
 import { auth } from '@/lib/auth/auth';
 import { creditService } from '@/lib/credits';
 import { getQuotaUsageByService, updateQuotaUsage } from '@/lib/quota/quota-service';
+import { checkAndAwardReferralReward } from '@/lib/rewards/referral-reward';
 import { type NextRequest, NextResponse } from 'next/server';
 
 export const dynamic = 'force-dynamic';
@@ -87,36 +88,61 @@ export async function POST(request: NextRequest) {
       console.warn('Quota service error (ignored in test mode):', error);
     }
 
-    // Check if should charge credits (when free quota is exhausted)
-    const shouldChargeCredits = dailyUsage >= 1 || monthlyUsage >= 3;
+    // Get free quota limits from config
+    const freeDailyQuota = creditsConfig.freeUser.imageGeneration.freeQuotaPerDay;
+    const freeMonthlyQuota = creditsConfig.freeUser.imageGeneration.freeQuotaPerMonth;
+
+    // Check if user has exceeded free quota
+    const hasExceededDailyQuota = freeDailyQuota > 0 && dailyUsage >= freeDailyQuota;
+    const hasExceededMonthlyQuota = freeMonthlyQuota > 0 && monthlyUsage >= freeMonthlyQuota;
+    
+    // If free quota is 0, always charge credits. Otherwise, charge when quota is exhausted.
+    const shouldChargeCredits = freeDailyQuota === 0 && freeMonthlyQuota === 0 
+      ? true 
+      : hasExceededDailyQuota || hasExceededMonthlyQuota;
 
     if (!isTestMode) {
+      // Always check credits if we should charge
       if (shouldChargeCredits) {
         const hasCredits = await creditService.hasEnoughCredits(userId, creditCost);
         if (!hasCredits) {
-          const limitType = dailyUsage >= 1 ? 'daily' : 'monthly';
           return NextResponse.json(
             {
-              error: `Insufficient credits. You have used your ${limitType} free quota (1/day, 3/month).`,
+              error: `Insufficient credits. Required: ${creditCost} credits. Please purchase credits to continue.`,
             },
             { status: 402 }
           );
         }
-      } else if (dailyUsage >= 1 && monthlyUsage >= 3) {
-        return NextResponse.json(
-          { error: 'Daily and monthly quota exceeded. Please use credits.' },
-          { status: 429 }
-        );
-      } else if (dailyUsage >= 1) {
-        return NextResponse.json(
-          { error: 'Daily quota exceeded (1/day). Try again tomorrow or use credits.' },
-          { status: 429 }
-        );
-      } else if (monthlyUsage >= 3) {
-        return NextResponse.json(
-          { error: 'Monthly quota exceeded (3/month). Please use credits.' },
-          { status: 429 }
-        );
+      } else {
+        // Check if free quota is exceeded
+        if (hasExceededDailyQuota && hasExceededMonthlyQuota) {
+          // Both quotas exceeded, should have been caught above, but double-check credits
+          const hasCredits = await creditService.hasEnoughCredits(userId, creditCost);
+          if (!hasCredits) {
+            return NextResponse.json(
+              { error: 'Daily and monthly quota exceeded. Please use credits.' },
+              { status: 402 }
+            );
+          }
+        } else if (hasExceededDailyQuota) {
+          // Daily quota exceeded, check if user has credits
+          const hasCredits = await creditService.hasEnoughCredits(userId, creditCost);
+          if (!hasCredits) {
+            return NextResponse.json(
+              { error: `Daily quota exceeded (${freeDailyQuota}/day). Please use credits.` },
+              { status: 402 }
+            );
+          }
+        } else if (hasExceededMonthlyQuota) {
+          // Monthly quota exceeded, check if user has credits
+          const hasCredits = await creditService.hasEnoughCredits(userId, creditCost);
+          if (!hasCredits) {
+            return NextResponse.json(
+              { error: `Monthly quota exceeded (${freeMonthlyQuota}/month). Please use credits.` },
+              { status: 402 }
+            );
+          }
+        }
       }
     }
 
@@ -379,6 +405,14 @@ export async function POST(request: NextRequest) {
               console.error('Error spending credits:', error);
               // Don't fail the request if credit spending fails
             }
+          }
+
+          // Check and award referral reward if this is user's first generation
+          if (!isTestMode) {
+            await checkAndAwardReferralReward(userId).catch((error) => {
+              console.error('Error checking referral reward:', error);
+              // Don't fail the request if referral reward check fails
+            });
           }
 
           return NextResponse.json({

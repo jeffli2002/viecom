@@ -30,7 +30,7 @@ export function LandingCTA() {
           viewport={{ once: true }}
           className="space-y-8"
         >
-          <h2 className="text-5xl md:text-7xl text-white leading-tight">
+          <h2 className="text-white leading-tight" style={{ fontSize: 'clamp(2.25rem, 6vw, 4.5rem)' }}>
             Ready to create stunning visuals?
           </h2>
           <p className="text-2xl text-violet-100 max-w-2xl mx-auto">

@@ -2,6 +2,7 @@ import { getModelCost } from '@/config/credits.config';
 import { auth } from '@/lib/auth/auth';
 import { creditService } from '@/lib/credits';
 import { getQuotaUsageByService, updateQuotaUsage } from '@/lib/quota/quota-service';
+import { checkAndAwardReferralReward } from '@/lib/rewards/referral-reward';
 import { type NextRequest, NextResponse } from 'next/server';
 
 export const dynamic = 'force-dynamic';
@@ -226,6 +227,14 @@ export async function POST(request: NextRequest) {
         console.error('Error spending credits:', error);
         // Don't fail the request if credit spending fails
       }
+    }
+
+    // Check and award referral reward if this is user's first generation
+    if (!isTestMode) {
+      await checkAndAwardReferralReward(userId).catch((error) => {
+        console.error('Error checking referral reward:', error);
+        // Don't fail the request if referral reward check fails
+      });
     }
 
     return NextResponse.json({

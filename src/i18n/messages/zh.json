@@ -22,15 +22,32 @@
   },
   "nav": {
     "home": "首页",
-    "imageGeneration": "图片生成",
-    "videoGeneration": "视频生成",
+    "generationTools": "生成工具",
+    "imageGeneration": "AI图片",
+    "imageGenerationDesc": "Text-to-Image 和 Image-to-Image",
+    "videoGeneration": "AI视频",
+    "videoGenerationDesc": "Text-to-Video 和 Image-to-Video",
+    "batchImageGeneration": "批量生图",
+    "batchImageGenerationDesc": "批量生成图片",
+    "batchVideoGeneration": "批量生视频",
+    "batchVideoGenerationDesc": "批量生成视频",
     "batchGeneration": "批量生成",
     "assets": "资产库",
     "dashboard": "控制台",
     "login": "登录",
     "signup": "注册",
     "logout": "退出登录",
-    "getStarted": "免费开始"
+    "getStarted": "免费开始",
+    "footerDescription": "为电商企业提供高质量的AI图片和视频生成服务",
+    "footerProduct": "产品",
+    "footerResources": "资源",
+    "footerCompany": "公司",
+    "footerDocs": "文档",
+    "footerPricing": "定价",
+    "footerAbout": "关于我们",
+    "footerContact": "联系我们",
+    "footerPrivacy": "隐私政策",
+    "footerTerms": "服务条款"
   },
   "hero": {
     "title": "产品视觉",
@@ -61,6 +78,72 @@
     "step3Title": "预览下载",
     "step3Desc": "预览生成结果，批量下载或一键发布到电商平台"
   },
+  "features": {
+    "badge": "核心功能",
+    "title": "打造专业产品视觉",
+    "titleHighlight": "所需的一切工具",
+    "subtitle": "我们的AI驱动平台结合前沿技术与直观设计，帮助您在几分钟内创建专业的产品图片和视频，而不是几天。",
+    "batch": {
+      "badge": "批量生成",
+      "title": "大规模批量图片和视频生成",
+      "description": "上传Excel/CSV文件，同时生成数百个产品图片和视频。非常适合需要为大型产品目录创建内容的电商企业。",
+      "benefit1": {
+        "title": "Excel/CSV批量上传",
+        "desc": "上传包含产品数据的电子表格，批量生成内容"
+      },
+      "benefit2": {
+        "title": "一键发布",
+        "desc": "自动将生成的内容发布到电商平台"
+      },
+      "benefit3": {
+        "title": "节省时间的自动化",
+        "desc": "通过自动化工作流程，将手动工作从几天减少到几分钟"
+      },
+      "statLabel": "批量大小",
+      "statValue": "1000+",
+      "alt": "批量生成"
+    },
+    "brand": {
+      "badge": "品牌分析",
+      "title": "AI驱动的品牌调性分析",
+      "description": "我们的先进AI分析您的品牌网站和产品信息，了解您的品牌调性、风格和讯息。这确保每个生成的图片和视频都完美匹配您的品牌形象。",
+      "benefit1": {
+        "title": "自动品牌检测",
+        "desc": "AI分析您的网站以了解品牌颜色、风格和调性"
+      },
+      "benefit2": {
+        "title": "增强提示词",
+        "desc": "基于品牌分析和产品卖点自动优化提示词"
+      },
+      "benefit3": {
+        "title": "一致的品牌声音",
+        "desc": "确保所有生成的内容与您的品牌形象保持一致"
+      },
+      "statLabel": "准确率",
+      "statValue": "95%+",
+      "alt": "品牌分析"
+    },
+    "quality": {
+      "badge": "高质量与创意",
+      "title": "专业品质，创意自由",
+      "description": "生成媲美专业摄影的精美高分辨率图片和视频。我们的AI模型产生创意、独特的内容，在竞争中脱颖而出。",
+      "benefit1": {
+        "title": "4K分辨率输出",
+        "desc": "生成超高质量图片和视频，适用于任何用例"
+      },
+      "benefit2": {
+        "title": "创意AI模型",
+        "desc": "访问前沿AI模型，实现最大创意和视觉吸引力"
+      },
+      "benefit3": {
+        "title": "多种风格和格式",
+        "desc": "从各种艺术风格、宽高比和视频格式中选择"
+      },
+      "statLabel": "质量评分",
+      "statValue": "9.5/10",
+      "alt": "高质量与创意"
+    }
+  },
   "showcase": {
     "title": "作品展示",
     "subtitle": "查看我们生成的优质内容"
@@ -81,13 +164,98 @@
     "download": "下载",
     "share": "分享"
   },
+  "videoGeneration": {
+    "subtitle": "创建专业的电商产品视频。支持Text-to-Video和Image-to-Video模式。",
+    "brandAnalysisOptional": "品牌分析（可选）",
+    "enterWebsiteUrl": "输入公司网站URL",
+    "analysisResult": "分析结果：",
+    "style": "风格",
+    "colorPalette": "色调",
+    "productSellingPointsOptional": "产品卖点（可选）",
+    "productSellingPointsPlaceholder": "例如：高质量，快速充电，长续航",
+    "videoStyle": "视频风格",
+    "videoStyles": {
+      "spoken-script": "口播文案型",
+      "product-comparison": "产品对比型",
+      "narrative-comedy": "叙事/喜剧型",
+      "360-showcase": "360度展示",
+      "product-demo": "产品演示"
+    }
+  },
   "batchGeneration": {
     "title": "批量生成",
+    "titleImage": "批量图片生成",
+    "titleVideo": "批量视频生成",
     "subtitle": "上传Excel/CSV文件，批量生成图片和视频，并自动发布到电商平台",
+    "subtitleImage": "上传Excel/CSV文件，批量生成产品图片",
+    "subtitleVideo": "上传Excel/CSV文件，批量生成产品视频",
+    "generationMode": "生成模式",
+    "aspectRatio": "宽高比",
+    "imageStyle": "图片风格",
+    "videoStyle": "视频风格",
     "downloadTemplate": "下载模板",
     "downloadExcel": "下载 Excel 模板",
     "downloadCSV": "下载 CSV 模板",
-    "uploadFile": "上传批量文件",
+    "uploadFile": "上传文件",
+    "clickToUpload": "点击上传或拖放文件",
+    "fileTypes": "CSV 或 Excel 文件 (.csv, .xlsx, .xls)",
+    "fileSelected": "已选择",
+    "validating": "正在校验...",
+    "reselectFile": "重新选择文件",
+    "validationErrors": "校验错误：",
+    "row": "第",
+    "moreErrors": "个错误",
+    "dataPreview": "数据预览",
+    "rows": "行",
+    "recoveredFromCache": "已从缓存恢复数据",
+    "enhanceAllPrompts": "一键增强所有 Prompt",
+    "selectAll": "全选",
+    "deselectAll": "取消全选",
+    "generating": "批量生成中...",
+    "startBatchGeneration": "开始批量生成",
+    "rowsSelected": "行",
+    "enhanced": "已增强",
+    "downloadResults": "下载结果",
+    "summary": "生成汇总",
+    "total": "总数量",
+    "completed": "已完成",
+    "generatingStatus": "生成中",
+    "failed": "失败",
+    "overallProgress": "整体进度",
+    "completedPercentage": "完成",
+    "completionRate": "完成率",
+    "statusDistribution": "状态分布",
+    "waiting": "等待生成",
+    "preview": "预览",
+    "previewTitle": "预览",
+    "rowNumber": "行",
+    "browserNotSupportVideo": "您的浏览器不支持视频播放",
+    "generationFailed": "生成失败",
+    "batchGenerationFailed": "批量生成失败",
+    "downloadTemplateFailed": "下载模板失败",
+    "uploadCSVOrExcel": "请上传 CSV 或 Excel 文件",
+    "pleaseSelectFile": "请先选择文件",
+    "uploadFailed": "上传失败",
+    "t2i": "Text-to-Image (文本生图)",
+    "i2i": "Image-to-Image (图生图)",
+    "t2v": "Text-to-Video (文本生视频)",
+    "i2v": "Image-to-Video (图生视频)",
+    "aspectRatio1:1": "1:1 (正方形)",
+    "aspectRatio16:9": "16:9 (横屏)",
+    "aspectRatio9:16": "9:16 (竖屏)",
+    "aspectRatio4:3": "4:3",
+    "aspectRatio3:4": "3:4",
+    "enhance": "增强",
+    "enhancePrompt": "增强 Prompt",
+    "enhancePromptPlaceholder": "点击右侧按钮增强 Prompt，或手动输入",
+    "enhancePromptFailed": "Prompt增强失败",
+    "noPromptToEnhance": "没有可增强的 Prompt",
+    "productName": "产品名称",
+    "productDescription": "产品描述",
+    "originalPrompt": "原始 Prompt",
+    "generationComplete": "生成完成",
+    "downloadAllResults": "下载所有结果",
+    "download": "下载",
     "startProcessing": "开始批量处理",
     "uploading": "上传中...",
     "instructions": "使用说明",
@@ -118,6 +286,8 @@
     "generateNew": "生成新内容",
     "searchPlaceholder": "搜索提示词...",
     "filterType": "筛选类型",
+    "all": "全部",
+    "download": "下载",
     "noAssets": "暂无资产",
     "noAssetsDesc": "开始生成你的第一个内容吧",
     "noAssetsSearch": "没有找到匹配的资产",

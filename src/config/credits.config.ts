@@ -51,6 +51,21 @@ export interface CreditsConfig {
       freeQuotaGB: number;
     };
   };
+
+  // Reward system configuration
+  rewards: {
+    checkin: {
+      dailyCredits: number; // Credits per day
+      weeklyBonusCredits: number; // Extra credits for 7 consecutive days
+      consecutiveDaysRequired: number; // Days required for weekly bonus
+    };
+    referral: {
+      creditsPerReferral: number; // Credits when referred user completes first generation
+    };
+    socialShare: {
+      creditsPerShare: number; // Credits per social media share
+    };
+  };
 }
 
 export const creditsConfig: CreditsConfig = {
@@ -104,6 +119,21 @@ export const creditsConfig: CreditsConfig = {
     },
     storage: {
       freeQuotaGB: 1,
+    },
+  },
+
+  // Reward system configuration
+  rewards: {
+    checkin: {
+      dailyCredits: 2, // Daily checkin reward
+      weeklyBonusCredits: 5, // Extra credits for 7 consecutive days
+      consecutiveDaysRequired: 7, // Days required for weekly bonus
+    },
+    referral: {
+      creditsPerReferral: 10, // Credits when referred user completes first generation
+    },
+    socialShare: {
+      creditsPerShare: 5, // Credits per social media share
     },
   },
 };
