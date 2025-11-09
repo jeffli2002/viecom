@@ -1,0 +1,105 @@
+import { auth } from '@/lib/auth/auth';
+import { isTestModeRequest } from '@/lib/utils/test-mode';
+import { getTestBatchJob } from '@/lib/workflow/test-batch-store';
+import { db } from '@/server/db';
+import { batchGenerationJob, generatedAsset } from '@/server/db/schema';
+import { eq } from 'drizzle-orm';
+import { type NextRequest, NextResponse } from 'next/server';
+
+export const dynamic = 'force-dynamic';
+
+export async function GET(
+  request: NextRequest,
+  { params }: { params: Promise<{ jobId: string }> }
+) {
+  try {
+    const { jobId } = await params;
+    const testMode = isTestModeRequest(request);
+
+    if (testMode) {
+      const job = getTestBatchJob(jobId);
+      if (!job) {
+        return NextResponse.json({ error: 'Job not found' }, { status: 404 });
+      }
+
+      return NextResponse.json({
+        success: true,
+        data: {
+          jobId: job.id,
+          jobStatus: job.status,
+          totalRows: job.totalRows,
+          processedRows: job.processedRows,
+          successfulRows: job.successfulRows,
+          failedRows: job.failedRows,
+          assets: job.assets,
+        },
+      });
+    }
+
+    const session = await auth.api.getSession({
+      headers: request.headers,
+    });
+
+    if (!session?.user?.id) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    // Get batch job
+    const [job] = await db
+      .select()
+      .from(batchGenerationJob)
+      .where(eq(batchGenerationJob.id, jobId))
+      .limit(1);
+
+    if (!job) {
+      return NextResponse.json({ error: 'Job not found' }, { status: 404 });
+    }
+
+    if (job.userId !== session.user.id) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
+
+    // Get generated assets for this job
+    const assets = await db
+      .select()
+      .from(generatedAsset)
+      .where(eq(generatedAsset.batchJobId, jobId))
+      .orderBy(generatedAsset.createdAt);
+
+    // Format assets for frontend
+    const formattedAssets = assets.map((asset, index) => ({
+      id: asset.id,
+      url: asset.publicUrl,
+      type: asset.assetType as 'image' | 'video',
+      prompt: asset.prompt,
+      enhancedPrompt: asset.enhancedPrompt || undefined,
+      model: (asset.generationParams as any)?.model || undefined,
+      status: asset.status as 'completed' | 'failed',
+      error: asset.errorMessage || undefined,
+      rowIndex: index,
+    }));
+
+    return NextResponse.json({
+      success: true,
+      data: {
+        jobId: job.id,
+        jobStatus: job.status,
+        totalRows: job.totalRows,
+        processedRows: job.processedRows,
+        successfulRows: job.successfulRows,
+        failedRows: job.failedRows,
+        assets: formattedAssets,
+      },
+    });
+  } catch (error) {
+    console.error('Get batch results error:', error);
+    return NextResponse.json(
+      {
+        error: error instanceof Error ? error.message : 'Failed to get batch results',
+      },
+      { status: 500 }
+    );
+  }
+}
+
+

@@ -1,0 +1,739 @@
+'use client';
+
+import UpgradePrompt from '@/components/auth/UpgradePrompt';
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Textarea } from '@/components/ui/textarea';
+import { creditsConfig } from '@/config/credits.config';
+import { useUpgradePrompt } from '@/hooks/use-upgrade-prompt';
+import type { BrandToneAnalysis } from '@/lib/brand/brand-tone-analyzer';
+import { useAuthStore } from '@/store/auth-store';
+import { VIDEO_STYLES, getVideoStyle } from '@/config/styles.config';
+import {
+  AlertCircle,
+  Download,
+  Globe,
+  Video as VideoIcon,
+  Loader2,
+  Share2,
+  Sparkles,
+  Upload,
+  Wand2,
+  X,
+} from 'lucide-react';
+import { useSearchParams } from 'next/navigation';
+import { useEffect, useRef, useState } from 'react';
+
+interface GenerationResult {
+  videoUrl: string;
+  prompt: string;
+  model: string;
+  error?: string;
+}
+
+type GenerationMode = 'text-to-video' | 'image-to-video';
+
+export default function VideoGenerator() {
+  const searchParams = useSearchParams();
+  const initialMode = (searchParams?.get('mode') as GenerationMode) || 'text-to-video';
+
+  const { user, isAuthenticated } = useAuthStore();
+  const { showUpgradePrompt, openUpgradePrompt, closeUpgradePrompt } = useUpgradePrompt();
+  const [mode, setMode] = useState<GenerationMode>(initialMode);
+  const [prompt, setPrompt] = useState('');
+  const [enhancedPrompt, setEnhancedPrompt] = useState('');
+  const [isEnhancing, setIsEnhancing] = useState(false);
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [aspectRatio, setAspectRatio] = useState<string>('16:9');
+  const [model, setModel] = useState<string>('sora-2');
+  const [videoStyle, setVideoStyle] = useState<string>('spoken-script'); // Video style selection
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [result, setResult] = useState<GenerationResult | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // New fields for brand and product information
+  const [websiteUrl, setWebsiteUrl] = useState('');
+  const [isAnalyzingBrand, setIsAnalyzingBrand] = useState(false);
+  const [brandAnalysis, setBrandAnalysis] = useState<BrandToneAnalysis | null>(null);
+  const [productSellingPoints, setProductSellingPoints] = useState('');
+  const [useBrandContext, setUseBrandContext] = useState(false);
+
+  const maxPromptLength = 2000;
+  const videoCreditCost = creditsConfig.consumption.videoGeneration['sora-2'];
+  const textDefaultPrompt =
+    'A professional product video showcasing a modern smartphone rotating smoothly, highlighting its sleek design and premium features, studio lighting, clean background';
+  const imageDefaultPrompt =
+    'Create a dynamic video from this product image, smooth transitions, professional presentation';
+
+  useEffect(() => {
+    if (searchParams?.get('mode')) {
+      setMode(searchParams.get('mode') as GenerationMode);
+    }
+  }, [searchParams]);
+
+  const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!['image/jpeg', 'image/png', 'image/webp', 'image/jpg'].includes(file.type)) {
+      alert('Please select a valid image file (JPEG, PNG, or WebP)');
+      return;
+    }
+
+    if (file.size > 10 * 1024 * 1024) {
+      alert('Image file must be less than 10MB');
+      return;
+    }
+
+    setImageFile(file);
+
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setImagePreview(reader.result as string);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleRemoveImage = () => {
+    setImageFile(null);
+    setImagePreview(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
+  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+  };
+
+  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    const file = e.dataTransfer.files?.[0];
+    if (!file) return;
+
+    if (!['image/jpeg', 'image/png', 'image/webp', 'image/jpg'].includes(file.type)) {
+      alert('Please select a valid image file (JPEG, PNG, or WebP)');
+      return;
+    }
+
+    if (file.size > 10 * 1024 * 1024) {
+      alert('Image file must be less than 10MB');
+      return;
+    }
+
+    setImageFile(file);
+
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setImagePreview(reader.result as string);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleAnalyzeBrand = async () => {
+    if (!websiteUrl.trim()) {
+      alert('Please enter a website URL');
+      return;
+    }
+
+    setIsAnalyzingBrand(true);
+    try {
+      const response = await fetch('/api/v1/analyze-brand-tone', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ websiteUrl: websiteUrl.trim() }),
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Failed to analyze brand tone');
+      }
+
+      const data = await response.json();
+      setBrandAnalysis(data.data);
+      setUseBrandContext(true);
+    } catch (error) {
+      console.error('Brand analysis error:', error);
+      alert(error instanceof Error ? error.message : 'Failed to analyze brand tone');
+    } finally {
+      setIsAnalyzingBrand(false);
+    }
+  };
+
+  const handleEnhancePrompt = async () => {
+    if (!prompt.trim()) {
+      alert('Please enter a prompt first');
+      return;
+    }
+
+    setIsEnhancing(true);
+    try {
+      const requestBody: any = {
+        prompt: prompt.trim(),
+      };
+
+      if (useBrandContext && brandAnalysis) {
+        requestBody.styleKeywords = brandAnalysis.styleKeywords;
+      }
+
+      if (productSellingPoints.trim()) {
+        requestBody.productSellingPoints = productSellingPoints
+          .split(',')
+          .map((s) => s.trim())
+          .filter(Boolean);
+      }
+
+      const response = await fetch('/api/v1/enhance-prompt', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(requestBody),
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Failed to enhance prompt');
+      }
+
+      const data = await response.json();
+      setEnhancedPrompt(data.enhancedPrompt || '');
+    } catch (error) {
+      console.error('Enhancement error:', error);
+      alert(error instanceof Error ? error.message : 'Failed to enhance prompt');
+    } finally {
+      setIsEnhancing(false);
+    }
+  };
+
+  const handleGenerate = async () => {
+    if (!user) {
+      openUpgradePrompt();
+      return;
+    }
+
+    if (!prompt.trim()) {
+      alert('Please enter a prompt');
+      return;
+    }
+
+    if (mode === 'image-to-video' && !imageFile && !imagePreview) {
+      alert('Please upload an image for image-to-video generation');
+      return;
+    }
+
+    setIsGenerating(true);
+    setResult(null);
+
+    try {
+      let finalPrompt = enhancedPrompt || prompt.trim();
+
+      // Add brand context and selling points to the prompt if available
+      if (useBrandContext && brandAnalysis) {
+        const contextParts: string[] = [];
+        if (brandAnalysis.styleKeywords.length > 0) {
+          contextParts.push(`Style: ${brandAnalysis.styleKeywords.join(', ')}`);
+        }
+        if (brandAnalysis.colorPalette.length > 0) {
+          contextParts.push(`Colors: ${brandAnalysis.colorPalette.join(', ')}`);
+        }
+        if (brandAnalysis.brandTone.length > 0) {
+          contextParts.push(`Brand tone: ${brandAnalysis.brandTone.join(', ')}`);
+        }
+        if (contextParts.length > 0) {
+          finalPrompt = `${finalPrompt}\n\n${contextParts.join('\n')}`;
+        }
+      }
+
+      if (productSellingPoints.trim()) {
+        const sellingPoints = productSellingPoints
+          .split(',')
+          .map((s) => s.trim())
+          .filter(Boolean);
+        if (sellingPoints.length > 0) {
+          finalPrompt = `${finalPrompt}\n\nProduct selling points: ${sellingPoints.join(', ')}`;
+        }
+      }
+
+      // Add video style enhancement to prompt
+      const selectedStyle = getVideoStyle(videoStyle);
+      if (selectedStyle?.promptEnhancement) {
+        finalPrompt = `${finalPrompt}, ${selectedStyle.promptEnhancement}`;
+      }
+
+      if (mode === 'image-to-video' && imagePreview) {
+        finalPrompt = `${finalPrompt}\n\n[Image attached: ${imageFile?.name || 'uploaded image'}]`;
+      }
+
+      const requestBody: any = {
+        prompt: finalPrompt,
+        model: model,
+        aspect_ratio: aspectRatio,
+        style: videoStyle, // Pass style to API
+      };
+
+      if (mode === 'image-to-video' && imagePreview) {
+        requestBody.image = imagePreview;
+      }
+
+      const response = await fetch('/api/v1/generate-video', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(requestBody),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        if (response.status === 429 || response.status === 402) {
+          openUpgradePrompt();
+          throw new Error(data.error || 'Video generation limit reached');
+        }
+
+        throw new Error(data.error || 'Failed to generate video');
+      }
+
+      if (!data.videoUrl) {
+        throw new Error('No video URL in response');
+      }
+
+      setResult({
+        videoUrl: data.videoUrl,
+        prompt: prompt,
+        model: data.model,
+      });
+
+      setIsGenerating(false);
+    } catch (error) {
+      setResult({
+        videoUrl: '',
+        prompt: prompt,
+        model: 'sora-2',
+        error: error instanceof Error ? error.message : 'Unknown error',
+      });
+      setIsGenerating(false);
+    }
+  };
+
+  const handleDownload = async (videoUrl: string) => {
+    try {
+      const response = await fetch(videoUrl);
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `generated-video-${Date.now()}.mp4`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Download failed:', error);
+      window.open(videoUrl, '_blank');
+    }
+  };
+
+  const handleShare = async () => {
+    if (!result?.videoUrl) return;
+    try {
+      await navigator.clipboard.writeText(result.videoUrl);
+      alert('Video URL copied to clipboard!');
+    } catch (error) {
+      console.error('Share failed:', error);
+    }
+  };
+
+  const canGenerate = prompt.trim().length > 0 && (mode === 'text-to-video' || imagePreview);
+
+  return (
+    <>
+      <UpgradePrompt
+        isOpen={showUpgradePrompt}
+        onClose={closeUpgradePrompt}
+        type="videoGeneration"
+      />
+      <div className="grid gap-8 lg:grid-cols-2">
+        <div className="space-y-6">
+          <Card className="p-6">
+            <div className="mb-6 space-y-4">
+              <Tabs value={mode} onValueChange={(value) => setMode(value as GenerationMode)}>
+                <TabsList className="grid w-full grid-cols-2">
+                  <TabsTrigger value="text-to-video">Text-to-Video</TabsTrigger>
+                  <TabsTrigger value="image-to-video">Image-to-Video</TabsTrigger>
+                </TabsList>
+
+                <TabsContent value="text-to-video" className="mt-6 space-y-6">
+                  <div className="space-y-2">
+                    <Label className="font-light text-gray-700 text-sm">
+                      Video Prompt <span className="text-red-500">*</span>
+                    </Label>
+                    <div className="relative">
+                      <Textarea
+                        placeholder={textDefaultPrompt}
+                        value={prompt}
+                        onChange={(e) => setPrompt(e.target.value.slice(0, maxPromptLength))}
+                        rows={6}
+                        className="resize-none border-gray-200 pr-24 pb-12 font-light focus:border-purple-400 focus:ring-purple-400/20"
+                      />
+                      <Button
+                        onClick={handleEnhancePrompt}
+                        disabled={!prompt.trim() || isEnhancing}
+                        className="absolute right-2 bottom-2 inline-flex items-center gap-2 rounded-lg border-2 border-purple-500 bg-purple-50 px-3 py-1.5 font-medium text-purple-700 text-sm shadow-sm transition-all duration-300 hover:bg-purple-100"
+                      >
+                        {isEnhancing ? (
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                        ) : (
+                          <Sparkles className="h-4 w-4" />
+                        )}
+                        {isEnhancing ? 'Enhancing...' : 'Enhance'}
+                      </Button>
+                    </div>
+                    <div className="text-right font-light text-gray-400 text-xs">
+                      {prompt.length} / {maxPromptLength}
+                    </div>
+                    {enhancedPrompt && (
+                      <div className="mt-4 rounded-xl border border-purple-200 bg-purple-50 p-4 shadow-sm">
+                        <div className="mb-2 flex items-center justify-between">
+                          <h4 className="flex items-center gap-2 font-semibold text-purple-700 text-sm">
+                            <Sparkles className="h-4 w-4" />
+                            Enhanced Prompt
+                          </h4>
+                          <Button
+                            onClick={() => setEnhancedPrompt('')}
+                            size="sm"
+                            variant="ghost"
+                            className="h-6 w-6 p-0 text-gray-600"
+                          >
+                            <X className="h-4 w-4" />
+                          </Button>
+                        </div>
+                        <Textarea
+                          value={enhancedPrompt}
+                          onChange={(e) => setEnhancedPrompt(e.target.value.slice(0, maxPromptLength))}
+                          className="resize-none border border-purple-200 bg-white text-sm"
+                          rows={5}
+                        />
+                        <p className="mt-1 text-right text-purple-600 text-xs">
+                          {enhancedPrompt.length} / {maxPromptLength}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                </TabsContent>
+
+                <TabsContent value="image-to-video" className="mt-0 space-y-6">
+                  <div className="space-y-2">
+                    <Label className="font-light text-gray-700 text-sm">Source Image</Label>
+
+                    {!imagePreview ? (
+                      <div
+                        onClick={() => fileInputRef.current?.click()}
+                        onDragOver={handleDragOver}
+                        onDrop={handleDrop}
+                        className="hover-card cursor-pointer rounded-xl border border-dashed border-gray-300 p-8 text-center transition-colors hover:border-purple-400"
+                      >
+                        <Upload className="mx-auto mb-3 h-12 w-12 text-gray-400" />
+                        <p className="mb-1 font-light text-gray-600 text-sm">
+                          Click to upload or drag and drop
+                        </p>
+                        <p className="font-light text-gray-400 text-xs">
+                          JPEG, PNG, or WebP (max 10MB)
+                        </p>
+                      </div>
+                    ) : (
+                      <div className="relative">
+                        <img
+                          src={imagePreview}
+                          alt="Preview"
+                          className="w-full rounded-xl border border-gray-200"
+                        />
+                        <button
+                          onClick={handleRemoveImage}
+                          className="absolute top-2 right-2 rounded-full bg-red-500 p-2 text-white transition-colors hover:bg-red-600"
+                        >
+                          <X className="h-4 w-4" />
+                        </button>
+                      </div>
+                    )}
+
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      accept="image/jpeg,image/png,image/webp,image/jpg"
+                      onChange={handleImageSelect}
+                      className="hidden"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label className="font-light text-gray-700 text-sm">
+                      Video Prompt <span className="text-red-500">*</span>
+                    </Label>
+                    <div className="relative">
+                      <Textarea
+                        placeholder={imageDefaultPrompt}
+                        value={prompt}
+                        onChange={(e) => setPrompt(e.target.value.slice(0, maxPromptLength))}
+                        rows={4}
+                        className="resize-none border-gray-200 pr-24 pb-12 font-light focus:border-purple-400 focus:ring-purple-400/20"
+                      />
+                      <Button
+                        onClick={handleEnhancePrompt}
+                        disabled={!prompt.trim() || isEnhancing}
+                        className="absolute right-2 bottom-2 inline-flex items-center gap-2 rounded-lg border-2 border-purple-500 bg-purple-50 px-3 py-1.5 font-medium text-purple-700 text-sm shadow-sm transition-all duration-300 hover:bg-purple-100"
+                      >
+                        {isEnhancing ? (
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                        ) : (
+                          <Sparkles className="h-4 w-4" />
+                        )}
+                        {isEnhancing ? 'Enhancing...' : 'Enhance'}
+                      </Button>
+                    </div>
+                    <div className="text-right font-light text-gray-400 text-xs">
+                      {prompt.length} / {maxPromptLength}
+                    </div>
+                    {enhancedPrompt && (
+                      <div className="mt-4 rounded-xl border border-purple-200 bg-purple-50 p-4 shadow-sm">
+                        <div className="mb-2 flex items-center justify-between">
+                          <h4 className="flex items-center gap-2 font-semibold text-purple-700 text-sm">
+                            <Sparkles className="h-4 w-4" />
+                            Enhanced Prompt
+                          </h4>
+                          <Button
+                            onClick={() => setEnhancedPrompt('')}
+                            size="sm"
+                            variant="ghost"
+                            className="h-6 w-6 p-0 text-gray-600"
+                          >
+                            <X className="h-4 w-4" />
+                          </Button>
+                        </div>
+                        <Textarea
+                          value={enhancedPrompt}
+                          onChange={(e) => setEnhancedPrompt(e.target.value.slice(0, maxPromptLength))}
+                          className="resize-none border border-purple-200 bg-white text-sm"
+                          rows={5}
+                        />
+                        <p className="mt-1 text-right text-purple-600 text-xs">
+                          {enhancedPrompt.length} / {maxPromptLength}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                </TabsContent>
+              </Tabs>
+
+              {/* Optional: Brand Context */}
+              <div className="rounded-lg border border-gray-200 bg-gray-50 p-4">
+                <div className="mb-3 flex items-center justify-between">
+                  <Label className="font-medium text-gray-700 text-sm">品牌分析（可选）</Label>
+                  <button
+                    onClick={() => setUseBrandContext(!useBrandContext)}
+                    className={`h-5 w-9 rounded-full transition-colors ${
+                      useBrandContext ? 'bg-purple-600' : 'bg-gray-300'
+                    }`}
+                  >
+                    <span
+                      className={`block h-4 w-4 translate-x-1 rounded-full bg-white transition-transform ${
+                        useBrandContext ? 'translate-x-5' : ''
+                      }`}
+                    />
+                  </button>
+                </div>
+                {useBrandContext && (
+                  <div className="space-y-3">
+                    <div className="flex gap-2">
+                      <Input
+                        placeholder="输入公司网站URL"
+                        value={websiteUrl}
+                        onChange={(e) => setWebsiteUrl(e.target.value)}
+                        className="flex-1"
+                      />
+                      <Button
+                        onClick={handleAnalyzeBrand}
+                        disabled={isAnalyzingBrand || !websiteUrl.trim()}
+                        size="sm"
+                      >
+                        {isAnalyzingBrand ? (
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                        ) : (
+                          <Globe className="h-4 w-4" />
+                        )}
+                      </Button>
+                    </div>
+                    {brandAnalysis && (
+                      <div className="rounded-md bg-white p-3 text-xs">
+                        <p className="font-medium">分析结果：</p>
+                        <p>风格: {brandAnalysis.styleKeywords.join(', ')}</p>
+                        <p>色调: {brandAnalysis.colorPalette.join(', ')}</p>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+
+              {/* Product Selling Points */}
+              <div className="space-y-2">
+                <Label className="font-light text-gray-700 text-sm">产品卖点（可选）</Label>
+                <Input
+                  placeholder="例如：高质量，快速充电，长续航"
+                  value={productSellingPoints}
+                  onChange={(e) => setProductSellingPoints(e.target.value)}
+                />
+              </div>
+
+              {/* Video Style Selection */}
+              <div className="space-y-2">
+                <Label className="font-light text-gray-700 text-sm">视频风格</Label>
+                <Select value={videoStyle} onValueChange={setVideoStyle}>
+                  <SelectTrigger className="border-gray-200 font-light">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {VIDEO_STYLES.map((style) => (
+                      <SelectItem key={style.id} value={style.id} title={style.description}>
+                        {style.displayName}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label className="font-light text-gray-700 text-sm">Model</Label>
+                  <Select value={model} onValueChange={setModel}>
+                    <SelectTrigger className="border-gray-200 font-light">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="sora-2">
+                        Sora 2 - {creditsConfig.consumption.videoGeneration['sora-2']} credits
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-2">
+                  <Label className="font-light text-gray-700 text-sm">Aspect Ratio</Label>
+                  <Select value={aspectRatio} onValueChange={setAspectRatio}>
+                    <SelectTrigger className="border-gray-200 font-light">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="16:9">Landscape (16:9)</SelectItem>
+                      <SelectItem value="9:16">Portrait (9:16)</SelectItem>
+                      <SelectItem value="1:1">Square (1:1)</SelectItem>
+                      <SelectItem value="4:3">Standard (4:3)</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              <div className="rounded-lg border border-gray-200 bg-gray-50 p-3 text-sm">
+                <p className="text-gray-700">
+                  <strong>Credits:</strong> {videoCreditCost} credits per video
+                </p>
+              </div>
+
+              <Button
+                onClick={handleGenerate}
+                disabled={isGenerating || !canGenerate}
+                className="w-full transform border-0 bg-gradient-to-r from-purple-600 via-pink-600 to-purple-600 font-bold text-lg text-white shadow-2xl shadow-purple-500/50 transition-all duration-300 hover:scale-105 hover:from-purple-700 hover:via-pink-700 hover:to-purple-700"
+                size="lg"
+              >
+                {isGenerating ? (
+                  <>
+                    <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                    Generating Video...
+                  </>
+                ) : (
+                  <>
+                    <VideoIcon className="mr-2 h-5 w-5" />
+                    Generate Video
+                  </>
+                )}
+              </Button>
+            </div>
+          </Card>
+        </div>
+
+        <div className="lg:sticky lg:top-24 lg:h-fit">
+          <Card className="p-6">
+            {!result && !isGenerating && (
+              <div className="flex aspect-video items-center justify-center rounded-xl bg-gray-100">
+                <div className="space-y-3 text-center">
+                  <VideoIcon className="mx-auto h-16 w-16 text-gray-400" />
+                  <p className="font-light text-gray-500 text-sm">Generated video will appear here</p>
+                </div>
+              </div>
+            )}
+
+            {isGenerating && (
+              <div className="flex aspect-video flex-col items-center justify-center rounded-xl bg-gray-100">
+                <Loader2 className="mb-4 h-12 w-12 animate-spin text-purple-600" />
+                <p className="font-medium text-gray-700">Generating video...</p>
+                <p className="mt-2 font-light text-gray-500 text-sm">This may take a few minutes</p>
+              </div>
+            )}
+
+            {result && result.error && (
+              <div className="rounded-xl border border-red-200 bg-red-50 p-6">
+                <div className="mb-2 flex items-center gap-2 text-red-700">
+                  <AlertCircle className="h-5 w-5" />
+                  <h3 className="font-semibold">Generation Failed</h3>
+                </div>
+                <p className="text-red-600 text-sm">{result.error}</p>
+              </div>
+            )}
+
+            {result && !result.error && result.videoUrl && (
+              <div className="space-y-4">
+                <video
+                  src={result.videoUrl}
+                  controls
+                  className="w-full rounded-xl"
+                  poster={imagePreview || undefined}
+                >
+                  Your browser does not support the video tag.
+                </video>
+                <div className="grid grid-cols-2 gap-3">
+                  <Button
+                    onClick={() => handleDownload(result.videoUrl)}
+                    variant="outline"
+                    className="border-gray-200 font-light"
+                  >
+                    <Download className="mr-2 h-4 w-4" />
+                    Download
+                  </Button>
+                  <Button
+                    onClick={handleShare}
+                    variant="outline"
+                    className="border-gray-200 font-light"
+                  >
+                    <Share2 className="mr-2 h-4 w-4" />
+                    Share
+                  </Button>
+                </div>
+              </div>
+            )}
+          </Card>
+        </div>
+      </div>
+    </>
+  );
+}
+

@@ -1,0 +1,406 @@
+'use client';
+
+import { authClient } from '@/lib/auth/auth-client';
+import type { User } from 'better-auth/types';
+import { create } from 'zustand';
+import { createJSONStorage, persist, subscribeWithSelector } from 'zustand/middleware';
+
+// Helper function to initialize user credits
+const initializeUserCredits = async (userId: string): Promise<void> => {
+  try {
+    const response = await fetch('/api/credits/initialize', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ userId }),
+      credentials: 'include',
+    });
+
+    if (!response.ok) {
+      console.warn('Failed to initialize user credits:', await response.text());
+    }
+  } catch (error) {
+    console.warn('Error initializing user credits:', error);
+  }
+};
+
+interface AuthState {
+  // Persistent state
+  user: User | null;
+  isAuthenticated: boolean;
+  lastUpdated: number;
+
+  // Temporary state
+  isLoading: boolean;
+  error: string | null;
+  isInitialized: boolean;
+
+  // Cache configuration
+  cacheExpiry: number;
+
+  // Actions
+  setUser: (user: User | null) => void;
+  setLoading: (loading: boolean) => void;
+  setInitialized: (initialized: boolean) => void;
+  setError: (error: string) => void;
+  clearError: () => void;
+
+  signIn: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
+  signUp: (
+    email: string,
+    password: string,
+    name?: string
+  ) => Promise<{ success: boolean; error?: string }>;
+  signOut: () => Promise<void>;
+
+  signInWithGoogle: (callbackUrl?: string) => Promise<void>;
+
+  updateUser: (data: { name?: string; image?: string }) => Promise<{
+    success: boolean;
+    error?: string;
+  }>;
+
+  initialize: () => Promise<void>;
+  refreshSession: () => Promise<void>;
+  clearAuth: () => void;
+
+  // Cache methods
+  isCacheValid: () => boolean;
+  invalidateCache: () => void;
+  setCacheExpiry: (expiry: number) => void;
+}
+
+export const useAuthStore = create<AuthState>()(
+  subscribeWithSelector(
+    persist(
+      (set, get): AuthState => ({
+        // Persistent state
+        user: null,
+        isAuthenticated: false,
+        lastUpdated: 0,
+
+        // Temporary state
+        isLoading: false,
+        error: null,
+        isInitialized: false,
+        cacheExpiry: 10 * 60 * 1000, // 10 minutes
+
+        // Cache methods
+        isCacheValid: () => {
+          const { lastUpdated, cacheExpiry } = get();
+          return lastUpdated > 0 && Date.now() - lastUpdated < cacheExpiry;
+        },
+
+        invalidateCache: () => set({ lastUpdated: 0 }),
+
+        setCacheExpiry: (expiry: number) => set({ cacheExpiry: expiry }),
+
+        // Actions
+        setUser: (user) => {
+          set({
+            user,
+            isAuthenticated: !!user,
+            lastUpdated: Date.now(),
+          });
+        },
+
+        setLoading: (loading) => {
+          set({ isLoading: loading });
+        },
+
+        setInitialized: (initialized) => {
+          set({ isInitialized: initialized });
+        },
+
+        setError: (error) => {
+          set({ error });
+        },
+
+        clearError: () => {
+          set({ error: null });
+        },
+        signIn: async (email, password) => {
+          set({ isLoading: true, error: null });
+
+          try {
+            const result = await authClient.signIn.email({
+              email,
+              password,
+            });
+
+            if (result.data) {
+              const user = result.data.user;
+              set({
+                user,
+                isAuthenticated: true,
+                isLoading: false,
+                lastUpdated: Date.now(),
+              });
+              return { success: true };
+            }
+
+            set({ isLoading: false });
+            return {
+              success: false,
+              error: result.error?.message || 'signIn error',
+            };
+          } catch (error) {
+            const errorMessage = error instanceof Error ? error.message : 'signIn error';
+            set({ error: errorMessage, isLoading: false });
+            return {
+              success: false,
+              error: errorMessage,
+            };
+          }
+        },
+        signUp: async (email, password, name) => {
+          set({ isLoading: true, error: null });
+
+          try {
+            const result = await authClient.signUp.email({
+              email: email,
+              password,
+              name: name || '',
+            });
+
+            if (result.data) {
+              const user = result.data.user;
+              set({
+                user,
+                isAuthenticated: true,
+                isLoading: false,
+                lastUpdated: Date.now(),
+              });
+
+              // Initialize user credits after successful registration
+              await initializeUserCredits(user.id);
+
+              return { success: true };
+            }
+            set({ isLoading: false });
+            return {
+              success: false,
+              error: result.error?.message || 'signUp error',
+            };
+          } catch (error) {
+            const errorMessage = error instanceof Error ? error.message : 'signUp error';
+            set({ error: errorMessage, isLoading: false });
+            return {
+              success: false,
+              error: errorMessage,
+            };
+          }
+        },
+
+        signOut: async () => {
+          set({ isLoading: true });
+
+          try {
+            await authClient.signOut();
+            set({
+              user: null,
+              isAuthenticated: false,
+              isLoading: false,
+              lastUpdated: 0,
+            });
+          } catch (error) {
+            console.error('Sign out error:', error);
+            set({
+              user: null,
+              isAuthenticated: false,
+              isLoading: false,
+              lastUpdated: 0,
+            });
+          }
+        },
+
+        signInWithGoogle: async (callbackUrl?: string) => {
+          set({ error: null });
+
+          try {
+            await authClient.signIn.social({
+              provider: 'google',
+              callbackURL: callbackUrl || '/',
+            });
+          } catch (error) {
+            console.error('Google sign in error:', error);
+            set({ error: 'Failed to sign in with Google' });
+          }
+        },
+
+        updateUser: async (data) => {
+          set({ isLoading: true, error: null });
+
+          try {
+            const result = await authClient.updateUser(data);
+
+            if (result.data?.status) {
+              await get().refreshSession();
+              set({ isLoading: false });
+              return { success: true };
+            }
+
+            set({ isLoading: false });
+            return {
+              success: false,
+              error: result.error?.message || 'updateUser error',
+            };
+          } catch (error) {
+            const errorMessage = error instanceof Error ? error.message : 'updateUser error';
+            set({ error: errorMessage, isLoading: false });
+            return {
+              success: false,
+              error: errorMessage,
+            };
+          }
+        },
+
+        refreshSession: async () => {
+          try {
+            const session = await authClient.getSession();
+
+            if (session.data) {
+              const user = session.data.user;
+              set({
+                user,
+                isAuthenticated: true,
+                lastUpdated: Date.now(),
+              });
+            } else {
+              set({
+                user: null,
+                isAuthenticated: false,
+                lastUpdated: Date.now(),
+              });
+            }
+          } catch (error) {
+            console.error('Refresh session error:', error);
+            set({
+              user: null,
+              isAuthenticated: false,
+              lastUpdated: Date.now(),
+            });
+          }
+        },
+
+        initialize: async () => {
+          if (get().isInitialized) return;
+
+          set({ isLoading: true });
+          const previousUser = get().user;
+
+          // Check if auth is disabled via environment variable
+          if (process.env.NEXT_PUBLIC_DISABLE_AUTH === 'true') {
+            const mockUser: User = {
+              id: 'dev-user',
+              email: 'dev@example.com',
+              name: 'Dev User',
+              emailVerified: true,
+              image: null,
+              createdAt: new Date(),
+              updatedAt: new Date(),
+            };
+            set({
+              user: mockUser,
+              isAuthenticated: true,
+              isLoading: false,
+              isInitialized: true,
+              lastUpdated: Date.now(),
+            });
+            return;
+          }
+
+          try {
+            const session = await authClient.getSession();
+            if (session.data) {
+              const user = session.data.user;
+              const isNewUser = !previousUser || previousUser.id !== user.id;
+
+              set({
+                user,
+                isAuthenticated: true,
+                isLoading: false,
+                isInitialized: true,
+                lastUpdated: Date.now(),
+              });
+
+              // Initialize credits for new users
+              if (isNewUser) {
+                await initializeUserCredits(user.id);
+              }
+            } else {
+              if (!get().isCacheValid()) {
+                set({
+                  user: null,
+                  isAuthenticated: false,
+                  isLoading: false,
+                  isInitialized: true,
+                  lastUpdated: Date.now(),
+                });
+              } else {
+                set({
+                  isLoading: false,
+                  isInitialized: true,
+                });
+              }
+            }
+          } catch (error) {
+            console.error('Initialize error:', error);
+            if (!get().isCacheValid()) {
+              set({
+                user: null,
+                isAuthenticated: false,
+                isLoading: false,
+                isInitialized: true,
+                lastUpdated: Date.now(),
+              });
+            } else {
+              set({
+                isLoading: false,
+                isInitialized: true,
+              });
+            }
+          }
+        },
+        clearAuth: () => {
+          set({
+            user: null,
+            isAuthenticated: false,
+            isLoading: false,
+            lastUpdated: 0,
+          });
+        },
+      }),
+      {
+        name: 'ecommerce-ai-auth',
+        storage: createJSONStorage(() => localStorage),
+        partialize: (state) => ({
+          user: state.user,
+          isAuthenticated: state.isAuthenticated,
+          lastUpdated: state.lastUpdated,
+          cacheExpiry: state.cacheExpiry,
+        }),
+        skipHydration: false,
+        version: 1,
+      }
+    )
+  )
+);
+
+export const useUser = () => useAuthStore((state) => state.user);
+export const useIsAuthenticated = () => useAuthStore((state) => state.isAuthenticated);
+export const useAuthLoading = () => useAuthStore((state) => state.isLoading);
+export const useAuthInitialized = () => useAuthStore((state) => state.isInitialized);
+export const useAuthError = () => useAuthStore((state) => state.error);
+export const useInitialize = () => useAuthStore((state) => state.initialize);
+export const useEmailLogin = () => useAuthStore((state) => state.signIn);
+export const useClearError = () => useAuthStore((state) => state.clearError);
+export const useSignInWithGoogle = () => useAuthStore((state) => state.signInWithGoogle);
+export const useSignOut = () => useAuthStore((state) => state.signOut);
+export const useRefreshSession = () => useAuthStore((state) => state.refreshSession);
+export const useEmailSignup = () => useAuthStore((state) => state.signUp);
+export const useSetError = () => useAuthStore((state) => state.setError);
+export const useUpdateUser = () => useAuthStore((state) => state.updateUser);
+
+
