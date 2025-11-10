@@ -313,38 +313,6 @@ function DashboardPageContent() {
               </Card>
             )}
 
-          {/* Image Generation - Monthly */}
-          {quotaUsage.imageGeneration &&
-            shouldShowQuota(quotaUsage.imageGeneration.monthly) && (
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2 text-base">
-                    <ImageIcon className="h-5 w-5 text-indigo-500" />
-                    图片生成 (每月)
-                  </CardTitle>
-                  <CardDescription>本月生成限制</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <span className="text-muted-foreground text-sm">已使用</span>
-                    <span className="font-medium text-sm">
-                      {quotaUsage.imageGeneration.monthly.used || 0} /{' '}
-                      {quotaUsage.imageGeneration.monthly.isUnlimited
-                        ? '∞'
-                        : quotaUsage.imageGeneration.monthly.limit || 0}
-                    </span>
-                  </div>
-                  {!quotaUsage.imageGeneration.monthly.isUnlimited &&
-                    (quotaUsage.imageGeneration.monthly.limit || 0) > 0 && (
-                      <Progress
-                        value={calculateUsagePercent(quotaUsage.imageGeneration.monthly)}
-                        className="h-2"
-                      />
-                    )}
-                </CardContent>
-              </Card>
-            )}
-
           {/* Video Generation - Daily */}
           {quotaUsage.videoGeneration &&
             shouldShowQuota(quotaUsage.videoGeneration.daily) && (
@@ -402,38 +370,6 @@ function DashboardPageContent() {
                     (quotaUsage.videoGeneration.monthly.limit || 0) > 0 && (
                       <Progress
                         value={calculateUsagePercent(quotaUsage.videoGeneration.monthly)}
-                        className="h-2"
-                      />
-                    )}
-                </CardContent>
-              </Card>
-            )}
-
-          {/* Image Extraction - Monthly */}
-          {quotaUsage.imageExtraction &&
-            shouldShowQuota(quotaUsage.imageExtraction.monthly) && (
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2 text-base">
-                    <ImageIcon className="h-5 w-5 text-green-500" />
-                    图片提取
-                  </CardTitle>
-                  <CardDescription>每月提取配额</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <span className="text-muted-foreground text-sm">已使用</span>
-                    <span className="font-medium text-sm">
-                      {quotaUsage.imageExtraction.monthly.used || 0} /{' '}
-                      {quotaUsage.imageExtraction.monthly.isUnlimited
-                        ? '∞'
-                        : quotaUsage.imageExtraction.monthly.limit || 0}
-                    </span>
-                  </div>
-                  {!quotaUsage.imageExtraction.monthly.isUnlimited &&
-                    (quotaUsage.imageExtraction.monthly.limit || 0) > 0 && (
-                      <Progress
-                        value={calculateUsagePercent(quotaUsage.imageExtraction.monthly)}
                         className="h-2"
                       />
                     )}
