@@ -73,15 +73,18 @@ export function CheckinDropdown() {
       });
       if (response.ok) {
         const data = await response.json();
-        console.log('Checkin status fetched:', {
-          data: data.data,
+        console.log('✅ Checkin status fetched:', {
+          checkedInToday: data.data?.checkedInToday,
+          consecutiveDays: data.data?.consecutiveDays,
+          todayCheckin: data.data?.todayCheckin,
           localDate: new Date().toISOString().split('T')[0],
           localTime: new Date().toLocaleString(),
-          utcDate: new Date().toISOString(),
         });
         if (data.success) {
           setCheckinStatus(data.data);
         }
+      } else {
+        console.error('Failed to fetch checkin status:', response.status);
       }
     } catch (error) {
       console.error('Failed to fetch checkin status:', error);
@@ -97,9 +100,16 @@ export function CheckinDropdown() {
       });
       if (response.ok) {
         const data = await response.json();
+        console.log('💰 Credit balance fetched:', {
+          balance: data.data?.balance,
+          availableBalance: data.data?.availableBalance,
+          totalEarned: data.data?.totalEarned,
+        });
         if (data.success) {
           setCreditBalance(data.data);
         }
+      } else {
+        console.error('Failed to fetch credit balance:', response.status);
       }
     } catch (error) {
       console.error('Failed to fetch credit balance:', error);
@@ -107,10 +117,16 @@ export function CheckinDropdown() {
   };
 
   const handleCheckin = async () => {
-    console.log('handleCheckin called:', { isAuthenticated, isCheckingIn, checkinStatus });
+    console.log('🎯 handleCheckin called:', { 
+      isAuthenticated, 
+      isCheckingIn, 
+      checkedInToday: checkinStatus?.checkedInToday,
+      todayCheckin: checkinStatus?.todayCheckin,
+    });
     
     // Check if user is authenticated first
     if (!isAuthenticated) {
+      console.log('❌ User not authenticated');
       toast.error('Please login to check in', {
         description: 'You need to login to earn daily rewards',
         action: {
@@ -126,7 +142,7 @@ export function CheckinDropdown() {
 
     // Show message if already checked in
     if (checkinStatus?.checkedInToday) {
-      console.log('Already checked in today:', checkinStatus.todayCheckin);
+      console.log('⚠️ Already checked in today. Credits earned:', checkinStatus.todayCheckin?.creditsEarned);
       toast.info('Already checked in today!', {
         description: `You earned ${checkinStatus.todayCheckin?.creditsEarned || 0} credits. Come back tomorrow!`,
       });
@@ -134,10 +150,11 @@ export function CheckinDropdown() {
     }
 
     if (isCheckingIn) {
-      console.log('Checkin blocked: isCheckingIn =', isCheckingIn);
+      console.log('⏳ Already checking in, please wait...');
       return;
     }
 
+    console.log('🚀 Starting checkin process...');
     setIsCheckingIn(true);
     try {
       const response = await fetch('/api/rewards/checkin', {
@@ -146,8 +163,16 @@ export function CheckinDropdown() {
       });
 
       const data = await response.json();
+      console.log('📥 Checkin API response:', { 
+        status: response.status, 
+        success: data.success, 
+        data: data.data,
+        error: data.error,
+      });
 
       if (response.ok && data.success) {
+        console.log('✅ Checkin successful! Refreshing data...');
+        
         // Show success message
         const creditsEarned = data.data?.creditsEarned || dailyCredits;
         const bonusMessage = data.data?.weeklyBonusEarned
@@ -160,7 +185,9 @@ export function CheckinDropdown() {
         });
 
         // Refresh status and balance
+        console.log('🔄 Refreshing checkin status and credit balance...');
         await Promise.all([fetchCheckinStatus(), fetchCreditBalance()]);
+        console.log('✅ Data refreshed!');
       } else {
         // Handle 401 Unauthorized
         if (response.status === 401) {
