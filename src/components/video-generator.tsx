@@ -184,7 +184,17 @@ export default function VideoGenerator() {
       const requestBody: any = {
         prompt: prompt.trim(),
         context: 'video', // Specify video context for proper system prompt
+        aspectRatio: aspectRatio, // Pass user-selected aspect ratio
+        style: videoStyle, // Pass user-selected video style
       };
+
+      // Include brand context if available (from brand analysis page)
+      if (brandAnalysis) {
+        requestBody.brandTone = brandAnalysis.brandTone;
+        requestBody.styleKeywords = brandAnalysis.styleKeywords;
+        requestBody.colorPalette = brandAnalysis.colorPalette;
+        requestBody.productFeatures = brandAnalysis.productFeatures;
+      }
 
       const response = await fetch('/api/v1/enhance-prompt', {
         method: 'POST',

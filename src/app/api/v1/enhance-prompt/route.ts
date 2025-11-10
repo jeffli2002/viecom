@@ -7,6 +7,8 @@ export const fetchCache = 'force-no-store';
 interface EnhancePromptRequest {
   prompt: string;
   context?: string;
+  aspectRatio?: string;
+  style?: string;
   brandTone?: string[];
   productFeatures?: string[];
   productSellingPoints?: string[];
@@ -20,6 +22,8 @@ export async function POST(request: NextRequest) {
     const {
       prompt,
       context = 'image',
+      aspectRatio,
+      style,
       brandTone = [],
       productFeatures = [],
       productSellingPoints = [],
@@ -47,6 +51,16 @@ export async function POST(request: NextRequest) {
     // Build context information for enhancement
     const contextInfo: string[] = [];
 
+    // Add user-selected parameters
+    if (aspectRatio) {
+      contextInfo.push(`Target aspect ratio: ${aspectRatio}`);
+    }
+
+    if (style) {
+      contextInfo.push(`Selected style: ${style}`);
+    }
+
+    // Add brand context
     if (brandTone.length > 0) {
       contextInfo.push(`Brand tone: ${brandTone.join(', ')}`);
     }
@@ -101,7 +115,7 @@ Optimized for Amazon / TikTok / Shopee / Taobao / Shopify / Douyin / Tmall produ
 No human unless required. Avoid clutter, harsh shadows, or busy backgrounds.
 
 [Instructions]:
-Naturally incorporate any provided brand tone, product features, and style keywords into the enhanced prompt. Only return the enhanced prompt text without any additional commentary.`;
+Optimize the prompt for the user's selected aspect ratio and style preference. Naturally incorporate any provided brand tone, product features, and style keywords into the enhanced prompt. Ensure composition and framing match the specified aspect ratio. Only return the enhanced prompt text without any additional commentary.`;
 
       // Video generation system prompt
       const videoSystemPrompt = `You are a professional e-commerce creative director and video designer specializing in producing high-converting product showcase videos for online stores. Your design style blends commercial realism, elegant motion, and platform-optimized composition.
@@ -142,7 +156,7 @@ Scene 4: final centered product shot with space for CTA text "Next-Level Sound."
 Lighting: cool tone, futuristic, sharp focus, smooth motion transitions, 16:9 cinematic layout.
 
 [Instructions]:
-Naturally incorporate any provided brand tone, product features, and style keywords into the enhanced prompt. Structure the prompt with clear scene descriptions and camera movements. Only return the enhanced prompt text without any additional commentary.`;
+Optimize the video for the user's selected aspect ratio and style preference. Naturally incorporate any provided brand tone, product features, and style keywords into the enhanced prompt. Structure the prompt with clear scene descriptions and camera movements appropriate for the specified aspect ratio. Only return the enhanced prompt text without any additional commentary.`;
 
       return [
         {

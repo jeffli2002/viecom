@@ -184,7 +184,17 @@ export default function ImageGenerator() {
       const requestBody: any = {
         prompt: prompt.trim(),
         context: 'image',
+        aspectRatio: aspectRatio, // Pass user-selected aspect ratio
+        style: imageStyle, // Pass user-selected image style
       };
+
+      // Include brand context if available (from brand analysis page)
+      if (brandAnalysis) {
+        requestBody.brandTone = brandAnalysis.brandTone;
+        requestBody.styleKeywords = brandAnalysis.styleKeywords;
+        requestBody.colorPalette = brandAnalysis.colorPalette;
+        requestBody.productFeatures = brandAnalysis.productFeatures;
+      }
 
       const response = await fetch('/api/v1/enhance-prompt', {
         method: 'POST',
