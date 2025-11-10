@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useAuthStore } from '@/store/auth-store';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -92,7 +92,7 @@ export function BrandAnalysisPage() {
   const t = useTranslations('brandAnalysis');
   const router = useRouter();
   const locale = useLocale();
-  const { isAuthenticated, isLoading: authLoading } = useAuthStore();
+  const { isAuthenticated } = useAuthStore();
   const [url, setUrl] = useState('');
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analysisStep, setAnalysisStep] = useState(0);
@@ -101,13 +101,6 @@ export function BrandAnalysisPage() {
   const [showGenerationDialog, setShowGenerationDialog] = useState(false);
   const [generationType, setGenerationType] = useState<'image' | 'video' | null>(null);
   const [generationMode, setGenerationMode] = useState<'single' | 'batch' | null>(null);
-
-  // Check authentication
-  useEffect(() => {
-    if (!authLoading && !isAuthenticated) {
-      router.push('/login');
-    }
-  }, [isAuthenticated, authLoading, router]);
 
   const quickExamples = [
     {
@@ -245,22 +238,6 @@ export function BrandAnalysisPage() {
 
     setShowGenerationDialog(false);
   };
-
-  // Show loading state while checking auth
-  if (authLoading) {
-    return (
-      <div className="container mx-auto py-12 px-4">
-        <div className="flex items-center justify-center py-12">
-          <Loader2 className="h-8 w-8 animate-spin text-primary" />
-        </div>
-      </div>
-    );
-  }
-
-  // Don't render content if not authenticated (will redirect)
-  if (!isAuthenticated) {
-    return null;
-  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-violet-50">
