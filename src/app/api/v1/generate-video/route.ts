@@ -64,42 +64,22 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid video model' }, { status: 400 });
     }
 
-    // Get daily and monthly quota usage
+    // Pure credit-based system: always check and charge credits
+    if (!isTestMode) {
+      const hasCredits = await creditService.hasEnoughCredits(userId, creditCost);
+      if (!hasCredits) {
+        return NextResponse.json(
+          {
+            error: `Insufficient credits. Required: ${creditCost} credits. Please earn more credits or upgrade your plan.`,
+          },
+          { status: 402 }
+        );
+      }
+    }
+
+    // Track usage for analytics only (not for quota enforcement)
     const dailyPeriod = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
     const monthlyPeriod = new Date().toISOString().substring(0, 7); // YYYY-MM
-
-    let dailyUsage = 0;
-    let monthlyUsage = 0;
-
-    try {
-      const dailyQuota = await getQuotaUsageByService(userId, 'video_generation', dailyPeriod);
-      const monthlyQuota = await getQuotaUsageByService(userId, 'video_generation', monthlyPeriod);
-      dailyUsage = dailyQuota?.usedAmount || 0;
-      monthlyUsage = monthlyQuota?.usedAmount || 0;
-    } catch (error) {
-      // In test mode, ignore quota errors
-      if (!isTestMode) {
-        throw error;
-      }
-      console.warn('Quota service error (ignored in test mode):', error);
-    }
-
-    // Check if should charge credits (when free quota is exhausted)
-    const shouldChargeCredits = dailyUsage >= 0 || monthlyUsage >= 0; // Free users have 0 video quota
-
-    if (!isTestMode) {
-      if (shouldChargeCredits) {
-        const hasCredits = await creditService.hasEnoughCredits(userId, creditCost);
-        if (!hasCredits) {
-          return NextResponse.json(
-            {
-              error: 'Insufficient credits for video generation',
-            },
-            { status: 402 }
-          );
-        }
-      }
-    }
 
     // Create video generation task using KIE API
     // Following im2prompt pattern: only create task, don't wait for completion
@@ -207,8 +187,8 @@ export async function POST(request: NextRequest) {
       console.warn('Quota update error (ignored in test mode):', error);
     }
 
-    // Charge credits
-    if (!isTestMode && shouldChargeCredits) {
+    // Pure credit-based system: always charge credits
+    if (!isTestMode) {
       try {
         await creditService.spendCredits({
           userId,
@@ -220,7 +200,6 @@ export async function POST(request: NextRequest) {
             model: 'sora-2',
             prompt: prompt.substring(0, 100),
             taskId,
-            usedFreeQuota: !shouldChargeCredits,
           },
         });
       } catch (error) {
@@ -240,9 +219,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       taskId,
       message: 'Video generation task created successfully',
-      creditsUsed: shouldChargeCredits ? creditCost : 0,
-      quotaRemaining: Math.max(0, 0 - dailyUsage), // Video has 0 free quota
-      usedFreeQuota: !shouldChargeCredits,
+      creditsUsed: creditCost,
     });
   } catch (error) {
     console.error('Error generating video:', error);

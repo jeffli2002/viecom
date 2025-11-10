@@ -68,83 +68,22 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: `Invalid model: ${model}` }, { status: 400 });
     }
 
-    // Get daily and monthly quota usage
+    // Pure credit-based system: always check and charge credits
+    if (!isTestMode) {
+      const hasCredits = await creditService.hasEnoughCredits(userId, creditCost);
+      if (!hasCredits) {
+        return NextResponse.json(
+          {
+            error: `Insufficient credits. Required: ${creditCost} credits. Please earn more credits or upgrade your plan.`,
+          },
+          { status: 402 }
+        );
+      }
+    }
+
+    // Track usage for analytics only (not for quota enforcement)
     const dailyPeriod = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
     const monthlyPeriod = new Date().toISOString().substring(0, 7); // YYYY-MM
-
-    let dailyUsage = 0;
-    let monthlyUsage = 0;
-
-    try {
-      const dailyQuota = await getQuotaUsageByService(userId, 'image_generation', dailyPeriod);
-      const monthlyQuota = await getQuotaUsageByService(userId, 'image_generation', monthlyPeriod);
-      dailyUsage = dailyQuota?.usedAmount || 0;
-      monthlyUsage = monthlyQuota?.usedAmount || 0;
-    } catch (error) {
-      // In test mode, ignore quota errors
-      if (!isTestMode) {
-        throw error;
-      }
-      console.warn('Quota service error (ignored in test mode):', error);
-    }
-
-    // Get free quota limits from config
-    const freeDailyQuota = creditsConfig.freeUser.imageGeneration.freeQuotaPerDay;
-    const freeMonthlyQuota = creditsConfig.freeUser.imageGeneration.freeQuotaPerMonth;
-
-    // Check if user has exceeded free quota
-    const hasExceededDailyQuota = freeDailyQuota > 0 && dailyUsage >= freeDailyQuota;
-    const hasExceededMonthlyQuota = freeMonthlyQuota > 0 && monthlyUsage >= freeMonthlyQuota;
-    
-    // If free quota is 0, always charge credits. Otherwise, charge when quota is exhausted.
-    const shouldChargeCredits = freeDailyQuota === 0 && freeMonthlyQuota === 0 
-      ? true 
-      : hasExceededDailyQuota || hasExceededMonthlyQuota;
-
-    if (!isTestMode) {
-      // Always check credits if we should charge
-      if (shouldChargeCredits) {
-        const hasCredits = await creditService.hasEnoughCredits(userId, creditCost);
-        if (!hasCredits) {
-          return NextResponse.json(
-            {
-              error: `Insufficient credits. Required: ${creditCost} credits. Please purchase credits to continue.`,
-            },
-            { status: 402 }
-          );
-        }
-      } else {
-        // Check if free quota is exceeded
-        if (hasExceededDailyQuota && hasExceededMonthlyQuota) {
-          // Both quotas exceeded, should have been caught above, but double-check credits
-          const hasCredits = await creditService.hasEnoughCredits(userId, creditCost);
-          if (!hasCredits) {
-            return NextResponse.json(
-              { error: 'Daily and monthly quota exceeded. Please use credits.' },
-              { status: 402 }
-            );
-          }
-        } else if (hasExceededDailyQuota) {
-          // Daily quota exceeded, check if user has credits
-          const hasCredits = await creditService.hasEnoughCredits(userId, creditCost);
-          if (!hasCredits) {
-            return NextResponse.json(
-              { error: `Daily quota exceeded (${freeDailyQuota}/day). Please use credits.` },
-              { status: 402 }
-            );
-          }
-        } else if (hasExceededMonthlyQuota) {
-          // Monthly quota exceeded, check if user has credits
-          const hasCredits = await creditService.hasEnoughCredits(userId, creditCost);
-          if (!hasCredits) {
-            return NextResponse.json(
-              { error: `Monthly quota exceeded (${freeMonthlyQuota}/month). Please use credits.` },
-              { status: 402 }
-            );
-          }
-        }
-      }
-    }
 
     const isStableDiffusion = model === 'stable-diffusion';
     const isNanoBanana = model === 'nano-banana';
@@ -364,7 +303,7 @@ export async function POST(request: NextRequest) {
             );
           }
 
-          // Update both daily and monthly quota
+          // Update usage statistics for analytics only
           try {
             await updateQuotaUsage({
               userId,
@@ -386,7 +325,8 @@ export async function POST(request: NextRequest) {
             console.warn('Quota update error (ignored in test mode):', error);
           }
 
-          if (!isTestMode && shouldChargeCredits) {
+          // Pure credit-based system: always charge credits
+          if (!isTestMode) {
             try {
               await creditService.spendCredits({
                 userId,
@@ -397,7 +337,6 @@ export async function POST(request: NextRequest) {
                   feature: 'image-generation',
                   model,
                   prompt: prompt.substring(0, 100),
-                  usedFreeQuota: !shouldChargeCredits,
                   taskId,
                 },
               });
@@ -421,9 +360,7 @@ export async function POST(request: NextRequest) {
             prompt,
             width,
             height,
-            creditsUsed: shouldChargeCredits ? creditCost : 0,
-            quotaRemaining: Math.max(0, 1 - dailyUsage),
-            usedFreeQuota: !shouldChargeCredits,
+            creditsUsed: creditCost,
             taskId,
           });
         }
