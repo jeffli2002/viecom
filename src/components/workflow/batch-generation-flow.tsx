@@ -395,7 +395,7 @@ export function BatchGenerationFlow({ generationType }: BatchGenerationFlowProps
     // Note: For batch generation, we use nano-banana for images and sora-2 for videos
     const creditCostPerItem = generationType === 'image' 
       ? creditsConfig.consumption.imageGeneration['nano-banana'] || 5
-      : creditsConfig.consumption.videoGeneration['sora-2'] || 15;
+      : creditsConfig.consumption.videoGeneration['sora-2'] || 20;
     
     const totalCreditCost = selectedRows.length * creditCostPerItem;
 
@@ -486,7 +486,7 @@ export function BatchGenerationFlow({ generationType }: BatchGenerationFlowProps
     // Note: For batch generation, we use nano-banana for images and sora-2 for videos
     const creditCostPerItem = generationType === 'image' 
       ? creditsConfig.consumption.imageGeneration['nano-banana'] || 5
-      : creditsConfig.consumption.videoGeneration['sora-2'] || 15;
+      : creditsConfig.consumption.videoGeneration['sora-2'] || 20;
     
     // Calculate how many items can be generated with available credits
     const userCredits = user?.credits?.balance || 0;
