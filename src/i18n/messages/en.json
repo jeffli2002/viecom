@@ -428,7 +428,8 @@
     "errors": {
       "urlRequired": "Please enter website URL",
       "invalidUrl": "Please enter a valid URL",
-      "analysisFailed": "Brand analysis failed"
+      "analysisFailed": "Brand analysis failed",
+      "loginRequired": "Please login to use brand analysis"
     },
     "success": {
       "analysisComplete": "Brand analysis completed!"

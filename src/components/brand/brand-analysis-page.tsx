@@ -128,6 +128,13 @@ export function BrandAnalysisPage() {
   ];
 
   const handleAnalyze = async (inputUrl?: string) => {
+    // Check authentication first
+    if (!isAuthenticated) {
+      toast.error(t('errors.loginRequired') || 'Please login to use this feature');
+      router.push('/login');
+      return;
+    }
+
     const targetUrl = inputUrl || url;
 
     if (!targetUrl) {

@@ -428,7 +428,8 @@
     "errors": {
       "urlRequired": "请输入网站 URL",
       "invalidUrl": "请输入有效的 URL",
-      "analysisFailed": "品牌分析失败"
+      "analysisFailed": "品牌分析失败",
+      "loginRequired": "请先登录以使用品牌分析功能"
     },
     "success": {
       "analysisComplete": "品牌分析完成！"
