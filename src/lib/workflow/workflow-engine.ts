@@ -2,7 +2,7 @@ import { randomUUID } from 'node:crypto';
 import { env } from '@/env';
 import { analyzeBrandTone } from '@/lib/brand/brand-tone-analyzer';
 import { creditService } from '@/lib/credits';
-import { getQuotaUsageByService, updateQuotaUsage } from '@/lib/quota/quota-service';
+import { updateQuotaUsage } from '@/lib/quota/quota-service';
 import { r2StorageService } from '@/lib/storage/r2';
 import * as XLSX from 'xlsx';
 
@@ -270,12 +270,18 @@ export class WorkflowEngine {
   ): Promise<WorkflowResult['generatedAssets'][0] & { creditsSpent: number }> {
     const { prompt, mode, type, baseImage, model = 'nano-banana', aspectRatio = '1:1' } = params;
 
-    // Check credits and quota
-    const creditCost = type === 'image' ? 5 : 15; // Simplified - should use getModelCost
+    // Pure credit-based system: check credits using config
+    const { creditsConfig } = await import('@/config/credits.config');
+    const { getModelCost } = await import('@/lib/quota/quota-service');
+    
+    const creditCost = type === 'image' 
+      ? getModelCost('imageGeneration', model)
+      : getModelCost('videoGeneration', 'sora-2');
+    
     const hasCredits = await creditService.hasEnoughCredits(userId, creditCost);
 
     if (!hasCredits) {
-      throw new Error('Insufficient credits');
+      throw new Error(`Insufficient credits. Required: ${creditCost} credits. Please earn more credits or upgrade your plan.`);
     }
 
     // Generate asset based on type
