@@ -126,7 +126,7 @@ export default function UpgradePrompt({
             <CardTitle className="text-xl font-bold text-gray-900">
               {!isAuthenticated
                 ? 'Sign In Required'
-                : `${limitType === 'daily' ? 'Daily' : 'Monthly'} Limit Reached`}
+                : 'Insufficient Credits'}
             </CardTitle>
             {onClose && (
               <Button
@@ -141,17 +141,19 @@ export default function UpgradePrompt({
           </div>
           <p className="mt-2 text-gray-700 text-sm font-medium">
             {!isAuthenticated
-              ? `Please sign in to use this feature. Free users get ${creditsLimit} ${contentType} per ${limitType}!`
-              : effectiveType === 'imageToText'
-                ? `You've used all ${creditsLimit} free ${contentType} for ${limitType === 'daily' ? 'today' : 'this month'}.`
-                : effectiveType === 'imageGeneration' || effectiveType === 'videoGeneration'
-                  ? `Insufficient credits. You need more credits to generate ${effectiveType === 'imageGeneration' ? 'images' : 'videos'}. (1 image = ${imageCreditCost} credits, 1 video = ${videoCreditCost} credits)`
-                  : `You've used all ${creditsLimit} free ${contentType} for ${limitType === 'daily' ? 'today' : 'this month'}. (1 image = ${imageCreditCost} credits, 1 video = ${videoCreditCost} credits)`}
+              ? 'Please sign in to use this feature. Sign up now to get free credits!'
+              : effectiveType === 'imageGeneration'
+                ? `You don't have enough credits to generate images. Each image costs ${imageCreditCost} credits. Upgrade your plan to get more credits or earn them through daily check-ins.`
+                : effectiveType === 'videoGeneration'
+                  ? `You don't have enough credits to generate videos. Each video costs ${videoCreditCost} credits. Upgrade your plan to get more credits or earn them through daily check-ins.`
+                  : effectiveType === 'imageToText'
+                    ? `You don't have enough credits for image-to-text conversion. Upgrade your plan to get more credits or earn them through daily check-ins.`
+                    : `You don't have enough credits. Upgrade your plan to get more credits or earn them through daily check-ins.`}
           </p>
           {isAuthenticated && (
             <div className="mt-2 text-center">
               <Badge variant="outline" className="text-xs border-gray-300 text-gray-700 bg-gray-50">
-                Available: {creditsUsed} {effectiveType === 'credits' ? 'credits' : contentType}
+                Current balance: {creditsUsed} credits
               </Badge>
             </div>
           )}
@@ -214,24 +216,26 @@ export default function UpgradePrompt({
                   >
                     继续生成（使用可用积分）
                   </Button>
-                ) : (
+                ) : onClose ? (
                   <Button 
                     variant="outline" 
                     className="w-full border-gray-300 text-gray-700 hover:bg-gray-50 hover:text-gray-900" 
                     onClick={onClose}
                   >
-                    Try Again {limitType === 'daily' ? 'Tomorrow' : 'Next Month'}
+                    Close
                   </Button>
-                )}
+                ) : null}
               </>
             )}
           </div>
 
-          <div className="space-y-1 text-center text-gray-600 text-sm">
-            <p>
-              Your {limitType} limit resets at {resetTime}
-            </p>
-          </div>
+          {isAuthenticated && (
+            <div className="space-y-1 text-center text-gray-600 text-sm">
+              <p>
+                💡 Earn free credits: Daily check-in (+2), Referrals (+10), Social share (+5)
+              </p>
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>
