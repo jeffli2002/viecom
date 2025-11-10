@@ -204,6 +204,7 @@
     "fileSelected": "已选择",
     "validating": "正在校验...",
     "reselectFile": "重新选择文件",
+    "resetAndReupload": "重新开始",
     "validationErrors": "校验错误：",
     "row": "第",
     "moreErrors": "个错误",

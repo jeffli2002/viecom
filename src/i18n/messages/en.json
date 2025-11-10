@@ -204,6 +204,7 @@
     "fileSelected": "File selected",
     "validating": "Validating...",
     "reselectFile": "Reselect File",
+    "resetAndReupload": "Reset & Reupload",
     "validationErrors": "Validation Errors",
     "row": "Row",
     "moreErrors": "more errors",

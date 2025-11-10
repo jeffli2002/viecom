@@ -1075,6 +1075,38 @@ export function BatchGenerationFlow({ generationType }: BatchGenerationFlowProps
                 <div className="flex gap-2">
                   <Button
                     size="sm"
+                    variant="destructive"
+                    onClick={() => {
+                      if (confirm(generationType === 'image' ? '确定要重新开始吗？所有数据将被清除。' : '确定要重新开始吗？所有数据将被清除。')) {
+                        setFile(null);
+                        setRows([]);
+                        setValidationErrors([]);
+                        setJobId(null);
+                        setGenerationProgress({ current: 0, total: 0 });
+                        localStorage.removeItem(cacheKey);
+                        if (fileInputRef.current) {
+                          fileInputRef.current.value = '';
+                        }
+                        // Clear all progress intervals
+                        progressIntervalsRef.current.forEach((intervals) => {
+                          intervals.forEach((interval) => clearInterval(interval));
+                        });
+                        progressIntervalsRef.current.clear();
+                        if (pollingInterval) {
+                          clearInterval(pollingInterval);
+                          setPollingInterval(null);
+                        }
+                        setIsGenerating(false);
+                        setIsEnhancingAll(false);
+                      }
+                    }}
+                    disabled={isGenerating}
+                  >
+                    <XCircle className="w-4 h-4 mr-2" />
+                    {t('resetAndReupload')}
+                  </Button>
+                  <Button
+                    size="sm"
                     onClick={handleEnhanceAllPrompts}
                     disabled={isEnhancingAll || rows.some((r) => r.status === 'enhancing') || rows.length === 0}
                   >
