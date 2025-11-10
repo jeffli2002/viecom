@@ -22,13 +22,11 @@ import { IMAGE_STYLES, getImageStyle } from '@/config/styles.config';
 import {
   AlertCircle,
   Download,
-  Globe,
   Image as ImageIcon,
   Loader2,
   Share2,
   Sparkles,
   Upload,
-  Wand2,
   X,
 } from 'lucide-react';
 import { useSearchParams } from 'next/navigation';
@@ -62,12 +60,8 @@ export default function ImageGenerator() {
   const [result, setResult] = useState<GenerationResult | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // New fields for brand and product information
-  const [websiteUrl, setWebsiteUrl] = useState('');
-  const [isAnalyzingBrand, setIsAnalyzingBrand] = useState(false);
+  // Brand analysis data (loaded from sessionStorage, no UI)
   const [brandAnalysis, setBrandAnalysis] = useState<BrandToneAnalysis | null>(null);
-  const [productSellingPoints, setProductSellingPoints] = useState('');
-  const [useBrandContext, setUseBrandContext] = useState(false);
 
   const maxPromptLength = 2000;
   const imageCreditCost = creditsConfig.consumption.imageGeneration['nano-banana'];
@@ -108,8 +102,6 @@ export default function ImageGenerator() {
             summary: brandData.metadata?.description || brandData.summary || '',
           };
           setBrandAnalysis(brandToneAnalysis);
-          setWebsiteUrl(brandData.website || '');
-          setUseBrandContext(true);
           // Clear sessionStorage after loading
           sessionStorage.removeItem('brandAnalysis');
         }
@@ -181,36 +173,6 @@ export default function ImageGenerator() {
     reader.readAsDataURL(file);
   };
 
-  const handleAnalyzeBrand = async () => {
-    if (!websiteUrl.trim()) {
-      alert('Please enter a website URL');
-      return;
-    }
-
-    setIsAnalyzingBrand(true);
-    try {
-      const response = await fetch('/api/v1/analyze-brand-tone', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ websiteUrl: websiteUrl.trim() }),
-      });
-
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || 'Failed to analyze brand tone');
-      }
-
-      const data = await response.json();
-      setBrandAnalysis(data.data);
-      setUseBrandContext(true);
-    } catch (error) {
-      console.error('Brand analysis error:', error);
-      alert(error instanceof Error ? error.message : 'Failed to analyze brand tone');
-    } finally {
-      setIsAnalyzingBrand(false);
-    }
-  };
-
   const handleEnhancePrompt = async () => {
     if (!prompt.trim()) {
       alert('Please enter a prompt first');
@@ -223,22 +185,6 @@ export default function ImageGenerator() {
         prompt: prompt.trim(),
         context: 'image',
       };
-
-      // Include brand context if available and enabled
-      if (useBrandContext && brandAnalysis) {
-        requestBody.brandTone = brandAnalysis.brandTone;
-        requestBody.productFeatures = brandAnalysis.productFeatures;
-        requestBody.styleKeywords = brandAnalysis.styleKeywords;
-        requestBody.colorPalette = brandAnalysis.colorPalette;
-      }
-
-      // Include product selling points if provided
-      if (productSellingPoints.trim()) {
-        requestBody.productSellingPoints = productSellingPoints
-          .split(',')
-          .map((s) => s.trim())
-          .filter(Boolean);
-      }
 
       const response = await fetch('/api/v1/enhance-prompt', {
         method: 'POST',
@@ -283,8 +229,8 @@ export default function ImageGenerator() {
     try {
       let finalPrompt = enhancedPrompt || prompt.trim();
 
-      // Add brand context and selling points to the prompt if available
-      if (useBrandContext && brandAnalysis) {
+      // Add brand context if available (from brand analysis page)
+      if (brandAnalysis) {
         const contextParts: string[] = [];
         if (brandAnalysis.styleKeywords.length > 0) {
           contextParts.push(`Style: ${brandAnalysis.styleKeywords.join(', ')}`);
@@ -297,16 +243,6 @@ export default function ImageGenerator() {
         }
         if (contextParts.length > 0) {
           finalPrompt = `${finalPrompt}\n\n${contextParts.join('\n')}`;
-        }
-      }
-
-      if (productSellingPoints.trim()) {
-        const sellingPoints = productSellingPoints
-          .split(',')
-          .map((s) => s.trim())
-          .filter(Boolean);
-        if (sellingPoints.length > 0) {
-          finalPrompt = `${finalPrompt}\n\nProduct selling points: ${sellingPoints.join(', ')}`;
         }
       }
 
@@ -425,107 +361,21 @@ export default function ImageGenerator() {
 
         <div className="grid gap-8 lg:grid-cols-2">
           <div className="space-y-6">
-            {/* Brand Analysis Section */}
-            <Card className="p-4">
-              <div className="space-y-4">
-                <div className="flex items-center gap-2">
-                  <Globe className="h-5 w-5 text-purple-600" />
-                  <Label className="text-base font-semibold">Brand Analysis (Optional)</Label>
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="website-url" className="text-sm text-gray-600">
-                    Company Website URL
-                  </Label>
-                  <div className="flex gap-2">
-                    <Input
-                      id="website-url"
-                      type="url"
-                      placeholder="https://example.com"
-                      value={websiteUrl}
-                      onChange={(e) => setWebsiteUrl(e.target.value)}
-                      className="flex-1"
-                    />
-                    <Button
-                      onClick={handleAnalyzeBrand}
-                      disabled={isAnalyzingBrand || !websiteUrl.trim()}
-                      variant="outline"
-                      className="border-purple-500 text-purple-700 hover:bg-purple-50"
-                    >
-                      {isAnalyzingBrand ? (
-                        <Loader2 className="h-4 w-4 animate-spin" />
-                      ) : (
-                        <Wand2 className="h-4 w-4" />
-                      )}
-                      {isAnalyzingBrand ? 'Analyzing...' : 'Analyze'}
-                    </Button>
-                  </div>
-                </div>
-                {brandAnalysis && (
-                  <div className="mt-4 rounded-lg border border-purple-200 bg-purple-50 p-3">
-                    <div className="mb-2 flex items-center justify-between">
-                      <span className="text-sm font-semibold text-purple-900">Brand Analysis</span>
-                      <Button
-                        onClick={() => {
-                          setBrandAnalysis(null);
-                          setUseBrandContext(false);
-                        }}
-                        size="sm"
-                        variant="ghost"
-                        className="h-6 w-6 p-0"
-                      >
-                        <X className="h-4 w-4" />
-                      </Button>
-                    </div>
-                    <div className="space-y-1 text-xs text-purple-800">
-                      {brandAnalysis.brandTone.length > 0 && (
-                        <p>
-                          <strong>Tone:</strong> {brandAnalysis.brandTone.join(', ')}
-                        </p>
-                      )}
-                      {brandAnalysis.styleKeywords.length > 0 && (
-                        <p>
-                          <strong>Style:</strong> {brandAnalysis.styleKeywords.join(', ')}
-                        </p>
-                      )}
-                      {brandAnalysis.colorPalette.length > 0 && (
-                        <p>
-                          <strong>Colors:</strong> {brandAnalysis.colorPalette.join(', ')}
-                        </p>
-                      )}
-                    </div>
-                    <label className="mt-2 flex items-center gap-2 text-xs">
-                      <input
-                        type="checkbox"
-                        checked={useBrandContext}
-                        onChange={(e) => setUseBrandContext(e.target.checked)}
-                        className="rounded"
-                      />
-                      <span>Use brand context in prompt enhancement</span>
-                    </label>
-                  </div>
-                )}
-              </div>
-            </Card>
-
-            {/* Product Selling Points Section */}
-            <div className="space-y-2">
-              <Label htmlFor="selling-points" className="text-sm font-semibold">
-                Product Selling Points (Optional)
-              </Label>
-              <Textarea
-                id="selling-points"
-                placeholder="e.g., Eco-friendly, Premium quality, Fast shipping, 24/7 support"
-                value={productSellingPoints}
-                onChange={(e) => setProductSellingPoints(e.target.value)}
-                rows={2}
-                className="text-sm"
-              />
-              <p className="text-xs text-gray-500">
-                Separate multiple points with commas. These will be incorporated into the prompt.
-              </p>
-            </div>
-
             <TabsContent value="text-to-image" className="mt-0 space-y-6">
+              {brandAnalysis && (
+                <div className="rounded-lg border border-purple-200 bg-purple-50 p-3">
+                  <div className="flex items-center gap-2">
+                    <Sparkles className="h-4 w-4 text-purple-600" />
+                    <span className="text-sm font-medium text-purple-900">
+                      Brand context will be automatically applied to your generation
+                    </span>
+                  </div>
+                  <p className="mt-1 text-xs text-purple-700">
+                    Style: {brandAnalysis.styleKeywords.slice(0, 3).join(', ')}
+                    {brandAnalysis.styleKeywords.length > 3 && '...'}
+                  </p>
+                </div>
+              )}
               <div className="space-y-2">
                 <Label className="font-light text-gray-700 text-sm">Image Description</Label>
                 <div className="relative">

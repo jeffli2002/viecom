@@ -22,13 +22,11 @@ import { VIDEO_STYLES, getVideoStyle } from '@/config/styles.config';
 import {
   AlertCircle,
   Download,
-  Globe,
   Video as VideoIcon,
   Loader2,
   Share2,
   Sparkles,
   Upload,
-  Wand2,
   X,
 } from 'lucide-react';
 import { useSearchParams } from 'next/navigation';
@@ -64,12 +62,8 @@ export default function VideoGenerator() {
   const [result, setResult] = useState<GenerationResult | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // New fields for brand and product information
-  const [websiteUrl, setWebsiteUrl] = useState('');
-  const [isAnalyzingBrand, setIsAnalyzingBrand] = useState(false);
+  // Brand analysis data (loaded from sessionStorage, no UI)
   const [brandAnalysis, setBrandAnalysis] = useState<BrandToneAnalysis | null>(null);
-  const [productSellingPoints, setProductSellingPoints] = useState('');
-  const [useBrandContext, setUseBrandContext] = useState(false);
 
   const maxPromptLength = 2000;
   const videoCreditCost = creditsConfig.consumption.videoGeneration['sora-2'];
@@ -108,8 +102,6 @@ export default function VideoGenerator() {
             summary: brandData.metadata?.description || brandData.summary || '',
           };
           setBrandAnalysis(brandToneAnalysis);
-          setWebsiteUrl(brandData.website || '');
-          setUseBrandContext(true);
           // Clear sessionStorage after loading
           sessionStorage.removeItem('brandAnalysis');
         }
@@ -181,36 +173,6 @@ export default function VideoGenerator() {
     reader.readAsDataURL(file);
   };
 
-  const handleAnalyzeBrand = async () => {
-    if (!websiteUrl.trim()) {
-      alert('Please enter a website URL');
-      return;
-    }
-
-    setIsAnalyzingBrand(true);
-    try {
-      const response = await fetch('/api/v1/analyze-brand-tone', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ websiteUrl: websiteUrl.trim() }),
-      });
-
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || 'Failed to analyze brand tone');
-      }
-
-      const data = await response.json();
-      setBrandAnalysis(data.data);
-      setUseBrandContext(true);
-    } catch (error) {
-      console.error('Brand analysis error:', error);
-      alert(error instanceof Error ? error.message : 'Failed to analyze brand tone');
-    } finally {
-      setIsAnalyzingBrand(false);
-    }
-  };
-
   const handleEnhancePrompt = async () => {
     if (!prompt.trim()) {
       alert('Please enter a prompt first');
@@ -222,17 +184,6 @@ export default function VideoGenerator() {
       const requestBody: any = {
         prompt: prompt.trim(),
       };
-
-      if (useBrandContext && brandAnalysis) {
-        requestBody.styleKeywords = brandAnalysis.styleKeywords;
-      }
-
-      if (productSellingPoints.trim()) {
-        requestBody.productSellingPoints = productSellingPoints
-          .split(',')
-          .map((s) => s.trim())
-          .filter(Boolean);
-      }
 
       const response = await fetch('/api/v1/enhance-prompt', {
         method: 'POST',
@@ -277,8 +228,8 @@ export default function VideoGenerator() {
     try {
       let finalPrompt = enhancedPrompt || prompt.trim();
 
-      // Add brand context and selling points to the prompt if available
-      if (useBrandContext && brandAnalysis) {
+      // Add brand context if available (from brand analysis page)
+      if (brandAnalysis) {
         const contextParts: string[] = [];
         if (brandAnalysis.styleKeywords.length > 0) {
           contextParts.push(`Style: ${brandAnalysis.styleKeywords.join(', ')}`);
@@ -291,16 +242,6 @@ export default function VideoGenerator() {
         }
         if (contextParts.length > 0) {
           finalPrompt = `${finalPrompt}\n\n${contextParts.join('\n')}`;
-        }
-      }
-
-      if (productSellingPoints.trim()) {
-        const sellingPoints = productSellingPoints
-          .split(',')
-          .map((s) => s.trim())
-          .filter(Boolean);
-        if (sellingPoints.length > 0) {
-          finalPrompt = `${finalPrompt}\n\nProduct selling points: ${sellingPoints.join(', ')}`;
         }
       }
 
@@ -413,6 +354,20 @@ export default function VideoGenerator() {
                 </TabsList>
 
                 <TabsContent value="text-to-video" className="mt-6 space-y-6">
+                  {brandAnalysis && (
+                    <div className="rounded-lg border border-purple-200 bg-purple-50 p-3">
+                      <div className="flex items-center gap-2">
+                        <Sparkles className="h-4 w-4 text-purple-600" />
+                        <span className="text-sm font-medium text-purple-900">
+                          Brand context will be automatically applied to your generation
+                        </span>
+                      </div>
+                      <p className="mt-1 text-xs text-purple-700">
+                        Style: {brandAnalysis.styleKeywords.slice(0, 3).join(', ')}
+                        {brandAnalysis.styleKeywords.length > 3 && '...'}
+                      </p>
+                    </div>
+                  )}
                   <div className="space-y-2">
                     <Label className="font-light text-gray-700 text-sm">
                       Video Prompt <span className="text-red-500">*</span>
@@ -573,65 +528,6 @@ export default function VideoGenerator() {
                   </div>
                 </TabsContent>
               </Tabs>
-
-              {/* Optional: Brand Context */}
-              <div className="rounded-lg border border-gray-200 bg-gray-50 p-4">
-                <div className="mb-3 flex items-center justify-between">
-                  <Label className="font-medium text-gray-700 text-sm">{t('brandAnalysisOptional')}</Label>
-                  <button
-                    onClick={() => setUseBrandContext(!useBrandContext)}
-                    className={`h-5 w-9 rounded-full transition-colors ${
-                      useBrandContext ? 'bg-purple-600' : 'bg-gray-300'
-                    }`}
-                  >
-                    <span
-                      className={`block h-4 w-4 translate-x-1 rounded-full bg-white transition-transform ${
-                        useBrandContext ? 'translate-x-5' : ''
-                      }`}
-                    />
-                  </button>
-                </div>
-                {useBrandContext && (
-                  <div className="space-y-3">
-                    <div className="flex gap-2">
-                      <Input
-                        placeholder={t('enterWebsiteUrl')}
-                        value={websiteUrl}
-                        onChange={(e) => setWebsiteUrl(e.target.value)}
-                        className="flex-1"
-                      />
-                      <Button
-                        onClick={handleAnalyzeBrand}
-                        disabled={isAnalyzingBrand || !websiteUrl.trim()}
-                        size="sm"
-                      >
-                        {isAnalyzingBrand ? (
-                          <Loader2 className="h-4 w-4 animate-spin" />
-                        ) : (
-                          <Globe className="h-4 w-4" />
-                        )}
-                      </Button>
-                    </div>
-                    {brandAnalysis && (
-                      <div className="rounded-md bg-white p-3 text-xs">
-                        <p className="font-medium">{t('analysisResult')}</p>
-                        <p>{t('style')}: {brandAnalysis.styleKeywords.join(', ')}</p>
-                        <p>{t('colorPalette')}: {brandAnalysis.colorPalette.join(', ')}</p>
-                      </div>
-                    )}
-                  </div>
-                )}
-              </div>
-
-              {/* Product Selling Points */}
-              <div className="space-y-2">
-                <Label className="font-light text-gray-700 text-sm">{t('productSellingPointsOptional')}</Label>
-                <Input
-                  placeholder={t('productSellingPointsPlaceholder')}
-                  value={productSellingPoints}
-                  onChange={(e) => setProductSellingPoints(e.target.value)}
-                />
-              </div>
 
               {/* Video Style Selection */}
               <div className="space-y-2">
