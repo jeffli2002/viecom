@@ -47,7 +47,9 @@
     "footerAbout": "About Us",
     "footerContact": "Contact",
     "footerPrivacy": "Privacy Policy",
-    "footerTerms": "Terms of Service"
+    "footerTerms": "Terms of Service",
+    "brandAnalysis": "Brand Analysis",
+    "brandAnalysisDesc": "AI-powered brand tone and style analysis"
   },
   "hero": {
     "title": "Product visuals that",
@@ -338,5 +340,114 @@
     "enhancedPrompt": "Enhanced Prompt",
     "model": "Model",
     "error": "Error"
+  },
+  "brandAnalysis": {
+    "title": "Brand Intelligence Analysis",
+    "subtitle": "AI-Powered Brand Analysis",
+    "poweredBy": "Powered by Firecrawl + DeepSeek AI",
+    "hero": {
+      "title": "Deep Brand Insights",
+      "titleHighlight": "Discover Market Opportunities",
+      "description": "Enter any brand website URL, and AI will automatically analyze brand positioning, visual style, target audience, competitive advantages, and 20+ dimensions of data"
+    },
+    "input": {
+      "title": "Enter Brand Website URL",
+      "description": "Supports any publicly accessible brand website, the system will automatically scrape and perform deep analysis",
+      "urlLabel": "Website Address",
+      "analyzing": "Analyzing...",
+      "startAnalysis": "Start Analysis",
+      "quickExamples": "Quick Examples:"
+    },
+    "steps": {
+      "connecting": "Connecting to website...",
+      "scraping": "Scraping content (Firecrawl)",
+      "extracting": "Extracting brand elements...",
+      "analyzing": "AI deep analysis (DeepSeek)",
+      "generating": "Generating brand report..."
+    },
+    "result": {
+      "analyzed": "Analyzed",
+      "completeness": "Analysis Completeness",
+      "productCategory": "Product Category",
+      "targetAge": "Target Age",
+      "incomeLevel": "Income Level",
+      "language": "Language"
+    },
+    "tabs": {
+      "overview": "Overview",
+      "visual": "Visual Style",
+      "audience": "Audience Analysis",
+      "content": "Content Strategy",
+      "recommendations": "Creative Recommendations"
+    },
+    "overview": {
+      "brandTone": "Brand Tone",
+      "personality": "Brand Personality",
+      "styleKeywords": "Style Keywords",
+      "competitiveAdvantage": "Competitive Advantages"
+    },
+    "visual": {
+      "colorScheme": "Brand Color Scheme",
+      "colorDescription": "Main colors extracted from the website, can be directly used for content creation",
+      "primaryColor": "Primary Color",
+      "primaryColorDesc": "Brand primary color, used for key elements and CTAs",
+      "secondaryColors": "Secondary Colors",
+      "clickToCopy": "Click to copy",
+      "accentColor": "Accent Color",
+      "photography": "Photography Style",
+      "layout": "Layout Design",
+      "typography": "Typography"
+    },
+    "audience": {
+      "profile": "Target Audience Profile",
+      "ageRange": "Age Range",
+      "income": "Income Level",
+      "preference": "Brand Preference",
+      "qualityFirst": "Quality First"
+    },
+    "content": {
+      "themes": "Content Themes",
+      "socialTone": "Social Media Tone",
+      "defaultSocialTone": "Professional and easy to understand",
+      "marketingFocus": "Marketing Focus"
+    },
+    "recommendations": {
+      "title": "Recommended Image/Video Styles",
+      "description": "Based on brand analysis, we recommend the most suitable creative styles for you",
+      "clickToUse": "Click to use this style for content generation",
+      "ctaTitle": "Start Creating Content with Brand Analysis",
+      "ctaDescription": "Based on AI analysis results, automatically generate product images and videos that match brand style",
+      "startCreation": "Start Creating"
+    },
+    "actions": {
+      "copy": "Copy",
+      "download": "Download Report",
+      "copied": "Copied to clipboard",
+      "downloaded": "Report downloaded"
+    },
+    "errors": {
+      "urlRequired": "Please enter website URL",
+      "invalidUrl": "Please enter a valid URL",
+      "analysisFailed": "Brand analysis failed"
+    },
+    "success": {
+      "analysisComplete": "Brand analysis completed!"
+    },
+    "generationDialog": {
+      "title": "Choose Generation Type",
+      "description": "Select the type and mode of content generation based on brand analysis",
+      "selectType": "Select Content Type",
+      "image": "Image",
+      "imageDesc": "Generate product images",
+      "video": "Video",
+      "videoDesc": "Generate product videos",
+      "selectMode": "Select Generation Mode",
+      "single": "Single Generation",
+      "singleDesc": "Generate one image or video at a time",
+      "batch": "Batch Generation",
+      "batchDesc": "Generate multiple images or videos from Excel/CSV",
+      "cancel": "Cancel",
+      "confirm": "Start Generation"
+    }
   }
 }

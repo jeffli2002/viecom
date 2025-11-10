@@ -27,6 +27,7 @@ import {
   Image as ImageIcon,
   LogOut,
   Menu,
+  Sparkles,
   User,
   Video,
   X,
@@ -134,6 +135,14 @@ export function Header() {
           >
             {t('assets')}
           </Link>
+          <Link
+            href="/brand-analysis"
+            className={`text-sm font-medium transition-colors hover:text-primary ${
+              pathname?.includes('/brand-analysis') ? 'text-primary' : 'text-muted-foreground'
+            }`}
+          >
+            {t('brandAnalysis')}
+          </Link>
         </nav>
 
         {/* User Menu / Auth Buttons */}
@@ -229,6 +238,14 @@ export function Header() {
               onClick={() => setIsMobileMenuOpen(false)}
             >
               {t('assets')}
+            </Link>
+            <Link
+              href="/brand-analysis"
+              className="flex items-center space-x-2 px-3 py-2 rounded-md hover:bg-accent"
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              <Sparkles className="h-4 w-4" />
+              <span>{t('brandAnalysis')}</span>
             </Link>
           </div>
         </div>

@@ -1,28 +1,34 @@
 import { db } from '@/server/db';
-import { showcaseGallery } from '@/server/db/schema';
-import { eq } from 'drizzle-orm';
+import { showcaseGallery, generatedAsset } from '@/server/db/schema';
+import { eq, and } from 'drizzle-orm';
 import { type NextRequest, NextResponse } from 'next/server';
 
 export const dynamic = 'force-dynamic';
 
 export async function GET(_request: NextRequest) {
   try {
-    // Get featured showcase assets
+    // Get featured showcase assets with JOIN to generatedAsset
     const assets = await db
       .select({
         id: showcaseGallery.id,
-        url: showcaseGallery.assetUrl,
-        type: showcaseGallery.assetType,
-        title: showcaseGallery.title,
+        url: generatedAsset.publicUrl,
+        type: generatedAsset.assetType,
+        title: generatedAsset.productName,
       })
       .from(showcaseGallery)
-      .where(eq(showcaseGallery.isActive, true))
+      .innerJoin(generatedAsset, eq(showcaseGallery.assetId, generatedAsset.id))
+      .where(
+        and(
+          eq(showcaseGallery.isActive, true),
+          eq(generatedAsset.status, 'completed')
+        )
+      )
       .orderBy(showcaseGallery.displayOrder)
       .limit(12);
 
     return NextResponse.json({
       success: true,
-      assets: assets.map((asset) => ({
+      assets: (assets || []).map((asset) => ({
         id: asset.id,
         url: asset.url || '',
         type: asset.type as 'image' | 'video',

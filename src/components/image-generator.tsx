@@ -82,6 +82,41 @@ export default function ImageGenerator() {
     if (searchParams?.get('mode')) {
       setMode(searchParams.get('mode') as GenerationMode);
     }
+
+    // Load brand analysis from sessionStorage if coming from brand analysis page
+    if (searchParams?.get('fromBrandAnalysis') === 'true') {
+      try {
+        const storedData = sessionStorage.getItem('brandAnalysis');
+        if (storedData) {
+          const brandData = JSON.parse(storedData);
+          // Convert BrandAnalysisResult to BrandToneAnalysis format
+          const brandToneAnalysis: BrandToneAnalysis = {
+            brandName: brandData.brandName,
+            brandTone: Array.isArray(brandData.brandTone)
+              ? brandData.brandTone
+              : brandData.brandTone?.split(/[、,]/).map((s: string) => s.trim()) || [],
+            productFeatures: brandData.productCategory || [],
+            targetAudience: Array.isArray(brandData.targetAudience)
+              ? brandData.targetAudience
+              : brandData.targetAudience?.split(/[、,]/).map((s: string) => s.trim()) || [],
+            colorPalette: [
+              brandData.colors?.primary,
+              ...(brandData.colors?.secondary || []),
+              brandData.colors?.accent,
+            ].filter(Boolean),
+            styleKeywords: brandData.styleKeywords || [],
+            summary: brandData.metadata?.description || brandData.summary || '',
+          };
+          setBrandAnalysis(brandToneAnalysis);
+          setWebsiteUrl(brandData.website || '');
+          setUseBrandContext(true);
+          // Clear sessionStorage after loading
+          sessionStorage.removeItem('brandAnalysis');
+        }
+      } catch (error) {
+        console.error('Failed to load brand analysis from sessionStorage:', error);
+      }
+    }
   }, [searchParams]);
 
   const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {

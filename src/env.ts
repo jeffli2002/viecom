@@ -26,6 +26,8 @@ export const env = createEnv({
     KIE_IMAGE_I2I_MODEL: z.string().optional(),
     // DeepSeek API (for prompt enhancement and brand analysis)
     DEEPSEEK_API_KEY: z.string().optional(),
+    // Firecrawl API (for website scraping)
+    FIRECRAWL_API_KEY: z.string().optional(),
     // OpenRouter API (for image generation with Gemini)
     OPENROUTER_API_KEY: z.string().optional(),
     // Admin Configuration
@@ -76,6 +78,7 @@ export const env = createEnv({
     KIE_IMAGE_T2I_MODEL: process.env.KIE_IMAGE_T2I_MODEL,
     KIE_IMAGE_I2I_MODEL: process.env.KIE_IMAGE_I2I_MODEL,
     DEEPSEEK_API_KEY: process.env.DEEPSEEK_API_KEY,
+    FIRECRAWL_API_KEY: process.env.FIRECRAWL_API_KEY,
     OPENROUTER_API_KEY: process.env.OPENROUTER_API_KEY,
     NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL,
     NEXT_PUBLIC_DISABLE_AUTH: process.env.NEXT_PUBLIC_DISABLE_AUTH,
