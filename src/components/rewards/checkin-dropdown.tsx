@@ -222,10 +222,21 @@ export function CheckinDropdown() {
       const dateStr = date.toISOString().split('T')[0];
       const dayName = dayNames[date.getDay()];
       const isToday = i === 0;
-      const isCheckedIn =
-        checkinStatus?.todayCheckin?.checkinDate === dateStr ||
-        checkinStatus?.recentCheckins?.some((c) => c.checkinDate === dateStr) ||
-        false;
+      
+      // Check if this day is checked in
+      let isCheckedIn = false;
+      if (isToday && checkinStatus?.checkedInToday) {
+        // If it's today and checkedInToday is true, mark as checked
+        isCheckedIn = true;
+      } else if (checkinStatus?.todayCheckin?.checkinDate === dateStr) {
+        // Also check todayCheckin data
+        isCheckedIn = true;
+      } else if (checkinStatus?.recentCheckins?.some((c) => c.checkinDate === dateStr)) {
+        // Check in recent checkins
+        isCheckedIn = true;
+      }
+
+      console.log(`Day ${dateStr}:`, { isToday, isCheckedIn, dateStr, todayCheckinDate: checkinStatus?.todayCheckin?.checkinDate });
 
       days.push({
         dayName,
