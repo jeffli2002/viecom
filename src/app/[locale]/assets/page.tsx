@@ -30,7 +30,7 @@ interface Asset {
   status: 'completed' | 'failed';
 }
 
-export default function AssetsPage() {
+function AssetsPageContent() {
   const t = useTranslations('assets');
   const { isAuthenticated, isLoading: authLoading } = useAuthStore();
   const router = useRouter();
@@ -202,5 +202,21 @@ export default function AssetsPage() {
         </div>
       )}
     </div>
+  );
+}
+
+export default function AssetsPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="container mx-auto py-8">
+          <div className="flex items-center justify-center py-12">
+            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          </div>
+        </div>
+      }
+    >
+      <AssetsPageContent />
+    </Suspense>
   );
 }

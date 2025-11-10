@@ -23,7 +23,7 @@ import {
 import { useTranslations } from 'next-intl';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { formatDistance } from 'date-fns';
 
 export const dynamic = 'force-dynamic';
@@ -90,7 +90,7 @@ interface CreditTransaction {
   createdAt: Date;
 }
 
-export default function DashboardPage() {
+function DashboardPageContent() {
   const t = useTranslations('dashboard');
   const { isAuthenticated, user, isLoading: authLoading } = useAuthStore();
   const router = useRouter();
@@ -556,5 +556,21 @@ export default function DashboardPage() {
         </Card>
       </div>
     </div>
+  );
+}
+
+export default function DashboardPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="container mx-auto py-8">
+          <div className="flex items-center justify-center py-12">
+            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          </div>
+        </div>
+      }
+    >
+      <DashboardPageContent />
+    </Suspense>
   );
 }
