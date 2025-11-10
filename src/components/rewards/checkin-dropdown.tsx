@@ -9,6 +9,8 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Progress } from '@/components/ui/progress';
 import { creditsConfig } from '@/config/credits.config';
+import { useAuthStore } from '@/store/auth-store';
+import { useRouter } from '@/i18n/navigation';
 import { Calendar, Flame, Gift, Sparkles } from 'lucide-react';
 import { toast } from 'sonner';
 import { useEffect, useState } from 'react';
@@ -45,6 +47,8 @@ interface CreditBalance {
 }
 
 export function CheckinDropdown() {
+  const { isAuthenticated } = useAuthStore();
+  const router = useRouter();
   const [checkinStatus, setCheckinStatus] = useState<CheckinStatus | null>(null);
   const [creditBalance, setCreditBalance] = useState<CreditBalance | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -97,6 +101,21 @@ export function CheckinDropdown() {
   };
 
   const handleCheckin = async () => {
+    // Check if user is authenticated first
+    if (!isAuthenticated) {
+      toast.error('Please login to check in', {
+        description: 'You need to login to earn daily rewards',
+        action: {
+          label: 'Login',
+          onClick: () => {
+            setIsOpen(false);
+            router.push('/login');
+          },
+        },
+      });
+      return;
+    }
+
     if (isCheckingIn || checkinStatus?.checkedInToday) return;
 
     setIsCheckingIn(true);
@@ -123,9 +142,23 @@ export function CheckinDropdown() {
         // Refresh status and balance
         await Promise.all([fetchCheckinStatus(), fetchCreditBalance()]);
       } else {
-        toast.error(data.error || 'Failed to check in', {
-          description: 'Please try again later',
-        });
+        // Handle 401 Unauthorized
+        if (response.status === 401) {
+          toast.error('Please login to check in', {
+            description: 'You need to login to earn daily rewards',
+            action: {
+              label: 'Login',
+              onClick: () => {
+                setIsOpen(false);
+                router.push('/login');
+              },
+            },
+          });
+        } else {
+          toast.error(data.error || 'Failed to check in', {
+            description: 'Please try again later',
+          });
+        }
       }
     } catch (error) {
       console.error('Failed to check in:', error);
