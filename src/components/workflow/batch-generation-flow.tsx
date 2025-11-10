@@ -549,7 +549,6 @@ export function BatchGenerationFlow({ generationType }: BatchGenerationFlowProps
       existingIntervals.forEach((interval) => clearInterval(interval));
     }
 
-    let progress = 0;
     const intervals: NodeJS.Timeout[] = [];
 
     const progressInterval = setInterval(() => {
@@ -557,13 +556,14 @@ export function BatchGenerationFlow({ generationType }: BatchGenerationFlowProps
         prev.map((row) => {
           if (row.rowIndex === rowIndex && row.status === 'generating') {
             // Increment progress gradually, but don't exceed 90% until actually completed
-            progress = Math.min(progress + Math.random() * 10, 90);
-            return { ...row, progress: Math.round(progress) };
+            const currentProgress = row.progress || 0;
+            const newProgress = Math.min(currentProgress + Math.random() * 8 + 2, 90);
+            return { ...row, progress: Math.round(newProgress) };
           }
           return row;
         })
       );
-    }, 1000); // Update every second
+    }, 1500); // Update every 1.5 seconds
     intervals.push(progressInterval);
 
     // Clear interval when row is completed or failed
@@ -597,9 +597,11 @@ export function BatchGenerationFlow({ generationType }: BatchGenerationFlowProps
         const statusData = await statusResponse.json();
         const assetsData = await assetsResponse.json();
 
-        // Update rows with asset URLs
+        // Update rows with asset URLs and status
         if (assetsData.success && assetsData.data.assets) {
           let completedCount = 0;
+          let processingCount = 0;
+          
           setRows((prev) =>
             prev.map((row) => {
               const asset =
@@ -626,11 +628,18 @@ export function BatchGenerationFlow({ generationType }: BatchGenerationFlowProps
                     error: asset.error,
                     progress: 0,
                   };
+                } else if (asset.status === 'processing') {
+                  processingCount++;
+                  // Keep progress simulation running for processing assets
+                  // Don't update status or progress here, let simulateRowProgress handle it
+                  return row;
                 }
               }
               return row;
             })
           );
+          
+          console.log(`Batch progress: ${completedCount} completed, ${processingCount} processing, total: ${totalRows}`);
           setGenerationProgress({ current: completedCount, total: totalRows });
         }
 
