@@ -119,11 +119,11 @@ export default function UpgradePrompt({
   const resetTime = limitType === 'daily' ? 'midnight UTC' : 'the 1st of next month';
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
-      <Card className="w-full max-w-md">
-        <CardHeader>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+      <Card className="w-full max-w-md bg-white shadow-2xl border-0">
+        <CardHeader className="bg-white">
           <div className="flex items-center justify-between">
-            <CardTitle className="text-xl">
+            <CardTitle className="text-xl font-bold text-gray-900">
               {!isAuthenticated
                 ? 'Sign In Required'
                 : `${limitType === 'daily' ? 'Daily' : 'Monthly'} Limit Reached`}
@@ -133,13 +133,13 @@ export default function UpgradePrompt({
                 variant="ghost"
                 size="sm"
                 onClick={onClose}
-                className="text-gray-500 hover:text-gray-700"
+                className="text-gray-500 hover:text-gray-900 hover:bg-gray-100"
               >
                 ✕
               </Button>
             )}
           </div>
-          <p className="mt-2 text-gray-600 text-sm">
+          <p className="mt-2 text-gray-700 text-sm font-medium">
             {!isAuthenticated
               ? `Please sign in to use this feature. Free users get ${creditsLimit} ${contentType} per ${limitType}!`
               : effectiveType === 'imageToText'
@@ -150,19 +150,19 @@ export default function UpgradePrompt({
           </p>
           {isAuthenticated && (
             <div className="mt-2 text-center">
-              <Badge variant="outline" className="text-xs">
+              <Badge variant="outline" className="text-xs border-gray-300 text-gray-700 bg-gray-50">
                 Available: {creditsUsed} {effectiveType === 'credits' ? 'credits' : contentType}
               </Badge>
             </div>
           )}
         </CardHeader>
-        <CardContent className="space-y-6">
-          <div className="rounded-lg bg-gradient-to-r from-purple-50 to-pink-50 py-4 text-center">
+        <CardContent className="space-y-6 bg-white">
+          <div className="rounded-lg bg-gradient-to-r from-purple-50 to-pink-50 py-4 text-center border border-purple-100">
             <h3 className="mb-2 font-bold text-2xl text-gray-900">Upgrade to {targetPlanName}</h3>
             <div className="flex items-center justify-center gap-2">
               <span className="font-bold text-3xl text-purple-600">${targetPlanPrice}/mo</span>
             </div>
-            <Badge className="mt-2 bg-purple-500">Save 20% with yearly</Badge>
+            <Badge className="mt-2 bg-purple-600 text-white hover:bg-purple-700">Save 20% with yearly</Badge>
           </div>
 
           <div className="space-y-3">
@@ -171,7 +171,7 @@ export default function UpgradePrompt({
                 <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-purple-100">
                   <feature.icon className="h-4 w-4 text-purple-600" />
                 </div>
-                <span className="text-gray-700">{feature.text}</span>
+                <span className="text-gray-800 font-medium">{feature.text}</span>
               </div>
             ))}
           </div>
@@ -180,7 +180,7 @@ export default function UpgradePrompt({
             {!isAuthenticated ? (
               <>
                 <Button
-                  className="w-full bg-purple-600 hover:bg-purple-700"
+                  className="w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold shadow-md"
                   onClick={() => {
                     window.location.href = `/${locale}/login`;
                   }}
@@ -189,7 +189,7 @@ export default function UpgradePrompt({
                 </Button>
                 <Button
                   variant="outline"
-                  className="w-full"
+                  className="w-full border-gray-300 text-gray-700 hover:bg-gray-50 hover:text-gray-900 font-medium"
                   onClick={() => {
                     window.location.href = `/${locale}/signup`;
                   }}
@@ -200,18 +200,26 @@ export default function UpgradePrompt({
             ) : (
               <>
                 <Button
-                  className="w-full bg-purple-600 hover:bg-purple-700"
+                  className="w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold shadow-md"
                   onClick={() => (window.location.href = `/${locale}/#pricing`)}
                 >
                   Upgrade to {targetPlanName}
                 </Button>
 
                 {showContinueButton && onContinue ? (
-                  <Button variant="outline" className="w-full" onClick={onContinue}>
+                  <Button 
+                    variant="outline" 
+                    className="w-full border-gray-300 text-gray-700 hover:bg-gray-50 hover:text-gray-900 font-medium" 
+                    onClick={onContinue}
+                  >
                     继续生成（使用可用积分）
                   </Button>
                 ) : (
-                  <Button variant="outline" className="w-full" onClick={onClose}>
+                  <Button 
+                    variant="outline" 
+                    className="w-full border-gray-300 text-gray-700 hover:bg-gray-50 hover:text-gray-900" 
+                    onClick={onClose}
+                  >
                     Try Again {limitType === 'daily' ? 'Tomorrow' : 'Next Month'}
                   </Button>
                 )}
@@ -219,7 +227,7 @@ export default function UpgradePrompt({
             )}
           </div>
 
-          <div className="space-y-1 text-center text-gray-500 text-sm">
+          <div className="space-y-1 text-center text-gray-600 text-sm">
             <p>
               Your {limitType} limit resets at {resetTime}
             </p>
