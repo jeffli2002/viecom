@@ -101,6 +101,8 @@ export function CheckinDropdown() {
   };
 
   const handleCheckin = async () => {
+    console.log('handleCheckin called:', { isAuthenticated, isCheckingIn, checkinStatus });
+    
     // Check if user is authenticated first
     if (!isAuthenticated) {
       toast.error('Please login to check in', {
@@ -116,7 +118,10 @@ export function CheckinDropdown() {
       return;
     }
 
-    if (isCheckingIn || checkinStatus?.checkedInToday) return;
+    if (isCheckingIn || checkinStatus?.checkedInToday) {
+      console.log('Checkin blocked:', { isCheckingIn, checkedInToday: checkinStatus?.checkedInToday });
+      return;
+    }
 
     setIsCheckingIn(true);
     try {
@@ -171,6 +176,15 @@ export function CheckinDropdown() {
   };
 
   const handleDateClick = (day: { date: string; isToday: boolean; isCheckedIn: boolean }) => {
+    console.log('handleDateClick called:', {
+      day,
+      isToday: day.isToday,
+      isCheckedIn: day.isCheckedIn,
+      isCheckingIn,
+      isAuthenticated,
+      checkinStatus,
+    });
+    
     // Only allow clicking today's date if not already checked in
     if (day.isToday && !day.isCheckedIn && !isCheckingIn) {
       handleCheckin();
