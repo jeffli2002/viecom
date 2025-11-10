@@ -86,13 +86,44 @@ export function BatchGenerationFlow({ generationType }: BatchGenerationFlowProps
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [previewAsset, setPreviewAsset] = useState<{ url: string; type: 'image' | 'video'; rowIndex: number } | null>(null);
   const { showUpgradePrompt, openUpgradePrompt, closeUpgradePrompt } = useUpgradePrompt();
-  const { user } = useAuthStore();
+  const { user, isAuthenticated } = useAuthStore();
   const progressIntervalsRef = useRef<Map<number, NodeJS.Timeout[]>>(new Map());
+  const [userCredits, setUserCredits] = useState<number>(0);
 
   const styles = generationType === 'image' ? IMAGE_STYLES : VIDEO_STYLES;
 
   // Cache key for localStorage
   const cacheKey = `batch-generation-${generationType}-cache`;
+
+  // Fetch user credits on mount and when user changes
+  useEffect(() => {
+    const fetchCredits = async () => {
+      if (!isAuthenticated) {
+        setUserCredits(0);
+        return;
+      }
+
+      try {
+        const response = await fetch('/api/credits/balance', {
+          credentials: 'include',
+        });
+        
+        if (response.ok) {
+          const data = await response.json();
+          setUserCredits(data.data?.balance || 0);
+          console.log('User credits fetched:', data.data?.balance);
+        } else {
+          console.warn('Failed to fetch credits');
+          setUserCredits(0);
+        }
+      } catch (error) {
+        console.error('Error fetching credits:', error);
+        setUserCredits(0);
+      }
+    };
+
+    fetchCredits();
+  }, [isAuthenticated, user?.id]);
 
   // Load cached data on mount
   useEffect(() => {
@@ -400,10 +431,11 @@ export function BatchGenerationFlow({ generationType }: BatchGenerationFlowProps
     const totalCreditCost = selectedRows.length * creditCostPerItem;
 
     // Check user credits
-    const userCredits = user?.credits?.balance || 0;
+    console.log('Checking credits:', { userCredits, totalCreditCost, selectedRows: selectedRows.length });
     
     if (userCredits < totalCreditCost) {
       // Show upgrade prompt
+      console.log('Insufficient credits, showing upgrade prompt');
       openUpgradePrompt();
       // Store the generation request for later (if user clicks continue)
       return;
@@ -489,7 +521,6 @@ export function BatchGenerationFlow({ generationType }: BatchGenerationFlowProps
       : creditsConfig.consumption.videoGeneration['sora-2'] || 20;
     
     // Calculate how many items can be generated with available credits
-    const userCredits = user?.credits?.balance || 0;
     const maxAffordableItems = Math.floor(userCredits / creditCostPerItem);
     
     if (maxAffordableItems === 0) {
@@ -607,6 +638,20 @@ export function BatchGenerationFlow({ generationType }: BatchGenerationFlowProps
           setIsGenerating(false);
           clearInterval(interval);
           setPollingInterval(null);
+          
+          // Refresh user credits after generation completes
+          try {
+            const creditsResponse = await fetch('/api/credits/balance', {
+              credentials: 'include',
+            });
+            if (creditsResponse.ok) {
+              const creditsData = await creditsResponse.json();
+              setUserCredits(creditsData.data?.balance || 0);
+              console.log('Credits refreshed after generation:', creditsData.data?.balance);
+            }
+          } catch (error) {
+            console.error('Error refreshing credits:', error);
+          }
         } else if (statusData.success && statusData.data.jobStatus === 'failed') {
           setIsGenerating(false);
           clearInterval(interval);
@@ -1486,7 +1531,7 @@ export function BatchGenerationFlow({ generationType }: BatchGenerationFlowProps
         onClose={closeUpgradePrompt}
         onContinue={handleContinueWithLimitedCredits}
         feature={generationType === 'image' ? 'imageGeneration' : 'videoGeneration'}
-        creditsUsed={user?.credits?.balance || 0}
+        creditsUsed={userCredits}
         creditsLimit={0}
         showContinueButton={true}
       />
