@@ -73,6 +73,12 @@ export function CheckinDropdown() {
       });
       if (response.ok) {
         const data = await response.json();
+        console.log('Checkin status fetched:', {
+          data: data.data,
+          localDate: new Date().toISOString().split('T')[0],
+          localTime: new Date().toLocaleString(),
+          utcDate: new Date().toISOString(),
+        });
         if (data.success) {
           setCheckinStatus(data.data);
         }
@@ -118,8 +124,17 @@ export function CheckinDropdown() {
       return;
     }
 
-    if (isCheckingIn || checkinStatus?.checkedInToday) {
-      console.log('Checkin blocked:', { isCheckingIn, checkedInToday: checkinStatus?.checkedInToday });
+    // Show message if already checked in
+    if (checkinStatus?.checkedInToday) {
+      console.log('Already checked in today:', checkinStatus.todayCheckin);
+      toast.info('Already checked in today!', {
+        description: `You earned ${checkinStatus.todayCheckin?.creditsEarned || 0} credits. Come back tomorrow!`,
+      });
+      return;
+    }
+
+    if (isCheckingIn) {
+      console.log('Checkin blocked: isCheckingIn =', isCheckingIn);
       return;
     }
 
