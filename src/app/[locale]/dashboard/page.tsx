@@ -26,6 +26,8 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { formatDistance } from 'date-fns';
 
+export const dynamic = 'force-dynamic';
+
 interface CreditBalance {
   balance: number;
   totalEarned: number;

@@ -17,7 +17,9 @@ import { useTranslations } from 'next-intl';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
+
+export const dynamic = 'force-dynamic';
 
 interface Asset {
   id: string;
