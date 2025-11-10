@@ -1,4 +1,6 @@
 import ImageGenerator from '@/components/image-generator';
+import { Loader2 } from 'lucide-react';
+import { Suspense } from 'react';
 
 export default function ImageGenerationPage() {
   return (
@@ -10,7 +12,15 @@ export default function ImageGenerationPage() {
           selling points.
         </p>
       </div>
-      <ImageGenerator />
+      <Suspense
+        fallback={
+          <div className="flex items-center justify-center py-12">
+            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          </div>
+        }
+      >
+        <ImageGenerator />
+      </Suspense>
     </div>
   );
 }

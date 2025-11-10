@@ -3,13 +3,12 @@
 import { useAuthStore } from '@/store/auth-store';
 import { usePathname } from '@/i18n/navigation';
 import { useSearchParams } from 'next/navigation';
-import { useEffect } from 'react';
+import { Suspense, useEffect } from 'react';
 
 /**
- * AuthProvider - Initializes authentication state on app load
- * and refreshes session after OAuth callbacks
+ * AuthProviderContent - Internal component that uses useSearchParams
  */
-export function AuthProvider({ children }: { children: React.ReactNode }) {
+function AuthProviderContent({ children }: { children: React.ReactNode }) {
   const initialize = useAuthStore((state) => state.initialize);
   const refreshSession = useAuthStore((state) => state.refreshSession);
   const isInitialized = useAuthStore((state) => state.isInitialized);
@@ -47,5 +46,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [searchParams, refreshSession, pathname]);
 
   return <>{children}</>;
+}
+
+/**
+ * AuthProvider - Wrapper component that provides Suspense boundary
+ */
+export function AuthProvider({ children }: { children: React.ReactNode }) {
+  return (
+    <Suspense fallback={<>{children}</>}>
+      <AuthProviderContent>{children}</AuthProviderContent>
+    </Suspense>
+  );
 }
 
