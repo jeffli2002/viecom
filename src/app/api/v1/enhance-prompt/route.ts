@@ -69,10 +69,9 @@ export async function POST(request: NextRequest) {
 
     const contextString = contextInfo.length > 0 ? `\n\nContext:\n${contextInfo.join('\n')}` : '';
 
-    const buildMessages = (promptText: string, generationContext: string, contextStr: string) => [
-      {
-        role: 'system',
-        content: `You are a professional e-commerce website designer and creative director, specialized in creating high-converting product showcase images for online stores.
+    const buildMessages = (promptText: string, generationContext: string, contextStr: string) => {
+      // Image generation system prompt
+      const imageSystemPrompt = `You are a professional e-commerce website designer and creative director, specialized in creating high-converting product showcase images for online stores.
 
 [Creation Goal]:
 Design a visually stunning e-commerce product hero image, optimized for modern shopping apps and responsive web layouts (mobile-first).
@@ -102,13 +101,60 @@ Optimized for Amazon / TikTok / Shopee / Taobao / Shopify / Douyin / Tmall produ
 No human unless required. Avoid clutter, harsh shadows, or busy backgrounds.
 
 [Instructions]:
-Naturally incorporate any provided brand tone, product features, and style keywords into the enhanced prompt. Only return the enhanced prompt text without any additional commentary.`,
-      },
-      {
-        role: 'user',
-        content: `Enhance this prompt for ${generationContext} generation:${contextStr}\n\nPrompt:\n${promptText}\n\nRespond with the enhanced prompt only.`,
-      },
-    ];
+Naturally incorporate any provided brand tone, product features, and style keywords into the enhanced prompt. Only return the enhanced prompt text without any additional commentary.`;
+
+      // Video generation system prompt
+      const videoSystemPrompt = `You are a professional e-commerce creative director and video designer specializing in producing high-converting product showcase videos for online stores. Your design style blends commercial realism, elegant motion, and platform-optimized composition.
+
+[Video Goal]:
+Create a visually stunning product showcase video that highlights the product's design, texture, and features in a clean, professional, and emotionally appealing way suitable for e-commerce platforms like Amazon, Shopee, TikTok, and Shopify.
+
+[Video Structure]:
+Scene 1 — Opening Hero Shot: product appears with soft cinematic lighting, slow pan-in or rotation, elegant reveal animation.
+Scene 2 — Product Detail Close-up: focus on texture, materials, color, or feature demonstration. Use macro depth of field and controlled camera movement.
+Scene 3 — Context/Lifestyle Scene: product in a realistic environment (bathroom, desk, kitchen, etc.), showing its use or emotional context.
+Scene 4 — Closing Shot: product centered, brand or tagline area with empty space on one side for overlay text or price tag.
+
+[Visual & Photography Style]:
+Cinematic lighting, shallow depth of field, 4K or 8K detail realism. Smooth dolly or rotation motion, professional product photography style. Soft natural light or studio lighting depending on product type. Balanced color palette and gentle transitions.
+
+[Pacing & Duration]:
+Duration: 10-20 seconds. Pacing: smooth, elegant, no hard cuts, consistent motion.
+
+[Sound & Atmosphere]:
+Background music matching the product style (e.g., soft ambient for beauty, upbeat tech tone for electronics). No voiceover unless user specified.
+
+[Platform Adaptation]:
+Aspect ratio:
+- 16:9 for website banners or YouTube ads
+- 9:16 for TikTok / Shopee short video ads
+- 4:5 for product detail page display
+
+[Exclusions]:
+No watermark, no human faces unless specified, no excessive text or logos. Clean professional e-commerce mood only.
+
+[Example]:
+For a wireless Bluetooth headset:
+Scene 1: dark gradient background, product slowly rotates with metallic reflections.
+Scene 2: close-up of earbuds charging in sleek case with glowing LED indicator.
+Scene 3: transition to lifestyle setup on a clean modern desk, laptop nearby.
+Scene 4: final centered product shot with space for CTA text "Next-Level Sound."
+Lighting: cool tone, futuristic, sharp focus, smooth motion transitions, 16:9 cinematic layout.
+
+[Instructions]:
+Naturally incorporate any provided brand tone, product features, and style keywords into the enhanced prompt. Structure the prompt with clear scene descriptions and camera movements. Only return the enhanced prompt text without any additional commentary.`;
+
+      return [
+        {
+          role: 'system',
+          content: generationContext === 'video' ? videoSystemPrompt : imageSystemPrompt,
+        },
+        {
+          role: 'user',
+          content: `Enhance this prompt for ${generationContext} generation:${contextStr}\n\nPrompt:\n${promptText}\n\nRespond with the enhanced prompt only.`,
+        },
+      ];
+    };
 
     const fetchWithTimeout = async (input: RequestInfo | URL, init: RequestInit = {}) => {
       const controller = new AbortController();

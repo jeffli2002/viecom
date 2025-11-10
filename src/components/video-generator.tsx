@@ -183,6 +183,7 @@ export default function VideoGenerator() {
     try {
       const requestBody: any = {
         prompt: prompt.trim(),
+        context: 'video', // Specify video context for proper system prompt
       };
 
       const response = await fetch('/api/v1/enhance-prompt', {
