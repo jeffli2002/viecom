@@ -24,24 +24,57 @@ export async function POST(request: NextRequest) {
     const existingCheckin = await db
       .select()
       .from(userDailyCheckin)
-      .where(eq(userDailyCheckin.checkinDate, today))
-      .where(eq(userDailyCheckin.userId, userId))
+      .where(and(
+        eq(userDailyCheckin.checkinDate, today),
+        eq(userDailyCheckin.userId, userId)
+      ))
       .limit(1);
 
     if (existingCheckin.length > 0) {
-      return NextResponse.json(
-        {
-          success: false,
-          error: 'Already checked in today',
-          data: {
-            checkinDate: today,
-            consecutiveDays: existingCheckin[0].consecutiveDays,
-            creditsEarned: existingCheckin[0].creditsEarned,
-            weeklyBonusEarned: existingCheckin[0].weeklyBonusEarned,
+      // Verify if credits were actually awarded by checking for the transaction
+      const { creditTransactions } = await import('@/server/db/schema');
+      const referenceId = `checkin_${userId}_${today}`;
+      
+      const creditTransaction = await db
+        .select()
+        .from(creditTransactions)
+        .where(and(
+          eq(creditTransactions.userId, userId),
+          eq(creditTransactions.referenceId, referenceId)
+        ))
+        .limit(1);
+
+      if (creditTransaction.length === 0) {
+        // Checkin record exists but no credit transaction - something went wrong
+        console.warn('[Checkin] Found orphaned checkin record (no credits awarded), deleting it:', {
+          userId,
+          today,
+          checkinId: existingCheckin[0].id,
+        });
+        
+        // Delete the orphaned checkin record to allow retry
+        await db
+          .delete(userDailyCheckin)
+          .where(eq(userDailyCheckin.id, existingCheckin[0].id));
+        
+        console.log('[Checkin] Orphaned record deleted, proceeding with checkin');
+        // Continue with normal checkin flow below
+      } else {
+        // Both checkin and credit transaction exist - already checked in
+        return NextResponse.json(
+          {
+            success: false,
+            error: 'Already checked in today',
+            data: {
+              checkinDate: today,
+              consecutiveDays: existingCheckin[0].consecutiveDays,
+              creditsEarned: existingCheckin[0].creditsEarned,
+              weeklyBonusEarned: existingCheckin[0].weeklyBonusEarned,
+            },
           },
-        },
-        { status: 400 }
-      );
+          { status: 400 }
+        );
+      }
     }
 
     // Get last checkin to calculate consecutive days
@@ -96,6 +129,14 @@ export async function POST(request: NextRequest) {
     // Create checkin record and award credits (neon-http doesn't support transactions)
     const checkinId = randomUUID();
     
+    console.log('[Checkin] Creating checkin record:', {
+      userId,
+      today,
+      consecutiveDays,
+      totalCredits,
+      weeklyBonusEarned,
+    });
+    
     // Create checkin record first
     await db.insert(userDailyCheckin).values({
       id: checkinId,
@@ -106,22 +147,33 @@ export async function POST(request: NextRequest) {
       weeklyBonusEarned,
     });
 
+    console.log('[Checkin] Checkin record created, awarding credits...');
+
     // Award credits
     const referenceId = `checkin_${userId}_${today}`;
-    await creditService.earnCredits({
-      userId,
-      amount: totalCredits,
-      source: 'checkin',
-      description: weeklyBonusEarned
-        ? `Daily checkin (Day ${consecutiveDays}) + Weekly bonus`
-        : `Daily checkin (Day ${consecutiveDays})`,
-      referenceId,
-      metadata: {
-        checkinDate: today,
-        consecutiveDays,
-        weeklyBonusEarned,
-      },
-    });
+    try {
+      const creditTransaction = await creditService.earnCredits({
+        userId,
+        amount: totalCredits,
+        source: 'checkin',
+        description: weeklyBonusEarned
+          ? `Daily checkin (Day ${consecutiveDays}) + Weekly bonus`
+          : `Daily checkin (Day ${consecutiveDays})`,
+        referenceId,
+        metadata: {
+          checkinDate: today,
+          consecutiveDays,
+          weeklyBonusEarned,
+        },
+      });
+      
+      console.log('[Checkin] Credits awarded successfully:', creditTransaction);
+    } catch (creditError) {
+      console.error('[Checkin] Failed to award credits:', creditError);
+      // Note: Checkin record already created, but credits failed
+      // This needs manual intervention or a cleanup job
+      throw new Error(`Checkin created but credits failed: ${creditError}`);
+    }
 
     const result = {
       checkinId,
