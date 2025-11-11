@@ -34,6 +34,16 @@
   --switch-background: #cbced4;
   --ring: oklch(0.708 0 0);
 
+  /* Unified Purple/Violet Theme - Consistent UX */
+  --brand-purple-50: #FAF5FF;    /* Light backgrounds, selected states */
+  --brand-purple-100: #F3E8FF;   /* Hover backgrounds, badges */
+  --brand-purple-200: #E9D5FF;   /* Borders, dividers */
+  --brand-purple-300: #D8B4FE;   /* Hover borders */
+  --brand-purple-500: #A855F7;   /* Primary interactive elements, borders */
+  --brand-purple-600: #9333EA;   /* Primary buttons, active states */
+  --brand-purple-700: #7E22CE;   /* Hover states, pressed */
+  --brand-purple-800: #6B21A8;   /* Dark accents */
+
   /* Chart Colors */
   --chart-1: oklch(0.646 0.222 41.116);
   --chart-2: oklch(0.6 0.118 184.704);
@@ -463,6 +473,143 @@ picture {
 
 .scale-in {
   animation: scale-in var(--animate-duration-normal) var(--animate-easing);
+}
+
+/* Unified Purple Theme - Reusable Classes */
+
+/* Primary Button - Consistent purple gradient */
+.btn-primary-purple {
+  background: linear-gradient(to right, var(--brand-purple-600), #E935C1, var(--brand-purple-600));
+  color: white;
+  border: none;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 8px 30px -5px rgba(147, 51, 234, 0.3);
+}
+
+.btn-primary-purple:hover {
+  background: linear-gradient(to right, var(--brand-purple-700), #D81DB1, var(--brand-purple-700));
+  transform: scale(1.05);
+  box-shadow: 0 10px 35px -5px rgba(147, 51, 234, 0.4);
+}
+
+.btn-primary-purple:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Selected State - For buttons/cards */
+.selected-purple {
+  background-color: var(--brand-purple-50);
+  border-color: var(--brand-purple-500);
+  color: var(--brand-purple-700);
+}
+
+.selected-purple-border {
+  border: 2px solid var(--brand-purple-500);
+  background-color: var(--brand-purple-50);
+  color: var(--brand-purple-700);
+}
+
+/* Unselected State - For buttons/cards */
+.unselected-gray {
+  border: 2px solid #E5E7EB;
+  background-color: white;
+  color: #374151;
+}
+
+.unselected-gray:hover {
+  border-color: var(--brand-purple-300);
+}
+
+/* Active Tab - Purple background */
+.tab-active-purple {
+  background-color: var(--brand-purple-600);
+  color: white;
+  border-radius: 9999px;
+}
+
+/* Inactive Tab - Gray outline */
+.tab-inactive-gray {
+  background-color: white;
+  color: #374151;
+  border: 2px solid #D1D5DB;
+  border-radius: 9999px;
+}
+
+.tab-inactive-gray:hover {
+  border-color: var(--brand-purple-300);
+}
+
+/* Avatar Circle - Purple */
+.avatar-purple {
+  border: 2px solid var(--brand-purple-500);
+}
+
+.avatar-purple-fallback {
+  background-color: var(--brand-purple-600);
+  color: white;
+  border-radius: 9999px;
+}
+
+/* Badge - Purple */
+.badge-purple {
+  background-color: var(--brand-purple-100);
+  color: var(--brand-purple-700);
+  border: 1px solid var(--brand-purple-200);
+}
+
+.badge-purple-solid {
+  background-color: var(--brand-purple-600);
+  color: white;
+}
+
+/* Link - Purple */
+.link-purple {
+  color: var(--brand-purple-600);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.link-purple:hover {
+  color: var(--brand-purple-700);
+}
+
+/* Border Accent - Purple */
+.border-accent-purple {
+  border-color: var(--brand-purple-200);
+}
+
+.border-accent-purple-strong {
+  border-color: var(--brand-purple-500);
+}
+
+/* Background Accent - Purple */
+.bg-accent-purple-light {
+  background-color: var(--brand-purple-50);
+}
+
+.bg-accent-purple {
+  background-color: var(--brand-purple-100);
+}
+
+/* Text Accent - Purple */
+.text-accent-purple {
+  color: var(--brand-purple-600);
+}
+
+.text-accent-purple-dark {
+  color: var(--brand-purple-700);
+}
+
+/* Icon Accent - Purple */
+.icon-purple {
+  color: var(--brand-purple-600);
+}
+
+/* Checkmark in selected states */
+.checkmark-purple {
+  color: var(--brand-purple-600);
 }
 
 /* Print Styles */
