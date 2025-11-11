@@ -9,16 +9,18 @@ import { creditsConfig } from '@/config/credits.config';
 export default function PricingPage() {
   // Get pricing data from config
   const plans = paymentConfig.plans.map((plan) => {
-    const monthlyCredits = plan.credits.monthly || plan.credits.onSignup || 0;
+    // For Free plan, use onSignup for capacity calculation but don't show as monthly
+    const monthlyCredits = plan.credits.monthly;
+    const creditsForCalculation = plan.credits.monthly || plan.credits.onSignup || 0;
     
     // Calculate estimated capacity based on Nano Banana (5 credits) and Sora 2 720P 10s (15 credits)
-    const imageCount = Math.floor(monthlyCredits / creditsConfig.consumption.imageGeneration['nano-banana']);
-    const videoCount = Math.floor(monthlyCredits / creditsConfig.consumption.videoGeneration['sora-2-720p-10s']);
+    const imageCount = Math.floor(creditsForCalculation / creditsConfig.consumption.imageGeneration['nano-banana']);
+    const videoCount = Math.floor(creditsForCalculation / creditsConfig.consumption.videoGeneration['sora-2-720p-10s']);
     
     // Create dynamic features list
     const features = [...plan.features];
     
-    // Replace first feature (credits/month) with detailed capacity if plan has credits
+    // Replace first feature (credits/month) with detailed capacity if plan has monthly credits
     if (monthlyCredits > 0 && features.length > 0 && features[0].includes('credits/month')) {
       features[0] = `${monthlyCredits} credits/month (up to ${imageCount} image generation or ${videoCount} video generation)`;
     }
@@ -35,7 +37,7 @@ export default function PricingPage() {
       cta: plan.id === 'free' ? 'Get Started' : `Upgrade to ${plan.name}`,
       highlighted: plan.popular,
       savings: plan.yearlyPrice ? 'Save 20% with yearly' : undefined,
-      capacityInfo: monthlyCredits > 0 
+      capacityInfo: creditsForCalculation > 0 
         ? `up to ${imageCount} image generation or ${videoCount} video generation` 
         : undefined,
       batchConcurrency: plan.limits?.batchSize,

@@ -1,0 +1,38 @@
+[1mdiff --git a/src/app/[locale]/terms/page.tsx b/src/app/[locale]/terms/page.tsx[m
+[1mindex 8aef768..b2cd8d8 100644[m
+[1m--- a/src/app/[locale]/terms/page.tsx[m
+[1m+++ b/src/app/[locale]/terms/page.tsx[m
+[36m@@ -1,6 +1,14 @@[m
+ import { Card, CardContent } from '@/components/ui/card';[m
+[32m+[m[32mimport { creditsConfig } from '@/config/credits.config';[m
+[32m+[m[32mimport { paymentConfig } from '@/config/payment.config';[m
+ [m
+ export default function TermsPage() {[m
+[32m+[m[32m  // Get configuration values[m
+[32m+[m[32m  const imageCost = creditsConfig.consumption.imageGeneration['nano-banana'];[m
+[32m+[m[32m  const videoCostMin = creditsConfig.consumption.videoGeneration['sora-2-720p-10s'];[m
+[32m+[m[32m  const videoCostMax = creditsConfig.consumption.videoGeneration['sora-2-pro-1080p-15s'];[m
+[32m+[m[32m  const freePlan = paymentConfig.plans.find(p => p.id === 'free');[m
+[32m+[m[32m  const freeSignupBonus = freePlan?.credits.onSignup || 30;[m
+   return ([m
+     <div className="container mx-auto px-4 py-12 max-w-4xl">[m
+       <h1 className="mb-8 text-4xl font-bold text-gray-900">Terms of Service</h1>[m
+[36m@@ -90,12 +98,14 @@[m [mexport default function TermsPage() {[m
+               images or videos:[m
+             </p>[m
+             <ul className="list-disc list-inside space-y-1 ml-4">[m
+[31m-              <li>Image generation: 5 credits per image</li>[m
+[31m-              <li>Video generation: 20 credits per video</li>[m
+[32m+[m[32m              <li>Image generation: {imageCost} credits per image</li>[m
+[32m+[m[32m              <li>Video generation: {videoCostMin}-{videoCostMax} credits per video (depending on model, resolution, and duration)</li>[m
+             </ul>[m
+             <p className="mt-2">[m
+[31m-              Credits are valid for the duration of your subscription period and do not roll over[m
+[31m-              to the next billing cycle unless otherwise specified.[m
+[32m+[m[32m              Free plan users receive {freeSignupBonus} credits as a sign-up bonus. Credits are valid for the[m[41m [m
+[32m+[m[32m              duration of your subscription period and do not roll over to the next billing cycle unless[m[41m [m
+[32m+[m[32m              otherwise specified. Credits earned through rewards (check-ins, referrals, sharing) remain[m[41m [m
+[32m+[m[32m              active as long as your account is in good standing.[m
+             </p>[m
+ [m
+             <h3 className="text-lg font-semibold text-gray-800 mt-4">4.4 Cancellation</h3>[m
