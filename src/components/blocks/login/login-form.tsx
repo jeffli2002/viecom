@@ -136,10 +136,13 @@ export function LoginForm({
                 </Button>
               </div>
 
-              <div className="relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-border after:border-t">
-                <span className="relative z-10 bg-card px-2 text-muted-foreground">
-                  Or use email
-                </span>
+              <div className="relative py-6">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-gray-200"></div>
+                </div>
+                <div className="relative flex justify-center text-sm">
+                  <span className="bg-white px-4 text-gray-500 font-medium">Or use email</span>
+                </div>
               </div>
 
               {/* Email password login */}
