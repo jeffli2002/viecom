@@ -902,7 +902,7 @@ export function BatchGenerationFlow({ generationType }: BatchGenerationFlowProps
                   <Select
                     value={generationMode}
                     onValueChange={(value) => setGenerationMode(value as typeof generationMode)}
-                    disabled={rows.length > 0}
+                    disabled={isGenerating}
                   >
                     <SelectTrigger>
                       <SelectValue />
@@ -924,7 +924,7 @@ export function BatchGenerationFlow({ generationType }: BatchGenerationFlowProps
                 </div>
                 <div>
                   <Label className="text-sm font-medium mb-2 block">{t('aspectRatio')}</Label>
-                  <Select value={aspectRatio} onValueChange={setAspectRatio} disabled={rows.length > 0}>
+                  <Select value={aspectRatio} onValueChange={setAspectRatio} disabled={isGenerating}>
                     <SelectTrigger>
                       <SelectValue />
                     </SelectTrigger>
@@ -954,7 +954,7 @@ export function BatchGenerationFlow({ generationType }: BatchGenerationFlowProps
                 <Label className="text-sm font-medium mb-2 block">
                   {generationType === 'image' ? t('imageStyle') : t('videoStyle')}
                 </Label>
-                <Select value={style} onValueChange={setStyle} disabled={rows.length > 0}>
+                <Select value={style} onValueChange={setStyle} disabled={isGenerating}>
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
@@ -1225,9 +1225,9 @@ export function BatchGenerationFlow({ generationType }: BatchGenerationFlowProps
                 <div className="flex gap-2">
                   <Button
                     size="sm"
-                    variant="destructive"
+                    variant="outline"
                     onClick={() => {
-                      if (confirm(generationType === 'image' ? '确定要重新开始吗？所有数据将被清除。' : '确定要重新开始吗？所有数据将被清除。')) {
+                      if (confirm(generationType === 'image' ? '确定要清除所有数据并重新开始吗？' : '确定要清除所有数据并重新开始吗？')) {
                         setFile(null);
                         setRows([]);
                         setValidationErrors([]);
@@ -1251,9 +1251,10 @@ export function BatchGenerationFlow({ generationType }: BatchGenerationFlowProps
                       }
                     }}
                     disabled={isGenerating}
+                    className="border-red-300 text-red-600 hover:bg-red-50 hover:border-red-400"
                   >
                     <XCircle className="w-4 h-4 mr-2" />
-                    {t('resetAndReupload')}
+                    {t('clearAndReset') || t('resetAndReupload')}
                   </Button>
                   <Button
                     size="sm"

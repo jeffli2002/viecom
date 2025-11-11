@@ -209,6 +209,7 @@
     "validating": "Validating...",
     "reselectFile": "Reselect File",
     "resetAndReupload": "Reset & Reupload",
+    "clearAndReset": "Clear All Data",
     "validationErrors": "Validation Errors",
     "row": "Row",
     "moreErrors": "more errors",
