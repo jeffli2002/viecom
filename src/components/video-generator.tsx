@@ -56,7 +56,8 @@ export default function VideoGenerator() {
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [aspectRatio, setAspectRatio] = useState<string>('16:9');
-  const [model, setModel] = useState<string>('sora-2');
+  const [model, setModel] = useState<'sora-2' | 'sora-2-pro'>('sora-2');
+  const [quality, setQuality] = useState<'standard' | 'high'>('standard'); // Quality for Sora 2 Pro (720P/1080P)
   const [videoStyle, setVideoStyle] = useState<string>('spoken-script'); // Video style selection
   const [duration, setDuration] = useState<10 | 15>(10); // Video duration selection
   const [outputFormat, setOutputFormat] = useState<'MP4'>('MP4'); // Output format selection
@@ -68,7 +69,19 @@ export default function VideoGenerator() {
   const [brandAnalysis, setBrandAnalysis] = useState<BrandToneAnalysis | null>(null);
 
   const maxPromptLength = 2000;
-  const videoCreditCost = creditsConfig.consumption.videoGeneration['sora-2'];
+  
+  // Calculate video credit cost dynamically based on model, duration, and quality
+  const getVideoCreditCost = () => {
+    if (model === 'sora-2') {
+      return creditsConfig.consumption.videoGeneration[`sora-2-720p-${duration}s`];
+    } else {
+      // Sora 2 Pro
+      const resolution = quality === 'standard' ? '720p' : '1080p';
+      return creditsConfig.consumption.videoGeneration[`sora-2-pro-${resolution}-${duration}s`];
+    }
+  };
+  
+  const videoCreditCost = getVideoCreditCost();
   const textDefaultPrompt =
     'A professional product video showcasing a modern smartphone rotating smoothly, highlighting its sleek design and premium features, studio lighting, clean background';
   const imageDefaultPrompt =
@@ -274,6 +287,7 @@ export default function VideoGenerator() {
         aspect_ratio: aspectRatio,
         style: videoStyle, // Pass style to API
         duration: duration, // Pass video duration (10 or 15 seconds)
+        quality: model === 'sora-2-pro' ? quality : 'standard', // Pass quality (standard=720P, high=1080P)
         output_format: outputFormat.toLowerCase(), // Pass output format (mp4)
       };
 
@@ -576,13 +590,25 @@ export default function VideoGenerator() {
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label className="font-light text-gray-700 text-sm">Model</Label>
-                  <Select value={model} onValueChange={setModel}>
+                  <Select 
+                    value={model} 
+                    onValueChange={(value) => {
+                      setModel(value as 'sora-2' | 'sora-2-pro');
+                      // Reset quality to standard when switching models
+                      if (value === 'sora-2') {
+                        setQuality('standard');
+                      }
+                    }}
+                  >
                     <SelectTrigger className="border-gray-200 font-light">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="sora-2">
-                        Sora 2 - {creditsConfig.consumption.videoGeneration['sora-2']} credits
+                        Sora 2 - {videoCreditCost} credits
+                      </SelectItem>
+                      <SelectItem value="sora-2-pro">
+                        Sora 2 Pro - {videoCreditCost} credits
                       </SelectItem>
                     </SelectContent>
                   </Select>
@@ -597,12 +623,51 @@ export default function VideoGenerator() {
                     <SelectContent>
                       <SelectItem value="16:9">Landscape (16:9)</SelectItem>
                       <SelectItem value="9:16">Portrait (9:16)</SelectItem>
-                      <SelectItem value="1:1">Square (1:1)</SelectItem>
-                      <SelectItem value="4:3">Standard (4:3)</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
               </div>
+
+              {/* Quality Selector - Only show for Sora 2 Pro */}
+              {model === 'sora-2-pro' && (
+                <div className="space-y-2">
+                  <Label className="font-light text-gray-700 text-sm">Quality</Label>
+                  <div className="grid grid-cols-2 gap-3">
+                    <button
+                      type="button"
+                      onClick={() => setQuality('standard')}
+                      className={`flex items-center justify-center rounded-lg border-2 py-3 px-4 text-sm font-medium transition-all ${
+                        quality === 'standard'
+                          ? 'border-purple-500 bg-purple-50 text-purple-700'
+                          : 'border-gray-200 bg-white text-gray-700 hover:border-purple-300'
+                      }`}
+                    >
+                      <span>Standard (720P)</span>
+                      {quality === 'standard' && (
+                        <svg className="ml-2 h-4 w-4" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                        </svg>
+                      )}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setQuality('high')}
+                      className={`flex items-center justify-center rounded-lg border-2 py-3 px-4 text-sm font-medium transition-all ${
+                        quality === 'high'
+                          ? 'border-purple-500 bg-purple-50 text-purple-700'
+                          : 'border-gray-200 bg-white text-gray-700 hover:border-purple-300'
+                      }`}
+                    >
+                      <span>High (1080P)</span>
+                      {quality === 'high' && (
+                        <svg className="ml-2 h-4 w-4" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                        </svg>
+                      )}
+                    </button>
+                  </div>
+                </div>
+              )}
 
               <div className="space-y-2">
                 <Label className="font-light text-gray-700 text-sm">Video Duration</Label>
