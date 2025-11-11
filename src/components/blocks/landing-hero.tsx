@@ -47,35 +47,30 @@ export function LandingHero() {
           </motion.div>
 
           <motion.h1
-            className="text-slate-900 tracking-tight leading-[1.1]"
-            style={{ fontSize: 'clamp(3rem, 8vw, 6rem)' }}
+            className="text-slate-900 tracking-tight leading-[1.15]"
+            style={{ fontSize: 'clamp(1.75rem, 5vw, 3rem)' }}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
           >
             {t('title')}
-            <br />
-            <span className="relative inline-block">
-              <span className="relative z-10 bg-gradient-to-r from-violet-600 via-fuchsia-600 to-purple-600 bg-clip-text text-transparent">
-                {t('titleHighlight')}
-              </span>
-              <motion.div
-                className="absolute bottom-2 left-0 right-0 h-4 bg-gradient-to-r from-violet-200 to-fuchsia-200 -z-0"
-                initial={{ scaleX: 0 }}
-                animate={{ scaleX: 1 }}
-                transition={{ delay: 0.8, duration: 0.6 }}
-              />
-            </span>
           </motion.h1>
 
           <motion.p
-            className="text-2xl text-slate-600 max-w-2xl mx-auto leading-relaxed"
+            className="text-lg text-slate-700 max-w-2xl mx-auto leading-relaxed mt-6 md:text-xl"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.5 }}
           >
             {t('description')}
-            <br />
+          </motion.p>
+
+          <motion.p
+            className="text-base text-slate-600 max-w-2xl mx-auto leading-relaxed mt-3 md:text-lg"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.6 }}
+          >
             {t('descriptionSub')}
           </motion.p>
 
