@@ -61,10 +61,11 @@ function transformAnalysisResult(
     : isZh ? '专业、现代、创新' : 'Professional, Modern, Innovative';
 
   // Extract primary color (first color) and secondary colors (rest)
+  const secondaryColors = analysis.colorPalette.slice(1, 4);
   const colors = {
     primary: analysis.colorPalette[0] || '#3B82F6',
-    secondary: analysis.colorPalette.slice(1, 4) || ['#8B5CF6', '#EC4899', '#10B981'],
-    accent: analysis.colorPalette[1] || undefined,
+    secondary: secondaryColors.length > 0 ? secondaryColors : ['#8B5CF6', '#EC4899', '#10B981'],
+    accent: analysis.colorPalette[4] || analysis.colorPalette[1] || undefined,
   };
 
   // Transform target audience array to string

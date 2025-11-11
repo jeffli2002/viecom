@@ -685,28 +685,39 @@ export function BrandAnalysisPage() {
                               onClick={() => copyToClipboard(color)}
                             >
                               <div
-                                className="aspect-square rounded-xl border-2 border-white shadow-lg hover:scale-105 transition-transform"
-                                style={{ backgroundColor: color }}
+                                className="aspect-square rounded-xl border-4 border-slate-300 shadow-lg hover:scale-105 transition-transform"
+                                style={{ backgroundColor: color || '#E5E7EB' }}
+                                title={color}
                               />
                               <div className="text-center">
-                                <div className="text-sm text-slate-900">{color}</div>
+                                <div className="text-sm font-semibold text-slate-900">{color}</div>
                                 <div className="text-xs text-slate-500">{t('visual.clickToCopy')}</div>
                               </div>
                             </div>
                           ))}
                         </div>
+                        {result.colors.secondary.length === 0 && (
+                          <p className="text-sm text-slate-500 text-center py-4">
+                            {t('visual.noSecondaryColors') || '未提取到辅助色彩'}
+                          </p>
+                        )}
                       </div>
 
                       {result.colors.accent && (
-                        <div className="p-4 rounded-xl bg-amber-50 border-2 border-amber-200">
+                        <div 
+                          className="p-4 rounded-xl bg-amber-50 border-2 border-amber-200 cursor-pointer hover:border-amber-300 transition-colors"
+                          onClick={() => copyToClipboard(result.colors.accent!)}
+                        >
                           <div className="flex items-center gap-3">
                             <div
-                              className="size-12 rounded-xl border-2 border-white shadow-lg"
+                              className="size-16 rounded-xl border-4 border-slate-300 shadow-lg hover:scale-110 transition-transform"
                               style={{ backgroundColor: result.colors.accent }}
+                              title={result.colors.accent}
                             />
                             <div>
                               <div className="text-sm text-slate-600">{t('visual.accentColor')}</div>
-                              <div className="text-slate-900">{result.colors.accent}</div>
+                              <div className="text-lg font-semibold text-slate-900">{result.colors.accent}</div>
+                              <div className="text-xs text-slate-500 mt-1">{t('visual.clickToCopy')}</div>
                             </div>
                           </div>
                         </div>
