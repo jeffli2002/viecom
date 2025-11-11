@@ -889,40 +889,25 @@ export function BrandAnalysisPage() {
                                 key={index}
                                 onClick={() => setSelectedStyle(isSelected ? null : style)}
                                 className={`
-                                  p-4 rounded-xl cursor-pointer group transition-all
+                                  p-4 rounded-xl cursor-pointer transition-all
                                   ${isSelected 
-                                    ? 'bg-gradient-to-br from-violet-600 to-fuchsia-600 border-2 border-violet-700 shadow-xl shadow-violet-500/50 scale-105' 
-                                    : 'bg-gradient-to-br from-white to-violet-50 border-2 border-violet-200 hover:border-violet-400 hover:shadow-lg hover:shadow-violet-200/50'
+                                    ? 'bg-violet-50 border-2 border-violet-500 shadow-md' 
+                                    : 'bg-white/80 border border-violet-200 hover:border-violet-400 hover:shadow-sm'
                                   }
                                 `}
                               >
-                                <div className="flex items-start gap-3">
-                                  <div className={`
-                                    size-10 rounded-lg flex items-center justify-center flex-shrink-0
-                                    ${isSelected
-                                      ? 'bg-white/20 backdrop-blur-sm'
-                                      : 'bg-gradient-to-br from-violet-600 to-fuchsia-600'
-                                    }
-                                  `}>
-                                    {isSelected ? (
-                                      <CheckCircle2 className="size-5 text-white" />
-                                    ) : (
-                                      <ImageIcon className="size-5 text-white" />
-                                    )}
-                                  </div>
-                                  <div className="flex-1">
-                                    <div className={`mb-1 font-semibold ${isSelected ? 'text-white' : 'text-slate-900 group-hover:text-violet-900'}`}>
-                                      {style}
-                                    </div>
-                                    <div className={`text-xs ${isSelected ? 'text-violet-100' : 'text-slate-600'}`}>
-                                      {isSelected ? t('recommendations.selected') || '已选择' : t('recommendations.clickToUse')}
-                                    </div>
-                                  </div>
+                                <div className="flex items-center gap-2 mb-2">
                                   {isSelected ? (
-                                    <CheckCircle2 className="size-5 text-white" />
+                                    <CheckCircle2 className="size-4 text-violet-600" />
                                   ) : (
-                                    <ChevronRight className="size-5 text-slate-400 group-hover:text-violet-600" />
+                                    <ImageIcon className="size-4 text-violet-600" />
                                   )}
+                                  <span className={`text-sm font-medium ${isSelected ? 'text-violet-700' : 'text-slate-900'}`}>
+                                    {style}
+                                  </span>
+                                </div>
+                                <div className={`text-xs ${isSelected ? 'text-violet-600' : 'text-slate-600'}`}>
+                                  {isSelected ? t('recommendations.selected') || '已选择' : t('recommendations.clickToUse')}
                                 </div>
                               </div>
                             );
