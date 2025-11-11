@@ -59,7 +59,9 @@ export function LandingHero() {
                 <>
                   AI-Powered Visuals, Designed for{' '}
                   <span className="relative inline-block">
-                    <span className="relative z-10">E-Commerce Brands</span>
+                    <span className="relative z-10 bg-gradient-to-r from-violet-600 via-fuchsia-600 to-purple-600 bg-clip-text text-transparent">
+                      E-Commerce Brands
+                    </span>
                     <motion.div
                       className="absolute bottom-2 left-0 right-0 h-3 bg-gradient-to-r from-violet-200 to-fuchsia-200 -z-0"
                       initial={{ scaleX: 0 }}
@@ -72,7 +74,9 @@ export function LandingHero() {
                 <>
                   AI助力你的
                   <span className="relative inline-block">
-                    <span className="relative z-10">电商品牌</span>
+                    <span className="relative z-10 bg-gradient-to-r from-violet-600 via-fuchsia-600 to-purple-600 bg-clip-text text-transparent">
+                      电商品牌
+                    </span>
                     <motion.div
                       className="absolute bottom-2 left-0 right-0 h-3 bg-gradient-to-r from-violet-200 to-fuchsia-200 -z-0"
                       initial={{ scaleX: 0 }}
