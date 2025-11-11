@@ -16,6 +16,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Progress } from '@/components/ui/progress';
 import {
+  AlertCircle,
   Download,
   FileSpreadsheet,
   FileText,
@@ -73,7 +74,7 @@ export function BatchGenerationFlow({ generationType }: BatchGenerationFlowProps
   const [isGenerating, setIsGenerating] = useState(false);
   const [validationErrors, setValidationErrors] = useState<Array<{ row: number; field: string; message: string }>>([]);
   const [generationMode, setGenerationMode] = useState<'t2i' | 'i2i' | 't2v' | 'i2v'>(
-    generationType === 'image' ? 't2i' : 't2v'
+    generationType === 'image' ? 'i2i' : 'i2v'
   );
   const [aspectRatio, setAspectRatio] = useState<string>(
     generationType === 'image' ? '1:1' : '16:9'
@@ -81,6 +82,12 @@ export function BatchGenerationFlow({ generationType }: BatchGenerationFlowProps
   const [style, setStyle] = useState<string>(
     generationType === 'image' ? 'studio-shot' : 'spoken-script'
   );
+  // Image-specific settings
+  const [outputFormat, setOutputFormat] = useState<'PNG' | 'JPEG'>('PNG');
+  // Video-specific settings
+  const [videoModel, setVideoModel] = useState<'sora-2' | 'sora-2-pro'>('sora-2');
+  const [videoDuration, setVideoDuration] = useState<10 | 15>(10);
+  const [videoQuality, setVideoQuality] = useState<'standard' | 'high'>('standard');
   const [jobId, setJobId] = useState<string | null>(null);
   const [pollingInterval, setPollingInterval] = useState<NodeJS.Timeout | null>(null);
   const [generationProgress, setGenerationProgress] = useState<{ current: number; total: number }>({ current: 0, total: 0 });
@@ -91,6 +98,16 @@ export function BatchGenerationFlow({ generationType }: BatchGenerationFlowProps
   const { user, isAuthenticated } = useAuthStore();
   const progressIntervalsRef = useRef<Map<number, NodeJS.Timeout[]>>(new Map());
   const [userCredits, setUserCredits] = useState<number>(0);
+  
+  // Calculate dynamic video credit cost based on model, duration, and quality
+  const getVideoCreditCost = () => {
+    if (videoModel === 'sora-2') {
+      return creditsConfig.consumption.videoGeneration[`sora-2-720p-${videoDuration}s`];
+    } else {
+      const resolution = videoQuality === 'standard' ? '720p' : '1080p';
+      return creditsConfig.consumption.videoGeneration[`sora-2-pro-${resolution}-${videoDuration}s`];
+    }
+  };
   const [brandInfo, setBrandInfo] = useState<{
     brandName?: string;
     selectedStyle?: string;
@@ -521,6 +538,17 @@ export function BatchGenerationFlow({ generationType }: BatchGenerationFlowProps
           mode: generationMode,
           aspectRatio,
           style,
+          // Image-specific parameters
+          ...(generationType === 'image' && {
+            outputFormat: outputFormat.toLowerCase(), // 'png' or 'jpeg'
+            model: 'nano-banana', // Fixed model for images
+          }),
+          // Video-specific parameters
+          ...(generationType === 'video' && {
+            model: videoModel, // 'sora-2' or 'sora-2-pro'
+            duration: videoDuration, // 10 or 15
+            quality: videoModel === 'sora-2-pro' ? videoQuality : 'standard', // 'standard' or 'high'
+          }),
         }),
         credentials: 'include',
       });
@@ -941,9 +969,6 @@ export function BatchGenerationFlow({ generationType }: BatchGenerationFlowProps
                         <>
                           <SelectItem value="16:9">{t('aspectRatio16:9')}</SelectItem>
                           <SelectItem value="9:16">{t('aspectRatio9:16')}</SelectItem>
-                          <SelectItem value="1:1">{t('aspectRatio1:1')}</SelectItem>
-                          <SelectItem value="4:3">{t('aspectRatio4:3')}</SelectItem>
-                          <SelectItem value="3:4">{t('aspectRatio3:4')}</SelectItem>
                         </>
                       )}
                     </SelectContent>
@@ -967,6 +992,154 @@ export function BatchGenerationFlow({ generationType }: BatchGenerationFlowProps
                   </SelectContent>
                 </Select>
               </div>
+
+              {/* Image-specific settings */}
+              {generationType === 'image' && (
+                <div>
+                  <Label className="text-sm font-medium mb-2 block">Output Format</Label>
+                  <div className="grid grid-cols-2 gap-3">
+                    <button
+                      type="button"
+                      onClick={() => setOutputFormat('PNG')}
+                      disabled={isGenerating}
+                      className={`flex items-center justify-center rounded-lg border-2 py-2.5 px-4 text-sm font-medium transition-all ${
+                        outputFormat === 'PNG'
+                          ? 'border-purple-500 bg-purple-50 text-purple-700'
+                          : 'border-gray-200 bg-white text-gray-700 hover:border-purple-300'
+                      } disabled:opacity-50 disabled:cursor-not-allowed`}
+                    >
+                      <span>PNG</span>
+                      {outputFormat === 'PNG' && (
+                        <svg className="ml-2 h-4 w-4" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                        </svg>
+                      )}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setOutputFormat('JPEG')}
+                      disabled={isGenerating}
+                      className={`flex items-center justify-center rounded-lg border-2 py-2.5 px-4 text-sm font-medium transition-all ${
+                        outputFormat === 'JPEG'
+                          ? 'border-purple-500 bg-purple-50 text-purple-700'
+                          : 'border-gray-200 bg-white text-gray-700 hover:border-purple-300'
+                      } disabled:opacity-50 disabled:cursor-not-allowed`}
+                    >
+                      <span>JPEG</span>
+                      {outputFormat === 'JPEG' && (
+                        <svg className="ml-2 h-4 w-4" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                        </svg>
+                      )}
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* Video-specific settings */}
+              {generationType === 'video' && (
+                <>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <Label className="text-sm font-medium mb-2 block">Model</Label>
+                      <Select 
+                        value={videoModel} 
+                        onValueChange={(value) => {
+                          setVideoModel(value as 'sora-2' | 'sora-2-pro');
+                          if (value === 'sora-2') {
+                            setVideoQuality('standard');
+                          }
+                        }}
+                        disabled={isGenerating}
+                      >
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="sora-2">
+                            Sora 2 - {videoModel === 'sora-2' ? getVideoCreditCost() : creditsConfig.consumption.videoGeneration[`sora-2-720p-${videoDuration}s`]} credits
+                          </SelectItem>
+                          <SelectItem value="sora-2-pro">
+                            Sora 2 Pro - {videoModel === 'sora-2-pro' ? getVideoCreditCost() : creditsConfig.consumption.videoGeneration[`sora-2-pro-${videoQuality === 'standard' ? '720p' : '1080p'}-${videoDuration}s`]} credits
+                          </SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div>
+                      <Label className="text-sm font-medium mb-2 block">Duration</Label>
+                      <div className="grid grid-cols-2 gap-2">
+                        <button
+                          type="button"
+                          onClick={() => setVideoDuration(10)}
+                          disabled={isGenerating}
+                          className={`flex items-center justify-center rounded-lg border-2 py-2 px-3 text-sm font-medium transition-all ${
+                            videoDuration === 10
+                              ? 'border-purple-500 bg-purple-50 text-purple-700'
+                              : 'border-gray-200 bg-white text-gray-700 hover:border-purple-300'
+                          } disabled:opacity-50 disabled:cursor-not-allowed`}
+                        >
+                          10s
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setVideoDuration(15)}
+                          disabled={isGenerating}
+                          className={`flex items-center justify-center rounded-lg border-2 py-2 px-3 text-sm font-medium transition-all ${
+                            videoDuration === 15
+                              ? 'border-purple-500 bg-purple-50 text-purple-700'
+                              : 'border-gray-200 bg-white text-gray-700 hover:border-purple-300'
+                          } disabled:opacity-50 disabled:cursor-not-allowed`}
+                        >
+                          15s
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Quality selector - only for Sora 2 Pro */}
+                  {videoModel === 'sora-2-pro' && (
+                    <div>
+                      <Label className="text-sm font-medium mb-2 block">Quality</Label>
+                      <div className="grid grid-cols-2 gap-3">
+                        <button
+                          type="button"
+                          onClick={() => setVideoQuality('standard')}
+                          disabled={isGenerating}
+                          className={`flex items-center justify-center rounded-lg border-2 py-2.5 px-4 text-sm font-medium transition-all ${
+                            videoQuality === 'standard'
+                              ? 'border-purple-500 bg-purple-50 text-purple-700'
+                              : 'border-gray-200 bg-white text-gray-700 hover:border-purple-300'
+                          } disabled:opacity-50 disabled:cursor-not-allowed`}
+                        >
+                          <span>Standard (720P)</span>
+                          {videoQuality === 'standard' && (
+                            <svg className="ml-2 h-4 w-4" fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                            </svg>
+                          )}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setVideoQuality('high')}
+                          disabled={isGenerating}
+                          className={`flex items-center justify-center rounded-lg border-2 py-2.5 px-4 text-sm font-medium transition-all ${
+                            videoQuality === 'high'
+                              ? 'border-purple-500 bg-purple-50 text-purple-700'
+                              : 'border-gray-200 bg-white text-gray-700 hover:border-purple-300'
+                          } disabled:opacity-50 disabled:cursor-not-allowed`}
+                        >
+                          <span>High (1080P)</span>
+                          {videoQuality === 'high' && (
+                            <svg className="ml-2 h-4 w-4" fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                            </svg>
+                          )}
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </>
+              )}
             </div>
 
             {/* Template Download */}
@@ -991,6 +1164,25 @@ export function BatchGenerationFlow({ generationType }: BatchGenerationFlowProps
                 </Button>
               </div>
             </div>
+
+            {/* I2V Restriction Warning */}
+            {generationMode === 'i2v' && (
+              <div className="rounded-lg border border-amber-200 bg-amber-50 p-4">
+                <div className="flex items-start gap-3">
+                  <AlertCircle className="h-5 w-5 text-amber-600 flex-shrink-0 mt-0.5" />
+                  <div>
+                    <h4 className="font-semibold text-amber-900 text-sm mb-1">
+                      Important Notice
+                    </h4>
+                    <p className="text-amber-800 text-xs leading-relaxed">
+                      Image-to-video generation <strong>does not support images containing people, faces, or human figures</strong>. 
+                      Please upload product images, objects, landscapes, or abstract content only. 
+                      Images with people will be rejected or produce poor results.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
 
             {/* File Upload */}
             <div className="space-y-4">
