@@ -34,7 +34,7 @@ export function Hero() {
         <div className="mx-auto max-w-6xl text-center">
           {/* Heading */}
           <h1 className="fade-in slide-up animate-in delay-100 duration-700">
-            <span className="font-bold text-3xl leading-[1.1] tracking-tight sm:text-4xl md:text-5xl lg:text-6xl">
+            <span className="font-bold text-2xl leading-[1.1] tracking-tight sm:text-3xl md:text-4xl lg:text-5xl">
               {t('title')}{' '}
               <span className="animate-gradient bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 bg-clip-text text-transparent">
                 {t('titleHighlight')}
