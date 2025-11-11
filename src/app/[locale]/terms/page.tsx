@@ -1,6 +1,14 @@
 import { Card, CardContent } from '@/components/ui/card';
+import { creditsConfig } from '@/config/credits.config';
+import { paymentConfig } from '@/config/payment.config';
 
 export default function TermsPage() {
+  // Get configuration values
+  const imageCost = creditsConfig.consumption.imageGeneration['nano-banana'];
+  const videoCostMin = creditsConfig.consumption.videoGeneration['sora-2-720p-10s'];
+  const videoCostMax = creditsConfig.consumption.videoGeneration['sora-2-pro-1080p-15s'];
+  const freePlan = paymentConfig.plans.find(p => p.id === 'free');
+  const freeSignupBonus = freePlan?.credits.onSignup || 30;
   return (
     <div className="container mx-auto px-4 py-12 max-w-4xl">
       <h1 className="mb-8 text-4xl font-bold text-gray-900">Terms of Service</h1>
@@ -90,12 +98,14 @@ export default function TermsPage() {
               images or videos:
             </p>
             <ul className="list-disc list-inside space-y-1 ml-4">
-              <li>Image generation: 5 credits per image</li>
-              <li>Video generation: 20 credits per video</li>
+              <li>Image generation: {imageCost} credits per image</li>
+              <li>Video generation: {videoCostMin}-{videoCostMax} credits per video (depending on model, resolution, and duration)</li>
             </ul>
             <p className="mt-2">
-              Credits are valid for the duration of your subscription period and do not roll over
-              to the next billing cycle unless otherwise specified.
+              Free plan users receive {freeSignupBonus} credits as a sign-up bonus. Credits are valid for the 
+              duration of your subscription period and do not roll over to the next billing cycle unless 
+              otherwise specified. Credits earned through rewards (check-ins, referrals, sharing) remain 
+              active as long as your account is in good standing.
             </p>
 
             <h3 className="text-lg font-semibold text-gray-800 mt-4">4.4 Cancellation</h3>

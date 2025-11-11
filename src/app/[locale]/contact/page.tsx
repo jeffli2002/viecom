@@ -1,7 +1,9 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Mail, MessageSquare, Globe, Clock } from 'lucide-react';
+import { creditsConfig } from '@/config/credits.config';
 
 export default function ContactPage() {
+  const dailyCheckinCredits = creditsConfig.rewards.checkin.dailyCredits;
   return (
     <div className="container mx-auto px-4 py-12 max-w-4xl">
       <div className="mb-12 text-center">
@@ -101,7 +103,7 @@ export default function ContactPage() {
             </h3>
             <p className="text-gray-700 text-sm">
               You can upgrade to a higher plan for more monthly credits, or you can earn credits
-              through daily check-ins, referrals, and social sharing. Free users receive 2 credits
+              through daily check-ins, referrals, and social sharing. Free users receive {dailyCheckinCredits} credits
               per day through daily check-in.
             </p>
           </div>

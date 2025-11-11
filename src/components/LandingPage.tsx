@@ -19,12 +19,16 @@ import { motion } from 'motion/react';
 import { Badge } from './ui/badge';
 import { Button } from './ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
+import { paymentConfig } from '@/config/payment.config';
 
 interface LandingPageProps {
   onGetStarted: () => void;
 }
 
 export function LandingPage({ onGetStarted }: LandingPageProps) {
+  // Get free plan sign-up bonus
+  const freePlan = paymentConfig.plans.find(p => p.id === 'free');
+  const freeCredits = freePlan?.credits.onSignup || 30;
   return (
     <div className="min-h-screen bg-white overflow-hidden">
       {/* Navigation */}
@@ -149,7 +153,7 @@ export function LandingPage({ onGetStarted }: LandingPageProps) {
               </div>
               <div className="flex items-center gap-2">
                 <CheckCircle2 className="size-4 text-green-600" />
-                40 free credits
+                {freeCredits} free credits
               </div>
               <div className="flex items-center gap-2">
                 <CheckCircle2 className="size-4 text-green-600" />
@@ -867,7 +871,7 @@ export function LandingPage({ onGetStarted }: LandingPageProps) {
               </Button>
             </div>
             <p className="text-violet-200">
-              40 free credits · No credit card required · Cancel anytime
+              {freeCredits} free credits · No credit card required · Cancel anytime
             </p>
           </motion.div>
         </div>

@@ -1,0 +1,382 @@
+# Cursor Rules for Viecom Project
+
+## Pricing and Credits Configuration
+
+### ❌ NEVER Hardcode Pricing or Credit Values
+
+**CRITICAL**: All pricing, credit costs, and subscription features MUST be sourced from configuration files. Never hardcode numerical values related to pricing, credits, or plan features.
+
+### ✅ ALWAYS Use Configuration Files
+
+```typescript
+// Import configuration files
+import { paymentConfig } from '@/config/payment.config';
+import { creditsConfig } from '@/config/credits.config';
+```
+
+### Configuration Reference Guide
+
+#### 1. Plan Pricing and Features
+```typescript
+// ✅ CORRECT: Use paymentConfig
+const freePlan = paymentConfig.plans.find(p => p.id === 'free');
+const proPlan = paymentConfig.plans.find(p => p.id === 'pro');
+const proplusPlan = paymentConfig.plans.find(p => p.id === 'proplus');
+
+// Access plan properties
+plan.price              // Monthly price
+plan.yearlyPrice        // Yearly price
+plan.credits.monthly    // Monthly credits
+plan.credits.onSignup   // Sign-up bonus credits
+plan.features           // Array of feature strings
+
+// ❌ WRONG: Never hardcode
+const price = 14.9;
+const credits = 500;
+```
+
+#### 2. Credit Consumption Rates
+```typescript
+// ✅ CORRECT: Use creditsConfig
+// Image generation
+const imageCost = creditsConfig.consumption.imageGeneration['nano-banana']; // 5 credits
+
+// Video generation
+const sora2_720p_10s = creditsConfig.consumption.videoGeneration['sora-2-720p-10s']; // 15 credits
+const sora2_720p_15s = creditsConfig.consumption.videoGeneration['sora-2-720p-15s']; // 20 credits
+const sora2Pro_720p_10s = creditsConfig.consumption.videoGeneration['sora-2-pro-720p-10s']; // 45 credits
+const sora2Pro_720p_15s = creditsConfig.consumption.videoGeneration['sora-2-pro-720p-15s']; // 60 credits
+const sora2Pro_1080p_10s = creditsConfig.consumption.videoGeneration['sora-2-pro-1080p-10s']; // 100 credits
+const sora2Pro_1080p_15s = creditsConfig.consumption.videoGeneration['sora-2-pro-1080p-15s']; // 130 credits
+
+// ❌ WRONG: Never hardcode
+const imageCost = 5;
+const videoCost = 20;
+```
+
+#### 3. Reward Credits
+```typescript
+// ✅ CORRECT: Use creditsConfig.rewards
+const dailyCheckin = creditsConfig.rewards.checkin.dailyCredits; // 2 credits
+const weeklyBonus = creditsConfig.rewards.checkin.weeklyBonusCredits; // 5 credits
+const referralReward = creditsConfig.rewards.referral.creditsPerReferral; // 10 credits
+const shareReward = creditsConfig.rewards.socialShare.creditsPerShare; // 5 credits
+
+// ❌ WRONG: Never hardcode
+const checkin = 2;
+const referral = 10;
+```
+
+#### 4. Capacity Calculations
+```typescript
+// ✅ CORRECT: Calculate dynamically
+const monthlyCredits = plan.credits.monthly;
+const imageCount = Math.floor(monthlyCredits / creditsConfig.consumption.imageGeneration['nano-banana']);
+const videoCount = Math.floor(monthlyCredits / creditsConfig.consumption.videoGeneration['sora-2-720p-10s']);
+
+// Use in UI
+<p>Up to {imageCount} images or {videoCount} videos</p>
+
+// ❌ WRONG: Never hardcode calculations
+const imageCount = 100; // ❌
+const videoCount = 25;  // ❌
+```
+
+### Common Patterns and Examples
+
+#### Pattern 1: Display Plan Price
+```typescript
+// ✅ CORRECT
+const plan = paymentConfig.plans.find(p => p.id === 'pro');
+<p>${plan.price}/month</p>
+
+// ❌ WRONG
+<p>$14.9/month</p>
+```
+
+#### Pattern 2: Show Credit Costs
+```typescript
+// ✅ CORRECT
+<p>Image generation costs {creditsConfig.consumption.imageGeneration['nano-banana']} credits</p>
+<p>Video generation costs {creditsConfig.consumption.videoGeneration['sora-2-720p-10s']}-{creditsConfig.consumption.videoGeneration['sora-2-pro-1080p-15s']} credits</p>
+
+// ❌ WRONG
+<p>Image generation costs 5 credits</p>
+<p>Video generation costs 20 credits</p>
+```
+
+#### Pattern 3: Free Plan Sign-up Bonus
+```typescript
+// ✅ CORRECT
+const freePlan = paymentConfig.plans.find(p => p.id === 'free');
+<p>Get {freePlan.credits.onSignup} credits on sign-up</p>
+
+// ❌ WRONG
+<p>Get 30 credits on sign-up</p>
+```
+
+#### Pattern 4: Reward Information
+```typescript
+// ✅ CORRECT
+<ul>
+  <li>Daily check-in: {creditsConfig.rewards.checkin.dailyCredits} credits/day</li>
+  <li>Referral: {creditsConfig.rewards.referral.creditsPerReferral} credits/referral</li>
+  <li>Social share: {creditsConfig.rewards.socialShare.creditsPerShare} credits/share</li>
+</ul>
+
+// ❌ WRONG
+<ul>
+  <li>Daily check-in: 2 credits/day</li>
+  <li>Referral: 10 credits/referral</li>
+  <li>Social share: 5 credits/share</li>
+</ul>
+```
+
+#### Pattern 5: Video Model Pricing
+```typescript
+// ✅ CORRECT
+const sora2Pricing = {
+  '10s': creditsConfig.consumption.videoGeneration['sora-2-720p-10s'],
+  '15s': creditsConfig.consumption.videoGeneration['sora-2-720p-15s'],
+};
+
+const sora2ProPricing = {
+  '720p-10s': creditsConfig.consumption.videoGeneration['sora-2-pro-720p-10s'],
+  '720p-15s': creditsConfig.consumption.videoGeneration['sora-2-pro-720p-15s'],
+  '1080p-10s': creditsConfig.consumption.videoGeneration['sora-2-pro-1080p-10s'],
+  '1080p-15s': creditsConfig.consumption.videoGeneration['sora-2-pro-1080p-15s'],
+};
+
+// ❌ WRONG
+const sora2Cost = 20;
+const sora2ProCost = 60;
+```
+
+#### Pattern 6: Terms/Policy/FAQ Pages
+```typescript
+// ✅ CORRECT: Terms of Service
+import { paymentConfig } from '@/config/payment.config';
+import { creditsConfig } from '@/config/credits.config';
+
+export default function TermsPage() {
+  const imageCost = creditsConfig.consumption.imageGeneration['nano-banana'];
+  const videoCostMin = creditsConfig.consumption.videoGeneration['sora-2-720p-10s'];
+  const videoCostMax = creditsConfig.consumption.videoGeneration['sora-2-pro-1080p-15s'];
+  const freePlan = paymentConfig.plans.find(p => p.id === 'free');
+  
+  return (
+    <div>
+      <p>Image generation: {imageCost} credits per image</p>
+      <p>Video generation: {videoCostMin}-{videoCostMax} credits per video</p>
+      <p>Free users receive {freePlan.credits.onSignup} credits on sign-up</p>
+    </div>
+  );
+}
+
+// ✅ CORRECT: Contact/FAQ Page
+export default function ContactPage() {
+  const dailyCheckinCredits = creditsConfig.rewards.checkin.dailyCredits;
+  const referralCredits = creditsConfig.rewards.referral.creditsPerReferral;
+  
+  return (
+    <div>
+      <p>Earn {dailyCheckinCredits} credits per day through daily check-in</p>
+      <p>Get {referralCredits} credits for each successful referral</p>
+    </div>
+  );
+}
+
+// ❌ WRONG: Hardcoded in any page
+<p>Image generation costs 5 credits</p>
+<p>Free users get 30 credits on signup</p>
+<p>Earn 2 credits per day</p>
+```
+
+### Where This Rule Applies
+
+**CRITICAL**: Apply configuration-driven approach to **EVERY SINGLE PAGE AND COMPONENT** that mentions pricing, credits, plans, or features. NO EXCEPTIONS.
+
+#### 1. **Public Pages** (MUST use config)
+   - `/pricing` - Pricing page ✅
+   - `/terms` - Terms of service ✅ (mentions credit costs, plan features)
+   - `/privacy` - Privacy policy (if mentions payment/credits)
+   - `/about` - About page (if mentions features/pricing)
+   - `/contact` - Contact page ✅ (FAQ mentions credits)
+   - `/docs` - Documentation (if mentions pricing/credits)
+   - `/faq` - FAQ page (if exists, must use config)
+   - Landing pages and hero sections
+   - Marketing pages
+   - Help/Support pages
+
+#### 2. **Authenticated Pages** (MUST use config)
+   - `/dashboard` - User dashboard ✅
+   - Any page showing credit balance or usage
+   - Upgrade prompts and modals ✅
+   - Settings pages
+   - Billing/subscription management pages
+   - Usage history pages
+
+#### 3. **Components** (MUST use config)
+   - `UpgradePrompt.tsx` - Subscription upgrade modal ✅
+   - `Header.tsx` - Header with credit display
+   - `PricingCard.tsx` - Any pricing display component
+   - `CreditBalance.tsx` - Credit display components
+   - Any component showing pricing, features, or credit costs
+   - Tooltips and help text mentioning credits
+
+#### 4. **API Routes** (MUST use config)
+   - Credit deduction logic must use `creditsConfig`
+   - Subscription validation must use `paymentConfig`
+   - Billing webhook handlers
+   - Usage tracking endpoints
+
+#### 5. **Email Templates & Notifications** (if applicable)
+   - Welcome emails mentioning sign-up bonus
+   - Billing notifications
+   - Credit balance warnings
+   - Upgrade prompts in emails
+
+### Code Review Checklist
+
+Before submitting code, verify **EVERY SINGLE FILE**:
+
+- [ ] No hardcoded prices ($0, $14.9, $24.9, etc.)
+- [ ] No hardcoded credit amounts (30, 500, 900)
+- [ ] No hardcoded consumption rates (5, 15, 20, 45, 60, 100, 130)
+- [ ] No hardcoded reward amounts (2, 5, 10)
+- [ ] All calculations use config values
+- [ ] Import statements include config files where needed
+- [ ] Dynamic calculations for capacity (image/video counts)
+- [ ] FAQ/Terms/Privacy/Contact pages use config (if they mention pricing/credits)
+- [ ] All components importing pricing/credit data use config
+- [ ] No text like "5 credits", "30 credits", "$14.9" in JSX/HTML
+
+### Automated Verification Commands
+
+Run these before committing to find violations:
+
+```bash
+# Search for hardcoded credit amounts (common violations)
+grep -r "30 credits" src/app src/components
+grep -r "500 credits" src/app src/components
+grep -r "900 credits" src/app src/components
+grep -r "2 credits" src/app src/components
+grep -r "5 credits" src/app src/components
+grep -r "10 credits" src/app src/components
+
+# Search for hardcoded prices
+grep -r "\$14.9" src/app src/components
+grep -r "\$24.9" src/app src/components
+grep -r "14.9/month" src/app src/components
+
+# Search for hardcoded video costs
+grep -r "15 credits" src/app src/components
+grep -r "20 credits" src/app src/components
+grep -r "45 credits" src/app src/components
+grep -r "60 credits" src/app src/components
+grep -r "100 credits" src/app src/components
+grep -r "130 credits" src/app src/components
+```
+
+If any matches found (except in comments), they MUST be replaced with config values.
+
+### Migration Guide
+
+When updating existing code:
+
+1. **Find hardcoded values**
+   ```bash
+   # Search for common hardcoded values
+   grep -r "5 credits" src/
+   grep -r "20 credits" src/
+   grep -r "\$14.9" src/
+   grep -r "500 credits" src/
+   ```
+
+2. **Add imports**
+   ```typescript
+   import { paymentConfig } from '@/config/payment.config';
+   import { creditsConfig } from '@/config/credits.config';
+   ```
+
+3. **Replace hardcoded values**
+   - Replace with appropriate config property
+   - Update JSX to use template literals or variables
+   - Test that values display correctly
+
+4. **Verify consistency**
+   - Check that all instances use the same config source
+   - Ensure calculations match across pages
+
+### Benefits of Configuration-Driven Approach
+
+1. **Single Source of Truth**: Update once, reflect everywhere
+2. **Consistency**: No discrepancies between pages
+3. **Maintainability**: Easy to adjust pricing/features
+4. **Testability**: Can mock config for testing
+5. **Scalability**: Add new plans without code changes
+
+### Configuration File Locations
+
+```
+src/config/
+├── payment.config.ts    # Plans, pricing, features, limits
+├── credits.config.ts    # Credit consumption, rewards, quotas
+└── batch.config.ts      # Batch processing configuration
+```
+
+### Error Prevention
+
+Common mistakes to avoid:
+
+```typescript
+// ❌ WRONG: Hardcoded in component
+export function PricingCard() {
+  return <div>Pro Plan: $14.9/month with 500 credits</div>;
+}
+
+// ✅ CORRECT: Using config
+export function PricingCard() {
+  const proPlan = paymentConfig.plans.find(p => p.id === 'pro');
+  return <div>{proPlan.name}: ${proPlan.price}/month with {proPlan.credits.monthly} credits</div>;
+}
+```
+
+```typescript
+// ❌ WRONG: Hardcoded calculation
+const canGenerate = userCredits >= 5;
+
+// ✅ CORRECT: Using config
+const imageCost = creditsConfig.consumption.imageGeneration['nano-banana'];
+const canGenerate = userCredits >= imageCost;
+```
+
+---
+
+## General Best Practices
+
+### TypeScript
+- Always use TypeScript strict mode
+- Define proper interfaces for all data structures
+- Use type guards when necessary
+
+### React
+- Prefer functional components with hooks
+- Use proper dependency arrays in useEffect
+- Memoize expensive calculations with useMemo
+
+### Performance
+- Avoid unnecessary re-renders
+- Use React.memo for pure components
+- Lazy load heavy components
+
+### Security
+- Never expose API keys in client-side code
+- Validate all user inputs
+- Sanitize data before database operations
+
+---
+
+**Last Updated**: November 2024
+**Maintained By**: Viecom Development Team
+
