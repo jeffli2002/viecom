@@ -5,12 +5,13 @@ import { Button } from '@/components/ui/button';
 import { useAuthStore } from '@/store/auth-store';
 import { ArrowRight, CheckCircle2, Image as ImageIcon, Play, Sparkles, Video } from 'lucide-react';
 import { motion } from 'motion/react';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 import { Link } from '@/i18n/navigation';
 import { useEffect, useState } from 'react';
 
 export function LandingHero() {
   const t = useTranslations('hero');
+  const locale = useLocale();
   const { isAuthenticated } = useAuthStore();
   const [mounted, setMounted] = useState(false);
 
@@ -48,12 +49,41 @@ export function LandingHero() {
 
           <motion.h1
             className="text-slate-900 tracking-tight leading-[1.15]"
-            style={{ fontSize: 'clamp(1.75rem, 5vw, 3rem)' }}
+            style={{ fontSize: 'clamp(2.25rem, 6vw, 4.5rem)' }}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
           >
-            {t('title')}
+            <span>
+              {locale === 'en' ? (
+                <>
+                  AI-Powered Visuals, Designed for{' '}
+                  <span className="relative inline-block">
+                    <span className="relative z-10">E-Commerce Brands</span>
+                    <motion.div
+                      className="absolute bottom-2 left-0 right-0 h-3 bg-gradient-to-r from-violet-200 to-fuchsia-200 -z-0"
+                      initial={{ scaleX: 0 }}
+                      animate={{ scaleX: 1 }}
+                      transition={{ delay: 0.8, duration: 0.6 }}
+                    />
+                  </span>
+                </>
+              ) : (
+                <>
+                  AI助力你的
+                  <span className="relative inline-block">
+                    <span className="relative z-10">电商品牌</span>
+                    <motion.div
+                      className="absolute bottom-2 left-0 right-0 h-3 bg-gradient-to-r from-violet-200 to-fuchsia-200 -z-0"
+                      initial={{ scaleX: 0 }}
+                      animate={{ scaleX: 1 }}
+                      transition={{ delay: 0.8, duration: 0.6 }}
+                    />
+                  </span>
+                  和销售
+                </>
+              )}
+            </span>
           </motion.h1>
 
           <motion.p
