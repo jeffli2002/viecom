@@ -164,7 +164,14 @@
     "generate": "生成",
     "generating": "生成中...",
     "download": "下载",
-    "share": "分享"
+    "share": "分享",
+    "imageStyles": {
+      "studio-shot": "影棚拍摄",
+      "lifestyle": "生活方式",
+      "minimalist": "极简主义",
+      "seasonal": "季节主题",
+      "infographic": "信息图表"
+    }
   },
   "videoGeneration": {
     "subtitle": "创建专业的电商产品视频。支持Text-to-Video和Image-to-Video模式。",
@@ -253,6 +260,20 @@
     "aspectRatio9:16": "9:16 (竖屏)",
     "aspectRatio4:3": "4:3",
     "aspectRatio3:4": "3:4",
+    "imageStyles": {
+      "studio-shot": "影棚拍摄",
+      "lifestyle": "生活方式",
+      "minimalist": "极简主义",
+      "seasonal": "季节主题",
+      "infographic": "信息图表"
+    },
+    "videoStyles": {
+      "spoken-script": "口播文案型",
+      "product-comparison": "产品对比型",
+      "narrative-comedy": "叙事/喜剧型",
+      "360-showcase": "360度展示",
+      "product-demo": "产品演示"
+    },
     "enhance": "增强",
     "enhancePrompt": "增强 Prompt",
     "enhancePromptPlaceholder": "点击右侧按钮增强 Prompt，或手动输入",

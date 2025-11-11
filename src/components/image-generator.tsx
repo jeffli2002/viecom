@@ -30,6 +30,7 @@ import {
   X,
 } from 'lucide-react';
 import { useSearchParams } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { useEffect, useRef, useState } from 'react';
 
 interface GenerationResult {
@@ -42,6 +43,7 @@ interface GenerationResult {
 type GenerationMode = 'text-to-image' | 'image-to-image';
 
 export default function ImageGenerator() {
+  const t = useTranslations('imageGeneration');
   const searchParams = useSearchParams();
   const initialMode = (searchParams?.get('mode') as GenerationMode) || 'text-to-image';
 
@@ -565,7 +567,7 @@ export default function ImageGenerator() {
                 <SelectContent>
                   {IMAGE_STYLES.map((style) => (
                     <SelectItem key={style.id} value={style.id} title={style.description}>
-                      {style.displayName}
+                      {t(`imageStyles.${style.id}`)}
                     </SelectItem>
                   ))}
                 </SelectContent>

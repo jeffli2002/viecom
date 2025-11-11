@@ -164,7 +164,14 @@
     "generate": "Generate",
     "generating": "Generating...",
     "download": "Download",
-    "share": "Share"
+    "share": "Share",
+    "imageStyles": {
+      "studio-shot": "Studio Shot",
+      "lifestyle": "Lifestyle",
+      "minimalist": "Minimalist",
+      "seasonal": "Seasonal",
+      "infographic": "Infographic"
+    }
   },
   "videoGeneration": {
     "subtitle": "Create professional e-commerce product videos. Supports Text-to-Video and Image-to-Video modes.",
@@ -253,6 +260,20 @@
     "aspectRatio9:16": "9:16 (Portrait)",
     "aspectRatio4:3": "4:3",
     "aspectRatio3:4": "3:4",
+    "imageStyles": {
+      "studio-shot": "Studio Shot",
+      "lifestyle": "Lifestyle",
+      "minimalist": "Minimalist",
+      "seasonal": "Seasonal",
+      "infographic": "Infographic"
+    },
+    "videoStyles": {
+      "spoken-script": "Spoken Script",
+      "product-comparison": "Product Comparison",
+      "narrative-comedy": "Narrative/Comedy",
+      "360-showcase": "360° Showcase",
+      "product-demo": "Product Demo"
+    },
     "enhance": "Enhance",
     "enhancePrompt": "Enhance Prompt",
     "enhancePromptPlaceholder": "Click the button on the right to enhance Prompt, or enter manually",

@@ -986,7 +986,9 @@ export function BatchGenerationFlow({ generationType }: BatchGenerationFlowProps
                   <SelectContent>
                     {styles.map((s) => (
                       <SelectItem key={s.id} value={s.id} title={s.description}>
-                        {s.displayName}
+                        {generationType === 'image' 
+                          ? t(`imageStyles.${s.id}`) 
+                          : t(`videoStyles.${s.id}`)}
                       </SelectItem>
                     ))}
                   </SelectContent>
