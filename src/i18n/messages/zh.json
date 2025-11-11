@@ -52,10 +52,9 @@
     "brandAnalysisDesc": "AI驱动的品牌调性和风格分析"
   },
   "hero": {
-    "title": "产品视觉",
-    "titleHighlight": "自动销售",
-    "description": "使用AI生成专业的产品图片和视频。",
-    "descriptionSub": "无需拍摄。无需编辑。只需结果。",
+    "title": "AI助力你的电商品牌和销售",
+    "description": "专为电商产品打造的AI图片与AI视频生成平台。",
+    "descriptionSub": "支持批量生图、生视频，让每个SKU都能拥有统一又高质的视觉呈现。",
     "trustedBy": "全球50,000+品牌信赖",
     "ctaStart": "免费开始创作",
     "ctaLogin": "登录",

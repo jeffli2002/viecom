@@ -34,17 +34,17 @@ export function Hero() {
         <div className="mx-auto max-w-6xl text-center">
           {/* Heading */}
           <h1 className="fade-in slide-up animate-in delay-100 duration-700">
-            <span className="font-bold text-2xl leading-[1.1] tracking-tight sm:text-3xl md:text-4xl lg:text-5xl">
-              {t('title')}{' '}
-              <span className="animate-gradient bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 bg-clip-text text-transparent">
-                {t('titleHighlight')}
-              </span>
+            <span className="font-bold text-xl leading-[1.2] tracking-tight sm:text-2xl md:text-3xl lg:text-4xl">
+              {t('title')}
             </span>
           </h1>
 
           {/* Description */}
-          <p className="fade-in slide-up mx-auto mt-8 max-w-3xl animate-in text-lg text-muted-foreground delay-200 duration-700 md:text-xl">
+          <p className="fade-in slide-up mx-auto mt-6 max-w-3xl animate-in text-base text-gray-700 delay-200 duration-700 md:text-lg">
             {t('description')}
+          </p>
+          <p className="fade-in slide-up mx-auto mt-3 max-w-3xl animate-in text-sm text-gray-600 delay-250 duration-700 md:text-base">
+            {t('descriptionSub')}
           </p>
 
           {/* CTA Buttons */}
