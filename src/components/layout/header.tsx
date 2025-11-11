@@ -151,17 +151,12 @@ export function Header() {
             <>
               <CheckinDropdown />
               <LanguageSwitcher />
-              <Link href="/dashboard">
-                <Button variant="ghost" size="sm">
-                  {t('dashboard')}
-                </Button>
-              </Link>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="relative h-10 w-10 rounded-full">
-                    <Avatar className="h-10 w-10">
-                      <AvatarImage src={user.image || ''} alt={user.name || ''} />
-                      <AvatarFallback>
+                  <Button variant="ghost" className="relative h-10 w-10 rounded-full p-0">
+                    <Avatar className="h-10 w-10 border-2 border-purple-500">
+                      <AvatarImage src={user.image || ''} alt={user.name || ''} className="rounded-full" />
+                      <AvatarFallback className="bg-purple-600 text-white rounded-full">
                         {user.name?.charAt(0).toUpperCase() || <User className="h-4 w-4" />}
                       </AvatarFallback>
                     </Avatar>

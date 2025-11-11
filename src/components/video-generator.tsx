@@ -58,6 +58,8 @@ export default function VideoGenerator() {
   const [aspectRatio, setAspectRatio] = useState<string>('16:9');
   const [model, setModel] = useState<string>('sora-2');
   const [videoStyle, setVideoStyle] = useState<string>('spoken-script'); // Video style selection
+  const [duration, setDuration] = useState<10 | 15>(10); // Video duration selection
+  const [outputFormat, setOutputFormat] = useState<'MP4'>('MP4'); // Output format selection
   const [isGenerating, setIsGenerating] = useState(false);
   const [result, setResult] = useState<GenerationResult | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -271,6 +273,8 @@ export default function VideoGenerator() {
         model: model,
         aspect_ratio: aspectRatio,
         style: videoStyle, // Pass style to API
+        duration: duration, // Pass video duration (10 or 15 seconds)
+        output_format: outputFormat.toLowerCase(), // Pass output format (mp4)
       };
 
       if (mode === 'image-to-video' && imagePreview) {
@@ -359,9 +363,21 @@ export default function VideoGenerator() {
           <Card className="p-6">
             <div className="mb-6 space-y-4">
               <Tabs value={mode} onValueChange={(value) => setMode(value as GenerationMode)}>
-                <TabsList className="grid w-full grid-cols-2">
-                  <TabsTrigger value="text-to-video">Text-to-Video</TabsTrigger>
-                  <TabsTrigger value="image-to-video">Image-to-Video</TabsTrigger>
+                <TabsList className="grid w-full grid-cols-2 bg-transparent gap-3 p-0">
+                  <TabsTrigger 
+                    value="text-to-video"
+                    className="font-medium data-[state=active]:bg-purple-600 data-[state=active]:text-white data-[state=inactive]:border-2 data-[state=inactive]:border-gray-300 data-[state=inactive]:rounded-full data-[state=inactive]:bg-white data-[state=inactive]:text-gray-700 rounded-full py-3 transition-all"
+                  >
+                    <Sparkles className="mr-2 h-4 w-4" />
+                    Text-to-Video
+                  </TabsTrigger>
+                  <TabsTrigger 
+                    value="image-to-video"
+                    className="font-medium data-[state=active]:bg-purple-600 data-[state=active]:text-white data-[state=inactive]:border-2 data-[state=inactive]:border-gray-300 data-[state=inactive]:rounded-full data-[state=inactive]:bg-white data-[state=inactive]:text-gray-700 rounded-full py-3 transition-all"
+                  >
+                    <VideoIcon className="mr-2 h-4 w-4" />
+                    Image-to-Video
+                  </TabsTrigger>
                 </TabsList>
 
                 <TabsContent value="text-to-video" className="mt-6 space-y-6">
@@ -588,10 +604,59 @@ export default function VideoGenerator() {
                 </div>
               </div>
 
-              <div className="rounded-lg border border-gray-200 bg-gray-50 p-3 text-sm">
-                <p className="text-gray-700">
-                  <strong>Credits:</strong> {videoCreditCost} credits per video
-                </p>
+              <div className="space-y-2">
+                <Label className="font-light text-gray-700 text-sm">Video Duration</Label>
+                <div className="grid grid-cols-2 gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setDuration(10)}
+                    className={`flex items-center justify-center rounded-lg border-2 py-3 px-4 text-sm font-medium transition-all ${
+                      duration === 10
+                        ? 'border-purple-500 bg-purple-50 text-purple-700'
+                        : 'border-gray-200 bg-white text-gray-700 hover:border-purple-300'
+                    }`}
+                  >
+                    <span>10 seconds</span>
+                    {duration === 10 && (
+                      <svg className="ml-2 h-4 w-4" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                      </svg>
+                    )}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setDuration(15)}
+                    className={`flex items-center justify-center rounded-lg border-2 py-3 px-4 text-sm font-medium transition-all ${
+                      duration === 15
+                        ? 'border-purple-500 bg-purple-50 text-purple-700'
+                        : 'border-gray-200 bg-white text-gray-700 hover:border-purple-300'
+                    }`}
+                  >
+                    <span>15 seconds</span>
+                    {duration === 15 && (
+                      <svg className="ml-2 h-4 w-4" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                      </svg>
+                    )}
+                  </button>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label className="font-light text-gray-700 text-sm">Output Format</Label>
+                <div className="flex">
+                  <button
+                    type="button"
+                    onClick={() => setOutputFormat('MP4')}
+                    className="flex-1 flex items-center justify-center rounded-lg border-2 border-purple-500 bg-purple-50 text-purple-700 py-3 px-4 text-sm font-medium"
+                    disabled
+                  >
+                    <span>MP4</span>
+                    <svg className="ml-2 h-4 w-4" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                    </svg>
+                  </button>
+                </div>
               </div>
 
               <Button

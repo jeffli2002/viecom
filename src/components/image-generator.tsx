@@ -56,6 +56,7 @@ export default function ImageGenerator() {
   const [aspectRatio, setAspectRatio] = useState<string>('1:1');
   const [model, setModel] = useState<string>('nano-banana');
   const [imageStyle, setImageStyle] = useState<string>('studio-shot'); // Image style selection
+  const [outputFormat, setOutputFormat] = useState<'PNG' | 'JPEG'>('PNG'); // Output format selection
   const [isGenerating, setIsGenerating] = useState(false);
   const [result, setResult] = useState<GenerationResult | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -271,6 +272,7 @@ export default function ImageGenerator() {
         model: model,
         aspect_ratio: aspectRatio,
         style: imageStyle, // Pass style to API
+        output_format: outputFormat.toLowerCase(), // Pass output format (png or jpeg)
       };
 
       if (mode === 'image-to-image' && imagePreview) {
@@ -358,12 +360,18 @@ export default function ImageGenerator() {
   return (
     <div className="mx-auto max-w-7xl">
       <Tabs value={mode} onValueChange={(v) => setMode(v as GenerationMode)} className="w-full">
-        <TabsList className="mx-auto mb-8 grid w-full max-w-md grid-cols-2">
-          <TabsTrigger value="text-to-image" className="font-light">
+        <TabsList className="mx-auto mb-8 grid w-full max-w-md grid-cols-2 bg-transparent gap-3 p-0">
+          <TabsTrigger 
+            value="text-to-image" 
+            className="font-medium data-[state=active]:bg-purple-600 data-[state=active]:text-white data-[state=inactive]:border-2 data-[state=inactive]:border-gray-300 data-[state=inactive]:rounded-full data-[state=inactive]:bg-white data-[state=inactive]:text-gray-700 rounded-full py-3 transition-all"
+          >
             <Sparkles className="mr-2 h-4 w-4" />
             Text to Image
           </TabsTrigger>
-          <TabsTrigger value="image-to-image" className="font-light">
+          <TabsTrigger 
+            value="image-to-image" 
+            className="font-medium data-[state=active]:bg-purple-600 data-[state=active]:text-white data-[state=inactive]:border-2 data-[state=inactive]:border-gray-300 data-[state=inactive]:rounded-full data-[state=inactive]:bg-white data-[state=inactive]:text-gray-700 rounded-full py-3 transition-all"
+          >
             <ImageIcon className="mr-2 h-4 w-4" />
             Image to Image
           </TabsTrigger>
@@ -573,16 +581,7 @@ export default function ImageGenerator() {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="nano-banana">
-                      Nano Banana (Gemini 2.5 Flash) -{' '}
-                      {creditsConfig.consumption.imageGeneration['nano-banana']} credits
-                    </SelectItem>
-                    <SelectItem value="flux-1.1-pro">
-                      Flux 1.1 Pro - {creditsConfig.consumption.imageGeneration['flux-1.1-pro']}{' '}
-                      credits
-                    </SelectItem>
-                    <SelectItem value="flux-1.1-ultra">
-                      Flux 1.1 Ultra - {creditsConfig.consumption.imageGeneration['flux-1.1-ultra']}{' '}
-                      credits
+                      Nano Banana - {creditsConfig.consumption.imageGeneration['nano-banana']} credits
                     </SelectItem>
                   </SelectContent>
                 </Select>
@@ -605,10 +604,42 @@ export default function ImageGenerator() {
               </div>
             </div>
 
-            <div className="rounded-lg border border-gray-200 bg-gray-50 p-3 text-sm">
-              <p className="text-gray-700">
-                <strong>Credits:</strong> Dynamic based on model
-              </p>
+            <div className="space-y-2">
+              <Label className="font-light text-gray-700 text-sm">Output Format</Label>
+              <div className="grid grid-cols-2 gap-3">
+                <button
+                  type="button"
+                  onClick={() => setOutputFormat('PNG')}
+                  className={`flex items-center justify-center rounded-lg border-2 py-3 px-4 text-sm font-medium transition-all ${
+                    outputFormat === 'PNG'
+                      ? 'border-purple-500 bg-purple-50 text-purple-700'
+                      : 'border-gray-200 bg-white text-gray-700 hover:border-purple-300'
+                  }`}
+                >
+                  <span>PNG</span>
+                  {outputFormat === 'PNG' && (
+                    <svg className="ml-2 h-4 w-4" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                    </svg>
+                  )}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setOutputFormat('JPEG')}
+                  className={`flex items-center justify-center rounded-lg border-2 py-3 px-4 text-sm font-medium transition-all ${
+                    outputFormat === 'JPEG'
+                      ? 'border-purple-500 bg-purple-50 text-purple-700'
+                      : 'border-gray-200 bg-white text-gray-700 hover:border-purple-300'
+                  }`}
+                >
+                  <span>JPEG</span>
+                  {outputFormat === 'JPEG' && (
+                    <svg className="ml-2 h-4 w-4" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                    </svg>
+                  )}
+                </button>
+              </div>
             </div>
 
             <Button
