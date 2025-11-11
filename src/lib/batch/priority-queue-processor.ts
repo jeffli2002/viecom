@@ -7,7 +7,7 @@ import { randomUUID } from 'node:crypto';
 import { db } from '@/server/db';
 import { batchGenerationJob, generatedAsset } from '@/server/db/schema';
 import { eq } from 'drizzle-orm';
-import { creditService } from '@/server/services/credit-service';
+import { creditService } from '@/lib/credits';
 import { r2StorageService } from '@/lib/storage/r2';
 import { getKieApiService } from '@/lib/kie/kie-api';
 import { getVideoModelInfo } from '@/config/credits.config';
