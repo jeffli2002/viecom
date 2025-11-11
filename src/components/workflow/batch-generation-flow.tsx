@@ -824,37 +824,37 @@ export function BatchGenerationFlow({ generationType }: BatchGenerationFlowProps
     <div className="space-y-6">
       {/* Brand Info Banner (if from brand analysis) */}
       {brandInfo && (
-        <Card className="border-2 border-violet-200 bg-gradient-to-r from-violet-50 to-fuchsia-50 shadow-lg">
+        <Card className="border border-violet-200 bg-gray-50">
           <CardContent className="p-6">
             <div className="flex items-start justify-between">
               <div className="flex-1">
                 <div className="flex items-center gap-3 mb-2">
-                  <div className="p-2 rounded-lg bg-gradient-to-br from-violet-600 to-fuchsia-600">
-                    <Sparkles className="size-5 text-white" />
+                  <div className="p-2 rounded-lg bg-violet-100">
+                    <Sparkles className="size-5 text-violet-600" />
                   </div>
                   <div>
                     <h3 className="text-lg font-bold text-slate-900">
                       {t('brandContext') || '品牌上下文已应用'}
                     </h3>
-                    <p className="text-sm text-violet-700 font-medium">
+                    <p className="text-sm text-slate-700 font-medium">
                       {brandInfo.brandName}
                     </p>
                   </div>
                 </div>
                 <div className="flex flex-wrap gap-2 mt-3">
                   {brandInfo.selectedStyle && (
-                    <Badge className="bg-violet-600 text-white hover:bg-violet-700 shadow-md">
+                    <Badge className="bg-violet-100 text-violet-700 hover:bg-violet-200 border border-violet-200">
                       <Zap className="size-3 mr-1" />
                       {t('selectedStyle') || '风格'}: {brandInfo.selectedStyle}
                     </Badge>
                   )}
                   {brandInfo.brandTone && (
-                    <Badge variant="outline" className="border-violet-400 text-violet-700 bg-white">
+                    <Badge className="bg-purple-100 text-purple-700 hover:bg-purple-200 border border-purple-200">
                       {t('brandTone') || '品牌调性'}: {typeof brandInfo.brandTone === 'string' ? brandInfo.brandTone : brandInfo.brandTone?.slice(0, 3).join('、')}
                     </Badge>
                   )}
                   {brandInfo.colors?.primary && (
-                    <Badge variant="outline" className="border-violet-400 text-violet-700 bg-white">
+                    <Badge className="bg-blue-100 text-blue-700 hover:bg-blue-200 border border-blue-200">
                       <div 
                         className="w-3 h-3 rounded-full mr-1 border border-slate-300" 
                         style={{ backgroundColor: brandInfo.colors.primary }}
@@ -1094,21 +1094,21 @@ export function BatchGenerationFlow({ generationType }: BatchGenerationFlowProps
           {/* Overall Statistics */}
           <div className="space-y-4">
             <div className="grid grid-cols-2 gap-3">
-              <div className="bg-blue-50 rounded-lg p-3 border border-blue-200">
-                <div className="text-2xl font-bold text-blue-600">{totalRows}</div>
-                <div className="text-xs text-blue-600 mt-1">{t('total')}</div>
+              <div className="bg-gray-50 rounded-lg p-3 border border-slate-200">
+                <div className="text-2xl font-bold text-slate-700">{totalRows}</div>
+                <div className="text-xs text-slate-600 mt-1">{t('total')}</div>
               </div>
-              <div className="bg-green-50 rounded-lg p-3 border border-green-200">
+              <div className="bg-gray-50 rounded-lg p-3 border border-slate-200">
                 <div className="text-2xl font-bold text-green-600">{completedCount}</div>
-                <div className="text-xs text-green-600 mt-1">{t('completed')}</div>
+                <div className="text-xs text-slate-600 mt-1">{t('completed')}</div>
               </div>
-              <div className="bg-yellow-50 rounded-lg p-3 border border-yellow-200">
-                <div className="text-2xl font-bold text-yellow-600">{generatingCount}</div>
-                <div className="text-xs text-yellow-600 mt-1">{t('generatingStatus')}</div>
+              <div className="bg-gray-50 rounded-lg p-3 border border-slate-200">
+                <div className="text-2xl font-bold text-amber-600">{generatingCount}</div>
+                <div className="text-xs text-slate-600 mt-1">{t('generatingStatus')}</div>
               </div>
-              <div className="bg-red-50 rounded-lg p-3 border border-red-200">
+              <div className="bg-gray-50 rounded-lg p-3 border border-slate-200">
                 <div className="text-2xl font-bold text-red-600">{failedCount}</div>
-                <div className="text-xs text-red-600 mt-1">{t('failed')}</div>
+                <div className="text-xs text-slate-600 mt-1">{t('failed')}</div>
               </div>
             </div>
 
