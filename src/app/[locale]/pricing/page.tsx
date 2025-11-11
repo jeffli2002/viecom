@@ -57,119 +57,6 @@ export default function PricingPage() {
         </div>
       </div>
 
-      {/* Credit Costs */}
-      <div className="mb-12 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg p-6 border border-purple-200">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4 text-center">
-          Credit Consumption Rates
-        </h3>
-        
-        {/* Image Generation */}
-        <div className="mb-6">
-          <div className="bg-white rounded-lg p-4 border border-blue-100 max-w-md mx-auto">
-            <div className="flex items-center gap-2 mb-2">
-              <Zap className="h-4 w-4 text-blue-600" />
-              <span className="font-semibold text-gray-900">Image Generation</span>
-            </div>
-            <p className="text-2xl font-bold text-blue-600">
-              {creditsConfig.consumption.imageGeneration['nano-banana']} credits
-            </p>
-            <p className="text-sm text-gray-600">per image (Nano Banana model)</p>
-          </div>
-        </div>
-
-        {/* Video Generation */}
-        <div>
-          <div className="text-center mb-3">
-            <div className="flex items-center gap-2 justify-center mb-1">
-              <Sparkles className="h-5 w-5 text-purple-600" />
-              <span className="font-semibold text-gray-900 text-lg">Video Generation</span>
-            </div>
-            <p className="text-xs text-gray-600">Pricing varies by model, resolution, and duration</p>
-          </div>
-          
-          <div className="grid md:grid-cols-2 gap-4 max-w-4xl mx-auto">
-            {/* Sora 2 */}
-            <div className="bg-white rounded-lg p-4 border border-purple-100">
-              <div className="mb-3">
-                <Badge className="bg-blue-100 text-blue-700 hover:bg-blue-100">Sora 2</Badge>
-                <p className="text-xs text-gray-500 mt-1">Standard quality • 720P • 2-3 min</p>
-              </div>
-              <div className="space-y-2">
-                <div className="flex justify-between items-center">
-                  <span className="text-sm text-gray-700">10 seconds</span>
-                  <span className="font-bold text-blue-600">
-                    {creditsConfig.consumption.videoGeneration['sora-2-720p-10s']} credits
-                  </span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-sm text-gray-700">15 seconds</span>
-                  <span className="font-bold text-blue-600">
-                    {creditsConfig.consumption.videoGeneration['sora-2-720p-15s']} credits
-                  </span>
-                </div>
-              </div>
-              <div className="mt-3 pt-3 border-t border-gray-100">
-                <p className="text-xs text-gray-600">
-                  💰 Most economical • ⚡ Fast generation
-                </p>
-              </div>
-            </div>
-
-            {/* Sora 2 Pro */}
-            <div className="bg-white rounded-lg p-4 border border-purple-200 relative">
-              <div className="absolute -top-2 -right-2">
-                <Badge className="bg-purple-600 text-white text-xs">Pro</Badge>
-              </div>
-              <div className="mb-3">
-                <Badge className="bg-purple-100 text-purple-700 hover:bg-purple-100">Sora 2 Pro</Badge>
-                <p className="text-xs text-gray-500 mt-1">High quality • 720P/1080P • 2-13 min</p>
-              </div>
-              <div className="space-y-2">
-                <div className="text-xs font-semibold text-gray-500 mb-1">720P Resolution:</div>
-                <div className="flex justify-between items-center pl-2">
-                  <span className="text-sm text-gray-700">10 seconds</span>
-                  <span className="font-bold text-purple-600">
-                    {creditsConfig.consumption.videoGeneration['sora-2-pro-720p-10s']} credits
-                  </span>
-                </div>
-                <div className="flex justify-between items-center pl-2">
-                  <span className="text-sm text-gray-700">15 seconds</span>
-                  <span className="font-bold text-purple-600">
-                    {creditsConfig.consumption.videoGeneration['sora-2-pro-720p-15s']} credits
-                  </span>
-                </div>
-                <div className="text-xs font-semibold text-gray-500 mb-1 mt-3">1080P Resolution:</div>
-                <div className="flex justify-between items-center pl-2">
-                  <span className="text-sm text-gray-700">10 seconds</span>
-                  <span className="font-bold text-purple-600">
-                    {creditsConfig.consumption.videoGeneration['sora-2-pro-1080p-10s']} credits
-                  </span>
-                </div>
-                <div className="flex justify-between items-center pl-2">
-                  <span className="text-sm text-gray-700">15 seconds</span>
-                  <span className="font-bold text-purple-600">
-                    {creditsConfig.consumption.videoGeneration['sora-2-pro-1080p-15s']} credits
-                  </span>
-                </div>
-              </div>
-              <div className="mt-3 pt-3 border-t border-purple-100">
-                <p className="text-xs text-gray-600">
-                  ✨ Premium quality • 🎬 Professional grade
-                </p>
-              </div>
-            </div>
-          </div>
-
-          {/* Pricing Tips */}
-          <div className="mt-4 bg-amber-50 rounded-lg p-3 border border-amber-200 max-w-4xl mx-auto">
-            <p className="text-xs text-amber-900">
-              <strong>💡 Pro Tip:</strong> Use Sora 2 for drafts and iterations (economical), 
-              then upgrade to Sora 2 Pro 1080P for final deliverables (premium quality).
-            </p>
-          </div>
-        </div>
-      </div>
-
       {/* Pricing Cards */}
       <div className="grid md:grid-cols-3 gap-6 mb-12">
         {plans.map((plan) => (
@@ -240,6 +127,126 @@ export default function PricingPage() {
         ))}
       </div>
 
+      {/* Credit Consumption Rates */}
+      <div className="mb-12 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg p-6 border border-purple-200">
+        <h3 className="text-2xl font-bold text-gray-900 mb-6 text-center">
+          Credit Consumption Rates
+        </h3>
+        
+        <div className="grid lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
+          {/* Image Generation - Single Card */}
+          <div className="lg:col-span-1">
+            <div className="bg-white rounded-lg p-6 border border-blue-200 h-full">
+              <div className="flex items-center gap-2 mb-4">
+                <Sparkles className="h-5 w-5 text-blue-600" />
+                <span className="font-bold text-gray-900 text-lg">Image Generation</span>
+              </div>
+              <p className="text-3xl font-bold text-blue-600 mb-2">
+                {creditsConfig.consumption.imageGeneration['nano-banana']} credits
+              </p>
+              <p className="text-sm text-gray-600 mb-4">per image (Nano Banana model)</p>
+              <div className="pt-4 border-t border-blue-100">
+                <p className="text-xs text-gray-600">
+                  ⚡ Fast generation • 📸 High quality
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Video Generation - Two Cards in Column */}
+          <div className="lg:col-span-2">
+            <div className="text-center mb-4">
+              <div className="flex items-center gap-2 justify-center mb-1">
+                <Sparkles className="h-5 w-5 text-purple-600" />
+                <span className="font-bold text-gray-900 text-lg">Video Generation</span>
+              </div>
+              <p className="text-sm text-gray-600">Pricing varies by model, resolution, and duration</p>
+            </div>
+            
+            <div className="grid md:grid-cols-2 gap-4">
+              {/* Sora 2 */}
+              <div className="bg-white rounded-lg p-4 border border-purple-100">
+                <div className="mb-3">
+                  <Badge className="bg-blue-100 text-blue-700 hover:bg-blue-100">Sora 2</Badge>
+                  <p className="text-xs text-gray-500 mt-1">Standard quality • 720P • 2-3 min</p>
+                </div>
+                <div className="space-y-2">
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm text-gray-700">10 seconds</span>
+                    <span className="font-bold text-blue-600">
+                      {creditsConfig.consumption.videoGeneration['sora-2-720p-10s']} credits
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm text-gray-700">15 seconds</span>
+                    <span className="font-bold text-blue-600">
+                      {creditsConfig.consumption.videoGeneration['sora-2-720p-15s']} credits
+                    </span>
+                  </div>
+                </div>
+                <div className="mt-3 pt-3 border-t border-gray-100">
+                  <p className="text-xs text-gray-600">
+                    💰 Most economical • ⚡ Fast generation
+                  </p>
+                </div>
+              </div>
+
+              {/* Sora 2 Pro */}
+              <div className="bg-white rounded-lg p-4 border border-purple-200 relative">
+                <div className="absolute -top-2 -right-2">
+                  <Badge className="bg-purple-600 text-white text-xs">Pro</Badge>
+                </div>
+                <div className="mb-3">
+                  <Badge className="bg-purple-100 text-purple-700 hover:bg-purple-100">Sora 2 Pro</Badge>
+                  <p className="text-xs text-gray-500 mt-1">High quality • 720P/1080P • 2-13 min</p>
+                </div>
+                <div className="space-y-2">
+                  <div className="text-xs font-semibold text-gray-500 mb-1">720P Resolution:</div>
+                  <div className="flex justify-between items-center pl-2">
+                    <span className="text-sm text-gray-700">10 seconds</span>
+                    <span className="font-bold text-purple-600">
+                      {creditsConfig.consumption.videoGeneration['sora-2-pro-720p-10s']} credits
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center pl-2">
+                    <span className="text-sm text-gray-700">15 seconds</span>
+                    <span className="font-bold text-purple-600">
+                      {creditsConfig.consumption.videoGeneration['sora-2-pro-720p-15s']} credits
+                    </span>
+                  </div>
+                  <div className="text-xs font-semibold text-gray-500 mb-1 mt-3">1080P Resolution:</div>
+                  <div className="flex justify-between items-center pl-2">
+                    <span className="text-sm text-gray-700">10 seconds</span>
+                    <span className="font-bold text-purple-600">
+                      {creditsConfig.consumption.videoGeneration['sora-2-pro-1080p-10s']} credits
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center pl-2">
+                    <span className="text-sm text-gray-700">15 seconds</span>
+                    <span className="font-bold text-purple-600">
+                      {creditsConfig.consumption.videoGeneration['sora-2-pro-1080p-15s']} credits
+                    </span>
+                  </div>
+                </div>
+                <div className="mt-3 pt-3 border-t border-purple-100">
+                  <p className="text-xs text-gray-600">
+                    ✨ Premium quality • 🎬 Professional grade
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Pricing Tips */}
+            <div className="mt-4 bg-amber-50 rounded-lg p-3 border border-amber-200">
+              <p className="text-xs text-amber-900">
+                <strong>💡 Pro Tip:</strong> Use Sora 2 for drafts and iterations (economical), 
+                then upgrade to Sora 2 Pro 1080P for final deliverables (premium quality).
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* FAQ */}
       <Card className="mb-12">
         <CardHeader>
@@ -282,9 +289,10 @@ export default function PricingPage() {
               Is there a free plan?
             </h3>
             <p className="text-gray-700 text-sm">
-              Yes! The Free plan is completely free forever. You get 30 credits on signup and can earn 
-              2 credits per day through daily check-ins. You can also earn bonus credits through referrals 
-              and social sharing.
+              Yes! The Free plan is completely free forever. You get {paymentConfig.plans[0].credits.onSignup} credits 
+              as a sign-up bonus and can earn {creditsConfig.rewards.checkin.dailyCredits} credits per day through daily check-ins. 
+              You can also earn bonus credits through referrals ({creditsConfig.rewards.referral.creditsPerReferral} credits per referral) 
+              and social sharing ({creditsConfig.rewards.socialShare.creditsPerShare} credits per share).
             </p>
           </div>
 
