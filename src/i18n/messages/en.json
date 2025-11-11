@@ -191,6 +191,10 @@
     "subtitle": "Upload Excel/CSV files to batch generate images and videos, and automatically publish to e-commerce platforms",
     "subtitleImage": "Upload Excel/CSV files to batch generate product images",
     "subtitleVideo": "Upload Excel/CSV files to batch generate product videos",
+    "brandContext": "Brand Context Applied",
+    "selectedStyle": "Style",
+    "brandTone": "Brand Tone",
+    "primaryColor": "Primary Color",
     "generationMode": "Generation Mode",
     "aspectRatio": "Aspect Ratio",
     "imageStyle": "Image Style",
@@ -345,7 +349,7 @@
   "brandAnalysis": {
     "title": "Brand Intelligence Analysis",
     "subtitle": "AI-Powered Brand Analysis",
-    "poweredBy": "Powered by Firecrawl + DeepSeek AI",
+    "poweredBy": "Powered by AI",
     "hero": {
       "title": "Deep Brand Insights",
       "titleHighlight": "Discover Market Opportunities",
@@ -361,9 +365,9 @@
     },
     "steps": {
       "connecting": "Connecting to website...",
-      "scraping": "Scraping content (Firecrawl)",
+      "scraping": "Scraping content",
       "extracting": "Extracting brand elements...",
-      "analyzing": "AI deep analysis (DeepSeek)",
+      "analyzing": "AI deep analysis",
       "generating": "Generating brand report..."
     },
     "result": {
@@ -416,6 +420,7 @@
       "title": "Recommended Image/Video Styles",
       "description": "Based on brand analysis, we recommend the most suitable creative styles for you",
       "clickToUse": "Click to use this style for content generation",
+      "selected": "Selected",
       "ctaTitle": "Start Creating Content with Brand Analysis",
       "ctaDescription": "Based on AI analysis results, automatically generate product images and videos that match brand style",
       "startCreation": "Start Creating"

@@ -25,6 +25,7 @@ import {
   XCircle,
   Sparkles,
   Maximize2,
+  Zap,
 } from 'lucide-react';
 import { useState, useEffect, useRef } from 'react';
 import { useTranslations } from 'next-intl';
@@ -39,6 +40,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import { CardContent } from '@/components/ui/card';
 import * as XLSX from 'xlsx';
 
 interface RowData {
@@ -89,6 +91,12 @@ export function BatchGenerationFlow({ generationType }: BatchGenerationFlowProps
   const { user, isAuthenticated } = useAuthStore();
   const progressIntervalsRef = useRef<Map<number, NodeJS.Timeout[]>>(new Map());
   const [userCredits, setUserCredits] = useState<number>(0);
+  const [brandInfo, setBrandInfo] = useState<{
+    brandName?: string;
+    selectedStyle?: string;
+    brandTone?: string;
+    colors?: { primary: string; secondary: string[] };
+  } | null>(null);
 
   const styles = generationType === 'image' ? IMAGE_STYLES : VIDEO_STYLES;
 
@@ -124,6 +132,36 @@ export function BatchGenerationFlow({ generationType }: BatchGenerationFlowProps
 
     fetchCredits();
   }, [isAuthenticated, user?.id]);
+
+  // Load brand analysis from sessionStorage if coming from brand analysis page
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const storedData = sessionStorage.getItem('brandAnalysis');
+        if (storedData) {
+          const brandData = JSON.parse(storedData);
+          setBrandInfo({
+            brandName: brandData.brandName,
+            selectedStyle: brandData.selectedStyle,
+            brandTone: brandData.brandTone,
+            colors: brandData.colors,
+          });
+          console.log('Loaded brand analysis:', brandData.brandName, brandData.selectedStyle);
+          
+          // Apply selected style if available
+          if (brandData.selectedStyle) {
+            const matchedStyle = styles.find(s => s.name === brandData.selectedStyle || s.name.includes(brandData.selectedStyle));
+            if (matchedStyle) {
+              setStyle(matchedStyle.id);
+              console.log('Applied style from brand analysis:', matchedStyle.id);
+            }
+          }
+        }
+      } catch (error) {
+        console.error('Failed to load brand analysis from sessionStorage:', error);
+      }
+    }
+  }, [generationType, styles]);
 
   // Load cached data on mount
   useEffect(() => {
@@ -784,6 +822,64 @@ export function BatchGenerationFlow({ generationType }: BatchGenerationFlowProps
 
   return (
     <div className="space-y-6">
+      {/* Brand Info Banner (if from brand analysis) */}
+      {brandInfo && (
+        <Card className="border-2 border-violet-200 bg-gradient-to-r from-violet-50 to-fuchsia-50 shadow-lg">
+          <CardContent className="p-6">
+            <div className="flex items-start justify-between">
+              <div className="flex-1">
+                <div className="flex items-center gap-3 mb-2">
+                  <div className="p-2 rounded-lg bg-gradient-to-br from-violet-600 to-fuchsia-600">
+                    <Sparkles className="size-5 text-white" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-bold text-slate-900">
+                      {t('brandContext') || '品牌上下文已应用'}
+                    </h3>
+                    <p className="text-sm text-violet-700 font-medium">
+                      {brandInfo.brandName}
+                    </p>
+                  </div>
+                </div>
+                <div className="flex flex-wrap gap-2 mt-3">
+                  {brandInfo.selectedStyle && (
+                    <Badge className="bg-violet-600 text-white hover:bg-violet-700 shadow-md">
+                      <Zap className="size-3 mr-1" />
+                      {t('selectedStyle') || '风格'}: {brandInfo.selectedStyle}
+                    </Badge>
+                  )}
+                  {brandInfo.brandTone && (
+                    <Badge variant="outline" className="border-violet-400 text-violet-700 bg-white">
+                      {t('brandTone') || '品牌调性'}: {typeof brandInfo.brandTone === 'string' ? brandInfo.brandTone : brandInfo.brandTone?.slice(0, 3).join('、')}
+                    </Badge>
+                  )}
+                  {brandInfo.colors?.primary && (
+                    <Badge variant="outline" className="border-violet-400 text-violet-700 bg-white">
+                      <div 
+                        className="w-3 h-3 rounded-full mr-1 border border-slate-300" 
+                        style={{ backgroundColor: brandInfo.colors.primary }}
+                      />
+                      {t('primaryColor') || '主色调'}
+                    </Badge>
+                  )}
+                </div>
+              </div>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => {
+                  setBrandInfo(null);
+                  sessionStorage.removeItem('brandAnalysis');
+                }}
+                className="text-slate-600 hover:text-slate-900"
+              >
+                <XCircle className="size-4" />
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Configuration Section */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2">

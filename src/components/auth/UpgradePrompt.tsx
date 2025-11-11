@@ -67,15 +67,16 @@ export default function UpgradePrompt({
     }
   }, [isAuthenticated]);
 
-  // Get configured credit costs
+  // Get configured credit costs (use cheapest options as baseline)
   const imageCreditCost = creditsConfig.consumption.imageGeneration['nano-banana'];
-  const videoCreditCost = creditsConfig.consumption.videoGeneration['sora-2'];
+  const videoCreditCost = creditsConfig.consumption.videoGeneration['sora-2-720p-10s'];
 
   // Determine which plan to recommend
   const targetPlan = userPlanId === 'pro' ? 'proplus' : 'pro';
   const targetPlanConfig = paymentConfig.plans.find((p) => p.id === targetPlan);
-  const targetPlanName = targetPlan === 'proplus' ? 'Pro+' : 'Pro';
+  const targetPlanName = targetPlanConfig?.name || (targetPlan === 'proplus' ? 'Pro+' : 'Pro');
   const targetPlanPrice = targetPlanConfig?.price || 14.9;
+  const targetPlanCredits = targetPlanConfig?.credits.monthly || 500;
 
   const getContentType = () => {
     switch (effectiveType) {
@@ -96,25 +97,24 @@ export default function UpgradePrompt({
 
   const contentType = getContentType();
 
-  // Calculate approximate images and videos based on credit costs
-  const creditsPerMonth = 500;
-  const approxImages = Math.floor(creditsPerMonth / imageCreditCost);
-  const approxVideos = Math.floor(creditsPerMonth / videoCreditCost);
+  // Calculate approximate images and videos based on Nano Banana (5 credits) and Sora 2 720P 10s (15 credits)
+  const approxImages = Math.floor(targetPlanCredits / imageCreditCost);
+  const approxVideos = Math.floor(targetPlanCredits / videoCreditCost);
 
+  // Use features from config and add capacity info
   const features = targetPlanConfig?.features.map((text, index) => ({
     icon: [Zap, Sparkles, Shield, Check, Check, Check][index] || Check,
     text,
-  })) || [
-    { icon: Zap, text: '300 Image-to-Text per month' },
-    {
-      icon: Sparkles,
-      text: `${creditsPerMonth} credits/month (~${approxImages} images or ${approxVideos} videos)`,
-    },
-    { icon: Shield, text: 'No Ads' },
-    { icon: Check, text: 'Commercial license' },
-    { icon: Check, text: 'HD quality exports' },
-    { icon: Check, text: 'Priority support' },
-  ];
+  })) || [];
+  
+  // Add capacity info as first feature if credits > 0
+  if (targetPlanCredits > 0 && features.length > 0) {
+    // Replace the first feature (credits/month) with detailed capacity
+    features[0] = {
+      icon: Zap,
+      text: `${targetPlanCredits} credits/month (up to ${approxImages} image generation or ${approxVideos} video generation)`,
+    };
+  }
 
   const resetTime = limitType === 'daily' ? 'midnight UTC' : 'the 1st of next month';
 
@@ -143,9 +143,9 @@ export default function UpgradePrompt({
             {!isAuthenticated
               ? 'Please sign in to use this feature. Sign up now to get free credits!'
               : effectiveType === 'imageGeneration'
-                ? `You don't have enough credits to generate images. Each image costs ${imageCreditCost} credits. Upgrade your plan to get more credits or earn them through daily check-ins.`
+                ? `You don't have enough credits to generate images. Each image costs ${imageCreditCost} credits (Nano Banana model). Upgrade your plan to get more credits or earn them through daily check-ins.`
                 : effectiveType === 'videoGeneration'
-                  ? `You don't have enough credits to generate videos. Each video costs ${videoCreditCost} credits. Upgrade your plan to get more credits or earn them through daily check-ins.`
+                  ? `You don't have enough credits to generate videos. Video costs range from ${creditsConfig.consumption.videoGeneration['sora-2-720p-10s']} credits (Sora 2) to ${creditsConfig.consumption.videoGeneration['sora-2-pro-1080p-15s']} credits (Sora 2 Pro 1080P). Upgrade your plan to get more credits or earn them through daily check-ins.`
                   : effectiveType === 'imageToText'
                     ? `You don't have enough credits for image-to-text conversion. Upgrade your plan to get more credits or earn them through daily check-ins.`
                     : `You don't have enough credits. Upgrade your plan to get more credits or earn them through daily check-ins.`}
@@ -232,7 +232,7 @@ export default function UpgradePrompt({
           {isAuthenticated && (
             <div className="space-y-1 text-center text-gray-600 text-sm">
               <p>
-                💡 Earn free credits: Daily check-in (+2), Referrals (+10), Social share (+5)
+                💡 Earn free credits: Daily check-in (+{creditsConfig.rewards.checkin.dailyCredits}), Referrals (+{creditsConfig.rewards.referral.creditsPerReferral}), Social share (+{creditsConfig.rewards.socialShare.creditsPerShare})
               </p>
             </div>
           )}

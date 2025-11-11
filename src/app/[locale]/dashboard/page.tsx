@@ -210,7 +210,7 @@ function DashboardPageContent() {
   };
 
   const imageCredits = creditsConfig.consumption.imageGeneration['nano-banana'];
-  const videoCredits = creditsConfig.consumption.videoGeneration['sora-2'];
+  const videoCredits = creditsConfig.consumption.videoGeneration['sora-2-720p-15s'];
 
   if (authLoading || isLoading) {
     return (
@@ -278,8 +278,8 @@ function DashboardPageContent() {
         </Card>
       </div>
 
-      {/* Quota Usage Section */}
-      {quotaUsage && (
+      {/* Quota Usage Section - Removed (no daily/monthly quotas) */}
+      {false && quotaUsage && (
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {/* Image Generation - Daily */}
           {quotaUsage.imageGeneration &&

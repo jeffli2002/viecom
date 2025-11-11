@@ -42,7 +42,9 @@ export interface KIEVideoGenerationParams {
   prompt: string;
   imageUrls?: string[]; // For I2V
   aspectRatio?: 'square' | 'portrait' | 'landscape';
-  quality?: 'standard' | 'high';
+  quality?: 'standard' | 'high';  // standard=720P, high=1080P
+  duration?: 10 | 15;  // 视频时长（秒）
+  model?: 'sora-2' | 'sora-2-pro';  // 模型选择
 }
 
 export interface KIETaskResponse {
@@ -225,10 +227,44 @@ export class KIEAPIService {
   }
 
   /**
-   * Generate video using sora 2 model
+   * Generate video using sora 2 or sora 2 pro model
    */
   async generateVideo(params: KIEVideoGenerationParams): Promise<KIETaskResponse> {
-    const model = params.imageUrls?.length ? 'sora-2-image-to-video' : 'sora-2-text-to-video';
+    // 确定使用的模型
+    const useProModel = params.model === 'sora-2-pro' || params.quality === 'high';
+    const hasImage = params.imageUrls?.length;
+    
+    let model: string;
+    if (useProModel) {
+      // Sora 2 Pro 支持720P和1080P
+      model = hasImage ? 'sora-2-pro-image-to-video' : 'sora-2-pro-text-to-video';
+    } else {
+      // Sora 2 仅支持720P
+      model = hasImage ? 'sora-2-image-to-video' : 'sora-2-text-to-video';
+    }
+    
+    // 构建输入参数
+    const input: any = {
+      prompt: params.prompt,
+      aspect_ratio: params.aspectRatio || 'landscape',
+    };
+    
+    // Sora 2 Pro 支持 quality 和 n_frames 参数
+    if (useProModel) {
+      input.quality = params.quality || 'standard';
+      
+      // 根据 duration 设置 n_frames
+      if (params.duration === 10) {
+        input.n_frames = '10s';
+      } else {
+        input.n_frames = '15s';  // 默认15秒
+      }
+    }
+    
+    // 添加图片URL（如果有）
+    if (hasImage) {
+      input.image_urls = params.imageUrls;
+    }
 
     const response = await fetch(`${this.baseUrl}/jobs/createTask`, {
       method: 'POST',
@@ -238,12 +274,7 @@ export class KIEAPIService {
       },
       body: JSON.stringify({
         model,
-        input: {
-          prompt: params.prompt,
-          aspect_ratio: params.aspectRatio || 'landscape',
-          quality: params.quality || 'standard',
-          ...(params.imageUrls?.length && { image_urls: params.imageUrls }),
-        },
+        input,
       }),
     });
 

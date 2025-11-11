@@ -191,6 +191,10 @@
     "subtitle": "上传Excel/CSV文件，批量生成图片和视频，并自动发布到电商平台",
     "subtitleImage": "上传Excel/CSV文件，批量生成产品图片",
     "subtitleVideo": "上传Excel/CSV文件，批量生成产品视频",
+    "brandContext": "品牌上下文已应用",
+    "selectedStyle": "风格",
+    "brandTone": "品牌调性",
+    "primaryColor": "主色调",
     "generationMode": "生成模式",
     "aspectRatio": "宽高比",
     "imageStyle": "图片风格",
@@ -345,7 +349,7 @@
   "brandAnalysis": {
     "title": "品牌智能分析",
     "subtitle": "AI-Powered Brand Analysis",
-    "poweredBy": "Powered by Firecrawl + DeepSeek AI",
+    "poweredBy": "由 AI 驱动",
     "hero": {
       "title": "深度解析品牌",
       "titleHighlight": "洞察市场机会",
@@ -361,9 +365,9 @@
     },
     "steps": {
       "connecting": "正在连接网站...",
-      "scraping": "抓取网站内容（Firecrawl）",
+      "scraping": "抓取网站内容",
       "extracting": "提取品牌元素...",
-      "analyzing": "AI 深度分析（DeepSeek）",
+      "analyzing": "AI 深度分析",
       "generating": "生成品牌报告..."
     },
     "result": {
@@ -416,6 +420,7 @@
       "title": "推荐图片/视频风格",
       "description": "基于品牌分析，为您推荐最适合的创作风格",
       "clickToUse": "点击使用此风格生成内容",
+      "selected": "已选择",
       "ctaTitle": "立即使用品牌分析生成内容",
       "ctaDescription": "基于 AI 分析结果，自动生成符合品牌风格的产品图片和视频",
       "startCreation": "开始创作"

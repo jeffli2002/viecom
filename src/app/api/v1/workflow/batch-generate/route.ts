@@ -17,11 +17,19 @@ interface BatchGenerateRequest {
     enhancedPrompt: string;
     baseImageUrl?: string; // Can be HTTP/HTTPS URL or base64 image
     productSellingPoints?: string;
+    // 新增视频参数
+    model?: 'sora-2' | 'sora-2-pro';
+    resolution?: '720p' | '1080p';
+    duration?: 10 | 15;
   }>;
   generationType: 'image' | 'video';
   mode: 't2i' | 'i2i' | 't2v' | 'i2v'; // Default mode, will be auto-determined per row if baseImageUrl exists
   aspectRatio: string;
   style?: string;
+  // 批量视频参数
+  defaultModel?: 'sora-2' | 'sora-2-pro';
+  defaultResolution?: '720p' | '1080p';
+  defaultDuration?: 10 | 15;
 }
 
 const MAX_RETRIES = 3;
@@ -319,6 +327,9 @@ export async function POST(request: NextRequest) {
       mode,
       aspectRatio,
       style,
+      defaultModel: body.defaultModel,
+      defaultResolution: body.defaultResolution,
+      defaultDuration: body.defaultDuration,
     }).catch((error) => {
       console.error('Background batch generation error:', error);
     });
@@ -342,6 +353,78 @@ export async function POST(request: NextRequest) {
   }
 }
 
+/**
+ * 处理批量视频生成（使用优先队列）
+ */
+async function processBatchVideoGeneration(
+  jobId: string,
+  userId: string,
+  rows: BatchGenerateRequest['rows'],
+  options: {
+    mode: 't2i' | 'i2i' | 't2v' | 'i2v';
+    aspectRatio: string;
+    style?: string;
+    defaultModel?: 'sora-2' | 'sora-2-pro';
+    defaultResolution?: '720p' | '1080p';
+    defaultDuration?: 10 | 15;
+  }
+) {
+  try {
+    // 动态导入优先队列处理器
+    const { PriorityQueueProcessor } = await import('@/lib/batch/priority-queue-processor');
+    const { payment } = await import('@/server/db/schema');
+    
+    // 获取用户套餐
+    let userPlan = 'free';
+    try {
+      const userPayment = await db
+        .select()
+        .from(payment)
+        .where(eq(payment.userId, userId))
+        .orderBy(payment.createdAt)
+        .limit(1);
+      
+      if (userPayment.length > 0 && userPayment[0].plan) {
+        userPlan = userPayment[0].plan;
+      }
+    } catch (error) {
+      console.warn('Failed to get user plan, using free:', error);
+    }
+    
+    // 转换任务格式
+    const tasks = rows.map(row => ({
+      rowIndex: row.rowIndex,
+      model: row.model || options.defaultModel || 'sora-2',
+      resolution: row.resolution || options.defaultResolution || '720p',
+      duration: row.duration || options.defaultDuration || 15,
+      prompt: row.prompt,
+      enhancedPrompt: row.enhancedPrompt,
+      imageUrl: row.baseImageUrl,
+      aspectRatio: options.aspectRatio,
+      productName: row.productName,
+      productDescription: row.productDescription,
+    }));
+    
+    console.log(
+      `[Job ${jobId}] Starting priority queue processing: ` +
+      `${tasks.length} tasks, plan=${userPlan}`
+    );
+    
+    // 创建处理器并执行
+    const processor = new PriorityQueueProcessor(userId, jobId, userPlan);
+    const stats = await processor.processBatch(tasks);
+    
+    console.log(
+      `[Job ${jobId}] Batch processing completed: ` +
+      `${stats.successful}/${stats.total} succeeded, ${stats.failed} failed`
+    );
+    
+  } catch (error) {
+    console.error(`[Job ${jobId}] Batch video generation error:`, error);
+    throw error;
+  }
+}
+
 async function processBatchGeneration(
   jobId: string,
   userId: string,
@@ -351,8 +434,17 @@ async function processBatchGeneration(
     mode: 't2i' | 'i2i' | 't2v' | 'i2v';
     aspectRatio: string;
     style?: string;
+    defaultModel?: 'sora-2' | 'sora-2-pro';
+    defaultResolution?: '720p' | '1080p';
+    defaultDuration?: 10 | 15;
   }
 ) {
+  // 对于视频，使用优先队列处理器
+  if (options.generationType === 'video') {
+    return await processBatchVideoGeneration(jobId, userId, rows, options);
+  }
+  
+  // 对于图片，保持原有顺序处理逻辑
   let processedRows = 0;
   let successfulRows = 0;
   let failedRows = 0;

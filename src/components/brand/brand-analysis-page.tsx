@@ -101,6 +101,7 @@ export function BrandAnalysisPage() {
   const [showGenerationDialog, setShowGenerationDialog] = useState(false);
   const [generationType, setGenerationType] = useState<'image' | 'video' | null>(null);
   const [generationMode, setGenerationMode] = useState<'single' | 'batch' | null>(null);
+  const [selectedStyle, setSelectedStyle] = useState<string | null>(null);
 
   const quickExamples = [
     {
@@ -218,8 +219,12 @@ export function BrandAnalysisPage() {
   const handleConfirmGeneration = () => {
     if (!result || !generationType || !generationMode) return;
 
-    // Store brand analysis data in sessionStorage
-    sessionStorage.setItem('brandAnalysis', JSON.stringify(result));
+    // Store brand analysis data in sessionStorage with selected style
+    const brandData = {
+      ...result,
+      selectedStyle: selectedStyle || undefined,  // 带入选中的风格
+    };
+    sessionStorage.setItem('brandAnalysis', JSON.stringify(brandData));
 
     // Navigate to the appropriate page
     if (generationMode === 'single') {
@@ -510,26 +515,41 @@ export function BrandAnalysisPage() {
 
               {/* Tabs for detailed analysis */}
               <Tabs value={selectedTab} onValueChange={setSelectedTab}>
-                <TabsList className="grid w-full grid-cols-5 h-auto p-1">
-                  <TabsTrigger value="overview" className="gap-2 py-3">
+                <TabsList className="grid w-full grid-cols-5 h-auto p-2 bg-white border-2 border-slate-200 rounded-xl shadow-lg">
+                  <TabsTrigger 
+                    value="overview" 
+                    className="gap-2 py-3 px-4 rounded-lg data-[state=active]:bg-gradient-to-br data-[state=active]:from-violet-600 data-[state=active]:to-violet-700 data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:shadow-violet-500/50 transition-all hover:scale-105 data-[state=inactive]:hover:bg-slate-100"
+                  >
                     <BarChart3 className="size-4" />
-                    <span className="hidden md:inline">{t('tabs.overview')}</span>
+                    <span className="hidden md:inline font-semibold">{t('tabs.overview')}</span>
                   </TabsTrigger>
-                  <TabsTrigger value="visual" className="gap-2 py-3">
+                  <TabsTrigger 
+                    value="visual" 
+                    className="gap-2 py-3 px-4 rounded-lg data-[state=active]:bg-gradient-to-br data-[state=active]:from-purple-600 data-[state=active]:to-purple-700 data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:shadow-purple-500/50 transition-all hover:scale-105 data-[state=inactive]:hover:bg-slate-100"
+                  >
                     <Palette className="size-4" />
-                    <span className="hidden md:inline">{t('tabs.visual')}</span>
+                    <span className="hidden md:inline font-semibold">{t('tabs.visual')}</span>
                   </TabsTrigger>
-                  <TabsTrigger value="audience" className="gap-2 py-3">
+                  <TabsTrigger 
+                    value="audience" 
+                    className="gap-2 py-3 px-4 rounded-lg data-[state=active]:bg-gradient-to-br data-[state=active]:from-blue-600 data-[state=active]:to-blue-700 data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:shadow-blue-500/50 transition-all hover:scale-105 data-[state=inactive]:hover:bg-slate-100"
+                  >
                     <Target className="size-4" />
-                    <span className="hidden md:inline">{t('tabs.audience')}</span>
+                    <span className="hidden md:inline font-semibold">{t('tabs.audience')}</span>
                   </TabsTrigger>
-                  <TabsTrigger value="content" className="gap-2 py-3">
+                  <TabsTrigger 
+                    value="content" 
+                    className="gap-2 py-3 px-4 rounded-lg data-[state=active]:bg-gradient-to-br data-[state=active]:from-amber-600 data-[state=active]:to-amber-700 data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:shadow-amber-500/50 transition-all hover:scale-105 data-[state=inactive]:hover:bg-slate-100"
+                  >
                     <MessageSquare className="size-4" />
-                    <span className="hidden md:inline">{t('tabs.content')}</span>
+                    <span className="hidden md:inline font-semibold">{t('tabs.content')}</span>
                   </TabsTrigger>
-                  <TabsTrigger value="recommendations" className="gap-2 py-3">
+                  <TabsTrigger 
+                    value="recommendations" 
+                    className="gap-2 py-3 px-4 rounded-lg data-[state=active]:bg-gradient-to-br data-[state=active]:from-fuchsia-600 data-[state=active]:to-fuchsia-700 data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:shadow-fuchsia-500/50 transition-all hover:scale-105 data-[state=inactive]:hover:bg-slate-100"
+                  >
                     <Lightbulb className="size-4" />
-                    <span className="hidden md:inline">{t('tabs.recommendations')}</span>
+                    <span className="hidden md:inline font-semibold">{t('tabs.recommendations')}</span>
                   </TabsTrigger>
                 </TabsList>
 
@@ -851,27 +871,51 @@ export function BrandAnalysisPage() {
                       </CardHeader>
                       <CardContent>
                         <div className="grid md:grid-cols-2 gap-4">
-                          {result.recommendedImageStyles.map((style, index) => (
-                            <div
-                              key={index}
-                              className="p-4 rounded-xl bg-gradient-to-br from-white to-violet-50 border-2 border-violet-200 hover:border-violet-400 transition-colors cursor-pointer group"
-                            >
-                              <div className="flex items-start gap-3">
-                                <div className="size-10 rounded-lg bg-gradient-to-br from-violet-600 to-fuchsia-600 flex items-center justify-center flex-shrink-0">
-                                  <ImageIcon className="size-5 text-white" />
-                                </div>
-                                <div className="flex-1">
-                                  <div className="text-slate-900 mb-1 group-hover:text-violet-900">
-                                    {style}
+                          {result.recommendedImageStyles.map((style, index) => {
+                            const isSelected = selectedStyle === style;
+                            return (
+                              <div
+                                key={index}
+                                onClick={() => setSelectedStyle(isSelected ? null : style)}
+                                className={`
+                                  p-4 rounded-xl cursor-pointer group transition-all
+                                  ${isSelected 
+                                    ? 'bg-gradient-to-br from-violet-600 to-fuchsia-600 border-2 border-violet-700 shadow-xl shadow-violet-500/50 scale-105' 
+                                    : 'bg-gradient-to-br from-white to-violet-50 border-2 border-violet-200 hover:border-violet-400 hover:shadow-lg hover:shadow-violet-200/50'
+                                  }
+                                `}
+                              >
+                                <div className="flex items-start gap-3">
+                                  <div className={`
+                                    size-10 rounded-lg flex items-center justify-center flex-shrink-0
+                                    ${isSelected
+                                      ? 'bg-white/20 backdrop-blur-sm'
+                                      : 'bg-gradient-to-br from-violet-600 to-fuchsia-600'
+                                    }
+                                  `}>
+                                    {isSelected ? (
+                                      <CheckCircle2 className="size-5 text-white" />
+                                    ) : (
+                                      <ImageIcon className="size-5 text-white" />
+                                    )}
                                   </div>
-                                  <div className="text-xs text-slate-600">
-                                    {t('recommendations.clickToUse')}
+                                  <div className="flex-1">
+                                    <div className={`mb-1 font-semibold ${isSelected ? 'text-white' : 'text-slate-900 group-hover:text-violet-900'}`}>
+                                      {style}
+                                    </div>
+                                    <div className={`text-xs ${isSelected ? 'text-violet-100' : 'text-slate-600'}`}>
+                                      {isSelected ? t('recommendations.selected') || '已选择' : t('recommendations.clickToUse')}
+                                    </div>
                                   </div>
+                                  {isSelected ? (
+                                    <CheckCircle2 className="size-5 text-white" />
+                                  ) : (
+                                    <ChevronRight className="size-5 text-slate-400 group-hover:text-violet-600" />
+                                  )}
                                 </div>
-                                <ChevronRight className="size-5 text-slate-400 group-hover:text-violet-600" />
                               </div>
-                            </div>
-                          ))}
+                            );
+                          })}
                         </div>
                       </CardContent>
                     </Card>
@@ -905,24 +949,24 @@ export function BrandAnalysisPage() {
 
         {/* Generation Options Dialog */}
         <Dialog open={showGenerationDialog} onOpenChange={setShowGenerationDialog}>
-          <DialogContent className="sm:max-w-[600px]">
+          <DialogContent className="sm:max-w-[600px] bg-white border-2 border-slate-200">
             <DialogHeader>
-              <DialogTitle>{t('generationDialog.title')}</DialogTitle>
-              <DialogDescription>{t('generationDialog.description')}</DialogDescription>
+              <DialogTitle className="text-slate-900 text-xl">{t('generationDialog.title')}</DialogTitle>
+              <DialogDescription className="text-slate-600 text-base">{t('generationDialog.description')}</DialogDescription>
             </DialogHeader>
 
             <div className="space-y-6 py-4">
               {/* Generation Type Selection */}
               <div className="space-y-3">
-                <Label className="text-base font-semibold">{t('generationDialog.selectType')}</Label>
+                <Label className="text-base font-semibold text-slate-900">{t('generationDialog.selectType')}</Label>
                 <div className="grid grid-cols-2 gap-4">
                   <motion.button
                     type="button"
                     onClick={() => handleGenerationTypeSelect('image')}
                     className={`p-6 rounded-xl border-2 transition-all text-left ${
                       generationType === 'image'
-                        ? 'border-violet-500 bg-violet-50 dark:bg-violet-950'
-                        : 'border-slate-200 hover:border-violet-300'
+                        ? 'border-violet-500 bg-violet-50 shadow-lg shadow-violet-500/30'
+                        : 'border-slate-200 bg-white hover:border-violet-300 hover:bg-violet-50/50'
                     }`}
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
@@ -937,7 +981,7 @@ export function BrandAnalysisPage() {
                       >
                         <ImageIcon className="size-5" />
                       </div>
-                      <span className="font-semibold">{t('generationDialog.image')}</span>
+                      <span className="font-semibold text-slate-900">{t('generationDialog.image')}</span>
                     </div>
                     <p className="text-sm text-slate-600">{t('generationDialog.imageDesc')}</p>
                   </motion.button>
@@ -947,8 +991,8 @@ export function BrandAnalysisPage() {
                     onClick={() => handleGenerationTypeSelect('video')}
                     className={`p-6 rounded-xl border-2 transition-all text-left ${
                       generationType === 'video'
-                        ? 'border-violet-500 bg-violet-50 dark:bg-violet-950'
-                        : 'border-slate-200 hover:border-violet-300'
+                        ? 'border-violet-500 bg-violet-50 shadow-lg shadow-violet-500/30'
+                        : 'border-slate-200 bg-white hover:border-violet-300 hover:bg-violet-50/50'
                     }`}
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
@@ -963,7 +1007,7 @@ export function BrandAnalysisPage() {
                       >
                         <Video className="size-5" />
                       </div>
-                      <span className="font-semibold">{t('generationDialog.video')}</span>
+                      <span className="font-semibold text-slate-900">{t('generationDialog.video')}</span>
                     </div>
                     <p className="text-sm text-slate-600">{t('generationDialog.videoDesc')}</p>
                   </motion.button>
@@ -973,15 +1017,15 @@ export function BrandAnalysisPage() {
               {/* Generation Mode Selection */}
               {generationType && (
                 <div className="space-y-3">
-                  <Label className="text-base font-semibold">{t('generationDialog.selectMode')}</Label>
+                  <Label className="text-base font-semibold text-slate-900">{t('generationDialog.selectMode')}</Label>
                   <div className="grid grid-cols-2 gap-4">
                     <motion.button
                       type="button"
                       onClick={() => handleGenerationModeSelect('single')}
                       className={`p-6 rounded-xl border-2 transition-all text-left ${
                         generationMode === 'single'
-                          ? 'border-violet-500 bg-violet-50 dark:bg-violet-950'
-                          : 'border-slate-200 hover:border-violet-300'
+                          ? 'border-violet-500 bg-violet-50 shadow-lg shadow-violet-500/30'
+                          : 'border-slate-200 bg-white hover:border-violet-300 hover:bg-violet-50/50'
                       }`}
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
@@ -996,7 +1040,7 @@ export function BrandAnalysisPage() {
                         >
                           <Sparkles className="size-5" />
                         </div>
-                        <span className="font-semibold">{t('generationDialog.single')}</span>
+                        <span className="font-semibold text-slate-900">{t('generationDialog.single')}</span>
                       </div>
                       <p className="text-sm text-slate-600">{t('generationDialog.singleDesc')}</p>
                     </motion.button>
@@ -1006,8 +1050,8 @@ export function BrandAnalysisPage() {
                       onClick={() => handleGenerationModeSelect('batch')}
                       className={`p-6 rounded-xl border-2 transition-all text-left ${
                         generationMode === 'batch'
-                          ? 'border-violet-500 bg-violet-50 dark:bg-violet-950'
-                          : 'border-slate-200 hover:border-violet-300'
+                          ? 'border-violet-500 bg-violet-50 shadow-lg shadow-violet-500/30'
+                          : 'border-slate-200 bg-white hover:border-violet-300 hover:bg-violet-50/50'
                       }`}
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
@@ -1022,7 +1066,7 @@ export function BrandAnalysisPage() {
                         >
                           <FileSpreadsheet className="size-5" />
                         </div>
-                        <span className="font-semibold">{t('generationDialog.batch')}</span>
+                        <span className="font-semibold text-slate-900">{t('generationDialog.batch')}</span>
                       </div>
                       <p className="text-sm text-slate-600">{t('generationDialog.batchDesc')}</p>
                     </motion.button>
@@ -1031,14 +1075,18 @@ export function BrandAnalysisPage() {
               )}
             </div>
 
-            <div className="flex justify-end gap-3 pt-4 border-t">
-              <Button variant="outline" onClick={() => setShowGenerationDialog(false)}>
+            <div className="flex justify-end gap-3 pt-4 border-t border-slate-200">
+              <Button 
+                variant="outline" 
+                onClick={() => setShowGenerationDialog(false)}
+                className="border-slate-300 text-slate-700 hover:bg-slate-50"
+              >
                 {t('generationDialog.cancel')}
               </Button>
               <Button
                 onClick={handleConfirmGeneration}
                 disabled={!generationType || !generationMode}
-                className="bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-700 hover:to-fuchsia-700"
+                className="bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-700 hover:to-fuchsia-700 text-white shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {t('generationDialog.confirm')}
                 <ChevronRight className="size-4 ml-2" />
