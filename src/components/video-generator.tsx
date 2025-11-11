@@ -60,7 +60,6 @@ export default function VideoGenerator() {
   const [quality, setQuality] = useState<'standard' | 'high'>('standard'); // Quality for Sora 2 Pro (720P/1080P)
   const [videoStyle, setVideoStyle] = useState<string>('spoken-script'); // Video style selection
   const [duration, setDuration] = useState<10 | 15>(10); // Video duration selection
-  const [outputFormat, setOutputFormat] = useState<'MP4'>('MP4'); // Output format selection
   const [isGenerating, setIsGenerating] = useState(false);
   const [result, setResult] = useState<GenerationResult | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -288,7 +287,7 @@ export default function VideoGenerator() {
         style: videoStyle, // Pass style to API
         duration: duration, // Pass video duration (10 or 15 seconds)
         quality: model === 'sora-2-pro' ? quality : 'standard', // Pass quality (standard=720P, high=1080P)
-        output_format: outputFormat.toLowerCase(), // Pass output format (mp4)
+        output_format: 'mp4', // Video output format (MP4 only)
       };
 
       if (mode === 'image-to-video' && imagePreview) {
@@ -468,6 +467,23 @@ export default function VideoGenerator() {
                 </TabsContent>
 
                 <TabsContent value="image-to-video" className="mt-0 space-y-6">
+                  {/* Warning Notice - No People/Faces */}
+                  <div className="rounded-lg border border-amber-200 bg-amber-50 p-4">
+                    <div className="flex items-start gap-3">
+                      <AlertCircle className="h-5 w-5 text-amber-600 flex-shrink-0 mt-0.5" />
+                      <div>
+                        <h4 className="font-semibold text-amber-900 text-sm mb-1">
+                          Important Notice
+                        </h4>
+                        <p className="text-amber-800 text-xs leading-relaxed">
+                          Image-to-video generation <strong>does not support images containing people, faces, or human figures</strong>. 
+                          Please upload product images, objects, landscapes, or abstract content only. 
+                          Images with people will be rejected or produce poor results.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
                   <div className="space-y-2">
                     <Label className="font-light text-gray-700 text-sm">Source Image</Label>
 
@@ -483,7 +499,7 @@ export default function VideoGenerator() {
                           Click to upload or drag and drop
                         </p>
                         <p className="font-light text-gray-400 text-xs">
-                          JPEG, PNG, or WebP (max 10MB)
+                          JPEG, PNG, or WebP (max 10MB) • No people or faces
                         </p>
                       </div>
                     ) : (
@@ -703,23 +719,6 @@ export default function VideoGenerator() {
                         <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                       </svg>
                     )}
-                  </button>
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <Label className="font-light text-gray-700 text-sm">Output Format</Label>
-                <div className="flex">
-                  <button
-                    type="button"
-                    onClick={() => setOutputFormat('MP4')}
-                    className="flex-1 flex items-center justify-center rounded-lg border-2 border-purple-500 bg-purple-50 text-purple-700 py-3 px-4 text-sm font-medium"
-                    disabled
-                  >
-                    <span>MP4</span>
-                    <svg className="ml-2 h-4 w-4" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                    </svg>
                   </button>
                 </div>
               </div>
