@@ -1383,14 +1383,13 @@ export function BatchGenerationFlow({ generationType }: BatchGenerationFlowProps
                                 e.stopPropagation();
                               }}
                               className="text-sm min-h-[80px] pr-28 select-text"
-                              disabled={row.status === 'generating' || row.status === 'completed'}
+                              disabled={row.status === 'generating'}
                             />
                             <Button
                               onClick={() => handleEnhanceSinglePrompt(row.rowIndex)}
                               disabled={
                                 row.status === 'enhancing' ||
                                 row.status === 'generating' ||
-                                row.status === 'completed' ||
                                 !row.prompt.trim()
                               }
                               size="sm"
@@ -1450,7 +1449,7 @@ export function BatchGenerationFlow({ generationType }: BatchGenerationFlowProps
                               e.stopPropagation();
                             }}
                             className="text-sm flex-1 select-text resize-none"
-                            disabled={row.status === 'generating' || row.status === 'completed'}
+                            disabled={row.status === 'generating'}
                             placeholder={t('enhancePromptPlaceholder')}
                           />
                         </div>
