@@ -397,7 +397,7 @@ export default function ImageGenerator() {
                 </div>
               )}
               <div className="space-y-2">
-                <Label className="font-light text-gray-700 text-sm">Image Description</Label>
+                <Label className="font-light text-gray-700 text-sm">{t('imageDescription')}</Label>
                 <div className="relative">
                   <Textarea
                     placeholder={textDefaultPrompt}
@@ -418,7 +418,7 @@ export default function ImageGenerator() {
                     ) : (
                       <Sparkles className="h-4 w-4" />
                     )}
-                    {isEnhancing ? 'Enhancing...' : 'Enhance'}
+                    {isEnhancing ? t('enhancing') : t('enhance')}
                   </Button>
                 </div>
                 <div className="text-right font-light text-gray-400 text-xs">
@@ -429,7 +429,7 @@ export default function ImageGenerator() {
                     <div className="mb-2 flex items-center justify-between">
                       <h4 className="flex items-center gap-2 font-semibold text-purple-700 text-sm">
                         <Sparkles className="h-4 w-4" />
-                        Enhanced Prompt
+                        {t('enhancedPrompt')}
                       </h4>
                       <Button
                         onClick={() => setEnhancedPrompt('')}
@@ -522,7 +522,7 @@ export default function ImageGenerator() {
                     ) : (
                       <Sparkles className="h-4 w-4" />
                     )}
-                    {isEnhancing ? 'Enhancing...' : 'Enhance'}
+                    {isEnhancing ? t('enhancing') : t('enhance')}
                   </Button>
                 </div>
                 <div className="text-right font-light text-gray-400 text-xs">
@@ -533,7 +533,7 @@ export default function ImageGenerator() {
                     <div className="mb-2 flex items-center justify-between">
                       <h4 className="flex items-center gap-2 font-semibold text-purple-700 text-sm">
                         <Sparkles className="h-4 w-4" />
-                        Enhanced Prompt
+                        {t('enhancedPrompt')}
                       </h4>
                       <Button
                         onClick={() => setEnhancedPrompt('')}
@@ -576,7 +576,7 @@ export default function ImageGenerator() {
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label className="font-light text-gray-700 text-sm">Model</Label>
+                <Label className="font-light text-gray-700 text-sm">{t('model')}</Label>
                 <Select value={model} onValueChange={setModel}>
                   <SelectTrigger className="border-gray-200 font-light">
                     <SelectValue />
@@ -590,7 +590,7 @@ export default function ImageGenerator() {
               </div>
 
               <div className="space-y-2">
-                <Label className="font-light text-gray-700 text-sm">Aspect Ratio</Label>
+                <Label className="font-light text-gray-700 text-sm">{t('aspectRatio')}</Label>
                 <Select value={aspectRatio} onValueChange={setAspectRatio}>
                   <SelectTrigger className="border-gray-200 font-light">
                     <SelectValue />
@@ -607,7 +607,7 @@ export default function ImageGenerator() {
             </div>
 
             <div className="space-y-2">
-              <Label className="font-light text-gray-700 text-sm">Output Format</Label>
+              <Label className="font-light text-gray-700 text-sm">{t('outputFormat')}</Label>
               <div className="grid grid-cols-2 gap-3">
                 <button
                   type="button"
@@ -653,12 +653,12 @@ export default function ImageGenerator() {
               {isGenerating ? (
                 <>
                   <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                  Generating Image...
+                  {t('generating')}
                 </>
               ) : (
                 <>
                   <ImageIcon className="mr-2 h-5 w-5" />
-                  Generate Image
+                  {t('generateImage')}
                 </>
               )}
             </Button>
@@ -671,7 +671,7 @@ export default function ImageGenerator() {
                   <div className="space-y-3 text-center">
                     <ImageIcon className="mx-auto h-16 w-16 text-gray-400" />
                     <p className="font-light text-gray-500 text-sm">
-                      Your generated image will appear here
+                      {t('imageWillAppearHere')}
                     </p>
                   </div>
                 </div>
@@ -681,8 +681,8 @@ export default function ImageGenerator() {
                 <div className="flex aspect-square items-center justify-center rounded-xl bg-gray-100">
                   <div className="space-y-4 text-center">
                     <Loader2 className="mx-auto h-12 w-12 animate-spin text-purple-600" />
-                    <p className="font-light text-base text-gray-700">Generating your image...</p>
-                    <p className="font-light text-gray-500 text-xs">This may take a few moments</p>
+                    <p className="font-light text-base text-gray-700">{t('generatingImage')}</p>
+                    <p className="font-light text-gray-500 text-xs">{t('generatingTakeMoments')}</p>
                   </div>
                 </div>
               )}
@@ -697,7 +697,7 @@ export default function ImageGenerator() {
                       className="border-gray-200 font-light"
                     >
                       <Download className="mr-2 h-4 w-4" />
-                      Download
+                      {t('download')}
                     </Button>
                     <Button
                       onClick={handleShare}
@@ -705,7 +705,7 @@ export default function ImageGenerator() {
                       className="border-gray-200 font-light"
                     >
                       <Share2 className="mr-2 h-4 w-4" />
-                      Share
+                      {t('share')}
                     </Button>
                   </div>
                 </div>
