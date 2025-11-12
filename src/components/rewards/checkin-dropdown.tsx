@@ -11,6 +11,7 @@ import { Progress } from '@/components/ui/progress';
 import { creditsConfig } from '@/config/credits.config';
 import { useAuthStore } from '@/store/auth-store';
 import { useRouter } from '@/i18n/navigation';
+import { useTranslations } from 'next-intl';
 import { Calendar, Flame, Gift, Sparkles } from 'lucide-react';
 import { toast } from 'sonner';
 import { useEffect, useState } from 'react';
@@ -47,6 +48,7 @@ interface CreditBalance {
 }
 
 export function CheckinDropdown() {
+  const t = useTranslations('nav');
   const { isAuthenticated } = useAuthStore();
   const router = useRouter();
   const [checkinStatus, setCheckinStatus] = useState<CheckinStatus | null>(null);
@@ -283,7 +285,7 @@ export function CheckinDropdown() {
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" size="sm" className="relative">
           <Calendar className="h-4 w-4 mr-2" />
-          Check-in
+          {t('checkin')}
           {checkinStatus?.checkedInToday && (
             <span className="ml-2 h-2 w-2 rounded-full bg-green-500" />
           )}

@@ -473,19 +473,17 @@ export default function VideoGenerator() {
                       <AlertCircle className="h-5 w-5 text-amber-600 flex-shrink-0 mt-0.5" />
                       <div>
                         <h4 className="font-semibold text-amber-900 text-sm mb-1">
-                          Important Notice
+                          {t('importantNotice')}
                         </h4>
                         <p className="text-amber-800 text-xs leading-relaxed">
-                          Image-to-video generation <strong>does not support images containing people, faces, or human figures</strong>. 
-                          Please upload product images, objects, landscapes, or abstract content only. 
-                          Images with people will be rejected or produce poor results.
+                          {t('i2vWarning')}
                         </p>
                       </div>
                     </div>
                   </div>
 
                   <div className="space-y-2">
-                    <Label className="font-light text-gray-700 text-sm">Source Image</Label>
+                    <Label className="font-light text-gray-700 text-sm">{t('sourceImage')}</Label>
 
                     {!imagePreview ? (
                       <div
@@ -496,10 +494,10 @@ export default function VideoGenerator() {
                       >
                         <Upload className="mx-auto mb-3 h-12 w-12 text-gray-400" />
                         <p className="mb-1 font-light text-gray-600 text-sm">
-                          Click to upload or drag and drop
+                          {t('clickToUpload')}
                         </p>
                         <p className="font-light text-gray-400 text-xs">
-                          JPEG, PNG, or WebP (max 10MB) • No people or faces
+                          {t('imageFormatDesc')}
                         </p>
                       </div>
                     ) : (
