@@ -1,6 +1,12 @@
 import { Card, CardContent } from '@/components/ui/card';
 import { AlertCircle } from 'lucide-react';
-import Link from 'next/link';
+import { Link } from '@/i18n/navigation';
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Refund Policy - Viecom',
+  description: 'Refund policy for Viecom AI image and video generation services. Learn about our no-refund policy for digital services.',
+};
 
 export default function RefundPolicyPage() {
   return (

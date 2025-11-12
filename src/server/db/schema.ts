@@ -552,3 +552,23 @@ export const socialShares = pgTable('social_shares', {
     unique: true,
   },
 }));
+
+// Admin users table
+export const admins = pgTable('admins', {
+  id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
+  email: text('email').notNull().unique(),
+  name: text('name'),
+  passwordHash: text('password_hash').notNull(),
+  role: text('role').notNull().default('admin'), // admin, super_admin
+  createdAt: timestamp('created_at')
+    .$defaultFn(() => new Date())
+    .notNull(),
+  updatedAt: timestamp('updated_at')
+    .$defaultFn(() => new Date())
+    .notNull(),
+  lastLoginAt: timestamp('last_login_at'),
+});
+
+// Export aliases for admin API compatibility
+export const users = user;
+export const creditBalances = userCredits;
