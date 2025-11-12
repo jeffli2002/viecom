@@ -158,6 +158,12 @@ export default function PricingPage() {
                     {pack.badge}
                   </Badge>
                 )}
+
+                {pack.discount && (
+                  <Badge className="absolute -top-3 right-4 bg-red-500 text-white border-0">
+                    {pack.discount}
+                  </Badge>
+                )}
                 
                 <CardHeader className="text-center">
                   <div className="mb-2">
@@ -165,7 +171,12 @@ export default function PricingPage() {
                   </div>
                   <CardTitle className="text-2xl">{pack.name}</CardTitle>
                   <div className="mt-4">
-                    <div className="text-4xl font-bold text-gray-900">
+                    {pack.originalPrice && (
+                      <div className="text-lg text-gray-400 line-through mb-1">
+                        ${pack.originalPrice}
+                      </div>
+                    )}
+                    <div className={`text-4xl font-bold ${pack.discount ? 'text-red-600' : 'text-gray-900'}`}>
                       ${pack.price}
                     </div>
                     <p className="text-sm text-gray-500 mt-1">

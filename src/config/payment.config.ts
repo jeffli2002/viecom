@@ -3,6 +3,8 @@ export interface CreditPack {
   name: string;
   credits: number;
   price: number;
+  originalPrice?: number; // Original price before discount
+  discount?: string; // Discount label (e.g., "10% OFF")
   stripePriceId?: string;
   creemProductKey?: string;
   popular?: boolean;
@@ -246,7 +248,9 @@ export const paymentConfig: PaymentConfig = {
       id: 'pack-5000',
       name: '5,000 Credits',
       credits: 5000,
-      price: 150,
+      price: 135,
+      originalPrice: 150,
+      discount: '10% OFF',
       stripePriceId: process.env.NEXT_PUBLIC_STRIPE_PRICE_PACK_5000 || 'price_pack_5000',
       creemProductKey: process.env.NEXT_PUBLIC_CREEM_PRICE_PACK_5000 || '',
     },
@@ -254,7 +258,9 @@ export const paymentConfig: PaymentConfig = {
       id: 'pack-10000',
       name: '10,000 Credits',
       credits: 10000,
-      price: 300,
+      price: 270,
+      originalPrice: 300,
+      discount: '20% OFF',
       stripePriceId: process.env.NEXT_PUBLIC_STRIPE_PRICE_PACK_10000 || 'price_pack_10000',
       creemProductKey: process.env.NEXT_PUBLIC_CREEM_PRICE_PACK_10000 || '',
       badge: 'Best Value',
