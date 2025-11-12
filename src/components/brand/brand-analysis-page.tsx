@@ -661,67 +661,115 @@ export function BrandAnalysisPage() {
                           </Button>
                         </div>
                         <div className="flex items-center gap-4">
-                          <div
-                            className="size-20 rounded-2xl border-4 border-white shadow-xl cursor-pointer hover:scale-110 transition-transform"
-                            style={{ backgroundColor: result.colors.primary }}
-                            onClick={() => copyToClipboard(result.colors.primary)}
-                          />
-                          <div>
-                            <div className="text-2xl text-slate-900 mb-1">
-                              {result.colors.primary}
-                            </div>
-                            <p className="text-sm text-slate-600">{t('visual.primaryColorDesc')}</p>
-                          </div>
+                          {(() => {
+                            // Ensure we always have a valid color
+                            const primaryColor = result.colors?.primary && 
+                                                 result.colors.primary.trim() !== '' && 
+                                                 result.colors.primary !== 'null' &&
+                                                 result.colors.primary !== 'undefined' &&
+                                                 /^#[0-9A-Fa-f]{6}$/.test(result.colors.primary)
+                              ? result.colors.primary 
+                              : '#9333EA'; // Purple-600 as default
+                            
+                            return (
+                              <>
+                                <div
+                                  className="size-20 rounded-2xl border-4 border-white shadow-xl cursor-pointer hover:scale-110 transition-transform"
+                                  style={{ backgroundColor: primaryColor }}
+                                  onClick={() => copyToClipboard(primaryColor)}
+                                  title="Click to copy"
+                                />
+                                <div>
+                                  <div className="text-2xl font-semibold text-slate-900 mb-1">
+                                    {primaryColor}
+                                  </div>
+                                  <p className="text-sm text-slate-600">{t('visual.primaryColorDesc')}</p>
+                                </div>
+                              </>
+                            );
+                          })()}
                         </div>
                       </div>
 
                       <div className="space-y-3">
                         <div className="text-sm text-slate-600">{t('visual.secondaryColors')}</div>
                         <div className="grid grid-cols-3 gap-4">
-                          {result.colors.secondary.map((color, index) => (
-                            <div
-                              key={index}
-                              className="space-y-2 p-4 rounded-xl bg-slate-50 border-2 border-slate-200 hover:border-purple-300 transition-colors cursor-pointer"
-                              onClick={() => copyToClipboard(color)}
-                            >
+                          {(() => {
+                            const defaultColors = ['#8B5CF6', '#EC4899', '#10B981']; // Violet, Pink, Green
+                            const secondaryColors = result.colors?.secondary || [];
+                            
+                            // Ensure we always have exactly 3 colors to display
+                            const displayColors = [0, 1, 2].map(index => {
+                              const color = secondaryColors[index];
+                              // Validate hex color format
+                              const isValidHex = color && 
+                                                 typeof color === 'string' &&
+                                                 color.trim() !== '' && 
+                                                 color !== 'null' && 
+                                                 color !== 'undefined' &&
+                                                 /^#[0-9A-Fa-f]{6}$/.test(color.trim());
+                              return isValidHex ? color.trim() : defaultColors[index];
+                            });
+                            
+                            return displayColors.map((color, index) => (
                               <div
-                                className="aspect-square rounded-xl border-4 border-slate-300 shadow-lg hover:scale-105 transition-transform"
-                                style={{ backgroundColor: color || '#E5E7EB' }}
-                                title={color}
-                              />
-                              <div className="text-center">
-                                <div className="text-sm font-semibold text-slate-900">{color}</div>
-                                <div className="text-xs text-slate-500">{t('visual.clickToCopy')}</div>
+                                key={index}
+                                className="space-y-2 p-4 rounded-xl bg-slate-50 border-2 border-slate-200 hover:border-purple-300 transition-colors cursor-pointer"
+                                onClick={() => copyToClipboard(color)}
+                              >
+                                <div
+                                  className="aspect-square rounded-xl border-4 border-slate-300 shadow-lg hover:scale-105 transition-transform"
+                                  style={{ backgroundColor: color }}
+                                  title={`Click to copy: ${color}`}
+                                />
+                                <div className="text-center">
+                                  <div className="text-sm font-semibold text-slate-900">{color}</div>
+                                  <div className="text-xs text-slate-500">{t('visual.clickToCopy')}</div>
+                                </div>
                               </div>
-                            </div>
-                          ))}
+                            ));
+                          })()}
                         </div>
-                        {result.colors.secondary.length === 0 && (
-                          <p className="text-sm text-slate-500 text-center py-4">
-                            {t('visual.noSecondaryColors') || '未提取到辅助色彩'}
-                          </p>
-                        )}
                       </div>
 
-                      {result.colors.accent && (
-                        <div 
-                          className="p-4 rounded-xl bg-amber-50 border-2 border-amber-200 cursor-pointer hover:border-amber-300 transition-colors"
-                          onClick={() => copyToClipboard(result.colors.accent!)}
-                        >
-                          <div className="flex items-center gap-3">
-                            <div
-                              className="size-16 rounded-xl border-4 border-slate-300 shadow-lg hover:scale-110 transition-transform"
-                              style={{ backgroundColor: result.colors.accent }}
-                              title={result.colors.accent}
-                            />
-                            <div>
-                              <div className="text-sm text-slate-600">{t('visual.accentColor')}</div>
-                              <div className="text-lg font-semibold text-slate-900">{result.colors.accent}</div>
-                              <div className="text-xs text-slate-500 mt-1">{t('visual.clickToCopy')}</div>
+                      <div 
+                        className="p-4 rounded-xl bg-amber-50 border-2 border-amber-200 cursor-pointer hover:border-amber-300 transition-colors"
+                        onClick={() => {
+                          const accentColor = result.colors?.accent && 
+                                             result.colors.accent.trim() !== '' && 
+                                             result.colors.accent !== 'null' &&
+                                             result.colors.accent !== 'undefined' &&
+                                             /^#[0-9A-Fa-f]{6}$/.test(result.colors.accent.trim())
+                            ? result.colors.accent.trim()
+                            : '#F59E0B';
+                          copyToClipboard(accentColor);
+                        }}
+                      >
+                        {(() => {
+                          const accentColor = result.colors?.accent && 
+                                             result.colors.accent.trim() !== '' && 
+                                             result.colors.accent !== 'null' &&
+                                             result.colors.accent !== 'undefined' &&
+                                             /^#[0-9A-Fa-f]{6}$/.test(result.colors.accent.trim())
+                            ? result.colors.accent.trim()
+                            : '#F59E0B'; // Orange as default
+                          
+                          return (
+                            <div className="flex items-center gap-3">
+                              <div
+                                className="size-16 rounded-xl border-4 border-slate-300 shadow-lg hover:scale-110 transition-transform"
+                                style={{ backgroundColor: accentColor }}
+                                title={`Click to copy: ${accentColor}`}
+                              />
+                              <div>
+                                <div className="text-sm text-slate-600">{t('visual.accentColor')}</div>
+                                <div className="text-lg font-semibold text-slate-900">{accentColor}</div>
+                                <div className="text-xs text-slate-500 mt-1">{t('visual.clickToCopy')}</div>
+                              </div>
                             </div>
-                          </div>
-                        </div>
-                      )}
+                          );
+                        })()}
+                      </div>
                     </CardContent>
                   </Card>
 
