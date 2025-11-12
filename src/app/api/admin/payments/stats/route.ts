@@ -16,68 +16,55 @@ export async function GET(request: Request) {
     const startDate = new Date();
     startDate.setDate(startDate.getDate() - daysAgo);
 
-    // Get total revenue (all time)
-    const totalRevenue = await db
+    // Note: payment table doesn't have amount/currency columns yet
+    // TODO: Add amount and currency columns to payment schema
+    
+    // Get payment count in range
+    const paymentCount = await db
       .select({
-        total: sql<number>`COALESCE(SUM(amount), 0)`,
-      })
-      .from(payment)
-      .where(eq(payment.status, 'succeeded'));
-
-    // Get revenue in range
-    const revenueInRange = await db
-      .select({
-        total: sql<number>`COALESCE(SUM(amount), 0)`,
         count: sql<number>`COUNT(*)`,
       })
       .from(payment)
       .where(
-        sql`status = 'succeeded' AND created_at >= ${startDate}`
+        sql`created_at >= ${startDate}`
       );
 
-    // Get revenue trend
-    const revenueTrend = await db.execute(sql`
-      SELECT 
-        DATE(created_at) as date,
-        COALESCE(SUM(amount), 0) as amount,
-        COUNT(*) as count
-      FROM ${payment}
-      WHERE created_at >= ${startDate} AND status = 'succeeded'
-      GROUP BY DATE(created_at)
-      ORDER BY date ASC
-    `);
-
-    // Get recent payments
+    // Get recent payments (without amount/currency)
     const recentPayments = await db
       .select({
         id: payment.id,
         userEmail: user.email,
-        amount: payment.amount,
-        currency: payment.currency,
         status: payment.status,
         createdAt: payment.createdAt,
         provider: payment.provider,
+        priceId: payment.priceId,
+        type: payment.type,
       })
       .from(payment)
       .leftJoin(user, eq(payment.userId, user.id))
       .orderBy(desc(payment.createdAt))
       .limit(50);
 
-    const revenueData = revenueInRange[0];
-    const avgTransaction = revenueData.count > 0 
-      ? Number(revenueData.total) / Number(revenueData.count) 
-      : 0;
-
-    return NextResponse.json({
+    const response = NextResponse.json({
       summary: {
-        totalRevenue: Number(totalRevenue[0]?.total) || 0,
-        revenueInRange: Number(revenueData?.total) || 0,
-        transactionCount: Number(revenueData?.count) || 0,
-        averageTransaction: avgTransaction,
+        totalRevenue: 0, // TODO: Add amount column to payment table
+        revenueInRange: 0, // TODO: Calculate from subscription plans
+        transactionCount: Number(paymentCount[0]?.count) || 0,
+        averageTransaction: 0, // TODO: Calculate when amount is available
       },
-      trend: revenueTrend.rows,
-      recentPayments,
+      trend: [], // TODO: Calculate trend when amount is available
+      recentPayments: recentPayments.map(p => ({
+        ...p,
+        amount: 0, // TODO: Calculate from priceId or add amount column
+        currency: 'usd',
+      })),
     });
+
+    // Prevent caching of admin data
+    response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0');
+    response.headers.set('Pragma', 'no-cache');
+    
+    return response;
   } catch (error: any) {
     console.error('Admin payments stats error:', error);
     

@@ -42,7 +42,11 @@ export default function AdminPaymentsPage() {
   const fetchData = async () => {
     setIsLoading(true);
     try {
-      const response = await fetch(`/api/admin/payments/stats?range=${range}`);
+      // Add cache-busting timestamp to prevent stale data
+      const timestamp = new Date().getTime();
+      const response = await fetch(`/api/admin/payments/stats?range=${range}&_t=${timestamp}`, {
+        cache: 'no-store',
+      });
       if (response.ok) {
         const result = await response.json();
         setData(result);
