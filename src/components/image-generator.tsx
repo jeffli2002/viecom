@@ -456,7 +456,7 @@ export default function ImageGenerator() {
 
             <TabsContent value="image-to-image" className="mt-0 space-y-6">
               <div className="space-y-2">
-                <Label className="font-light text-gray-700 text-sm">Source Image</Label>
+                <Label className="font-light text-gray-700 text-sm">{t('sourceImage')}</Label>
 
                 {!imagePreview ? (
                   <div
@@ -467,10 +467,10 @@ export default function ImageGenerator() {
                   >
                     <Upload className="mx-auto mb-3 h-12 w-12 text-gray-400" />
                     <p className="mb-1 font-light text-gray-600 text-sm">
-                      Click to upload or drag and drop
+                      {t('clickToUpload')}
                     </p>
                     <p className="font-light text-gray-400 text-xs">
-                      JPEG, PNG, or WebP (max 10MB)
+                      {t('imageFormatDesc')}
                     </p>
                   </div>
                 ) : (
@@ -500,7 +500,7 @@ export default function ImageGenerator() {
 
               <div className="space-y-2">
                 <Label className="font-light text-gray-700 text-sm">
-                  Transformation Prompt <span className="text-red-500">*</span>
+                  {t('transformationPrompt')} <span className="text-red-500">*</span>
                 </Label>
                 <div className="relative">
                   <Textarea

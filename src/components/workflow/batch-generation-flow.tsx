@@ -1043,7 +1043,7 @@ export function BatchGenerationFlow({ generationType }: BatchGenerationFlowProps
                 <>
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <Label className="text-sm font-medium mb-2 block">Model</Label>
+                      <Label className="text-sm font-medium mb-2 block">{t('model')}</Label>
                       <Select 
                         value={videoModel} 
                         onValueChange={(value) => {
@@ -1068,7 +1068,7 @@ export function BatchGenerationFlow({ generationType }: BatchGenerationFlowProps
                       </Select>
                     </div>
                     <div>
-                      <Label className="text-sm font-medium mb-2 block">Duration</Label>
+                      <Label className="text-sm font-medium mb-2 block">{t('duration')}</Label>
                       <div className="grid grid-cols-2 gap-2">
                         <button
                           type="button"
@@ -1101,7 +1101,7 @@ export function BatchGenerationFlow({ generationType }: BatchGenerationFlowProps
                   {/* Quality selector - only for Sora 2 Pro */}
                   {videoModel === 'sora-2-pro' && (
                     <div>
-                      <Label className="text-sm font-medium mb-2 block">Quality</Label>
+                      <Label className="text-sm font-medium mb-2 block">{t('quality')}</Label>
                       <div className="grid grid-cols-2 gap-3">
                         <button
                           type="button"
@@ -1174,12 +1174,10 @@ export function BatchGenerationFlow({ generationType }: BatchGenerationFlowProps
                   <AlertCircle className="h-5 w-5 text-amber-600 flex-shrink-0 mt-0.5" />
                   <div>
                     <h4 className="font-semibold text-amber-900 text-sm mb-1">
-                      Important Notice
+                      {t('importantNotice')}
                     </h4>
                     <p className="text-amber-800 text-xs leading-relaxed">
-                      Image-to-video generation <strong>does not support images containing people, faces, or human figures</strong>. 
-                      Please upload product images, objects, landscapes, or abstract content only. 
-                      Images with people will be rejected or produce poor results.
+                      {t('i2vWarning')}
                     </p>
                   </div>
                 </div>
