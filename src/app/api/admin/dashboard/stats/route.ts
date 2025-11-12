@@ -39,10 +39,9 @@ export async function GET(request: Request) {
       .where(eq(subscription.status, 'active'));
 
     // Get today's revenue
-    const todayRevenue = await db
-      .select({ total: sql<number>`COALESCE(SUM(amount), 0)` })
-      .from(payment)
-      .where(gte(payment.createdAt, today));
+    // Note: payment table doesn't have amount column yet
+    // TODO: Add amount column to payment table or calculate from subscription plans
+    const todayRevenue = [{ total: 0 }];
 
     // Get today's credits consumed (all API calls)
     const todayCreditsConsumed = await db
