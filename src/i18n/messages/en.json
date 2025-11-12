@@ -184,6 +184,7 @@
     }
   },
   "videoGeneration": {
+    "title": "AI Video Generation",
     "subtitle": "Create professional e-commerce product videos. Supports Text-to-Video and Image-to-Video modes.",
     "modeTextToVideo": "Text-to-Video",
     "modeImageToVideo": "Image-to-Video",

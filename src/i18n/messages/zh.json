@@ -184,6 +184,7 @@
     }
   },
   "videoGeneration": {
+    "title": "AI视频生成",
     "subtitle": "创建专业的电商产品视频。支持文生视频和图生视频模式。",
     "modeTextToVideo": "文生视频",
     "modeImageToVideo": "图生视频",
