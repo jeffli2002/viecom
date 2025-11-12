@@ -45,7 +45,7 @@ type GenerationMode = 'text-to-video' | 'image-to-video';
 export default function VideoGenerator() {
   const t = useTranslations('videoGeneration');
   const searchParams = useSearchParams();
-  const initialMode = (searchParams?.get('mode') as GenerationMode) || 'text-to-video';
+  const initialMode = (searchParams?.get('mode') as GenerationMode) || 'image-to-video';
 
   const { user, isAuthenticated } = useAuthStore();
   const { showUpgradePrompt, openUpgradePrompt, closeUpgradePrompt } = useUpgradePrompt();

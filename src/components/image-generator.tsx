@@ -45,7 +45,7 @@ type GenerationMode = 'text-to-image' | 'image-to-image';
 export default function ImageGenerator() {
   const t = useTranslations('imageGeneration');
   const searchParams = useSearchParams();
-  const initialMode = (searchParams?.get('mode') as GenerationMode) || 'text-to-image';
+  const initialMode = (searchParams?.get('mode') as GenerationMode) || 'image-to-image';
 
   const { user, isAuthenticated } = useAuthStore();
   const { showUpgradePrompt, openUpgradePrompt, closeUpgradePrompt } = useUpgradePrompt();
