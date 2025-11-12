@@ -1,3 +1,14 @@
+export interface CreditPack {
+  id: string;
+  name: string;
+  credits: number;
+  price: number;
+  stripePriceId?: string;
+  creemProductKey?: string;
+  popular?: boolean;
+  badge?: string;
+}
+
 export interface PaymentConfig {
   provider: 'stripe' | 'creem';
   currency: string;
@@ -15,6 +26,7 @@ export interface PaymentConfig {
     proplusProductKeyYearly: string;
   };
   plans: Plan[];
+  creditPacks: CreditPack[];
   trial: {
     enabled: boolean;
     days: number;
@@ -208,6 +220,44 @@ export const paymentConfig: PaymentConfig = {
         quality: 'fullhd',
         apiCalls: 10000,
       },
+    },
+  ],
+
+  creditPacks: [
+    {
+      id: 'pack-1000',
+      name: '1,000 Credits',
+      credits: 1000,
+      price: 30,
+      stripePriceId: process.env.NEXT_PUBLIC_STRIPE_PRICE_PACK_1000 || 'price_pack_1000',
+      creemProductKey: process.env.NEXT_PUBLIC_CREEM_PRICE_PACK_1000 || '',
+    },
+    {
+      id: 'pack-2000',
+      name: '2,000 Credits',
+      credits: 2000,
+      price: 60,
+      stripePriceId: process.env.NEXT_PUBLIC_STRIPE_PRICE_PACK_2000 || 'price_pack_2000',
+      creemProductKey: process.env.NEXT_PUBLIC_CREEM_PRICE_PACK_2000 || '',
+      popular: true,
+      badge: 'Most Popular',
+    },
+    {
+      id: 'pack-5000',
+      name: '5,000 Credits',
+      credits: 5000,
+      price: 150,
+      stripePriceId: process.env.NEXT_PUBLIC_STRIPE_PRICE_PACK_5000 || 'price_pack_5000',
+      creemProductKey: process.env.NEXT_PUBLIC_CREEM_PRICE_PACK_5000 || '',
+    },
+    {
+      id: 'pack-10000',
+      name: '10,000 Credits',
+      credits: 10000,
+      price: 300,
+      stripePriceId: process.env.NEXT_PUBLIC_STRIPE_PRICE_PACK_10000 || 'price_pack_10000',
+      creemProductKey: process.env.NEXT_PUBLIC_CREEM_PRICE_PACK_10000 || '',
+      badge: 'Best Value',
     },
   ],
 

@@ -129,6 +129,107 @@ export default function PricingPage() {
         ))}
       </div>
 
+      {/* Credit Packs - One-time Purchase */}
+      <div className="mb-12">
+        <div className="text-center mb-8">
+          <h2 className="text-3xl font-bold text-gray-900 mb-2">One-Time Credit Packs</h2>
+          <p className="text-gray-600">
+            Need extra credits? Purchase credit packs without a subscription
+          </p>
+        </div>
+
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {paymentConfig.creditPacks.map((pack) => {
+            const imageCount = Math.floor(pack.credits / creditsConfig.consumption.imageGeneration['nano-banana']);
+            const videoCount = Math.floor(pack.credits / creditsConfig.consumption.videoGeneration['sora-2-720p-10s']);
+            const pricePerCredit = (pack.price / pack.credits).toFixed(3);
+
+            return (
+              <Card 
+                key={pack.id} 
+                className={`relative ${
+                  pack.popular 
+                    ? 'border-2 border-purple-500 shadow-lg' 
+                    : 'border border-gray-200'
+                }`}
+              >
+                {pack.badge && (
+                  <Badge className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-gradient-to-r from-purple-600 to-pink-600 text-white border-0">
+                    {pack.badge}
+                  </Badge>
+                )}
+                
+                <CardHeader className="text-center">
+                  <div className="mb-2">
+                    <Zap className={`h-10 w-10 mx-auto ${pack.popular ? 'text-purple-600' : 'text-gray-600'}`} />
+                  </div>
+                  <CardTitle className="text-2xl">{pack.name}</CardTitle>
+                  <div className="mt-4">
+                    <div className="text-4xl font-bold text-gray-900">
+                      ${pack.price}
+                    </div>
+                    <p className="text-sm text-gray-500 mt-1">
+                      ${pricePerCredit} per credit
+                    </p>
+                  </div>
+                </CardHeader>
+
+                <CardContent className="space-y-4">
+                  <div className="bg-gray-50 rounded-lg p-4 text-center">
+                    <p className="text-sm text-gray-600 mb-2">Estimated capacity:</p>
+                    <p className="text-sm font-semibold text-gray-900">
+                      ~{imageCount} images
+                    </p>
+                    <p className="text-xs text-gray-500">or</p>
+                    <p className="text-sm font-semibold text-gray-900">
+                      ~{videoCount} videos
+                    </p>
+                  </div>
+
+                  <ul className="space-y-2">
+                    <li className="flex items-start gap-2">
+                      <Check className="h-4 w-4 text-green-600 flex-shrink-0 mt-0.5" />
+                      <span className="text-sm text-gray-700">One-time purchase</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <Check className="h-4 w-4 text-green-600 flex-shrink-0 mt-0.5" />
+                      <span className="text-sm text-gray-700">Credits never expire</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <Check className="h-4 w-4 text-green-600 flex-shrink-0 mt-0.5" />
+                      <span className="text-sm text-gray-700">No subscription required</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <Check className="h-4 w-4 text-green-600 flex-shrink-0 mt-0.5" />
+                      <span className="text-sm text-gray-700">Instant delivery</span>
+                    </li>
+                  </ul>
+
+                  <Link href={`/#pricing`} className="block">
+                    <Button
+                      className={`w-full ${
+                        pack.popular
+                          ? 'bg-purple-600 hover:bg-purple-700'
+                          : 'bg-gray-800 hover:bg-gray-900'
+                      }`}
+                      size="lg"
+                    >
+                      Purchase Now
+                    </Button>
+                  </Link>
+                </CardContent>
+              </Card>
+            );
+          })}
+        </div>
+
+        <div className="mt-6 text-center">
+          <p className="text-sm text-gray-600">
+            💡 Credit packs can be combined with any subscription plan
+          </p>
+        </div>
+      </div>
+
       {/* Credit Consumption Rates */}
       <div className="mb-12 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg p-6 border border-purple-200">
         <h3 className="text-2xl font-bold text-gray-900 mb-6 text-center">
