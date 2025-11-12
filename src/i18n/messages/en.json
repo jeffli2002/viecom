@@ -71,8 +71,9 @@
     "featureBatchDesc": "Excel/CSV batch upload, one-click generation and publishing to e-commerce platforms"
   },
   "howItWorks": {
-    "title": "How It Works",
-    "subtitle": "Three simple steps to generate professional content",
+    "badge": "How It Works",
+    "title": "Three Simple Steps",
+    "subtitle": "From upload to publish, AI handles all the heavy lifting for you",
     "step1Title": "Upload Data",
     "step1Desc": "Upload Excel/CSV files or directly input product information",
     "step2Title": "AI Generation",

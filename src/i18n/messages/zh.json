@@ -71,8 +71,9 @@
     "featureBatchDesc": "Excel/CSV批量上传，一键生成并发布到电商平台"
   },
   "howItWorks": {
-    "title": "如何使用",
-    "subtitle": "简单三步，轻松生成专业内容",
+    "badge": "如何使用",
+    "title": "简单三步，轻松生成",
+    "subtitle": "从上传到发布，AI为您完成所有繁重的工作",
     "step1Title": "上传数据",
     "step1Desc": "上传Excel/CSV文件或直接输入产品信息",
     "step2Title": "AI生成",
