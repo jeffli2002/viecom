@@ -2,7 +2,7 @@ import { db } from '@/server/db';
 import { user, subscription, userCredits } from '@/server/db/schema';
 import { requireAdmin } from '@/lib/admin/auth';
 import { NextResponse } from 'next/server';
-import { eq, like, desc, sql } from 'drizzle-orm';
+import { eq, like, desc, sql, gte } from 'drizzle-orm';
 
 export async function GET(request: Request) {
   try {
@@ -11,8 +11,20 @@ export async function GET(request: Request) {
 
     const { searchParams } = new URL(request.url);
     const search = searchParams.get('search') || '';
-    const limit = parseInt(searchParams.get('limit') || '50');
+    const range = searchParams.get('range') || 'all';
+    const limit = parseInt(searchParams.get('limit') || '100');
     const offset = parseInt(searchParams.get('offset') || '0');
+
+    // Calculate date range
+    let startDate: Date | null = null;
+    if (range === 'today') {
+      startDate = new Date();
+      startDate.setHours(0, 0, 0, 0);
+    } else if (range !== 'all') {
+      startDate = new Date();
+      const daysAgo = range === '7d' ? 7 : range === '30d' ? 30 : 90;
+      startDate.setDate(startDate.getDate() - daysAgo);
+    }
 
     // Build query
     let query = db
@@ -21,9 +33,9 @@ export async function GET(request: Request) {
         email: user.email,
         name: user.name,
         createdAt: user.createdAt,
-        plan: subscription.plan,
+        plan: subscription.planType,
         subscriptionStatus: subscription.status,
-        availableBalance: sql<number>`${userCredits.balance} - ${userCredits.frozenBalance}`,
+        availableBalance: sql<number>`COALESCE(${userCredits.balance} - ${userCredits.frozenBalance}, 0)`,
         totalEarned: userCredits.totalEarned,
         totalSpent: userCredits.totalSpent,
       })
@@ -34,18 +46,35 @@ export async function GET(request: Request) {
       .limit(limit)
       .offset(offset);
 
-    // Add search filter if provided
-    if (search) {
+    // Add date range filter
+    if (startDate) {
+      query = query.where(
+        search 
+          ? sql`${user.email} LIKE ${`%${search}%`} AND ${user.createdAt} >= ${startDate}`
+          : sql`${user.createdAt} >= ${startDate}`
+      );
+    } else if (search) {
       query = query.where(like(user.email, `%${search}%`));
     }
 
     const usersList = await query;
 
     // Get total count
-    const totalCount = await db
+    let totalCountQuery = db
       .select({ count: sql<number>`count(*)` })
-      .from(user)
-      .where(search ? like(user.email, `%${search}%`) : undefined);
+      .from(user);
+
+    if (startDate && search) {
+      totalCountQuery = totalCountQuery.where(
+        sql`${user.email} LIKE ${`%${search}%`} AND ${user.createdAt} >= ${startDate}`
+      );
+    } else if (startDate) {
+      totalCountQuery = totalCountQuery.where(sql`${user.createdAt} >= ${startDate}`);
+    } else if (search) {
+      totalCountQuery = totalCountQuery.where(like(user.email, `%${search}%`));
+    }
+
+    const totalCount = await totalCountQuery;
 
     return NextResponse.json({
       users: usersList,

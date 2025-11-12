@@ -19,11 +19,11 @@ export async function GET(request: Request) {
     // Get subscription stats by plan
     const planStats = await db.execute(sql`
       SELECT 
-        plan,
+        plan_type as plan,
         COUNT(*) as count,
         SUM(CASE WHEN status = 'active' THEN 1 ELSE 0 END) as active_count
       FROM ${subscription}
-      GROUP BY plan
+      GROUP BY plan_type
     `);
 
     // Get recent subscriptions with user info
@@ -33,10 +33,10 @@ export async function GET(request: Request) {
         userId: subscription.userId,
         userEmail: user.email,
         userName: user.name,
-        plan: subscription.plan,
+        plan: subscription.planType,
         status: subscription.status,
-        currentPeriodStart: subscription.currentPeriodStart,
-        currentPeriodEnd: subscription.currentPeriodEnd,
+        currentPeriodStart: subscription.periodStart,
+        currentPeriodEnd: subscription.periodEnd,
         createdAt: subscription.createdAt,
       })
       .from(subscription)
@@ -50,10 +50,10 @@ export async function GET(request: Request) {
       SELECT 
         DATE(created_at) as date,
         COUNT(*) as count,
-        plan
+        plan_type as plan
       FROM ${subscription}
       WHERE created_at >= ${startDate}
-      GROUP BY DATE(created_at), plan
+      GROUP BY DATE(created_at), plan_type
       ORDER BY date ASC
     `);
 

@@ -12,10 +12,10 @@ export async function GET() {
     // Get plan counts
     const planCounts = await db.execute(sql`
       SELECT 
-        COALESCE(plan, 'free') as plan,
+        COALESCE(plan_type, 'free') as plan,
         COUNT(*) as count
       FROM ${subscription}
-      GROUP BY plan
+      GROUP BY plan_type
     `);
 
     // Get status counts
@@ -33,11 +33,11 @@ export async function GET() {
         id: subscription.id,
         userId: subscription.userId,
         userEmail: user.email,
-        plan: subscription.plan,
+        plan: subscription.planType,
         status: subscription.status,
-        startDate: subscription.startDate,
-        endDate: subscription.endDate,
-        amount: subscription.amount,
+        startDate: subscription.periodStart,
+        endDate: subscription.periodEnd,
+        amount: sql<number>`0`, // TODO: Add amount calculation based on plan
       })
       .from(subscription)
       .leftJoin(user, eq(subscription.userId, user.id))

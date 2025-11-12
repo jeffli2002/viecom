@@ -3,6 +3,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useEffect, useState } from 'react';
 import { Download, Search } from 'lucide-react';
 
@@ -21,17 +22,18 @@ interface User {
 export default function AdminUsersPage() {
   const [users, setUsers] = useState<User[]>([]);
   const [search, setSearch] = useState('');
+  const [range, setRange] = useState('all');
   const [isLoading, setIsLoading] = useState(true);
   const [total, setTotal] = useState(0);
 
   useEffect(() => {
     fetchUsers();
-  }, [search]);
+  }, [search, range]);
 
   const fetchUsers = async () => {
     setIsLoading(true);
     try {
-      const response = await fetch(`/api/admin/users?search=${search}&limit=50`);
+      const response = await fetch(`/api/admin/users?search=${search}&range=${range}&limit=100`);
       if (response.ok) {
         const data = await response.json();
         setUsers(data.users);
@@ -70,10 +72,24 @@ export default function AdminUsersPage() {
           <h1 className="text-3xl font-bold text-gray-900">Users Management</h1>
           <p className="text-gray-500 mt-1">Total: {total} users</p>
         </div>
-        <Button onClick={() => downloadCSV('users.csv', users)} variant="outline">
-          <Download className="mr-2 h-4 w-4" />
-          Export Users
-        </Button>
+        <div className="flex items-center gap-3">
+          <Select value={range} onValueChange={setRange}>
+            <SelectTrigger className="w-[180px]">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="today">Today</SelectItem>
+              <SelectItem value="7d">Last 7 days</SelectItem>
+              <SelectItem value="30d">Last 30 days</SelectItem>
+              <SelectItem value="90d">Last 90 days</SelectItem>
+              <SelectItem value="all">All Time</SelectItem>
+            </SelectContent>
+          </Select>
+          <Button onClick={() => downloadCSV('users.csv', users)} variant="outline">
+            <Download className="mr-2 h-4 w-4" />
+            Export Users
+          </Button>
+        </div>
       </div>
 
       {/* Search */}
