@@ -60,15 +60,15 @@ export async function GET(request: Request) {
         u.id,
         u.email,
         u.name,
-        COALESCE(SUM(CASE WHEN ct.type = 'spend' AND ct.source = 'api_call' AND ct.amount < 0 THEN ABS(ct.amount) ELSE 0 END), 0) as total_consumed,
-        COALESCE(SUM(CASE WHEN ct.type = 'spend' AND ct.source = 'api_call' AND ct.amount < 0 AND (ct.description LIKE '%image%' OR ct.description LIKE '%Image%') THEN ABS(ct.amount) ELSE 0 END), 0) as image_credits,
-        COALESCE(SUM(CASE WHEN ct.type = 'spend' AND ct.source = 'api_call' AND ct.amount < 0 AND (ct.description LIKE '%video%' OR ct.description LIKE '%Video%') THEN ABS(ct.amount) ELSE 0 END), 0) as video_credits,
+        COALESCE(SUM(CASE WHEN ct.type = 'spend' AND ct.source = 'api_call' THEN ABS(ct.amount) ELSE 0 END), 0) as total_consumed,
+        COALESCE(SUM(CASE WHEN ct.type = 'spend' AND ct.source = 'api_call' AND (ct.description LIKE '%image%' OR ct.description LIKE '%Image%') THEN ABS(ct.amount) ELSE 0 END), 0) as image_credits,
+        COALESCE(SUM(CASE WHEN ct.type = 'spend' AND ct.source = 'api_call' AND (ct.description LIKE '%video%' OR ct.description LIKE '%Video%') THEN ABS(ct.amount) ELSE 0 END), 0) as video_credits,
         COALESCE(MAX(uc.balance) - MAX(uc.frozen_balance), 0) as remaining
       FROM ${user} u
       LEFT JOIN ${creditTransactions} ct ON u.id = ct.user_id AND ct.created_at >= ${startDate}
       LEFT JOIN ${userCredits} uc ON u.id = uc.user_id
       GROUP BY u.id, u.email, u.name
-      HAVING COALESCE(SUM(CASE WHEN ct.type = 'spend' AND ct.source = 'api_call' AND ct.amount < 0 THEN ABS(ct.amount) ELSE 0 END), 0) > 0
+      HAVING COALESCE(SUM(CASE WHEN ct.type = 'spend' AND ct.source = 'api_call' THEN ABS(ct.amount) ELSE 0 END), 0) > 0
       ORDER BY total_consumed DESC
       LIMIT 10
     `);
@@ -77,8 +77,8 @@ export async function GET(request: Request) {
     const creditsTrend = await db.execute(sql`
       SELECT 
         DATE(created_at) as date,
-        SUM(CASE WHEN type = 'spend' AND source = 'api_call' AND (description LIKE '%image%' OR description LIKE '%Image%') THEN ABS(amount) ELSE 0 END) as "imageCredits",
-        SUM(CASE WHEN type = 'spend' AND source = 'api_call' AND (description LIKE '%video%' OR description LIKE '%Video%') THEN ABS(amount) ELSE 0 END) as "videoCredits"
+        COALESCE(SUM(CASE WHEN type = 'spend' AND source = 'api_call' AND (description LIKE '%image%' OR description LIKE '%Image%') THEN ABS(amount) ELSE 0 END), 0) as "imageCredits",
+        COALESCE(SUM(CASE WHEN type = 'spend' AND source = 'api_call' AND (description LIKE '%video%' OR description LIKE '%Video%') THEN ABS(amount) ELSE 0 END), 0) as "videoCredits"
       FROM ${creditTransactions}
       WHERE created_at >= ${startDate}
       GROUP BY DATE(created_at)
