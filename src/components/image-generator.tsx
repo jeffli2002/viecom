@@ -368,14 +368,14 @@ export default function ImageGenerator() {
             className="font-medium data-[state=active]:bg-purple-600 data-[state=active]:text-white data-[state=inactive]:border-2 data-[state=inactive]:border-gray-300 data-[state=inactive]:rounded-full data-[state=inactive]:bg-white data-[state=inactive]:text-gray-700 rounded-full py-3 transition-all"
           >
             <Sparkles className="mr-2 h-4 w-4" />
-            Text to Image
+            {t('modeTextToImage')}
           </TabsTrigger>
           <TabsTrigger 
             value="image-to-image" 
             className="font-medium data-[state=active]:bg-purple-600 data-[state=active]:text-white data-[state=inactive]:border-2 data-[state=inactive]:border-gray-300 data-[state=inactive]:rounded-full data-[state=inactive]:bg-white data-[state=inactive]:text-gray-700 rounded-full py-3 transition-all"
           >
             <ImageIcon className="mr-2 h-4 w-4" />
-            Image to Image
+            {t('modeImageToImage')}
           </TabsTrigger>
         </TabsList>
 
