@@ -44,27 +44,22 @@ export async function GET(request: Request) {
       .from(payment)
       .where(gte(payment.createdAt, today));
 
-    // Get today's image credits consumed
-    const todayImageCredits = await db
+    // Get today's credits consumed (all API calls)
+    const todayCreditsConsumed = await db
       .select({ total: sql<number>`COALESCE(SUM(ABS(amount)), 0)` })
       .from(creditTransactions)
       .where(
         and(
-          eq(creditTransactions.type, 'image_generation'),
+          eq(creditTransactions.type, 'spend'),
+          eq(creditTransactions.source, 'api_call'),
           gte(creditTransactions.createdAt, today)
         )
       );
 
-    // Get today's video credits consumed
-    const todayVideoCredits = await db
-      .select({ total: sql<number>`COALESCE(SUM(ABS(amount)), 0)` })
-      .from(creditTransactions)
-      .where(
-        and(
-          eq(creditTransactions.type, 'video_generation'),
-          gte(creditTransactions.createdAt, today)
-        )
-      );
+    // For now, we'll show total API credits consumed
+    // In the future, you can differentiate by checking metadata or description
+    const todayImageCredits = todayCreditsConsumed;
+    const todayVideoCredits = todayCreditsConsumed;
 
     // Get registration trend (last 30 days)
     const registrationTrend = await db.execute(sql`
@@ -81,8 +76,8 @@ export async function GET(request: Request) {
     const creditsTrend = await db.execute(sql`
       SELECT 
         DATE(created_at) as date,
-        SUM(CASE WHEN source = 'api_call' AND amount < 0 THEN ABS(amount) ELSE 0 END) as "imageCredits",
-        SUM(CASE WHEN source = 'api_call' AND amount < 0 THEN ABS(amount) ELSE 0 END) as "videoCredits"
+        SUM(CASE WHEN type = 'spend' AND source = 'api_call' AND amount < 0 THEN ABS(amount) ELSE 0 END) as "imageCredits",
+        SUM(CASE WHEN type = 'spend' AND source = 'api_call' AND amount < 0 THEN ABS(amount) ELSE 0 END) as "videoCredits"
       FROM ${creditTransactions}
       WHERE created_at >= ${startDate}
       GROUP BY DATE(created_at)
