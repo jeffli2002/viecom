@@ -40,7 +40,7 @@ interface CreditsSummary {
 
 export default function AdminCreditsPage() {
   const [data, setData] = useState<CreditsSummary | null>(null);
-  const [range, setRange] = useState('30d');
+  const [range, setRange] = useState('today');
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -98,6 +98,7 @@ export default function AdminCreditsPage() {
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
+            <SelectItem value="today">Today</SelectItem>
             <SelectItem value="7d">Last 7 days</SelectItem>
             <SelectItem value="30d">Last 30 days</SelectItem>
             <SelectItem value="90d">Last 90 days</SelectItem>
