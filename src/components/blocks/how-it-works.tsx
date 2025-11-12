@@ -13,6 +13,7 @@ export function HowItWorks() {
       title: t('step1Title'),
       description: t('step1Desc'),
       color: 'from-blue-500 to-blue-600',
+      iconColor: 'text-blue-600',
       bgColor: 'bg-blue-500/10',
       borderColor: 'border-blue-200',
       hoverBorderColor: 'hover:border-blue-400',
@@ -23,6 +24,7 @@ export function HowItWorks() {
       title: t('step2Title'),
       description: t('step2Desc'),
       color: 'from-purple-500 to-purple-600',
+      iconColor: 'text-purple-600',
       bgColor: 'bg-purple-500/10',
       borderColor: 'border-purple-200',
       hoverBorderColor: 'hover:border-purple-400',
@@ -33,6 +35,7 @@ export function HowItWorks() {
       title: t('step3Title'),
       description: t('step3Desc'),
       color: 'from-green-500 to-green-600',
+      iconColor: 'text-green-600',
       bgColor: 'bg-green-500/10',
       borderColor: 'border-green-200',
       hoverBorderColor: 'hover:border-green-400',
@@ -69,7 +72,7 @@ export function HowItWorks() {
                 {/* Icon */}
                 <div className="mb-6 mt-4 flex justify-center">
                   <div className={`flex h-20 w-20 items-center justify-center rounded-2xl ${step.bgColor} transition-all duration-300 group-hover:scale-110 group-hover:rotate-3`}>
-                    <step.icon className={`h-10 w-10 bg-gradient-to-r ${step.color} bg-clip-text text-transparent`} style={{ WebkitTextFillColor: 'transparent', WebkitBackgroundClip: 'text' }} />
+                    <step.icon className={`h-10 w-10 ${step.iconColor}`} />
                   </div>
                 </div>
 
