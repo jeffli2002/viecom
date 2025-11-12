@@ -2,6 +2,7 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useEffect, useState } from 'react';
 import { Download, Users } from 'lucide-react';
 
@@ -30,16 +31,21 @@ interface SubscriptionStats {
 
 export default function AdminSubscriptionsPage() {
   const [data, setData] = useState<SubscriptionStats | null>(null);
+  const [range, setRange] = useState('all');
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [range]);
 
   const fetchData = async () => {
     setIsLoading(true);
     try {
-      const response = await fetch('/api/admin/subscriptions/stats');
+      // Add cache-busting timestamp to prevent stale data
+      const timestamp = new Date().getTime();
+      const response = await fetch(`/api/admin/subscriptions/stats?range=${range}&_t=${timestamp}`, {
+        cache: 'no-store',
+      });
       if (response.ok) {
         const result = await response.json();
         setData(result);
@@ -82,10 +88,24 @@ export default function AdminSubscriptionsPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold text-gray-900">Subscriptions Management</h1>
-        <Button onClick={() => downloadCSV('subscriptions.csv', data.recentSubscriptions)} variant="outline">
-          <Download className="mr-2 h-4 w-4" />
-          Export Subscriptions
-        </Button>
+        <div className="flex items-center gap-3">
+          <Select value={range} onValueChange={setRange}>
+            <SelectTrigger className="w-[180px]">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="today">Today</SelectItem>
+              <SelectItem value="7d">Last 7 days</SelectItem>
+              <SelectItem value="30d">Last 30 days</SelectItem>
+              <SelectItem value="90d">Last 90 days</SelectItem>
+              <SelectItem value="all">All Time</SelectItem>
+            </SelectContent>
+          </Select>
+          <Button onClick={() => downloadCSV('subscriptions.csv', data.recentSubscriptions)} variant="outline">
+            <Download className="mr-2 h-4 w-4" />
+            Export Subscriptions
+          </Button>
+        </div>
       </div>
 
       {/* Plan Distribution */}
