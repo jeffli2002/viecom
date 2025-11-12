@@ -5,6 +5,9 @@ export const routing = defineRouting({
   defaultLocale: 'en',
   localePrefix: 'as-needed', // Don't show locale prefix for default locale
   localeDetection: true, // Auto-detect locale from browser
+  pathnames: {
+    // Explicitly exclude admin routes from i18n
+  } as const,
 });
 
 export const locales = [
