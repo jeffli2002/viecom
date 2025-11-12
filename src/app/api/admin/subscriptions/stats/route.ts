@@ -1,5 +1,5 @@
 import { db } from '@/server/db';
-import { subscriptions, users } from '@/server/db/schema';
+import { subscription, user } from '@/server/db/schema';
 import { requireAdmin } from '@/lib/admin/auth';
 import { NextResponse } from 'next/server';
 import { sql, eq, desc } from 'drizzle-orm';
@@ -14,7 +14,7 @@ export async function GET() {
       SELECT 
         COALESCE(plan, 'free') as plan,
         COUNT(*) as count
-      FROM ${subscriptions}
+      FROM ${subscription}
       GROUP BY plan
     `);
 
@@ -23,25 +23,25 @@ export async function GET() {
       SELECT 
         status,
         COUNT(*) as count
-      FROM ${subscriptions}
+      FROM ${subscription}
       GROUP BY status
     `);
 
     // Get recent subscriptions (last 50)
     const recentSubscriptions = await db
       .select({
-        id: subscriptions.id,
-        userId: subscriptions.userId,
-        userEmail: users.email,
-        plan: subscriptions.plan,
-        status: subscriptions.status,
-        startDate: subscriptions.startDate,
-        endDate: subscriptions.endDate,
-        amount: subscriptions.amount,
+        id: subscription.id,
+        userId: subscription.userId,
+        userEmail: user.email,
+        plan: subscription.plan,
+        status: subscription.status,
+        startDate: subscription.startDate,
+        endDate: subscription.endDate,
+        amount: subscription.amount,
       })
-      .from(subscriptions)
-      .leftJoin(users, eq(subscriptions.userId, users.id))
-      .orderBy(desc(subscriptions.createdAt))
+      .from(subscription)
+      .leftJoin(user, eq(subscription.userId, user.id))
+      .orderBy(desc(subscription.createdAt))
       .limit(50);
 
     // Parse plan counts

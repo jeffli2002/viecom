@@ -3,10 +3,9 @@ import { admins } from '@/server/db/schema';
 import { eq } from 'drizzle-orm';
 import { NextResponse } from 'next/server';
 import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
+import { SignJWT } from 'jose';
 
 const JWT_SECRET = process.env.ADMIN_JWT_SECRET || 'your-admin-secret-key-change-in-production';
-const JWT_EXPIRES_IN = '7d';
 
 export async function POST(request: Request) {
   try {
@@ -42,15 +41,15 @@ export async function POST(request: Request) {
     }
 
     // Generate JWT token
-    const token = jwt.sign(
-      {
-        id: adminUser.id,
-        email: adminUser.email,
-        role: 'admin',
-      },
-      JWT_SECRET,
-      { expiresIn: remember ? '30d' : JWT_EXPIRES_IN }
-    );
+    const secret = new TextEncoder().encode(JWT_SECRET);
+    const token = await new SignJWT({
+      id: adminUser.id,
+      email: adminUser.email,
+      role: 'admin',
+    })
+      .setProtectedHeader({ alg: 'HS256' })
+      .setExpirationTime(remember ? '30d' : '7d')
+      .sign(secret);
 
     // Set cookie
     const response = NextResponse.json({

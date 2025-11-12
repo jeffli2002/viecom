@@ -1,5 +1,5 @@
 import { cookies } from 'next/headers';
-import jwt from 'jsonwebtoken';
+import { jwtVerify } from 'jose';
 
 const JWT_SECRET = process.env.ADMIN_JWT_SECRET || 'your-admin-secret-key-change-in-production';
 
@@ -18,13 +18,14 @@ export async function verifyAdminToken(): Promise<AdminTokenPayload | null> {
       return null;
     }
 
-    const decoded = jwt.verify(token, JWT_SECRET) as AdminTokenPayload;
+    const secret = new TextEncoder().encode(JWT_SECRET);
+    const { payload } = await jwtVerify(token, secret);
     
-    if (decoded.role !== 'admin') {
+    if (payload.role !== 'admin') {
       return null;
     }
 
-    return decoded;
+    return payload as AdminTokenPayload;
   } catch (error) {
     console.error('Admin token verification error:', error);
     return null;

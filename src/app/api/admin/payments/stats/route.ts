@@ -1,5 +1,5 @@
 import { db } from '@/server/db';
-import { payments, users } from '@/server/db/schema';
+import { payment, user } from '@/server/db/schema';
 import { requireAdmin } from '@/lib/admin/auth';
 import { NextResponse } from 'next/server';
 import { sql, gte, eq, desc } from 'drizzle-orm';
@@ -21,8 +21,8 @@ export async function GET(request: Request) {
       .select({
         total: sql<number>`COALESCE(SUM(amount), 0)`,
       })
-      .from(payments)
-      .where(eq(payments.status, 'succeeded'));
+      .from(payment)
+      .where(eq(payment.status, 'succeeded'));
 
     // Get revenue in range
     const revenueInRange = await db
@@ -30,7 +30,7 @@ export async function GET(request: Request) {
         total: sql<number>`COALESCE(SUM(amount), 0)`,
         count: sql<number>`COUNT(*)`,
       })
-      .from(payments)
+      .from(payment)
       .where(
         sql`status = 'succeeded' AND created_at >= ${startDate}`
       );
@@ -41,7 +41,7 @@ export async function GET(request: Request) {
         DATE(created_at) as date,
         COALESCE(SUM(amount), 0) as amount,
         COUNT(*) as count
-      FROM ${payments}
+      FROM ${payment}
       WHERE created_at >= ${startDate} AND status = 'succeeded'
       GROUP BY DATE(created_at)
       ORDER BY date ASC
@@ -50,17 +50,17 @@ export async function GET(request: Request) {
     // Get recent payments
     const recentPayments = await db
       .select({
-        id: payments.id,
-        userEmail: users.email,
-        amount: payments.amount,
-        currency: payments.currency,
-        status: payments.status,
-        createdAt: payments.createdAt,
-        provider: payments.provider,
+        id: payment.id,
+        userEmail: user.email,
+        amount: payment.amount,
+        currency: payment.currency,
+        status: payment.status,
+        createdAt: payment.createdAt,
+        provider: payment.provider,
       })
-      .from(payments)
-      .leftJoin(users, eq(payments.userId, users.id))
-      .orderBy(desc(payments.createdAt))
+      .from(payment)
+      .leftJoin(user, eq(payment.userId, user.id))
+      .orderBy(desc(payment.createdAt))
       .limit(50);
 
     const revenueData = revenueInRange[0];
