@@ -74,19 +74,44 @@ function AssetsPageContent() {
 
   const handleDownload = async (asset: Asset) => {
     try {
-      const response = await fetch(asset.url);
+      console.log('Starting download for:', asset.url);
+
+      // Try to fetch the asset
+      const response = await fetch(asset.url, {
+        mode: 'cors',
+        credentials: 'omit',
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to fetch asset: ${response.status} ${response.statusText}`);
+      }
+
       const blob = await response.blob();
+      console.log('Blob created:', blob.size, 'bytes');
+
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
       const extension = asset.type === 'image' ? 'png' : 'mp4';
-      a.download = `asset-${asset.id}.${extension}`;
+      a.download = `${asset.type}-${asset.id}-${Date.now()}.${extension}`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
       window.URL.revokeObjectURL(url);
+
+      console.log('Download triggered successfully');
     } catch (error) {
       console.error('Download failed:', error);
+      
+      // Fallback: try direct link download
+      console.log('Trying fallback method: direct link');
+      const a = document.createElement('a');
+      a.href = asset.url;
+      a.target = '_blank';
+      a.download = `${asset.type}-${asset.id}.${asset.type === 'image' ? 'png' : 'mp4'}`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
     }
   };
 
