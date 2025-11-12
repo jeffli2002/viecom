@@ -3,7 +3,7 @@ import { admins } from '@/server/db/schema';
 import bcrypt from 'bcryptjs';
 
 async function createAdmin() {
-  const email = process.env.ADMIN_EMAIL || 'admin@viecom.ai';
+  const email = process.env.ADMIN_EMAIL || 'admin@viecom.pro';
   const password = process.env.ADMIN_PASSWORD || 'admin123456';
   const name = 'Admin User';
 

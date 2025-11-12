@@ -17,7 +17,7 @@ Viecom Admin Dashboard 是一个功能完整的管理后台，用于监控和管
 ADMIN_JWT_SECRET=your-super-secret-admin-key-change-this-in-production
 
 # 默认管理员账号（可选，用于首次创建）
-ADMIN_EMAIL=admin@viecom.ai
+ADMIN_EMAIL=admin@viecom.pro
 ADMIN_PASSWORD=change-me-immediately
 ```
 
@@ -39,7 +39,7 @@ pnpm tsx src/scripts/create-admin.ts
 ```
 
 这将创建一个管理员账号：
-- **Email**: `admin@viecom.ai`（或你设置的 ADMIN_EMAIL）
+- **Email**: `admin@viecom.pro`（或你设置的 ADMIN_EMAIL）
 - **Password**: `admin123456`（或你设置的 ADMIN_PASSWORD）
 
 **⚠️ 重要**：首次登录后立即修改密码！

@@ -26,28 +26,28 @@ export default function ContactPage() {
             <div>
               <p className="text-sm text-gray-600 mb-1">General Inquiries</p>
               <a
-                href="mailto:support@viecom.ai"
+                href="mailto:support@viecom.pro"
                 className="text-purple-600 hover:underline font-medium"
               >
-                support@viecom.ai
+                support@viecom.pro
               </a>
             </div>
             <div>
               <p className="text-sm text-gray-600 mb-1">Sales & Enterprise</p>
               <a
-                href="mailto:sales@viecom.ai"
+                href="mailto:sales@viecom.pro"
                 className="text-purple-600 hover:underline font-medium"
               >
-                sales@viecom.ai
+                sales@viecom.pro
               </a>
             </div>
             <div>
               <p className="text-sm text-gray-600 mb-1">Technical Support</p>
               <a
-                href="mailto:tech@viecom.ai"
+                href="mailto:tech@viecom.pro"
                 className="text-purple-600 hover:underline font-medium"
               >
-                tech@viecom.ai
+                tech@viecom.pro
               </a>
             </div>
           </CardContent>

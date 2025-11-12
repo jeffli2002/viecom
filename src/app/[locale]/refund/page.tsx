@@ -114,8 +114,8 @@ export default function RefundPolicyPage() {
             
             <p className="mt-4">
               To request a refund review under these exceptional circumstances, please contact our support team at{' '}
-              <a href="mailto:support@viecom.ai" className="text-purple-600 hover:underline">
-                support@viecom.ai
+              <a href="mailto:support@viecom.pro" className="text-purple-600 hover:underline">
+                support@viecom.pro
               </a>{' '}
               within 7 days of the transaction with:
             </p>
@@ -191,7 +191,7 @@ export default function RefundPolicyPage() {
               please contact us:
             </p>
             <ul className="list-none space-y-2 ml-4">
-              <li><strong>Email:</strong> <a href="mailto:support@viecom.ai" className="text-purple-600 hover:underline">support@viecom.ai</a></li>
+              <li><strong>Email:</strong> <a href="mailto:support@viecom.pro" className="text-purple-600 hover:underline">support@viecom.pro</a></li>
               <li><strong>Support:</strong> <Link href="/contact" className="text-purple-600 hover:underline">Contact Page</Link></li>
             </ul>
             

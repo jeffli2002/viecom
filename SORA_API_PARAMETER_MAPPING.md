@@ -514,7 +514,7 @@ POST https://api.kie.ai/api/v1/jobs/createTask
   "model": "sora-2-image-to-video",
   "input": {
     "prompt": "create dynamic motion from product image...",
-    "image_urls": ["https://storage.viecom.ai/uploads/user123/image.jpg"],
+    "image_urls": ["https://storage.viecom.pro/uploads/user123/image.jpg"],
     "aspect_ratio": "portrait",
     "n_frames": "10",
     "size": "standard",

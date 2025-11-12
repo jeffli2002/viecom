@@ -289,14 +289,14 @@ export default function TermsPage() {
               <p>For questions about these Terms of Service, contact us at:</p>
               <p>
                 <strong>Email:</strong>{' '}
-                <a href="mailto:legal@viecom.ai" className="text-purple-600 hover:underline">
-                  legal@viecom.ai
+                <a href="mailto:legal@viecom.pro" className="text-purple-600 hover:underline">
+                  legal@viecom.pro
                 </a>
               </p>
               <p>
                 <strong>Support:</strong>{' '}
-                <a href="mailto:support@viecom.ai" className="text-purple-600 hover:underline">
-                  support@viecom.ai
+                <a href="mailto:support@viecom.pro" className="text-purple-600 hover:underline">
+                  support@viecom.pro
                 </a>
               </p>
             </div>
