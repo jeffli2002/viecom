@@ -97,6 +97,11 @@ export function Footer() {
                   {t('footerTerms') || '服务条款'}
                 </Link>
               </li>
+              <li>
+                <Link href="/refund" className="text-muted-foreground hover:text-primary">
+                  {t('footerRefund') || '退款政策'}
+                </Link>
+              </li>
             </ul>
           </div>
         </div>
