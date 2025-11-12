@@ -85,7 +85,7 @@ export async function GET(request: Request) {
       ORDER BY date ASC
     `);
 
-    return NextResponse.json({
+    const response = NextResponse.json({
       summary: {
         totalConsumed: Number(totalConsumed[0]?.total) || 0,
         imageCredits: Number(imageCredits.rows[0]?.total) || 0,
@@ -94,6 +94,12 @@ export async function GET(request: Request) {
       top10Users: top10Users.rows,
       trend: creditsTrend.rows,
     });
+
+    // Prevent caching of admin data
+    response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0');
+    response.headers.set('Pragma', 'no-cache');
+    
+    return response;
   } catch (error: any) {
     console.error('Admin credits summary error:', error);
     

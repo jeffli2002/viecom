@@ -76,12 +76,18 @@ export async function GET(request: Request) {
 
     const totalCount = await totalCountQuery;
 
-    return NextResponse.json({
+    const response = NextResponse.json({
       users: usersList,
       total: Number(totalCount[0]?.count) || 0,
       limit,
       offset,
     });
+
+    // Prevent caching of admin data
+    response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0');
+    response.headers.set('Pragma', 'no-cache');
+    
+    return response;
   } catch (error: any) {
     console.error('Admin users list error:', error);
     

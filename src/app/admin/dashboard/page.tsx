@@ -43,7 +43,11 @@ export default function AdminDashboardPage() {
   const fetchStats = async () => {
     setIsLoading(true);
     try {
-      const response = await fetch(`/api/admin/dashboard/stats?range=${range}`);
+      // Add cache-busting timestamp to prevent stale data
+      const timestamp = new Date().getTime();
+      const response = await fetch(`/api/admin/dashboard/stats?range=${range}&_t=${timestamp}`, {
+        cache: 'no-store',
+      });
       if (response.ok) {
         const data = await response.json();
         setStats(data);

@@ -50,7 +50,11 @@ export default function AdminCreditsPage() {
   const fetchData = async () => {
     setIsLoading(true);
     try {
-      const response = await fetch(`/api/admin/credits/summary?range=${range}`);
+      // Add cache-busting timestamp to prevent stale data
+      const timestamp = new Date().getTime();
+      const response = await fetch(`/api/admin/credits/summary?range=${range}&_t=${timestamp}`, {
+        cache: 'no-store',
+      });
       if (response.ok) {
         const result = await response.json();
         setData(result);

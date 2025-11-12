@@ -83,7 +83,7 @@ export async function GET(request: Request) {
       ORDER BY date ASC
     `);
 
-    return NextResponse.json({
+    const response = NextResponse.json({
       kpis: {
         todayRegistrations: Number(todayRegistrations[0]?.count) || 0,
         registrationsInRange: Number(registrationsInRange[0]?.count) || 0,
@@ -97,6 +97,12 @@ export async function GET(request: Request) {
         credits: creditsTrend.rows,
       },
     });
+
+    // Prevent caching of admin data
+    response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0');
+    response.headers.set('Pragma', 'no-cache');
+    
+    return response;
   } catch (error: any) {
     console.error('Admin stats error:', error);
     
