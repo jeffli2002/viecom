@@ -13,10 +13,10 @@ export function LandingFooter() {
           {/* Brand */}
           <div className="space-y-4">
             <div className="flex items-center">
-              <img 
-                src="/brandlogo4.png" 
-                alt="Viecom Logo" 
-                style={{ height: '64px', width: '218px', objectFit: 'contain' }}
+              <img
+                src="/brandlogo5transb.png"
+                alt="Viecom Logo"
+                style={{ height: '56px', width: '210px', objectFit: 'contain' }}
               />
             </div>
             <p className="text-sm text-muted-foreground">

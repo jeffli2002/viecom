@@ -32,10 +32,10 @@ export function LandingHeader() {
             animate={{ opacity: 1, x: 0 }}
           >
             <Link href="/" className="flex items-center">
-              <img 
-                src="/brandlogo4.png" 
-                alt="Viecom Logo" 
-                style={{ height: '64px', width: '218px', objectFit: 'contain' }}
+              <img
+                src="/brandlogo5transb.png"
+                alt="Viecom Logo"
+                style={{ height: '56px', width: '210px', objectFit: 'contain' }}
               />
             </Link>
           </motion.div>
