@@ -332,9 +332,20 @@ export default function ImageGenerator() {
     }
   };
 
+  const getDownloadUrl = (imageUrl: string, previewUrl?: string) => {
+    if (imageUrl.startsWith('/api/v1/media')) {
+      return `${imageUrl}${imageUrl.includes('?') ? '&' : '?'}download=1`;
+    }
+    if (previewUrl && previewUrl.startsWith('/api/v1/media')) {
+      return `${previewUrl}${previewUrl.includes('?') ? '&' : '?'}download=1`;
+    }
+    return imageUrl;
+  };
+
   const handleDownload = async (imageUrl: string, fallbackUrl?: string) => {
     try {
-      const response = await fetch(imageUrl);
+      const downloadUrl = getDownloadUrl(imageUrl, fallbackUrl);
+      const response = await fetch(downloadUrl);
       const blob = await response.blob();
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
@@ -346,7 +357,7 @@ export default function ImageGenerator() {
       window.URL.revokeObjectURL(url);
     } catch (error) {
       console.error('Download failed:', error);
-      const targetUrl = fallbackUrl ?? imageUrl;
+      const targetUrl = getDownloadUrl(fallbackUrl ?? imageUrl);
       window.open(targetUrl, '_blank');
     }
   };
