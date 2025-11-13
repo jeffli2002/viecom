@@ -333,9 +333,17 @@ export default function VideoGenerator() {
     }
   };
 
+  const getDownloadUrl = (videoUrl: string) => {
+    if (videoUrl.startsWith('/api/v1/media')) {
+      return `${videoUrl}${videoUrl.includes('?') ? '&' : '?'}download=1`;
+    }
+    return videoUrl;
+  };
+
   const handleDownload = async (videoUrl: string) => {
     try {
-      const response = await fetch(videoUrl);
+      const downloadUrl = getDownloadUrl(videoUrl);
+      const response = await fetch(downloadUrl);
       const blob = await response.blob();
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
@@ -347,7 +355,7 @@ export default function VideoGenerator() {
       window.URL.revokeObjectURL(url);
     } catch (error) {
       console.error('Download failed:', error);
-      window.open(videoUrl, '_blank');
+      window.open(getDownloadUrl(videoUrl), '_blank');
     }
   };
 

@@ -30,6 +30,8 @@ interface GeneratedAsset {
   status: 'completed' | 'failed';
   error?: string;
   rowIndex: number; // Original row index in CSV
+  previewUrl?: string;
+  r2Key?: string;
 }
 
 interface BatchResultsProps {
@@ -67,10 +69,31 @@ export function BatchResults({ jobId, assets: initialAssets }: BatchResultsProps
     setSelectedAssets(new Set());
   };
 
+  const getAssetDownloadUrl = (asset: GeneratedAsset) => {
+    if (asset.r2Key) {
+      return `/api/v1/media?key=${encodeURIComponent(asset.r2Key)}&download=1`;
+    }
+    if (asset.url.startsWith('/api/v1/media')) {
+      return `${asset.url}${asset.url.includes('?') ? '&' : '?'}download=1`;
+    }
+    return asset.url;
+  };
+
+  const getAssetPreviewUrl = (asset: GeneratedAsset) => {
+    if (asset.previewUrl) {
+      return asset.previewUrl;
+    }
+    if (asset.url.startsWith('/api/v1/media') && asset.r2Key) {
+      return `/api/v1/media?key=${encodeURIComponent(asset.r2Key)}`;
+    }
+    return asset.url;
+  };
+
   const handleDownloadAsset = async (asset: GeneratedAsset) => {
     setDownloadingAssets((prev) => new Set(prev).add(asset.id));
     try {
-      const response = await fetch(asset.url);
+      const downloadUrl = getAssetDownloadUrl(asset);
+      const response = await fetch(downloadUrl);
       const blob = await response.blob();
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
@@ -83,7 +106,7 @@ export function BatchResults({ jobId, assets: initialAssets }: BatchResultsProps
       window.URL.revokeObjectURL(url);
     } catch (error) {
       console.error('Download failed:', error);
-      alert('下载失败');
+      window.open(getAssetDownloadUrl(asset), '_blank');
     } finally {
       setDownloadingAssets((prev) => {
         const next = new Set(prev);
@@ -159,6 +182,8 @@ export function BatchResults({ jobId, assets: initialAssets }: BatchResultsProps
               status: asset.status,
               error: asset.error,
               rowIndex: asset.rowIndex,
+              previewUrl: asset.previewUrl,
+              r2Key: asset.r2Key,
             }));
             setAssets(formattedAssets);
             setIsLoading(false);
@@ -307,7 +332,7 @@ export function BatchResults({ jobId, assets: initialAssets }: BatchResultsProps
                   <div className="relative aspect-square rounded-lg overflow-hidden bg-gray-100 card-image-container">
                     {asset.type === 'image' ? (
                       <Image
-                        src={asset.url}
+                        src={getAssetPreviewUrl(asset)}
                         alt="Generated asset"
                         fill
                         className="object-contain transition-transform duration-300"
@@ -315,7 +340,7 @@ export function BatchResults({ jobId, assets: initialAssets }: BatchResultsProps
                       />
                     ) : (
                       <video
-                        src={asset.url}
+                        src={getAssetPreviewUrl(asset)}
                         controls
                         className="w-full h-full object-contain transition-transform duration-300"
                       />

@@ -44,7 +44,7 @@ export async function GET(
       .orderBy(generatedAsset.createdAt);
 
     // Format assets for frontend
-    const formattedAssets = assets.map((asset) => ({
+    const formattedAssets = assets.map((asset, index) => ({
       id: asset.id,
       publicUrl: asset.publicUrl,
       url: asset.publicUrl, // Alias for compatibility
@@ -54,7 +54,9 @@ export async function GET(
       model: (asset.generationParams as any)?.model || asset.model || undefined,
       status: asset.status as 'completed' | 'failed',
       error: asset.errorMessage || undefined,
-      rowIndex: (asset.metadata as any)?.rowIndex || undefined,
+      rowIndex: (asset.metadata as any)?.rowIndex ?? index,
+      previewUrl: (asset.metadata as any)?.previewUrl || undefined,
+      r2Key: asset.r2Key || undefined,
     }));
 
     return NextResponse.json({

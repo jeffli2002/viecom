@@ -77,6 +77,8 @@ export async function GET(
       status: asset.status as 'completed' | 'failed',
       error: asset.errorMessage || undefined,
       rowIndex: index,
+      previewUrl: (asset.metadata as any)?.previewUrl || undefined,
+      r2Key: asset.r2Key || undefined,
     }));
 
     return NextResponse.json({

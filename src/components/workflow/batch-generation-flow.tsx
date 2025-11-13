@@ -55,6 +55,8 @@ interface RowData {
   isSelected: boolean;
   status?: 'pending' | 'enhancing' | 'enhanced' | 'generating' | 'completed' | 'failed';
   assetUrl?: string;
+  assetPreviewUrl?: string;
+  assetR2Key?: string;
   error?: string;
   progress?: number; // 0-100, for generation progress
 }
@@ -118,7 +120,31 @@ export function BatchGenerationFlow({ generationType }: BatchGenerationFlowProps
   const styles = generationType === 'image' ? IMAGE_STYLES : VIDEO_STYLES;
 
   // Cache key for localStorage
-  const cacheKey = `batch-generation-${generationType}-cache`;
+const cacheKey = `batch-generation-${generationType}-cache`;
+
+const getRowPreviewUrl = (row: RowData) => {
+  if (row.assetPreviewUrl) {
+    return row.assetPreviewUrl;
+  }
+  if (row.assetUrl?.startsWith('/api/v1/media') && row.assetR2Key) {
+    return `/api/v1/media?key=${encodeURIComponent(row.assetR2Key)}`;
+  }
+  return row.assetUrl;
+};
+
+const getRowDownloadUrl = (row: RowData) => {
+  if (row.assetR2Key) {
+    return `/api/v1/media?key=${encodeURIComponent(row.assetR2Key)}&download=1`;
+  }
+  const preview = getRowPreviewUrl(row);
+  if (preview?.startsWith('/api/v1/media')) {
+    return `${preview}${preview.includes('?') ? '&' : '?'}download=1`;
+  }
+  return row.assetUrl || preview || '';
+};
+
+const hasCompletedAsset = (row: RowData) =>
+  row.status === 'completed' && Boolean(getRowPreviewUrl(row));
 
   // Fetch user credits on mount and when user changes
   useEffect(() => {
@@ -683,6 +709,8 @@ export function BatchGenerationFlow({ generationType }: BatchGenerationFlowProps
                     ...row,
                     status: 'completed' as const,
                     assetUrl: asset.publicUrl || asset.url,
+                    assetPreviewUrl: asset.previewUrl || asset.publicUrl || asset.url,
+                    assetR2Key: asset.r2Key || undefined,
                     error: asset.error,
                     progress: 100,
                   };
@@ -691,6 +719,8 @@ export function BatchGenerationFlow({ generationType }: BatchGenerationFlowProps
                     ...row,
                     status: 'failed' as const,
                     assetUrl: asset.publicUrl || asset.url,
+                    assetPreviewUrl: asset.previewUrl || asset.publicUrl || asset.url,
+                    assetR2Key: asset.r2Key || undefined,
                     error: asset.error,
                     progress: 0,
                   };
@@ -839,7 +869,7 @@ export function BatchGenerationFlow({ generationType }: BatchGenerationFlowProps
   };
 
   // Get completed assets for display
-  const completedAssets = rows.filter((r) => r.status === 'completed' && r.assetUrl);
+  const completedAssets = rows.filter(hasCompletedAsset);
 
   // Calculate statistics
   const totalRows = rows.length;
@@ -1656,13 +1686,13 @@ export function BatchGenerationFlow({ generationType }: BatchGenerationFlowProps
                             <div className="relative aspect-square bg-white rounded-lg overflow-hidden border shadow-sm">
                               {generationType === 'image' ? (
                                 <img
-                                  src={row.assetUrl}
+                                  src={getRowPreviewUrl(row) || row.assetUrl || ''}
                                   alt={`Generated ${row.rowIndex}`}
                                   className="w-full h-full object-contain transition-transform duration-300 group-hover:scale-105"
                                 />
                               ) : (
                                 <video
-                                  src={row.assetUrl}
+                                  src={getRowPreviewUrl(row) || row.assetUrl || ''}
                                   controls
                                   className="w-full h-full object-contain"
                                 >
@@ -1677,7 +1707,7 @@ export function BatchGenerationFlow({ generationType }: BatchGenerationFlowProps
                                   variant="secondary"
                                   onClick={() => {
                                     setPreviewAsset({
-                                      url: row.assetUrl!,
+                                      url: getRowPreviewUrl(row) || row.assetUrl || '',
                                       type: generationType,
                                       rowIndex: row.rowIndex,
                                     });
@@ -1691,8 +1721,10 @@ export function BatchGenerationFlow({ generationType }: BatchGenerationFlowProps
                                   size="sm"
                                   variant="secondary"
                                   onClick={() => {
+                                    const downloadUrl = getRowDownloadUrl(row);
+                                    if (!downloadUrl) return;
                                     const a = document.createElement('a');
-                                    a.href = row.assetUrl!;
+                                    a.href = downloadUrl;
                                     a.download = `${row.productName || `generated-${row.rowIndex}`}-${Date.now()}.${generationType === 'image' ? 'jpg' : 'mp4'}`;
                                     document.body.appendChild(a);
                                     a.click();
@@ -1779,7 +1811,7 @@ export function BatchGenerationFlow({ generationType }: BatchGenerationFlowProps
                       </>
                     )}
                   </Button>
-                  {rows.some((r) => r.status === 'completed' && r.assetUrl) && (
+                  {rows.some(hasCompletedAsset) && (
                     <Button onClick={handleDownloadResults}>
                       <Download className="w-4 h-4 mr-2" />
                       {t('downloadResults')}
