@@ -181,6 +181,12 @@
     "imageWillAppearHere": "Your generated image will appear here",
     "download": "Download",
     "share": "Share",
+    "shareCopied": "Image URL copied to clipboard!",
+    "shareCopyFallback": "Copy this URL to share your image:",
+    "shareRewarded": "Thanks for sharing! Bonus credits added to your account.",
+    "shareRewardFailed": "We couldn't add credits for this share. Please try again later.",
+    "shareLoginRequired": "Log in to earn credits for sharing.",
+    "shareAlreadyRewarded": "Share reward already claimed for this image.",
     "generationFailed": "Generation Failed",
     "imageStyles": {
       "studio-shot": "Studio Shot",

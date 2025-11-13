@@ -62,7 +62,10 @@ export default function ImageGenerator() {
   const [outputFormat, setOutputFormat] = useState<'PNG' | 'JPEG'>('PNG'); // Output format selection
   const [isGenerating, setIsGenerating] = useState(false);
   const [result, setResult] = useState<GenerationResult | null>(null);
+  const [shareStatus, setShareStatus] = useState<'idle' | 'pending' | 'awarded' | 'error'>('idle');
+  const [shareMessage, setShareMessage] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const shareReferenceRef = useRef<string | null>(null);
 
   // Brand analysis data (loaded from sessionStorage, no UI)
   const [brandAnalysis, setBrandAnalysis] = useState<BrandToneAnalysis | null>(null);
@@ -114,6 +117,12 @@ export default function ImageGenerator() {
       }
     }
   }, [searchParams]);
+
+  useEffect(() => {
+    setShareStatus('idle');
+    setShareMessage(null);
+    shareReferenceRef.current = null;
+  }, [result?.imageUrl]);
 
   const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -342,22 +351,95 @@ export default function ImageGenerator() {
     }
   };
 
+  const awardShareReward = async () => {
+    if (!result?.imageUrl) return;
+    if (!user) {
+      setShareStatus('error');
+      setShareMessage(t('shareLoginRequired'));
+      return;
+    }
+    if (shareStatus === 'pending') return;
+    if (shareStatus === 'awarded') {
+      setShareMessage(t('shareAlreadyRewarded'));
+      return;
+    }
+
+    setShareStatus('pending');
+
+    try {
+      const referenceId =
+        shareReferenceRef.current ||
+        `image_share_${
+          typeof globalThis.crypto?.randomUUID === 'function'
+            ? globalThis.crypto.randomUUID()
+            : Date.now()
+        }`;
+      shareReferenceRef.current = referenceId;
+
+      const response = await fetch('/api/rewards/share', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          platform: 'other',
+          shareUrl: result.imageUrl,
+          assetId: null,
+          referenceId,
+        }),
+      });
+
+      const data = await response.json().catch(() => ({}));
+
+      if (response.status === 401) {
+        setShareStatus('error');
+        setShareMessage(t('shareLoginRequired'));
+        return;
+      }
+
+      if (!response.ok) {
+        throw new Error(data?.error || data?.message || t('shareRewardFailed'));
+      }
+
+      setShareStatus('awarded');
+      setShareMessage(t('shareRewarded'));
+    } catch (error) {
+      console.error('Share reward error:', error);
+      setShareStatus('error');
+      setShareMessage(
+        error instanceof Error ? error.message : t('shareRewardFailed')
+      );
+    }
+  };
+
   const handleShare = async () => {
     if (!result?.imageUrl) return;
 
+    const sharePayload = {
+      title: 'AI Generated Image',
+      text: 'Check out this AI-generated image!',
+      url: result.imageUrl,
+    };
+
     if (navigator.share) {
       try {
-        await navigator.share({
-          title: 'AI Generated Image',
-          text: 'Check out this AI-generated image!',
-          url: result.imageUrl,
-        });
+        await navigator.share(sharePayload);
+        await awardShareReward();
       } catch (error) {
+        if (error instanceof DOMException && error.name === 'AbortError') {
+          return;
+        }
         console.error('Share failed:', error);
       }
+    } else if (navigator.clipboard) {
+      try {
+        await navigator.clipboard.writeText(result.imageUrl);
+        alert(t('shareCopied'));
+        await awardShareReward();
+      } catch (error) {
+        console.error('Clipboard copy failed:', error);
+      }
     } else {
-      navigator.clipboard.writeText(result.imageUrl);
-      alert('Image URL copied to clipboard!');
+      window.prompt(t('shareCopyFallback'), result.imageUrl);
+      await awardShareReward();
     }
   };
 
@@ -720,6 +802,15 @@ export default function ImageGenerator() {
                       {t('share')}
                     </Button>
                   </div>
+                  {shareMessage && (
+                    <p
+                      className={`text-center text-xs ${
+                        shareStatus === 'error' ? 'text-red-600' : 'text-green-600'
+                      }`}
+                    >
+                      {shareMessage}
+                    </p>
+                  )}
                 </div>
               )}
 
