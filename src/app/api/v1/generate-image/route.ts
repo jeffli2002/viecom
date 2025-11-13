@@ -3,6 +3,8 @@ import { auth } from '@/lib/auth/auth';
 import { creditService } from '@/lib/credits';
 import { getQuotaUsageByService, updateQuotaUsage } from '@/lib/quota/quota-service';
 import { checkAndAwardReferralReward } from '@/lib/rewards/referral-reward';
+import { db } from '@/server/db';
+import { generatedAsset } from '@/server/db/schema';
 import { type NextRequest, NextResponse } from 'next/server';
 
 export const dynamic = 'force-dynamic';
@@ -42,6 +44,8 @@ export async function POST(request: NextRequest) {
       userId = session.user.id;
     }
 
+    const generationMode = image ? 'i2i' : 't2i';
+
     const {
       prompt,
       model = 'nano-banana',
@@ -54,6 +58,8 @@ export async function POST(request: NextRequest) {
       safety_tolerance = 2,
       output_format = 'jpeg',
       image,
+      style,
+      enhancedPrompt: enhancedPromptInput,
     } = await request.json();
 
     if (!prompt || typeof prompt !== 'string') {
@@ -87,6 +93,7 @@ export async function POST(request: NextRequest) {
 
     const isStableDiffusion = model === 'stable-diffusion';
     const isNanoBanana = model === 'nano-banana';
+    let sourceImagePublicUrl: string | undefined;
 
     if (isNanoBanana) {
       // Use KIE API for nano-banana image generation
@@ -178,6 +185,8 @@ export async function POST(request: NextRequest) {
                   'image'
                 );
 
+                sourceImagePublicUrl = r2Result.url;
+
                 let signedUrl: string | null = null;
                 try {
                   signedUrl = await r2StorageService.getSignedUrl(r2Result.key, 3600);
@@ -245,6 +254,7 @@ export async function POST(request: NextRequest) {
             );
           }
           imageUrlForKie = image;
+              sourceImagePublicUrl = image;
         } else {
           return NextResponse.json(
             { error: 'Invalid image URL format. Expected base64 data URL or HTTP/HTTPS URL.' },
@@ -320,6 +330,7 @@ export async function POST(request: NextRequest) {
           }
 
           const imageBuffer = Buffer.from(await imageResponse.arrayBuffer());
+          const outputFileSize = imageBuffer.length;
 
           // In test mode, skip R2 upload and use KIE API URL directly
           let r2Result: { key: string; url: string };
@@ -392,6 +403,49 @@ export async function POST(request: NextRequest) {
             ? imageUrl
             : `/api/v1/media?key=${encodeURIComponent(r2Result.key)}`;
 
+          let savedAssetId: string | undefined;
+
+          if (!isTestMode) {
+            try {
+              savedAssetId = randomUUID();
+              await db.insert(generatedAsset).values({
+                id: savedAssetId,
+                userId,
+                assetType: 'image',
+                generationMode,
+                prompt,
+                enhancedPrompt: enhancedPromptInput,
+                baseImageUrl: sourceImagePublicUrl,
+                styleId: typeof style === 'string' ? style : null,
+                r2Key: r2Result.key,
+                publicUrl: r2Result.url,
+                thumbnailUrl: previewUrl.startsWith('http') ? previewUrl : undefined,
+                width,
+                height,
+                fileSize: outputFileSize,
+                status: 'completed',
+                creditsSpent: creditCost,
+                generationParams: {
+                  aspect_ratio,
+                  output_format,
+                  prompt_upsampling,
+                  seed,
+                  safety_tolerance,
+                  raw,
+                  style,
+                  model,
+                },
+                metadata: {
+                  previewUrl,
+                  taskId,
+                  generationMode,
+                },
+              });
+            } catch (saveError) {
+              console.error('Failed to persist generated image asset:', saveError);
+            }
+          }
+
           return NextResponse.json({
             imageUrl: r2Result.url,
             previewUrl,
@@ -401,6 +455,7 @@ export async function POST(request: NextRequest) {
             height,
             creditsUsed: creditCost,
             taskId,
+            assetId: savedAssetId ?? null,
           });
         }
 
