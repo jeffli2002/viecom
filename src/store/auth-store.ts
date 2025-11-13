@@ -140,10 +140,11 @@ export const useAuthStore = create<AuthState>()(
               return { success: true };
             }
 
-            set({ isLoading: false });
+            const message = result.error?.message || 'Invalid email or password';
+            set({ isLoading: false, error: message });
             return {
               success: false,
-              error: result.error?.message || 'signIn error',
+              error: message,
             };
           } catch (error) {
             const errorMessage = error instanceof Error ? error.message : 'signIn error';

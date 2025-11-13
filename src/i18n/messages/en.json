@@ -533,5 +533,32 @@
       "cancel": "Cancel",
       "confirm": "Start Generation"
     }
+  },
+  "resetPassword": {
+    "titleRequest": "Reset your password",
+    "titleReset": "Create a new password",
+    "descriptionRequest": "Enter your email and we'll send you a secure reset link.",
+    "descriptionReset": "Choose a secure password to protect your Viecom account.",
+    "tokenErrorTitle": "Reset link expired or invalid",
+    "tokenErrorBody": "Request a new reset link to continue.",
+    "requestSuccess": "If this email exists in our system, a password reset link has been sent.",
+    "requestError": "Unable to send reset email. Please try again.",
+    "resetSuccess": "Password updated successfully. You can now sign in with your new password.",
+    "resetError": "Unable to reset password. Please try again.",
+    "passwordTooShort": "Password must be at least {count} characters long.",
+    "passwordMismatch": "Passwords do not match.",
+    "emailLabel": "Email address",
+    "emailPlaceholder": "you@company.com",
+    "sendLink": "Send reset link",
+    "sendingLink": "Sending link...",
+    "newPasswordLabel": "New password",
+    "newPasswordPlaceholder": "Enter a new password",
+    "passwordHint": "Must be at least {count} characters.",
+    "confirmPasswordLabel": "Confirm password",
+    "confirmPasswordPlaceholder": "Confirm your new password",
+    "updatePassword": "Update password",
+    "updatingPassword": "Updating password...",
+    "rememberText": "Remember your password?",
+    "backToLogin": "Back to login"
   }
 }

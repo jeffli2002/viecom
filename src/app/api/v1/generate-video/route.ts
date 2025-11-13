@@ -1,8 +1,14 @@
-import { getModelCost } from '@/config/credits.config';
+import { getVideoModelInfo } from '@/config/credits.config';
+import { env } from '@/env';
 import { auth } from '@/lib/auth/auth';
 import { creditService } from '@/lib/credits';
-import { getQuotaUsageByService, updateQuotaUsage } from '@/lib/quota/quota-service';
+import { getKieApiService } from '@/lib/kie/kie-api';
+import { r2StorageService } from '@/lib/storage/r2';
+import { updateQuotaUsage } from '@/lib/quota/quota-service';
 import { checkAndAwardReferralReward } from '@/lib/rewards/referral-reward';
+import { db } from '@/server/db';
+import { generatedAsset } from '@/server/db/schema';
+import { randomUUID } from 'node:crypto';
 import { type NextRequest, NextResponse } from 'next/server';
 
 export const dynamic = 'force-dynamic';
@@ -14,6 +20,18 @@ function mapAspectRatio(ratio: string): 'square' | 'portrait' | 'landscape' {
   if (ratio === '9:16' || ratio === 'portrait') return 'portrait';
   return 'landscape'; // Default to landscape for 16:9, 4:3, etc.
 }
+
+const isR2Configured = () =>
+  !!(
+    env.R2_BUCKET_NAME &&
+    env.R2_BUCKET_NAME !== 'dummy' &&
+    env.R2_ACCESS_KEY_ID &&
+    env.R2_ACCESS_KEY_ID !== 'dummy' &&
+    env.R2_SECRET_ACCESS_KEY &&
+    env.R2_SECRET_ACCESS_KEY !== 'dummy' &&
+    env.R2_ENDPOINT &&
+    env.R2_ENDPOINT !== 'https://dummy.r2.cloudflarestorage.com'
+  );
 
 export async function POST(request: NextRequest) {
   try {
@@ -40,9 +58,14 @@ export async function POST(request: NextRequest) {
 
     const {
       prompt,
-      mode = 't2v', // t2v or i2v
+      model = 'sora-2',
+      mode,
       aspect_ratio = '16:9',
-      image, // For i2v mode
+      duration = 10,
+      quality = 'standard',
+      style,
+      image,
+      enhancedPrompt: enhancedPromptInput,
     } = await request.json();
 
     if (!prompt || typeof prompt !== 'string') {
@@ -59,10 +82,24 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const creditCost = getModelCost('videoGeneration', 'sora-2');
+    const normalizedModel: 'sora-2' | 'sora-2-pro' = model === 'sora-2-pro' ? 'sora-2-pro' : 'sora-2';
+    const normalizedDuration: 10 | 15 = duration === 15 ? 15 : 10;
+    const normalizedQuality = normalizedModel === 'sora-2-pro' ? (quality === 'high' ? 'high' : 'standard') : 'standard';
+    const resolution: '720p' | '1080p' =
+      normalizedModel === 'sora-2-pro' ? (normalizedQuality === 'high' ? '1080p' : '720p') : '720p';
+
+    const { modelKey, credits: creditCost } = getVideoModelInfo({
+      model: normalizedModel,
+      resolution,
+      duration: normalizedDuration,
+    });
+
     if (creditCost === 0) {
-      return NextResponse.json({ error: 'Invalid video model' }, { status: 400 });
+      return NextResponse.json({ error: 'Invalid video model configuration' }, { status: 400 });
     }
+
+    const generationMode: 't2v' | 'i2v' =
+      mode === 'i2v' || mode === 'image-to-video' || Boolean(image) ? 'i2v' : 't2v';
 
     // Pure credit-based system: always check and charge credits
     if (!isTestMode) {
@@ -81,89 +118,140 @@ export async function POST(request: NextRequest) {
     const dailyPeriod = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
     const monthlyPeriod = new Date().toISOString().substring(0, 7); // YYYY-MM
 
-    // Create video generation task using KIE API
-    // Following im2prompt pattern: only create task, don't wait for completion
-    const kieApiKey = process.env.KIE_API_KEY;
-    if (!kieApiKey) {
-      return NextResponse.json({ error: 'KIE API key not configured' }, { status: 500 });
+    const kieApiService = getKieApiService();
+
+    let imageUrlForKie: string | undefined;
+    let sourceImagePublicUrl: string | undefined;
+
+    if (generationMode === 'i2v') {
+      if (!image) {
+        return NextResponse.json({ error: 'Image is required for image-to-video mode' }, { status: 400 });
+      }
+
+      if (typeof image === 'string' && image.startsWith('data:image/')) {
+        if (!isR2Configured()) {
+          return NextResponse.json(
+            {
+              error:
+                'R2 storage is not configured. Please configure R2 credentials in environment variables to use image-to-video generation.',
+            },
+            { status: 500 }
+          );
+        }
+
+        const base64Match = image.match(/^data:image\/(\w+);base64,(.+)$/);
+        if (!base64Match) {
+          return NextResponse.json(
+            { error: 'Invalid image format. Expected base64 data URL.' },
+            { status: 400 }
+          );
+        }
+
+        const [, imageType, base64Data] = base64Match;
+        const imageBuffer = Buffer.from(base64Data, 'base64');
+        const extension =
+          imageType === 'png' ? 'png' : imageType === 'jpeg' || imageType === 'jpg' ? 'jpeg' : 'png';
+        const contentType = `image/${extension}`;
+
+        try {
+          const uploadResult = await r2StorageService.uploadAsset(
+            imageBuffer,
+            `input-video-image-${randomUUID()}.${extension}`,
+            contentType,
+            'image'
+          );
+
+          sourceImagePublicUrl = uploadResult.url;
+
+          try {
+            imageUrlForKie = await r2StorageService.getSignedUrl(uploadResult.key, 3600);
+          } catch (signError) {
+            console.error('Failed to create signed URL for video input image (fallback to public URL):', signError);
+            imageUrlForKie = uploadResult.url;
+          }
+
+          const parsed = new URL(imageUrlForKie);
+          if (parsed.protocol !== 'https:') {
+            throw new Error(`Input image URL must use HTTPS. Current protocol: ${parsed.protocol || 'unknown'}`);
+          }
+        } catch (error) {
+          console.error('Failed to upload input image for video generation:', error);
+          return NextResponse.json(
+            { error: 'Failed to process input image for video generation. Please try again.' },
+            { status: 500 }
+          );
+        }
+      } else if (typeof image === 'string' && (image.startsWith('http://') || image.startsWith('https://'))) {
+        try {
+          const parsed = new URL(image);
+          if (parsed.protocol !== 'https:') {
+            return NextResponse.json(
+              { error: 'Input image URL must use HTTPS.' },
+              { status: 400 }
+            );
+          }
+        } catch {
+          return NextResponse.json({ error: 'Invalid input image URL.' }, { status: 400 });
+        }
+
+        sourceImagePublicUrl = image;
+        imageUrlForKie = image;
+      } else {
+        return NextResponse.json(
+          { error: 'Unsupported image format. Please upload the file directly.' },
+          { status: 400 }
+        );
+      }
     }
 
-    const kieAspectRatio = mapAspectRatio(aspect_ratio);
-
-    const response = await fetch('https://api.kie.ai/api/v1/jobs/createTask', {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${kieApiKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: mode === 'i2v' ? 'sora-2-image-to-video' : 'sora-2-text-to-video',
-        input:
-          mode === 'i2v' && image
-            ? {
-                prompt,
-                image_urls: [image],
-                aspect_ratio: kieAspectRatio,
-                quality: 'standard',
-              }
-            : {
-                prompt,
-                aspect_ratio: kieAspectRatio,
-                quality: 'standard',
-              },
-      }),
+    const generationResponse = await kieApiService.generateVideo({
+      prompt,
+      model: normalizedModel,
+      aspectRatio: mapAspectRatio(aspect_ratio),
+      quality: normalizedQuality,
+      duration: normalizedDuration,
+      imageUrls: imageUrlForKie ? [imageUrlForKie] : undefined,
     });
 
-    const responseText = await response.text();
+    const taskId = generationResponse.data.taskId;
 
-    if (!responseText || responseText.trim() === '') {
-      console.error('Empty response from KIE API');
+    const videoResult = await kieApiService.pollTaskStatus(taskId, 'video');
+    if (!videoResult.videoUrl) {
       return NextResponse.json(
-        {
-          error:
-            'Empty response from video generation service. The service may be experiencing issues. Please try again.',
-        },
+        { error: 'Video generation completed but no video URL found' },
         { status: 500 }
       );
     }
 
-    if (!response.ok) {
-      let errorData: any = {};
-      try {
-        errorData = JSON.parse(responseText);
-      } catch (e) {
-        console.error('Failed to parse error response:', responseText);
-      }
-      console.error('KIE API error:', errorData);
+    const videoResponse = await fetch(videoResult.videoUrl);
+    if (!videoResponse.ok) {
       return NextResponse.json(
-        { error: errorData.msg || 'Failed to create video generation task' },
-        { status: response.status }
-      );
-    }
-
-    let data: any;
-    try {
-      data = JSON.parse(responseText);
-    } catch (error) {
-      console.error('Failed to parse response. Response text:', responseText);
-      console.error('Parse error:', error);
-      return NextResponse.json(
-        {
-          error:
-            'Invalid response from video generation service. The service may be experiencing issues. Please try again.',
-        },
+        { error: 'Failed to download generated video' },
         { status: 500 }
       );
     }
 
-    if (data.code !== 200) {
-      return NextResponse.json(
-        { error: data.msg || 'Failed to create video generation task' },
-        { status: 400 }
+    const videoBuffer = Buffer.from(await videoResponse.arrayBuffer());
+    const outputFileSize = videoBuffer.length;
+
+    let r2Result: { key: string; url: string };
+    if (isTestMode) {
+      r2Result = {
+        key: `test-video-${randomUUID()}`,
+        url: videoResult.videoUrl,
+      };
+    } else {
+      r2Result = await r2StorageService.uploadAsset(
+        videoBuffer,
+        `video-${randomUUID()}.mp4`,
+        'video/mp4',
+        'video'
       );
     }
 
-    const taskId = data.data.taskId;
+    const previewUrl = isTestMode
+      ? videoResult.videoUrl
+      : `/api/v1/media?key=${encodeURIComponent(r2Result.key)}`;
 
     // Update quota
     try {
@@ -194,10 +282,13 @@ export async function POST(request: NextRequest) {
           userId,
           amount: creditCost,
           source: 'api_call',
-          description: `Video generation with ${mode}`,
+          description: `Video generation (${generationMode}) with ${normalizedModel}`,
           metadata: {
             feature: 'video-generation',
-            model: 'sora-2',
+            model: normalizedModel,
+            modelKey,
+            resolution,
+            duration: normalizedDuration,
             prompt: prompt.substring(0, 100),
             taskId,
           },
@@ -216,10 +307,56 @@ export async function POST(request: NextRequest) {
       });
     }
 
+    let savedAssetId: string | undefined;
+    if (!isTestMode) {
+      try {
+        savedAssetId = randomUUID();
+        await db.insert(generatedAsset).values({
+          id: savedAssetId,
+          userId,
+          assetType: 'video',
+          generationMode,
+          prompt,
+          enhancedPrompt: enhancedPromptInput,
+          baseImageUrl: sourceImagePublicUrl,
+          styleId: typeof style === 'string' ? style : null,
+          videoStyle: typeof style === 'string' ? style : null,
+          r2Key: r2Result.key,
+          publicUrl: r2Result.url,
+          thumbnailUrl: previewUrl.startsWith('http') ? previewUrl : undefined,
+          duration: normalizedDuration,
+          fileSize: outputFileSize,
+          status: 'completed',
+          creditsSpent: creditCost,
+          generationParams: {
+            aspect_ratio,
+            duration: normalizedDuration,
+            quality: normalizedQuality,
+            resolution,
+            style,
+            model: normalizedModel,
+            modelKey,
+          },
+          metadata: {
+            previewUrl,
+            taskId,
+            generationMode,
+          },
+        });
+      } catch (saveError) {
+        console.error('Failed to persist generated video asset:', saveError);
+      }
+    }
+
     return NextResponse.json({
+      videoUrl: r2Result.url,
+      previewUrl,
+      model: normalizedModel,
+      prompt,
+      duration: normalizedDuration,
       taskId,
-      message: 'Video generation task created successfully',
       creditsUsed: creditCost,
+      assetId: savedAssetId ?? null,
     });
   } catch (error) {
     console.error('Error generating video:', error);

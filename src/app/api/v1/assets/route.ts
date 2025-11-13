@@ -28,6 +28,8 @@ export async function GET(request: NextRequest) {
         prompt: generatedAsset.prompt,
         createdAt: generatedAsset.createdAt,
         status: generatedAsset.status,
+        metadata: generatedAsset.metadata,
+        r2Key: generatedAsset.r2Key,
       })
       .from(generatedAsset)
       .where(eq(generatedAsset.userId, session.user.id))
@@ -44,6 +46,12 @@ export async function GET(request: NextRequest) {
         prompt: asset.prompt,
         createdAt: asset.createdAt.toISOString(),
         status: asset.status as 'completed' | 'failed',
+        previewUrl:
+          typeof asset.metadata === 'object' && asset.metadata
+            ? // @ts-expect-error metadata comes from JSONB
+              (asset.metadata.previewUrl as string | undefined) ?? undefined
+            : undefined,
+        r2Key: asset.r2Key || undefined,
       })),
     });
   } catch (error) {

@@ -28,6 +28,8 @@ interface Asset {
   prompt: string;
   createdAt: string;
   status: 'completed' | 'failed';
+  previewUrl?: string | null;
+  r2Key?: string | null;
 }
 
 function AssetsPageContent() {
@@ -57,7 +59,11 @@ function AssetsPageContent() {
       });
       if (response.ok) {
         const data = await response.json();
-        setAssets(data.assets || []);
+        setAssets((data.assets || []).map((asset: Asset) => ({
+          ...asset,
+          previewUrl: asset.previewUrl || null,
+          r2Key: asset.r2Key || null,
+        })));
       }
     } catch (error) {
       console.error('Failed to fetch assets:', error);
@@ -72,12 +78,34 @@ function AssetsPageContent() {
     return matchesSearch && matchesType && asset.status === 'completed';
   });
 
+  const getDownloadUrl = (asset: Asset) => {
+    if (asset.type === 'image' || asset.type === 'video') {
+      if (asset.url && asset.url.startsWith('/api/v1/media') && asset.r2Key) {
+        return `/api/v1/media?key=${encodeURIComponent(asset.r2Key)}`;
+      }
+    }
+    return asset.url;
+  };
+
+  const getPreviewUrl = (asset: Asset) => {
+    if (asset.previewUrl) {
+      return asset.previewUrl;
+    }
+
+    if (asset.url && asset.url.startsWith('/api/v1/media') && asset.r2Key) {
+      return `/api/v1/media?key=${encodeURIComponent(asset.r2Key)}`;
+    }
+
+    return asset.url;
+  };
+
   const handleDownload = async (asset: Asset) => {
     try {
-      console.log('Starting download for:', asset.url);
+      const downloadUrl = getDownloadUrl(asset);
+      console.log('Starting download for:', downloadUrl);
 
       // Try to fetch the asset
-      const response = await fetch(asset.url, {
+      const response = await fetch(downloadUrl, {
         mode: 'cors',
         credentials: 'omit',
       });
@@ -106,7 +134,7 @@ function AssetsPageContent() {
       // Fallback: try direct link download
       console.log('Trying fallback method: direct link');
       const a = document.createElement('a');
-      a.href = asset.url;
+      a.href = getDownloadUrl(asset);
       a.target = '_blank';
       a.download = `${asset.type}-${asset.id}.${asset.type === 'image' ? 'png' : 'mp4'}`;
       document.body.appendChild(a);
@@ -184,7 +212,7 @@ function AssetsPageContent() {
               <div className="relative aspect-square bg-muted card-image-container">
                 {asset.type === 'image' ? (
                   <Image
-                    src={asset.url}
+                    src={getPreviewUrl(asset)}
                     alt={asset.prompt}
                     fill
                     className="object-cover transition-transform duration-300"
@@ -192,11 +220,13 @@ function AssetsPageContent() {
                   />
                 ) : (
                   <video
-                    src={asset.url}
+                    src={getPreviewUrl(asset)}
                     className="w-full h-full object-cover transition-transform duration-300"
                     muted
                     loop
                     playsInline
+                    controls={false}
+                    preload="metadata"
                   />
                 )}
                 <div className="absolute top-2 right-2">
