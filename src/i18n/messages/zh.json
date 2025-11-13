@@ -468,9 +468,12 @@
       "colorDescription": "从网站中提取的主要颜色，可直接用于内容创作",
       "primaryColor": "主色调",
       "primaryColorDesc": "品牌主色，用于关键元素和 CTA",
+      "primaryColorFetching": "正在从品牌 Logo 提取颜色...",
       "secondaryColors": "辅助色彩",
+      "noSecondaryColors": "未检测到额外颜色",
       "clickToCopy": "点击复制",
       "accentColor": "强调色",
+      "noAccentColor": "未检测到强调色",
       "photography": "摄影风格",
       "layout": "布局设计",
       "typography": "字体排版"

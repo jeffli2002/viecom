@@ -468,9 +468,12 @@
       "colorDescription": "Main colors extracted from the website, can be directly used for content creation",
       "primaryColor": "Primary Color",
       "primaryColorDesc": "Brand primary color, used for key elements and CTAs",
+      "primaryColorFetching": "Deriving from brand logo...",
       "secondaryColors": "Secondary Colors",
+      "noSecondaryColors": "No additional colors detected from AI or logo",
       "clickToCopy": "Click to copy",
       "accentColor": "Accent Color",
+      "noAccentColor": "No accent color detected",
       "photography": "Photography Style",
       "layout": "Layout Design",
       "typography": "Typography"

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useAuthStore } from '@/store/auth-store';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -71,6 +71,8 @@ interface BrandAnalysisResult {
   };
   competitiveAdvantage?: string[];
   recommendedImageStyles?: string[];
+  recommendedVideoStyles?: string[];
+  audienceSegments?: string[];
   metadata: {
     title: string;
     description: string;
@@ -79,6 +81,92 @@ interface BrandAnalysisResult {
   socialMediaTone?: string;
   marketingFocus?: string[];
 }
+
+const HEX_COLOR_REGEX = /^#[0-9A-Fa-f]{6}$/;
+
+const getValidHexColor = (color?: string | null): string | null => {
+  if (!color) return null;
+
+  const normalized = color.trim();
+  if (
+    normalized === '' ||
+    normalized.toLowerCase() === 'null' ||
+    normalized.toLowerCase() === 'undefined'
+  ) {
+    return null;
+  }
+
+  return HEX_COLOR_REGEX.test(normalized) ? normalized.toUpperCase() : null;
+};
+
+const extractLogoDominantColor = async (website?: string): Promise<string | null> => {
+  if (!website) return null;
+
+  try {
+    const url = new URL(website.startsWith('http') ? website : `https://${website}`);
+    const faviconUrl = `https://www.google.com/s2/favicons?sz=256&domain_url=${encodeURIComponent(url.origin)}`;
+
+    return await new Promise<string | null>((resolve) => {
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
+      img.referrerPolicy = 'no-referrer';
+      img.src = faviconUrl;
+
+      img.onload = () => {
+        try {
+          const canvas = document.createElement('canvas');
+          const width = Math.max(img.width, 16);
+          const height = Math.max(img.height, 16);
+          canvas.width = width;
+          canvas.height = height;
+          const context = canvas.getContext('2d');
+
+          if (!context) {
+            resolve(null);
+            return;
+          }
+
+          context.drawImage(img, 0, 0);
+          const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+          const data = imageData.data;
+
+          let r = 0;
+          let g = 0;
+          let b = 0;
+          let count = 0;
+
+          for (let offset = 0; offset < data.length; offset += 4) {
+            if (offset + 3 >= data.length) break;
+            const alpha = data[offset + 3] ?? 255;
+            if (alpha < 128) continue; // Skip nearly transparent pixels
+
+            r += data[offset] ?? 0;
+            g += data[offset + 1] ?? 0;
+            b += data[offset + 2] ?? 0;
+            count += 1;
+          }
+
+          if (count === 0) {
+            resolve(null);
+            return;
+          }
+
+          const average = (value: number) => Math.round(value / count);
+          const toHex = (value: number) => value.toString(16).padStart(2, '0').toUpperCase();
+          const hex = `#${toHex(average(r))}${toHex(average(g))}${toHex(average(b))}`;
+
+          resolve(HEX_COLOR_REGEX.test(hex) ? hex : null);
+        } catch {
+          resolve(null);
+        }
+      };
+
+      img.onerror = () => resolve(null);
+    });
+  } catch {
+    return null;
+  }
+};
 
 const analysisSteps = [
   { label: 'connecting', progress: 20 },
@@ -102,6 +190,8 @@ export function BrandAnalysisPage() {
   const [generationType, setGenerationType] = useState<'image' | 'video' | null>(null);
   const [generationMode, setGenerationMode] = useState<'single' | 'batch' | null>(null);
   const [selectedStyle, setSelectedStyle] = useState<string | null>(null);
+  const [logoColor, setLogoColor] = useState<string | null>(null);
+  const [isLogoColorLoading, setIsLogoColorLoading] = useState(false);
 
   const quickExamples = [
     {
@@ -121,11 +211,109 @@ export function BrandAnalysisPage() {
     },
   ];
 
+  const navigate = useCallback(
+    (href: string) => {
+      (router as unknown as { push: (path: string) => void }).push(href);
+    },
+    [router],
+  );
+
+  const hasImageRecommendations = Boolean(result?.recommendedImageStyles && result.recommendedImageStyles.length > 0);
+  const hasVideoRecommendations = Boolean(result?.recommendedVideoStyles && result.recommendedVideoStyles.length > 0);
+
+  const {
+    safeAnalysisStepIndex,
+    currentAnalysisStep,
+  } = useMemo(() => {
+    if (analysisSteps.length === 0) {
+      return {
+        safeAnalysisStepIndex: 0,
+        currentAnalysisStep: { label: 'analyzing', progress: 0 },
+      };
+    }
+
+    const index = Math.min(Math.max(analysisStep, 0), analysisSteps.length - 1);
+    const fallbackStep = { label: 'analyzing', progress: 0 };
+    return {
+      safeAnalysisStepIndex: index,
+      currentAnalysisStep: analysisSteps[index] ?? fallbackStep,
+    };
+  }, [analysisStep]);
+
+  useEffect(() => {
+    if (!result) {
+      setLogoColor(null);
+      return;
+    }
+
+    const hasValidPrimary = getValidHexColor(result.colors?.primary) !== null;
+    const hasValidSecondary = Array.isArray(result.colors?.secondary)
+      ? result.colors.secondary.some((color) => getValidHexColor(color))
+      : false;
+
+    if (hasValidPrimary && hasValidSecondary) {
+      setLogoColor(null);
+      return;
+    }
+
+    let isMounted = true;
+    setIsLogoColorLoading(true);
+
+    extractLogoDominantColor(result.website)
+      .then((color) => {
+        if (isMounted) {
+          setLogoColor(getValidHexColor(color));
+        }
+      })
+      .finally(() => {
+        if (isMounted) {
+          setIsLogoColorLoading(false);
+        }
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, [result]);
+
+  const {
+    primaryColor,
+    secondaryColors,
+    accentColor,
+  } = useMemo(() => {
+    if (!result) {
+      return {
+        primaryColor: '#9333EA',
+        secondaryColors: [] as string[],
+        accentColor: '#F59E0B',
+      };
+    }
+
+    const validPrimary = getValidHexColor(result.colors?.primary);
+    const validSecondary = Array.isArray(result.colors?.secondary)
+      ? (result.colors.secondary.map((color) => getValidHexColor(color)).filter(Boolean) as string[])
+      : [];
+    const uniqueSecondary = [...new Set(validSecondary.filter((color) => color && color !== validPrimary))];
+
+    const basePrimary = validPrimary ?? logoColor ?? '#9333EA';
+    const accent =
+      getValidHexColor(result.colors?.accent) ??
+      (uniqueSecondary.length > 0 ? uniqueSecondary[0] : null) ??
+      logoColor ??
+      basePrimary;
+
+    return {
+      primaryColor: basePrimary,
+      secondaryColors: uniqueSecondary,
+      accentColor: accent,
+    };
+  }, [logoColor, result]);
+
   const handleAnalyze = async (inputUrl?: string) => {
     // Check authentication first
     if (!isAuthenticated) {
       toast.error(t('errors.loginRequired') || 'Please login to use this feature');
-      router.push('/login');
+      navigate('/login');
       return;
     }
 
@@ -229,15 +417,15 @@ export function BrandAnalysisPage() {
     // Navigate to the appropriate page
     if (generationMode === 'single') {
       if (generationType === 'image') {
-        router.push('/image-generation?fromBrandAnalysis=true');
+        navigate('/image-generation?fromBrandAnalysis=true');
       } else {
-        router.push('/video-generation?fromBrandAnalysis=true');
+        navigate('/video-generation?fromBrandAnalysis=true');
       }
     } else {
       if (generationType === 'image') {
-        router.push('/batch-image-generation?fromBrandAnalysis=true');
+        navigate('/batch-image-generation?fromBrandAnalysis=true');
       } else {
-        router.push('/batch-video-generation?fromBrandAnalysis=true');
+        navigate('/batch-video-generation?fromBrandAnalysis=true');
       }
     }
 
@@ -379,13 +567,13 @@ export function BrandAnalysisPage() {
                   <div className="space-y-3">
                     <div className="flex items-center justify-between">
                       <span className="text-slate-900">
-                        {t(`steps.${analysisSteps[analysisStep].label}`)}
+                        {t(`steps.${currentAnalysisStep.label}`)}
                       </span>
                       <span className="text-violet-600">
-                        {analysisSteps[analysisStep].progress}%
+                        {currentAnalysisStep.progress}%
                       </span>
                     </div>
-                    <Progress value={analysisSteps[analysisStep].progress} className="h-3" />
+                    <Progress value={currentAnalysisStep.progress} className="h-3" />
                   </div>
 
                   <div className="grid grid-cols-5 gap-3">
@@ -395,17 +583,17 @@ export function BrandAnalysisPage() {
                         className={`
                           p-3 rounded-xl text-center transition-all
                           ${
-                            index < analysisStep
+                            index < safeAnalysisStepIndex
                               ? 'bg-green-100 border-2 border-green-300'
-                              : index === analysisStep
+                              : index === safeAnalysisStepIndex
                                 ? 'bg-violet-100 border-2 border-violet-300'
                                 : 'bg-slate-100 border-2 border-slate-200'
                           }
                         `}
                       >
-                        {index < analysisStep ? (
+                        {index < safeAnalysisStepIndex ? (
                           <CheckCircle2 className="size-6 mx-auto text-green-600" />
-                        ) : index === analysisStep ? (
+                        ) : index === safeAnalysisStepIndex ? (
                           <Loader2 className="size-6 mx-auto text-violet-600 animate-spin" />
                         ) : (
                           <div className="size-6 mx-auto rounded-full border-2 border-slate-400" />
@@ -654,121 +842,96 @@ export function BrandAnalysisPage() {
                           <Button
                             variant="ghost"
                             size="sm"
-                            onClick={() => copyToClipboard(result.colors.primary)}
+                            onClick={() => copyToClipboard(primaryColor)}
                           >
                             <Copy className="size-3 mr-1" />
                             {t('actions.copy')}
                           </Button>
                         </div>
                         <div className="flex items-center gap-4">
-                          {(() => {
-                            // Ensure we always have a valid color
-                            const primaryColor = result.colors?.primary && 
-                                                 result.colors.primary.trim() !== '' && 
-                                                 result.colors.primary !== 'null' &&
-                                                 result.colors.primary !== 'undefined' &&
-                                                 /^#[0-9A-Fa-f]{6}$/.test(result.colors.primary)
-                              ? result.colors.primary 
-                              : '#9333EA'; // Purple-600 as default
-                            
-                            return (
-                              <>
-                                <div
-                                  className="size-20 rounded-2xl border-4 border-white shadow-xl cursor-pointer hover:scale-110 transition-transform"
-                                  style={{ backgroundColor: primaryColor }}
-                                  onClick={() => copyToClipboard(primaryColor)}
-                                  title="Click to copy"
-                                />
-                                <div>
-                                  <div className="text-2xl font-semibold text-slate-900 mb-1">
-                                    {primaryColor}
-                                  </div>
-                                  <p className="text-sm text-slate-600">{t('visual.primaryColorDesc')}</p>
-                                </div>
-                              </>
-                            );
-                          })()}
+                          <>
+                            <div
+                              className="size-20 rounded-2xl border-4 border-white shadow-xl cursor-pointer hover:scale-110 transition-transform"
+                              style={{ backgroundColor: primaryColor }}
+                              onClick={() => copyToClipboard(primaryColor)}
+                              title={t('visual.clickToCopy')}
+                            />
+                            <div>
+                              <div className="text-2xl font-semibold text-slate-900 mb-1">
+                                {primaryColor}
+                              </div>
+                              <p className="text-sm text-slate-600">
+                                {isLogoColorLoading && !getValidHexColor(result.colors?.primary)
+                                  ? t('visual.primaryColorFetching')
+                                  : t('visual.primaryColorDesc')}
+                              </p>
+                            </div>
+                          </>
                         </div>
                       </div>
 
                       <div className="space-y-3">
-                        <div className="text-sm text-slate-600">{t('visual.secondaryColors')}</div>
-                        <div className="grid grid-cols-3 gap-4">
-                          {(() => {
-                            const defaultColors = ['#8B5CF6', '#EC4899', '#10B981']; // Violet, Pink, Green
-                            const secondaryColors = result.colors?.secondary || [];
-                            
-                            // Ensure we always have exactly 3 colors to display
-                            const displayColors = [0, 1, 2].map(index => {
-                              const color = secondaryColors[index];
-                              // Validate hex color format
-                              const isValidHex = color && 
-                                                 typeof color === 'string' &&
-                                                 color.trim() !== '' && 
-                                                 color !== 'null' && 
-                                                 color !== 'undefined' &&
-                                                 /^#[0-9A-Fa-f]{6}$/.test(color.trim());
-                              return isValidHex ? color.trim() : defaultColors[index];
-                            });
-                            
-                            return displayColors.map((color, index) => (
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm text-slate-600">{t('visual.secondaryColors')}</span>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => copyToClipboard(secondaryColors.join(', '))}
+                            disabled={secondaryColors.length === 0}
+                          >
+                            <Copy className="size-3 mr-1" />
+                            {t('actions.copy')}
+                          </Button>
+                        </div>
+                        {secondaryColors.length === 0 ? (
+                          <p className="text-sm text-slate-500 italic">
+                            {t('visual.noSecondaryColors')}
+                          </p>
+                        ) : (
+                          <div className="flex flex-wrap gap-3">
+                            {secondaryColors.map((color, index) => (
                               <div
-                                key={index}
+                                key={`${color}-${index}`}
                                 className="space-y-2 p-4 rounded-xl bg-slate-50 border-2 border-slate-200 hover:border-purple-300 transition-colors cursor-pointer"
                                 onClick={() => copyToClipboard(color)}
                               >
                                 <div
                                   className="aspect-square rounded-xl border-4 border-slate-300 shadow-lg hover:scale-105 transition-transform"
                                   style={{ backgroundColor: color }}
-                                  title={`Click to copy: ${color}`}
+                                  title={t('visual.clickToCopy')}
                                 />
                                 <div className="text-center">
                                   <div className="text-sm font-semibold text-slate-900">{color}</div>
                                   <div className="text-xs text-slate-500">{t('visual.clickToCopy')}</div>
                                 </div>
                               </div>
-                            ));
-                          })()}
-                        </div>
+                            ))}
+                          </div>
+                        )}
                       </div>
 
                       <div 
                         className="p-4 rounded-xl bg-amber-50 border-2 border-amber-200 cursor-pointer hover:border-amber-300 transition-colors"
-                        onClick={() => {
-                          const accentColor = result.colors?.accent && 
-                                             result.colors.accent.trim() !== '' && 
-                                             result.colors.accent !== 'null' &&
-                                             result.colors.accent !== 'undefined' &&
-                                             /^#[0-9A-Fa-f]{6}$/.test(result.colors.accent.trim())
-                            ? result.colors.accent.trim()
-                            : '#F59E0B';
-                          copyToClipboard(accentColor);
-                        }}
+                        onClick={() => accentColor && copyToClipboard(accentColor)}
                       >
-                        {(() => {
-                          const accentColor = result.colors?.accent && 
-                                             result.colors.accent.trim() !== '' && 
-                                             result.colors.accent !== 'null' &&
-                                             result.colors.accent !== 'undefined' &&
-                                             /^#[0-9A-Fa-f]{6}$/.test(result.colors.accent.trim())
-                            ? result.colors.accent.trim()
-                            : '#F59E0B'; // Orange as default
-                          
-                          return (
-                            <div className="flex items-center gap-3">
-                              <div
-                                className="size-16 rounded-xl border-4 border-slate-300 shadow-lg hover:scale-110 transition-transform"
-                                style={{ backgroundColor: accentColor }}
-                                title={`Click to copy: ${accentColor}`}
-                              />
-                              <div>
-                                <div className="text-sm text-slate-600">{t('visual.accentColor')}</div>
-                                <div className="text-lg font-semibold text-slate-900">{accentColor}</div>
-                                <div className="text-xs text-slate-500 mt-1">{t('visual.clickToCopy')}</div>
-                              </div>
+                        {accentColor ? (
+                          <div className="flex items-center gap-3">
+                            <div
+                              className="size-16 rounded-xl border-4 border-slate-300 shadow-lg hover:scale-110 transition-transform"
+                              style={{ backgroundColor: accentColor }}
+                              title={t('visual.clickToCopy')}
+                            />
+                            <div>
+                              <div className="text-sm text-slate-600">{t('visual.accentColor')}</div>
+                              <div className="text-lg font-semibold text-slate-900">{accentColor}</div>
+                              <div className="text-xs text-slate-500 mt-1">{t('visual.clickToCopy')}</div>
                             </div>
-                          );
-                        })()}
+                          </div>
+                        ) : (
+                          <p className="text-sm text-slate-500 italic">
+                            {t('visual.noAccentColor')}
+                          </p>
+                        )}
                       </div>
                     </CardContent>
                   </Card>
@@ -858,6 +1021,22 @@ export function BrandAnalysisPage() {
                           <div className="text-2xl text-slate-900">{t('audience.qualityFirst')}</div>
                         </div>
                       </div>
+
+                      {result.audienceSegments && result.audienceSegments.length > 0 && (
+                        <div className="p-4 rounded-xl bg-white border-2 border-slate-200">
+                          <div className="flex items-center gap-2 mb-3">
+                            <Target className="size-5 text-blue-600" />
+                            <span className="text-sm text-slate-600">{t('audience.segments')}</span>
+                          </div>
+                          <div className="flex flex-wrap gap-2">
+                            {result.audienceSegments.map((segment, index) => (
+                              <Badge key={index} variant="outline" className="border-blue-200 text-blue-700">
+                                {segment}
+                              </Badge>
+                            ))}
+                          </div>
+                        </div>
+                      )}
                     </CardContent>
                   </Card>
                 </TabsContent>
@@ -919,7 +1098,7 @@ export function BrandAnalysisPage() {
 
                 {/* Recommendations Tab */}
                 <TabsContent value="recommendations" className="space-y-6 mt-6">
-                  {result.recommendedImageStyles && result.recommendedImageStyles.length > 0 && (
+                  {(hasImageRecommendations || hasVideoRecommendations) && result && (
                     <Card className="border-2 border-violet-200">
                       <CardHeader className="bg-gradient-to-r from-violet-50 to-fuchsia-50">
                         <CardTitle className="flex items-center gap-2">
@@ -928,39 +1107,86 @@ export function BrandAnalysisPage() {
                         </CardTitle>
                         <CardDescription>{t('recommendations.description')}</CardDescription>
                       </CardHeader>
-                      <CardContent>
-                        <div className="grid md:grid-cols-2 gap-4">
-                          {result.recommendedImageStyles.map((style, index) => {
-                            const isSelected = selectedStyle === style;
-                            return (
-                              <div
-                                key={index}
-                                onClick={() => setSelectedStyle(isSelected ? null : style)}
-                                className={`
-                                  p-4 rounded-xl cursor-pointer transition-all
-                                  ${isSelected 
-                                    ? 'bg-violet-50 border-2 border-violet-500 shadow-md' 
-                                    : 'bg-white/80 border border-violet-200 hover:border-violet-400 hover:shadow-sm'
-                                  }
-                                `}
-                              >
-                                <div className="flex items-center gap-2 mb-2">
-                                  {isSelected ? (
-                                    <CheckCircle2 className="size-4 text-violet-600" />
-                                  ) : (
-                                    <ImageIcon className="size-4 text-violet-600" />
-                                  )}
-                                  <span className={`text-sm font-medium ${isSelected ? 'text-violet-700' : 'text-slate-900'}`}>
-                                    {style}
-                                  </span>
-                                </div>
-                                <div className={`text-xs ${isSelected ? 'text-violet-600' : 'text-slate-600'}`}>
-                                  {isSelected ? t('recommendations.selected') || '已选择' : t('recommendations.clickToUse')}
-                                </div>
-                              </div>
-                            );
-                          })}
-                        </div>
+                      <CardContent className="space-y-6">
+                        {hasImageRecommendations && (
+                          <div className="space-y-3">
+                            <h4 className="text-sm font-semibold text-slate-600 uppercase tracking-wide">
+                              {t('recommendations.imageStylesTitle')}
+                            </h4>
+                            <div className="grid md:grid-cols-2 gap-4">
+                              {result.recommendedImageStyles?.map((style, index) => {
+                                const isSelected = selectedStyle === style;
+                                return (
+                                  <div
+                                    key={`image-style-${index}`}
+                                    onClick={() => setSelectedStyle(isSelected ? null : style)}
+                                    className={`
+                                      p-4 rounded-xl cursor-pointer transition-all
+                                      ${isSelected 
+                                        ? 'bg-violet-50 border-2 border-violet-500 shadow-md' 
+                                        : 'bg-white/80 border border-violet-200 hover:border-violet-400 hover:shadow-sm'
+                                      }
+                                    `}
+                                  >
+                                    <div className="flex items-center gap-2 mb-2">
+                                      {isSelected ? (
+                                        <CheckCircle2 className="size-4 text-violet-600" />
+                                      ) : (
+                                        <ImageIcon className="size-4 text-violet-600" />
+                                      )}
+                                      <span className={`text-sm font-medium ${isSelected ? 'text-violet-700' : 'text-slate-900'}`}>
+                                        {style}
+                                      </span>
+                                    </div>
+                                    <div className={`text-xs ${isSelected ? 'text-violet-600' : 'text-slate-600'}`}>
+                                      {isSelected ? t('recommendations.selected') || '已选择' : t('recommendations.clickToUse')}
+                                    </div>
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          </div>
+                        )}
+
+                        {hasVideoRecommendations && (
+                          <div className="space-y-3">
+                            <h4 className="text-sm font-semibold text-slate-600 uppercase tracking-wide">
+                              {t('recommendations.videoStylesTitle')}
+                            </h4>
+                            <div className="grid md:grid-cols-2 gap-4">
+                              {result.recommendedVideoStyles?.map((style, index) => {
+                                const isSelected = selectedStyle === style;
+                                return (
+                                  <div
+                                    key={`video-style-${index}`}
+                                    onClick={() => setSelectedStyle(isSelected ? null : style)}
+                                    className={`
+                                      p-4 rounded-xl cursor-pointer transition-all
+                                      ${isSelected 
+                                        ? 'bg-fuchsia-50 border-2 border-fuchsia-500 shadow-md' 
+                                        : 'bg-white/80 border border-fuchsia-200 hover:border-fuchsia-400 hover:shadow-sm'
+                                      }
+                                    `}
+                                  >
+                                    <div className="flex items-center gap-2 mb-2">
+                                      {isSelected ? (
+                                        <CheckCircle2 className="size-4 text-fuchsia-600" />
+                                      ) : (
+                                        <Video className="size-4 text-fuchsia-600" />
+                                      )}
+                                      <span className={`text-sm font-medium ${isSelected ? 'text-fuchsia-700' : 'text-slate-900'}`}>
+                                        {style}
+                                      </span>
+                                    </div>
+                                    <div className={`text-xs ${isSelected ? 'text-fuchsia-600' : 'text-slate-600'}`}>
+                                      {isSelected ? t('recommendations.selected') || '已选择' : t('recommendations.clickToUse')}
+                                    </div>
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          </div>
+                        )}
                       </CardContent>
                     </Card>
                   )}

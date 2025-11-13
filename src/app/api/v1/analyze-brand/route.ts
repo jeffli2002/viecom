@@ -20,6 +20,7 @@ export interface BrandAnalysisResult {
   targetAudience: string;
   audienceAge?: string;
   audienceIncome?: string;
+  audienceSegments?: string[];
   brandPersonality: string[];
   contentThemes: string[];
   visualStyle?: {
@@ -29,6 +30,7 @@ export interface BrandAnalysisResult {
   };
   competitiveAdvantage?: string[];
   recommendedImageStyles?: string[];
+  recommendedVideoStyles?: string[];
   metadata: {
     title: string;
     description: string;
@@ -49,58 +51,107 @@ function transformAnalysisResult(
   const isZh = locale === 'zh';
   const separator = isZh ? '、' : ', ';
   
-  // Extract brand name from URL or use first product feature
+  const brandToneList = Array.isArray(analysis.brandTone) ? analysis.brandTone.filter(Boolean) : [];
+  const productFeatures = Array.isArray(analysis.productFeatures)
+    ? analysis.productFeatures.filter(Boolean)
+    : [];
+  const colorPalette = Array.isArray(analysis.colorPalette) ? analysis.colorPalette.filter(Boolean) : [];
+  const styleKeywords = Array.isArray(analysis.styleKeywords) ? analysis.styleKeywords.filter(Boolean) : [];
+
   const brandName =
-    analysis.brandName ||
+    analysis.brandName?.trim() ||
     new URL(websiteUrl).hostname.replace('www.', '').split('.')[0] ||
     (isZh ? '未知品牌' : 'Unknown Brand');
 
-  // Transform brand tone array to string
-  const brandTone = analysis.brandTone.length > 0
-    ? analysis.brandTone.join(separator)
-    : isZh ? '专业、现代、创新' : 'Professional, Modern, Innovative';
+  const brandTone =
+    brandToneList.length > 0
+      ? brandToneList.join(separator)
+      : isZh
+        ? '专业、现代、创新'
+        : 'Professional, Modern, Innovative';
 
-  // Extract primary color (first color) and secondary colors (rest)
-  const secondaryColors = analysis.colorPalette.slice(1, 4);
+  const secondaryColors = colorPalette.slice(1, 4);
   const colors = {
-    primary: analysis.colorPalette[0] || '#3B82F6',
+    primary: colorPalette[0] || '#3B82F6',
     secondary: secondaryColors.length > 0 ? secondaryColors : ['#8B5CF6', '#EC4899', '#10B981'],
-    accent: analysis.colorPalette[4] || analysis.colorPalette[1] || undefined,
+    accent: colorPalette[4] || colorPalette[1] || undefined,
   };
 
-  // Transform target audience array to string
-  const targetAudience = analysis.targetAudience.length > 0
-    ? analysis.targetAudience.join(separator)
-    : isZh ? '25-40岁的专业人士' : 'Professionals aged 25-40';
+  const demographics = analysis.audienceDemographics || {};
+  const demographicSegments = Array.isArray(demographics.keySegments)
+    ? demographics.keySegments.filter(Boolean)
+    : [];
+  const targetAudienceList =
+    analysis.targetAudience.length > 0 ? analysis.targetAudience : demographicSegments;
 
-  // Use product features as product category
-  const productCategory = analysis.productFeatures.length > 0
-    ? analysis.productFeatures
-    : isZh ? ['产品类别 1', '产品类别 2'] : ['Product Category 1', 'Product Category 2'];
+  const targetAudience =
+    targetAudienceList.length > 0
+      ? targetAudienceList.join(separator)
+      : isZh
+        ? '25-40岁的专业人士'
+        : 'Professionals aged 25-40';
 
-  // Use brand tone as brand personality
-  const brandPersonality = analysis.brandTone.length > 0
-    ? analysis.brandTone
-    : isZh ? ['专业', '创新', '可靠', '友好'] : ['Professional', 'Innovative', 'Reliable', 'Friendly'];
+  const audienceAge = demographics.ageRange?.trim();
+  const audienceIncome = demographics.incomeLevel?.trim();
 
-  // Use style keywords as content themes (or create from summary)
-  const contentThemes = analysis.styleKeywords.length > 0
-    ? analysis.styleKeywords.slice(0, 5)
-    : isZh
-      ? ['产品创新', '用户体验', '行业领导', '客户成功']
-      : ['Product Innovation', 'User Experience', 'Industry Leadership', 'Customer Success'];
+  const productCategory =
+    productFeatures.length > 0
+      ? productFeatures
+      : isZh
+        ? ['产品类别 1', '产品类别 2']
+        : ['Product Category 1', 'Product Category 2'];
+
+  const brandPersonality =
+    brandToneList.length > 0
+      ? brandToneList
+      : isZh
+        ? ['专业', '创新', '可靠', '友好']
+        : ['Professional', 'Innovative', 'Reliable', 'Friendly'];
+
+  const contentThemes =
+    styleKeywords.length > 0
+      ? styleKeywords.slice(0, 5)
+      : isZh
+        ? ['产品创新', '用户体验', '行业领导', '客户成功']
+        : ['Product Innovation', 'User Experience', 'Industry Leadership', 'Customer Success'];
+
+  const creativeGuidance = analysis.creativeGuidance || {};
+  const imageStyles = Array.isArray(creativeGuidance.imageStyles)
+    ? creativeGuidance.imageStyles.filter(Boolean)
+    : [];
+  const videoStyles = Array.isArray(creativeGuidance.videoStyles)
+    ? creativeGuidance.videoStyles.filter(Boolean)
+    : [];
+  const messagingAngles = Array.isArray(creativeGuidance.messagingAngles)
+    ? creativeGuidance.messagingAngles.filter(Boolean)
+    : [];
+
+  const defaultImageStyles = isZh
+    ? ['专业产品摄影', '现代办公场景', '用户使用场景', '简洁产品特写']
+    : ['Professional Product Photography', 'Modern Office Scenes', 'User Usage Scenarios', 'Clean Product Close-ups'];
+  const defaultVideoStyles = isZh
+    ? ['动态产品演示', '真实用户见证', '品牌故事短片']
+    : ['Dynamic Product Demo', 'Authentic User Testimonials', 'Brand Story Short Film'];
+
+  const marketingFocus =
+    messagingAngles.length > 0
+      ? messagingAngles
+      : isZh
+        ? ['产品特性', '用户价值', '品牌故事']
+        : ['Product Features', 'User Value', 'Brand Story'];
 
   return {
     brandName,
     website: websiteUrl,
     productCategory,
     brandTone,
-    brandVoice: brandTone, // Use brand tone as voice for now
+    brandVoice: brandTone,
     colors,
-    styleKeywords: analysis.styleKeywords,
+    styleKeywords,
     targetAudience,
-    audienceAge: isZh ? '25-40岁' : '25-40 years',
-    audienceIncome: isZh ? '中等收入' : 'Middle Income',
+    audienceAge: audienceAge || (isZh ? '25-40岁' : '25-40 years'),
+    audienceIncome: audienceIncome || (isZh ? '中等收入' : 'Middle Income'),
+    audienceSegments: targetAudienceList.length > 0 ? targetAudienceList : undefined,
     brandPersonality,
     contentThemes,
     visualStyle: {
@@ -117,16 +168,15 @@ function transformAnalysisResult(
     competitiveAdvantage: isZh
       ? ['产品质量', '用户体验', '创新能力']
       : ['Product Quality', 'User Experience', 'Innovation Capability'],
-    recommendedImageStyles: isZh
-      ? ['专业产品摄影', '现代办公场景', '用户使用场景', '简洁产品特写']
-      : ['Professional Product Photography', 'Modern Office Scenes', 'User Usage Scenarios', 'Clean Product Close-ups'],
+    recommendedImageStyles: (imageStyles.length > 0 ? imageStyles : defaultImageStyles).slice(0, 6),
+    recommendedVideoStyles: videoStyles.length > 0 ? videoStyles.slice(0, 6) : defaultVideoStyles,
     metadata: {
       title: brandName,
       description: analysis.summary || (isZh ? '品牌网站' : 'Brand Website'),
       language: isZh ? 'zh-CN' : 'en-US',
     },
     socialMediaTone: isZh ? '专业且易于理解' : 'Professional and easy to understand',
-    marketingFocus: isZh ? ['产品特性', '用户价值', '品牌故事'] : ['Product Features', 'User Value', 'Brand Story'],
+    marketingFocus,
   };
 }
 
