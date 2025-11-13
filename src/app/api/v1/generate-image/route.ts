@@ -45,8 +45,6 @@ export async function POST(request: NextRequest) {
       userId = session.user.id;
     }
 
-    const generationMode = image ? 'i2i' : 't2i';
-
     const {
       prompt,
       model = 'nano-banana',
@@ -62,6 +60,8 @@ export async function POST(request: NextRequest) {
       style,
       enhancedPrompt: enhancedPromptInput,
     } = await request.json();
+
+    const generationMode = image ? 'i2i' : 't2i';
 
     if (!prompt || typeof prompt !== 'string') {
       return NextResponse.json(
