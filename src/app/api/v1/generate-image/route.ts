@@ -5,6 +5,7 @@ import { getQuotaUsageByService, updateQuotaUsage } from '@/lib/quota/quota-serv
 import { checkAndAwardReferralReward } from '@/lib/rewards/referral-reward';
 import { db } from '@/server/db';
 import { generatedAsset } from '@/server/db/schema';
+import { randomUUID } from 'node:crypto';
 import { type NextRequest, NextResponse } from 'next/server';
 
 export const dynamic = 'force-dynamic';
@@ -110,7 +111,6 @@ export async function POST(request: NextRequest) {
       }
 
       const { r2StorageService } = await import('@/lib/storage/r2');
-      const { randomUUID } = await import('node:crypto');
 
       // Map aspect ratio to KIE API format (image_size)
       const aspectRatioMap: Record<
