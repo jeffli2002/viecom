@@ -79,10 +79,11 @@ function AssetsPageContent() {
   });
 
   const getDownloadUrl = (asset: Asset) => {
-    if (asset.type === 'image' || asset.type === 'video') {
-      if (asset.url && asset.url.startsWith('/api/v1/media') && asset.r2Key) {
-        return `/api/v1/media?key=${encodeURIComponent(asset.r2Key)}`;
-      }
+    if (asset.r2Key) {
+      return `/api/v1/media?key=${encodeURIComponent(asset.r2Key)}&download=1`;
+    }
+    if (asset.url && asset.url.startsWith('/api/v1/media')) {
+      return `${asset.url}${asset.url.includes('?') ? '&' : '?'}download=1`;
     }
     return asset.url;
   };
@@ -134,7 +135,7 @@ function AssetsPageContent() {
       // Fallback: try direct link download
       console.log('Trying fallback method: direct link');
       const a = document.createElement('a');
-      a.href = getDownloadUrl(asset);
+      a.href = downloadUrl;
       a.target = '_blank';
       a.download = `${asset.type}-${asset.id}.${asset.type === 'image' ? 'png' : 'mp4'}`;
       document.body.appendChild(a);

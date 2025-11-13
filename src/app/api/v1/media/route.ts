@@ -5,6 +5,7 @@ import { Readable } from 'node:stream';
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const key = searchParams.get('key');
+  const shouldDownload = searchParams.get('download') === '1';
 
   if (!key) {
     return NextResponse.json({ error: 'Missing key parameter' }, { status: 400 });
@@ -34,6 +35,11 @@ export async function GET(request: NextRequest) {
     }
     if (asset.lastModified) {
       headers['Last-Modified'] = asset.lastModified.toUTCString();
+    }
+    if (shouldDownload) {
+      const filename = key.split('/').pop() || 'asset';
+      headers['Content-Disposition'] = `attachment; filename="${filename}"`;
+      headers['Cache-Control'] = 'private, max-age=0';
     }
 
     return new NextResponse(stream, {
