@@ -494,8 +494,10 @@
     "recommendations": {
       "title": "Recommended Image/Video Styles",
       "description": "Based on brand analysis, we recommend the most suitable creative styles for you",
+      "imageStylesTitle": "Recommended Image Styles",
       "clickToUse": "Click to use this style for content generation",
       "selected": "Selected",
+      "videoStylesTitle": "Recommended Video Styles",
       "ctaTitle": "Start Creating Content with Brand Analysis",
       "ctaDescription": "Based on AI analysis results, automatically generate product images and videos that match brand style",
       "startCreation": "Start Creating"

@@ -178,8 +178,33 @@ export async function POST(request: NextRequest) {
                   'image'
                 );
 
-                imageUrlForKie = r2Result.url;
-                console.log(`Converted base64 image to R2 URL: ${imageUrlForKie}`);
+                let signedUrl: string | null = null;
+                try {
+                  signedUrl = await r2StorageService.getSignedUrl(r2Result.key, 3600);
+                } catch (signError) {
+                  console.error('Failed to create signed URL for input image (falling back to public URL):', signError);
+                }
+
+                imageUrlForKie = signedUrl || r2Result.url;
+
+                try {
+                  const parsed = new URL(imageUrlForKie);
+                  if (parsed.protocol !== 'https:') {
+                    throw new Error(
+                      `Input image URL must use HTTPS. Current protocol: ${parsed.protocol || 'unknown'}`
+                    );
+                  }
+                } catch (urlError) {
+                  console.error('Invalid input image URL generated for KIE:', urlError);
+                  return NextResponse.json(
+                    { error: 'Failed to prepare source image. Please try uploading the image again.' },
+                    { status: 500 }
+                  );
+                }
+
+                console.log(
+                  `Prepared input image URL for KIE (${signedUrl ? 'signed' : 'public'}): ${imageUrlForKie}`
+                );
               } catch (r2Error: any) {
                 console.error('R2 upload error:', r2Error);
                 const errorCode = r2Error?.Code || r2Error?.code || 'Unknown';
@@ -208,8 +233,17 @@ export async function POST(request: NextRequest) {
             { error: 'Blob URLs are not supported. Please upload the image file directly.' },
             { status: 400 }
           );
-        } else if (typeof image === 'string' && (image.startsWith('http://') || image.startsWith('https://'))) {
-          // Already a valid HTTP/HTTPS URL, use directly
+        } else if (
+          typeof image === 'string' &&
+          (image.startsWith('http://') || image.startsWith('https://'))
+        ) {
+          // Already a URL supplied by client
+          if (image.startsWith('http://')) {
+            return NextResponse.json(
+              { error: 'Source image URL must use HTTPS for image-to-image generation.' },
+              { status: 400 }
+            );
+          }
           imageUrlForKie = image;
         } else {
           return NextResponse.json(
@@ -354,8 +388,13 @@ export async function POST(request: NextRequest) {
             });
           }
 
+          const previewUrl = isTestMode
+            ? imageUrl
+            : `/api/v1/media?key=${encodeURIComponent(r2Result.key)}`;
+
           return NextResponse.json({
             imageUrl: r2Result.url,
+            previewUrl,
             model,
             prompt,
             width,

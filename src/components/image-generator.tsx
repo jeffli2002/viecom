@@ -35,6 +35,7 @@ import { useEffect, useRef, useState } from 'react';
 
 interface GenerationResult {
   imageUrl: string;
+  previewUrl?: string;
   prompt: string;
   model: string;
   error?: string;
@@ -304,6 +305,7 @@ export default function ImageGenerator() {
 
       setResult({
         imageUrl: data.imageUrl,
+        previewUrl: data.previewUrl ?? data.imageUrl,
         prompt: prompt,
         model: data.model,
       });
@@ -312,6 +314,7 @@ export default function ImageGenerator() {
     } catch (error) {
       setResult({
         imageUrl: '',
+        previewUrl: undefined,
         prompt: prompt,
         model: 'nano-banana',
         error: error instanceof Error ? error.message : 'Unknown error',
@@ -320,7 +323,7 @@ export default function ImageGenerator() {
     }
   };
 
-  const handleDownload = async (imageUrl: string) => {
+  const handleDownload = async (imageUrl: string, fallbackUrl?: string) => {
     try {
       const response = await fetch(imageUrl);
       const blob = await response.blob();
@@ -334,7 +337,8 @@ export default function ImageGenerator() {
       window.URL.revokeObjectURL(url);
     } catch (error) {
       console.error('Download failed:', error);
-      window.open(imageUrl, '_blank');
+      const targetUrl = fallbackUrl ?? imageUrl;
+      window.open(targetUrl, '_blank');
     }
   };
 
@@ -687,12 +691,20 @@ export default function ImageGenerator() {
                 </div>
               )}
 
-              {result && !result.error && result.imageUrl && (
+              {result && !result.error && (result.previewUrl || result.imageUrl) && (
                 <div className="space-y-4">
-                  <img src={result.imageUrl} alt="Generated" className="w-full rounded-xl" />
+                  <img
+                    src={result.previewUrl ?? result.imageUrl}
+                    alt="Generated"
+                    className="w-full rounded-xl"
+                  />
                   <div className="grid grid-cols-2 gap-3">
                     <Button
-                      onClick={() => handleDownload(result.imageUrl)}
+                      onClick={() => {
+                        const primaryUrl = result.imageUrl || result.previewUrl;
+                        if (!primaryUrl) return;
+                        handleDownload(primaryUrl, result.previewUrl ?? result.imageUrl);
+                      }}
                       variant="outline"
                       className="border-gray-200 font-light"
                     >

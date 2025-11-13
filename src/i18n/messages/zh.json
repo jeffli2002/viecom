@@ -494,8 +494,10 @@
     "recommendations": {
       "title": "推荐图片/视频风格",
       "description": "基于品牌分析，为您推荐最适合的创作风格",
+      "imageStylesTitle": "推荐图片风格",
       "clickToUse": "点击使用此风格生成内容",
       "selected": "已选择",
+      "videoStylesTitle": "推荐视频风格",
       "ctaTitle": "立即使用品牌分析生成内容",
       "ctaDescription": "基于 AI 分析结果，自动生成符合品牌风格的产品图片和视频",
       "startCreation": "开始创作"
