@@ -4,12 +4,46 @@ import { betterAuth } from 'better-auth';
 import { drizzleAdapter } from 'better-auth/adapters/drizzle';
 import { admin, apiKey } from 'better-auth/plugins';
 
+const createTrustedOrigins = (): string[] => {
+  const origins = new Set<string>();
+
+  try {
+    const baseUrl = new URL(env.NEXT_PUBLIC_APP_URL);
+    const baseOrigin = `${baseUrl.protocol}//${baseUrl.host}`;
+    origins.add(baseOrigin);
+
+    const hostname = baseUrl.hostname.toLowerCase();
+    const isLocalhost =
+      hostname === 'localhost' ||
+      hostname === '127.0.0.1' ||
+      hostname === '0.0.0.0' ||
+      hostname.endsWith('.local') ||
+      hostname.endsWith('.localhost');
+
+    if (!isLocalhost) {
+      const portSuffix = baseUrl.port ? `:${baseUrl.port}` : '';
+
+      if (hostname.startsWith('www.')) {
+        const rootHost = hostname.replace(/^www\./, '');
+        origins.add(`${baseUrl.protocol}//${rootHost}${portSuffix}`);
+      } else {
+        origins.add(`${baseUrl.protocol}//www.${hostname}${portSuffix}`);
+      }
+    }
+  } catch (error) {
+    console.warn('[auth] Invalid NEXT_PUBLIC_APP_URL, cannot derive trusted origins:', error);
+  }
+
+  return Array.from(origins);
+};
+
 export const auth = betterAuth({
   database: drizzleAdapter(db, {
     provider: 'pg',
   }),
   baseURL: env.NEXT_PUBLIC_APP_URL,
   secret: env.BETTER_AUTH_SECRET,
+  trustedOrigins: createTrustedOrigins(),
   emailAndPassword: {
     enabled: true,
     async sendResetPassword({ user, url }) {
