@@ -156,9 +156,7 @@ export function ResetPasswordForm({ className }: { className?: string }) {
           {isResetMode ? t('titleReset') : t('titleRequest')}
         </CardTitle>
         <CardDescription>
-          {isResetMode
-            ? t('descriptionReset')
-            : t('descriptionRequest')}
+          {isResetMode ? t('descriptionReset') : t('descriptionRequest')}
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">

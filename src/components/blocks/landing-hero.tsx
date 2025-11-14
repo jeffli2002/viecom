@@ -2,11 +2,11 @@
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Link } from '@/i18n/navigation';
 import { useAuthStore } from '@/store/auth-store';
 import { ArrowRight, CheckCircle2, Image as ImageIcon, Play, Sparkles, Video } from 'lucide-react';
 import { motion } from 'motion/react';
-import { useTranslations, useLocale } from 'next-intl';
-import { Link } from '@/i18n/navigation';
+import { useLocale, useTranslations } from 'next-intl';
 import { useEffect, useState } from 'react';
 
 export function LandingHero() {

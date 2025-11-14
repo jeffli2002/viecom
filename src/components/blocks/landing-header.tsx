@@ -1,18 +1,17 @@
 'use client';
 
-import { Button } from '@/components/ui/button';
 import { CheckinDropdown } from '@/components/rewards/checkin-dropdown';
+import { Button } from '@/components/ui/button';
 import { LanguageSwitcher } from '@/components/widget/language-switcher';
+import { Link } from '@/i18n/navigation';
 import { useAuthStore } from '@/store/auth-store';
 import { ArrowRight, Menu, X } from 'lucide-react';
 import { motion } from 'motion/react';
 import { useTranslations } from 'next-intl';
-import { Link, usePathname } from '@/i18n/navigation';
 import { useEffect, useState } from 'react';
 
 export function LandingHeader() {
   const t = useTranslations('nav');
-  const pathname = usePathname();
   const { isAuthenticated } = useAuthStore();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [mounted, setMounted] = useState(false);

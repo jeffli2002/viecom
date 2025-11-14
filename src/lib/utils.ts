@@ -9,7 +9,8 @@ export function isWebView(): boolean {
   if (typeof window === 'undefined') return false;
 
   const userAgent = window.navigator.userAgent.toLowerCase();
-  const standalone = (window.navigator as any).standalone;
+  const navigatorWithStandalone = window.navigator as Navigator & { standalone?: boolean };
+  const standalone = navigatorWithStandalone.standalone ?? false;
 
   const isIosWebView =
     /iphone|ipod|ipad/.test(userAgent) && !standalone && !/safari/.test(userAgent);

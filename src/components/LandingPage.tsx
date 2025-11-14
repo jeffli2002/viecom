@@ -1,3 +1,4 @@
+import { paymentConfig } from '@/config/payment.config';
 import {
   ArrowRight,
   CheckCircle2,
@@ -19,7 +20,6 @@ import { motion } from 'motion/react';
 import { Badge } from './ui/badge';
 import { Button } from './ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
-import { paymentConfig } from '@/config/payment.config';
 
 interface LandingPageProps {
   onGetStarted: () => void;
@@ -27,7 +27,7 @@ interface LandingPageProps {
 
 export function LandingPage({ onGetStarted }: LandingPageProps) {
   // Get free plan sign-up bonus
-  const freePlan = paymentConfig.plans.find(p => p.id === 'free');
+  const freePlan = paymentConfig.plans.find((p) => p.id === 'free');
   const freeCredits = freePlan?.credits.onSignup || 30;
   return (
     <div className="min-h-screen bg-white overflow-hidden">
@@ -245,7 +245,7 @@ export function LandingPage({ onGetStarted }: LandingPageProps) {
               { value: '99.9%', label: 'Satisfaction Rate' },
             ].map((stat, index) => (
               <motion.div
-                key={index}
+                key={stat.label}
                 className="text-center"
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}

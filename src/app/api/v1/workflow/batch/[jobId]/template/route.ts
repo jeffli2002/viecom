@@ -66,7 +66,11 @@ export async function GET(
       })
     );
 
-    const fileBuffer = Buffer.from(await getObjectResponse.Body!.transformToByteArray());
+    if (!getObjectResponse.Body) {
+      return NextResponse.json({ error: 'File payload missing' }, { status: 500 });
+    }
+
+    const fileBuffer = Buffer.from(await getObjectResponse.Body.transformToByteArray());
 
     // Parse original file
     const originalRows = templateGenerator.parseTemplateFile(fileBuffer, 'template.xlsx');
@@ -78,9 +82,14 @@ export async function GET(
       .where(eq(generatedAsset.batchJobId, jobId));
 
     // Create a map of row index to asset
-    const assetMap = new Map<number, typeof generatedAssets[0]>();
+    type AssetMetadata = { rowIndex?: number };
+    const assetMap = new Map<number, (typeof generatedAssets)[0]>();
     generatedAssets.forEach((asset) => {
-      const rowIndex = (asset.metadata as any)?.rowIndex;
+      const metadata =
+        typeof asset.metadata === 'object' && asset.metadata !== null
+          ? (asset.metadata as AssetMetadata)
+          : undefined;
+      const rowIndex = metadata?.rowIndex;
       if (rowIndex) {
         assetMap.set(rowIndex, asset);
       }
@@ -91,7 +100,7 @@ export async function GET(
     const updatedRows = originalRows.map((row, index) => {
       const rowIndex = index + 1;
       const asset = assetMap.get(rowIndex);
-      
+
       return {
         ...row,
         productName: row.productName || row.productTitle || '',
@@ -119,13 +128,14 @@ export async function GET(
         'generatedAssetUrl',
       ];
 
-      let csv = headers.join(',') + '\n';
+      let csv = `${headers.join(',')}\n`;
       updatedRows.forEach((row) => {
         const values = headers.map((header) => {
-          const value = (row as any)[header] || '';
+          const typedRow = row as Record<string, unknown>;
+          const value = typedRow[header] || '';
           return `"${String(value).replace(/"/g, '""')}"`;
         });
-        csv += values.join(',') + '\n';
+        csv += `${values.join(',')}\n`;
       });
 
       return new NextResponse(csv, {
@@ -134,53 +144,56 @@ export async function GET(
           'Content-Disposition': `attachment; filename="batch-results-${jobId}.csv"`,
         },
       });
-    } else {
-      // Generate Excel - minimal fields + results
-      const headers = [
-        'productName',
-        'productDescription',
-        'prompt',
-        'baseImageUrl',
-        'productSellingPoints',
-        'enhancedPrompt',
-        'generatedImageUrl',
-        'generatedVideoUrl',
-        'generatedAssetUrl',
-      ];
-
-      const data = [
-        headers,
-        ...updatedRows.map((row) => headers.map((header) => (row as any)[header] || '')),
-      ];
-
-      const workbook = XLSX.utils.book_new();
-      const worksheet = XLSX.utils.aoa_to_sheet(data);
-      
-      // Set column widths
-      const colWidths = [
-        { wch: 30 }, // productName
-        { wch: 50 }, // productDescription
-        { wch: 50 }, // prompt
-        { wch: 50 }, // baseImageUrl (longer for URLs/base64)
-        { wch: 40 }, // productSellingPoints
-        { wch: 50 }, // enhancedPrompt
-        { wch: 50 }, // generatedImageUrl
-        { wch: 50 }, // generatedVideoUrl
-        { wch: 50 }, // generatedAssetUrl
-      ];
-      worksheet['!cols'] = colWidths;
-      
-      XLSX.utils.book_append_sheet(workbook, worksheet, 'Batch Results');
-
-      const buffer = XLSX.write(workbook, { type: 'buffer', bookType: 'xlsx' });
-
-      return new NextResponse(buffer, {
-        headers: {
-          'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-          'Content-Disposition': `attachment; filename="batch-results-${jobId}.xlsx"`,
-        },
-      });
     }
+
+    // Generate Excel - minimal fields + results
+    const headers = [
+      'productName',
+      'productDescription',
+      'prompt',
+      'baseImageUrl',
+      'productSellingPoints',
+      'enhancedPrompt',
+      'generatedImageUrl',
+      'generatedVideoUrl',
+      'generatedAssetUrl',
+    ];
+
+    const data = [
+      headers,
+      ...updatedRows.map((row) => {
+        const typedRow = row as Record<string, unknown>;
+        return headers.map((header) => typedRow[header] || '');
+      }),
+    ];
+
+    const workbook = XLSX.utils.book_new();
+    const worksheet = XLSX.utils.aoa_to_sheet(data);
+
+    // Set column widths
+    const colWidths = [
+      { wch: 30 }, // productName
+      { wch: 50 }, // productDescription
+      { wch: 50 }, // prompt
+      { wch: 50 }, // baseImageUrl (longer for URLs/base64)
+      { wch: 40 }, // productSellingPoints
+      { wch: 50 }, // enhancedPrompt
+      { wch: 50 }, // generatedImageUrl
+      { wch: 50 }, // generatedVideoUrl
+      { wch: 50 }, // generatedAssetUrl
+    ];
+    worksheet['!cols'] = colWidths;
+
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Batch Results');
+
+    const buffer = XLSX.write(workbook, { type: 'buffer', bookType: 'xlsx' });
+
+    return new NextResponse(buffer, {
+      headers: {
+        'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        'Content-Disposition': `attachment; filename="batch-results-${jobId}.xlsx"`,
+      },
+    });
   } catch (error) {
     console.error('Download template error:', error);
     return NextResponse.json(

@@ -49,7 +49,7 @@ export async function GET(request: NextRequest) {
         previewUrl:
           typeof asset.metadata === 'object' && asset.metadata
             ? // @ts-expect-error metadata comes from JSONB
-              (asset.metadata.previewUrl as string | undefined) ?? undefined
+              ((asset.metadata.previewUrl as string | undefined) ?? undefined)
             : undefined,
         r2Key: asset.r2Key || undefined,
       })),
@@ -64,5 +64,3 @@ export async function GET(request: NextRequest) {
     );
   }
 }
-
-

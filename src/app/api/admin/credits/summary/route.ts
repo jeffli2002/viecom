@@ -1,8 +1,8 @@
+import { requireAdmin } from '@/lib/admin/auth';
 import { db } from '@/server/db';
 import { creditTransactions, user, userCredits } from '@/server/db/schema';
-import { requireAdmin } from '@/lib/admin/auth';
+import { and, eq, gte, sql } from 'drizzle-orm';
 import { NextResponse } from 'next/server';
-import { sql, gte, and, eq } from 'drizzle-orm';
 
 export async function GET(request: Request) {
   try {
@@ -12,7 +12,7 @@ export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);
     const range = searchParams.get('range') || 'today';
 
-    let startDate = new Date();
+    const startDate = new Date();
     if (range === 'today') {
       startDate.setHours(0, 0, 0, 0);
     } else {
@@ -27,10 +27,7 @@ export async function GET(request: Request) {
       })
       .from(creditTransactions)
       .where(
-        and(
-          eq(creditTransactions.type, 'spend'),
-          gte(creditTransactions.createdAt, startDate)
-        )
+        and(eq(creditTransactions.type, 'spend'), gte(creditTransactions.createdAt, startDate))
       );
 
     // Get image credits consumed (check description for image generation, any source)
@@ -96,22 +93,15 @@ export async function GET(request: Request) {
     // Prevent caching of admin data
     response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0');
     response.headers.set('Pragma', 'no-cache');
-    
+
     return response;
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Admin credits summary error:', error);
-    
-    if (error.message?.includes('Unauthorized')) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      );
+
+    if (error instanceof Error && error.message.includes('Unauthorized')) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    return NextResponse.json(
-      { error: 'Failed to fetch credits summary' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Failed to fetch credits summary' }, { status: 500 });
   }
 }
-

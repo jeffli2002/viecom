@@ -1,10 +1,10 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
+import { Link } from '@/i18n/navigation';
 import { useAuthStore } from '@/store/auth-store';
 import { ArrowRight, Sparkles } from 'lucide-react';
 import { motion } from 'motion/react';
-import { Link } from '@/i18n/navigation';
 import { useEffect, useState } from 'react';
 
 export function LandingCTA() {
@@ -30,7 +30,10 @@ export function LandingCTA() {
           viewport={{ once: true }}
           className="space-y-8"
         >
-          <h2 className="text-white leading-tight" style={{ fontSize: 'clamp(2.25rem, 6vw, 4.5rem)' }}>
+          <h2
+            className="text-white leading-tight"
+            style={{ fontSize: 'clamp(2.25rem, 6vw, 4.5rem)' }}
+          >
             Ready to create stunning visuals?
           </h2>
           <p className="text-2xl text-violet-100 max-w-2xl mx-auto">

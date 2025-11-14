@@ -1,6 +1,17 @@
-import React, { useState, useEffect } from "react";
-import { BrowserRouter as Router, Routes, Route, Link, useNavigate } from "react-router-dom";
-import { LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid, ResponsiveContainer, BarChart, Bar, Legend } from "recharts";
+import React, { useEffect, useState } from 'react';
+import { Link, Route, BrowserRouter as Router, Routes, useNavigate } from 'react-router-dom';
+import {
+  Bar,
+  BarChart,
+  CartesianGrid,
+  Legend,
+  Line,
+  LineChart,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from 'recharts';
 
 // NOTE: Fixed version — wraps routing context correctly so useNavigate() is only used inside a <Router>.
 // This file is a self-contained React prototype that assumes TailwindCSS is available in the project.
@@ -27,11 +38,15 @@ const mockRegisterTrend = (days = 30) => {
 
 const mockCreditsTrend = (days = 30) => {
   const dates = generateDates(days);
-  return dates.map((d) => ({ date: d, imageCredits: Math.floor(Math.random() * 5000), videoCredits: Math.floor(Math.random() * 2000) }));
+  return dates.map((d) => ({
+    date: d,
+    imageCredits: Math.floor(Math.random() * 5000),
+    videoCredits: Math.floor(Math.random() * 2000),
+  }));
 };
 
 const mockUsers = (count = 12) => {
-  const plans = ["Free", "Basic", "Pro", "Pro+"];
+  const plans = ['Free', 'Basic', 'Pro', 'Pro+'];
   const users = [];
   for (let i = 0; i < count; i++) {
     const email = `user${i + 1}@example.com`;
@@ -40,8 +55,18 @@ const mockUsers = (count = 12) => {
     const plan = plans[Math.floor(Math.random() * plans.length)];
     const imgCredits = Math.floor(Math.random() * 5000);
     const vidCredits = Math.floor(Math.random() * 2000);
-    const paid = Math.random() > 0.6 ? (Math.floor(Math.random() * 100) + 10) : 0;
-    users.push({ id: i + 1, email, signup: signup.toISOString().slice(0, 10), plan, paid, imgCredits, vidCredits, remaining: 10000 - imgCredits - vidCredits, lastActive: todayStr() });
+    const paid = Math.random() > 0.6 ? Math.floor(Math.random() * 100) + 10 : 0;
+    users.push({
+      id: i + 1,
+      email,
+      signup: signup.toISOString().slice(0, 10),
+      plan,
+      paid,
+      imgCredits,
+      vidCredits,
+      remaining: 10000 - imgCredits - vidCredits,
+      lastActive: todayStr(),
+    });
   }
   return users;
 };
@@ -50,12 +75,14 @@ const mockUsers = (count = 12) => {
 function downloadCSV(filename, rows) {
   if (!rows || !rows.length) return;
   const header = Object.keys(rows[0]);
-  const csv = [header.join(",")].concat(rows.map((r) => header.map((h) => JSON.stringify(r[h] ?? "")).join(","))).join("\n");
-  const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+  const csv = [header.join(',')]
+    .concat(rows.map((r) => header.map((h) => JSON.stringify(r[h] ?? '')).join(',')))
+    .join('\n');
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
   const url = URL.createObjectURL(blob);
-  const link = document.createElement("a");
+  const link = document.createElement('a');
   link.href = url;
-  link.setAttribute("download", filename);
+  link.setAttribute('download', filename);
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
@@ -75,7 +102,13 @@ function TopBar({ onLogout }) {
           <option>Last 30 days</option>
           <option>Custom range</option>
         </select>
-        <button onClick={onLogout} className="px-3 py-1 bg-red-500 text-white rounded">Logout</button>
+        <button
+          type="button"
+          onClick={onLogout}
+          className="px-3 py-1 bg-red-500 text-white rounded"
+        >
+          Logout
+        </button>
       </div>
     </div>
   );
@@ -85,12 +118,24 @@ function Sidebar() {
   return (
     <aside className="w-64 bg-white border-r p-4 h-screen sticky top-0">
       <nav className="flex flex-col gap-2">
-        <Link to="/admin/dashboard" className="p-2 rounded hover:bg-gray-100">Dashboard</Link>
-        <Link to="/admin/users" className="p-2 rounded hover:bg-gray-100">Users</Link>
-        <Link to="/admin/subscriptions" className="p-2 rounded hover:bg-gray-100">Subscriptions</Link>
-        <Link to="/admin/payments" className="p-2 rounded hover:bg-gray-100">Payments</Link>
-        <Link to="/admin/credits" className="p-2 rounded hover:bg-gray-100">Credits (积分)</Link>
-        <Link to="/admin/settings" className="p-2 rounded hover:bg-gray-100">Settings</Link>
+        <Link to="/admin/dashboard" className="p-2 rounded hover:bg-gray-100">
+          Dashboard
+        </Link>
+        <Link to="/admin/users" className="p-2 rounded hover:bg-gray-100">
+          Users
+        </Link>
+        <Link to="/admin/subscriptions" className="p-2 rounded hover:bg-gray-100">
+          Subscriptions
+        </Link>
+        <Link to="/admin/payments" className="p-2 rounded hover:bg-gray-100">
+          Payments
+        </Link>
+        <Link to="/admin/credits" className="p-2 rounded hover:bg-gray-100">
+          Credits (积分)
+        </Link>
+        <Link to="/admin/settings" className="p-2 rounded hover:bg-gray-100">
+          Settings
+        </Link>
       </nav>
     </aside>
   );
@@ -99,14 +144,14 @@ function Sidebar() {
 /* --------------------------- Pages --------------------------- */
 function LoginPage() {
   const navigate = useNavigate();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [remember, setRemember] = useState(true);
   const handleSubmit = (e) => {
     e.preventDefault();
     // Mock auth: accept any email/password
-    localStorage.setItem("admin_logged_in", "1");
-    navigate("/admin/dashboard");
+    localStorage.setItem('admin_logged_in', '1');
+    navigate('/admin/dashboard');
   };
 
   return (
@@ -115,13 +160,31 @@ function LoginPage() {
         <h2 className="text-2xl font-semibold mb-4">管理员登录</h2>
         <p className="text-sm text-gray-500 mb-6">请输入你的管理员账号以查看仪表盘</p>
         <form onSubmit={handleSubmit} className="space-y-4">
-          <input value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Email" className="w-full border rounded px-3 py-2" />
-          <input value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Password" type="password" className="w-full border rounded px-3 py-2" />
+          <input
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="Email"
+            className="w-full border rounded px-3 py-2"
+          />
+          <input
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="Password"
+            type="password"
+            className="w-full border rounded px-3 py-2"
+          />
           <div className="flex items-center justify-between">
-            <label className="flex items-center gap-2"><input type="checkbox" checked={remember} onChange={() => setRemember(!remember)} /> Remember me</label>
-            <a className="text-sm text-blue-600" href="#">Forgot password?</a>
+            <label className="flex items-center gap-2">
+              <input type="checkbox" checked={remember} onChange={() => setRemember(!remember)} />{' '}
+              Remember me
+            </label>
+            <a className="text-sm text-blue-600" href="/reset-password">
+              Forgot password?
+            </a>
           </div>
-          <button type="submit" className="w-full bg-blue-600 text-white py-2 rounded">Login</button>
+          <button type="submit" className="w-full bg-blue-600 text-white py-2 rounded">
+            Login
+          </button>
         </form>
       </div>
     </div>
@@ -181,7 +244,13 @@ function DashboardPage() {
                 <XAxis dataKey="date" />
                 <YAxis />
                 <Tooltip />
-                <Line type="monotone" dataKey="count" stroke="#2563eb" strokeWidth={2} dot={false} />
+                <Line
+                  type="monotone"
+                  dataKey="count"
+                  stroke="#2563eb"
+                  strokeWidth={2}
+                  dot={false}
+                />
               </LineChart>
             </ResponsiveContainer>
           </div>
@@ -196,8 +265,20 @@ function DashboardPage() {
                 <XAxis dataKey="date" />
                 <YAxis />
                 <Tooltip />
-                <Line type="monotone" dataKey="imageCredits" stroke="#10b981" strokeWidth={2} dot={false} />
-                <Line type="monotone" dataKey="videoCredits" stroke="#f59e0b" strokeWidth={2} dot={false} />
+                <Line
+                  type="monotone"
+                  dataKey="imageCredits"
+                  stroke="#10b981"
+                  strokeWidth={2}
+                  dot={false}
+                />
+                <Line
+                  type="monotone"
+                  dataKey="videoCredits"
+                  stroke="#f59e0b"
+                  strokeWidth={2}
+                  dot={false}
+                />
                 <Legend />
               </LineChart>
             </ResponsiveContainer>
@@ -209,7 +290,13 @@ function DashboardPage() {
         <div className="flex items-center justify-between mb-3">
           <h3 className="font-semibold">当日新注册用户</h3>
           <div className="flex gap-2">
-            <button onClick={() => downloadCSV("new-registrations.csv", users)} className="px-3 py-1 border rounded">导出 CSV</button>
+            <button
+              type="button"
+              onClick={() => downloadCSV('new-registrations.csv', users)}
+              className="px-3 py-1 border rounded"
+            >
+              导出 CSV
+            </button>
           </div>
         </div>
         <div className="overflow-x-auto">
@@ -231,7 +318,7 @@ function DashboardPage() {
                   <td className="py-2">{u.signup}</td>
                   <td className="py-2 text-sm">{u.email}</td>
                   <td className="py-2">{u.plan}</td>
-                  <td className="py-2">{u.paid ? `$${u.paid}` : "-"}</td>
+                  <td className="py-2">{u.paid ? `$${u.paid}` : '-'}</td>
                   <td className="py-2">{u.imgCredits}</td>
                   <td className="py-2">{u.vidCredits}</td>
                   <td className="py-2">{u.remaining}</td>
@@ -250,7 +337,9 @@ function CreditsPage() {
   const total = users.reduce((s, u) => s + u.imgCredits + u.vidCredits, 0);
   const imgTotal = users.reduce((s, u) => s + u.imgCredits, 0);
   const vidTotal = users.reduce((s, u) => s + u.vidCredits, 0);
-  const top10 = [...users].sort((a, b) => b.imgCredits + b.vidCredits - (a.imgCredits + a.vidCredits)).slice(0, 10);
+  const top10 = [...users]
+    .sort((a, b) => b.imgCredits + b.vidCredits - (a.imgCredits + a.vidCredits))
+    .slice(0, 10);
 
   return (
     <div className="p-6 space-y-6">
@@ -277,11 +366,15 @@ function CreditsPage() {
               <div key={u.id} className="flex items-center justify-between border rounded p-2">
                 <div>
                   <div className="font-medium">{u.email}</div>
-                  <div className="text-sm text-gray-500">{u.plan} · 注册 {u.signup}</div>
+                  <div className="text-sm text-gray-500">
+                    {u.plan} · 注册 {u.signup}
+                  </div>
                 </div>
                 <div className="text-right">
                   <div className="text-sm">总消耗 {u.imgCredits + u.vidCredits}</div>
-                  <div className="text-xs text-gray-500">图像 {u.imgCredits} / 视频 {u.vidCredits}</div>
+                  <div className="text-xs text-gray-500">
+                    图像 {u.imgCredits} / 视频 {u.vidCredits}
+                  </div>
                 </div>
               </div>
             ))}
@@ -335,7 +428,13 @@ function CreditsPage() {
           </table>
         </div>
         <div className="mt-3">
-          <button onClick={() => downloadCSV("credits-detail.csv", users)} className="px-3 py-1 border rounded">导出 CSV</button>
+          <button
+            type="button"
+            onClick={() => downloadCSV('credits-detail.csv', users)}
+            className="px-3 py-1 border rounded"
+          >
+            导出 CSV
+          </button>
         </div>
       </div>
     </div>
@@ -345,7 +444,7 @@ function CreditsPage() {
 /* --------------------------- App + Routing --------------------------- */
 export default function AppPrototype() {
   // Keep top-level state here, but create an inner component that uses useNavigate() inside Router.
-  const [loggedIn, setLoggedIn] = useState(() => !!localStorage.getItem("admin_logged_in"));
+  const [loggedIn, setLoggedIn] = useState(() => !!localStorage.getItem('admin_logged_in'));
 
   return (
     <Router>
@@ -361,14 +460,14 @@ function InnerApp({ loggedIn, setLoggedIn }) {
   useEffect(() => {
     if (!loggedIn) {
       const path = window.location.pathname;
-      if (!path.startsWith("/admin/login")) navigate("/admin/login");
+      if (!path.startsWith('/admin/login')) navigate('/admin/login');
     }
   }, [loggedIn, navigate]);
 
   const handleLogout = () => {
-    localStorage.removeItem("admin_logged_in");
+    localStorage.removeItem('admin_logged_in');
     setLoggedIn(false);
-    navigate("/admin/login");
+    navigate('/admin/login');
   };
 
   return (

@@ -1,7 +1,6 @@
 'use client';
 
 import { useAuthStore } from '@/store/auth-store';
-import { usePathname } from '@/i18n/navigation';
 import { useSearchParams } from 'next/navigation';
 import { Suspense, useEffect } from 'react';
 
@@ -12,7 +11,6 @@ function AuthProviderContent({ children }: { children: React.ReactNode }) {
   const initialize = useAuthStore((state) => state.initialize);
   const refreshSession = useAuthStore((state) => state.refreshSession);
   const isInitialized = useAuthStore((state) => state.isInitialized);
-  const pathname = usePathname();
   const searchParams = useSearchParams();
 
   useEffect(() => {
@@ -43,7 +41,7 @@ function AuthProviderContent({ children }: { children: React.ReactNode }) {
 
       return () => clearTimeout(timer);
     }
-  }, [searchParams, refreshSession, pathname]);
+  }, [searchParams, refreshSession]);
 
   return <>{children}</>;
 }
@@ -53,9 +51,8 @@ function AuthProviderContent({ children }: { children: React.ReactNode }) {
  */
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   return (
-    <Suspense fallback={<>{children}</>}>
+    <Suspense fallback={children}>
       <AuthProviderContent>{children}</AuthProviderContent>
     </Suspense>
   );
 }
-

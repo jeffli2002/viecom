@@ -1,8 +1,8 @@
-import { db } from '@/server/db';
-import { subscription, user, payment } from '@/server/db/schema';
 import { requireAdmin } from '@/lib/admin/auth';
+import { db } from '@/server/db';
+import { payment, subscription, user } from '@/server/db/schema';
+import { desc, eq, gte, sql } from 'drizzle-orm';
 import { NextResponse } from 'next/server';
-import { eq, sql, gte, desc } from 'drizzle-orm';
 
 export async function GET(request: Request) {
   try {
@@ -62,20 +62,13 @@ export async function GET(request: Request) {
       recentSubscriptions,
       trend: subscriptionTrend.rows,
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Admin subscriptions error:', error);
-    
-    if (error.message?.includes('Unauthorized')) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      );
+
+    if (error instanceof Error && error.message.includes('Unauthorized')) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    return NextResponse.json(
-      { error: 'Failed to fetch subscriptions' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Failed to fetch subscriptions' }, { status: 500 });
   }
 }
-

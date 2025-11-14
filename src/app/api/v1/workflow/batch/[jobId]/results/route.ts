@@ -67,19 +67,30 @@ export async function GET(
       .orderBy(generatedAsset.createdAt);
 
     // Format assets for frontend
-    const formattedAssets = assets.map((asset, index) => ({
-      id: asset.id,
-      url: asset.publicUrl,
-      type: asset.assetType as 'image' | 'video',
-      prompt: asset.prompt,
-      enhancedPrompt: asset.enhancedPrompt || undefined,
-      model: (asset.generationParams as any)?.model || undefined,
-      status: asset.status as 'completed' | 'failed',
-      error: asset.errorMessage || undefined,
-      rowIndex: index,
-      previewUrl: (asset.metadata as any)?.previewUrl || undefined,
-      r2Key: asset.r2Key || undefined,
-    }));
+    const formattedAssets = assets.map((asset, index) => {
+      const generationParams =
+        typeof asset.generationParams === 'object' && asset.generationParams !== null
+          ? (asset.generationParams as { model?: string })
+          : undefined;
+      const metadata =
+        typeof asset.metadata === 'object' && asset.metadata !== null
+          ? (asset.metadata as { previewUrl?: string })
+          : undefined;
+
+      return {
+        id: asset.id,
+        url: asset.publicUrl,
+        type: asset.assetType as 'image' | 'video',
+        prompt: asset.prompt,
+        enhancedPrompt: asset.enhancedPrompt || undefined,
+        model: generationParams?.model,
+        status: asset.status as 'completed' | 'failed',
+        error: asset.errorMessage || undefined,
+        rowIndex: index,
+        previewUrl: metadata?.previewUrl || undefined,
+        r2Key: asset.r2Key || undefined,
+      };
+    });
 
     return NextResponse.json({
       success: true,
@@ -103,5 +114,3 @@ export async function GET(
     );
   }
 }
-
-

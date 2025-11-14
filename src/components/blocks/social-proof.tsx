@@ -16,7 +16,7 @@ export function SocialProof() {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-5xl mx-auto">
           {stats.map((stat, index) => (
             <motion.div
-              key={index}
+              key={`${stat.label}-${stat.value}`}
               className="text-center"
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -34,5 +34,3 @@ export function SocialProof() {
     </section>
   );
 }
-
-

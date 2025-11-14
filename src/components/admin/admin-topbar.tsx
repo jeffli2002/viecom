@@ -25,20 +25,16 @@ export function AdminTopBar() {
       <div className="flex items-center gap-4">
         <h1 className="text-lg font-semibold text-gray-900">Admin Dashboard</h1>
       </div>
-      
+
       <div className="flex items-center gap-3">
         <div className="relative">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-          <Input
-            type="text"
-            placeholder="Search email..."
-            className="pl-10 w-64"
-          />
+          <Input type="text" placeholder="Search email..." className="pl-10 w-64" />
         </div>
-        
-        <Button 
-          onClick={handleLogout} 
-          variant="outline" 
+
+        <Button
+          onClick={handleLogout}
+          variant="outline"
           size="sm"
           className="border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700 hover:border-red-300"
         >
@@ -49,4 +45,3 @@ export function AdminTopBar() {
     </div>
   );
 }
-

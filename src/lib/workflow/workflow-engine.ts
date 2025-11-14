@@ -2,9 +2,26 @@ import { randomUUID } from 'node:crypto';
 import { env } from '@/env';
 import { analyzeBrandTone } from '@/lib/brand/brand-tone-analyzer';
 import { creditService } from '@/lib/credits';
+import type { EcommercePlatform, PublishResult } from '@/lib/publishing/platform-service';
 import { updateQuotaUsage } from '@/lib/quota/quota-service';
 import { r2StorageService } from '@/lib/storage/r2';
 import * as XLSX from 'xlsx';
+
+type BrandAnalysisResult = Awaited<ReturnType<typeof analyzeBrandTone>>;
+type PublishResultWithPlatform = PublishResult & { platform: EcommercePlatform };
+const SUPPORTED_PLATFORMS: ReadonlyArray<EcommercePlatform> = [
+  'tiktok',
+  'amazon',
+  'shopify',
+  'taobao',
+  'douyin',
+  'temu',
+  'other',
+] as const;
+
+const isEcommercePlatform = (value: string): value is EcommercePlatform => {
+  return SUPPORTED_PLATFORMS.includes(value as EcommercePlatform);
+};
 
 export interface WorkflowInput {
   companyUrl?: string;
@@ -22,14 +39,14 @@ export interface WorkflowStep {
   name: string;
   status: 'pending' | 'processing' | 'completed' | 'failed';
   progress?: number;
-  result?: any;
+  result?: unknown;
   error?: string;
 }
 
 export interface WorkflowResult {
   workflowId: string;
   steps: WorkflowStep[];
-  brandAnalysis?: any;
+  brandAnalysis?: BrandAnalysisResult | null;
   enhancedPrompts: string[];
   generatedAssets: Array<{
     id: string;
@@ -53,7 +70,7 @@ export class WorkflowEngine {
     const steps: WorkflowStep[] = [];
     const enhancedPrompts: string[] = [];
     const generatedAssets: WorkflowResult['generatedAssets'] = [];
-    let brandAnalysis: any = null;
+    let brandAnalysis: BrandAnalysisResult | null = null;
     let totalCreditsSpent = 0;
 
     try {
@@ -183,8 +200,8 @@ export class WorkflowEngine {
    */
   private async enhancePrompt(
     basePrompt: string,
-    brandAnalysis: any,
-    productImage?: string,
+    brandAnalysis: BrandAnalysisResult | null,
+    _productImage?: string,
     variationIndex = 0
   ): Promise<string> {
     const deepseekKey = env.DEEPSEEK_API_KEY;
@@ -266,22 +283,24 @@ export class WorkflowEngine {
       model?: string;
       aspectRatio?: string;
     },
-    workflowId: string
+    _workflowId: string
   ): Promise<WorkflowResult['generatedAssets'][0] & { creditsSpent: number }> {
     const { prompt, mode, type, baseImage, model = 'nano-banana', aspectRatio = '1:1' } = params;
 
     // Pure credit-based system: check credits using config
-    const { creditsConfig } = await import('@/config/credits.config');
     const { getModelCost } = await import('@/lib/quota/quota-service');
-    
-    const creditCost = type === 'image' 
-      ? getModelCost('imageGeneration', model)
-      : getModelCost('videoGeneration', 'sora-2');
-    
+
+    const creditCost =
+      type === 'image'
+        ? getModelCost('imageGeneration', model)
+        : getModelCost('videoGeneration', 'sora-2');
+
     const hasCredits = await creditService.hasEnoughCredits(userId, creditCost);
 
     if (!hasCredits) {
-      throw new Error(`Insufficient credits. Required: ${creditCost} credits. Please earn more credits or upgrade your plan.`);
+      throw new Error(
+        `Insufficient credits. Required: ${creditCost} credits. Please earn more credits or upgrade your plan.`
+      );
     }
 
     // Generate asset based on type
@@ -290,14 +309,14 @@ export class WorkflowEngine {
         userId,
         prompt,
         mode,
+        creditCost,
         baseImage,
         model,
-        aspectRatio,
-        creditCost
+        aspectRatio
       );
-    } else {
-      return await this.generateVideo(userId, prompt, mode, baseImage, creditCost);
     }
+
+    return await this.generateVideo(userId, prompt, mode, creditCost, baseImage);
   }
 
   /**
@@ -307,10 +326,10 @@ export class WorkflowEngine {
     userId: string,
     prompt: string,
     mode: 't2i' | 'i2i',
+    creditCost: number,
     baseImage?: string,
     model = 'nano-banana',
-    aspectRatio = '1:1',
-    creditCost: number
+    aspectRatio = '1:1'
   ): Promise<WorkflowResult['generatedAssets'][0] & { creditsSpent: number }> {
     const { getKieApiService } = await import('@/lib/kie/kie-api');
     const kieApiService = getKieApiService();
@@ -420,8 +439,8 @@ export class WorkflowEngine {
     userId: string,
     prompt: string,
     mode: 't2v' | 'i2v',
-    baseImage?: string,
-    creditCost: number
+    creditCost: number,
+    baseImage?: string
   ): Promise<WorkflowResult['generatedAssets'][0] & { creditsSpent: number }> {
     const { getKieApiService } = await import('@/lib/kie/kie-api');
     const kieApiService = getKieApiService();
@@ -560,15 +579,14 @@ export class WorkflowEngine {
       });
 
       // Upload ZIP to R2
-      const { r2StorageService } = await import('@/lib/storage/r2');
-      const { key, url } = await r2StorageService.uploadFile(
+      const uploadResult = await r2StorageService.uploadFile(
         zipBuffer,
         `workflow-${workflowId}.zip`,
         'application/zip',
         'workflow-exports'
       );
 
-      return url;
+      return uploadResult.url;
     } catch (error) {
       console.error('ZIP creation error:', error);
       // Fallback: return first asset URL
@@ -603,7 +621,7 @@ export class WorkflowEngine {
       model?: string;
       status: 'completed' | 'failed';
       error?: string;
-      publishResults?: any[];
+      publishResults?: PublishResultWithPlatform[];
     }>;
   }> {
     // Parse CSV/Excel using template generator
@@ -611,7 +629,7 @@ export class WorkflowEngine {
     const rows = templateGenerator.parseTemplateFile(fileBuffer, fileName);
 
     // Process each row
-    const results: Array<{ assetId: string; publishResults?: any[] }> = [];
+    const results: Array<{ assetId: string; publishResults?: PublishResultWithPlatform[] }> = [];
 
     for (const row of rows) {
       try {
@@ -659,7 +677,8 @@ export class WorkflowEngine {
         }
 
         // Get aspect ratio from options (set by frontend) or use default
-        const aspectRatio = options?.aspectRatio || row.aspectRatio || (generationType === 'image' ? '1:1' : '16:9');
+        const aspectRatio =
+          options?.aspectRatio || row.aspectRatio || (generationType === 'image' ? '1:1' : '16:9');
 
         // Generate asset
         const asset = await this.generateAsset(
@@ -708,12 +727,12 @@ export class WorkflowEngine {
         }
 
         // Auto-publish if requested and publish info is available
-        let publishResults: any[] | undefined;
+        let publishResults: PublishResultWithPlatform[] | undefined;
         if ((options?.autoPublish || row.publishPlatforms) && row.publishPlatforms) {
           const platforms = row.publishPlatforms
             .split(',')
-            .map((p) => p.trim())
-            .filter(Boolean) as any[];
+            .map((p) => p.trim().toLowerCase())
+            .filter((p): p is EcommercePlatform => isEcommercePlatform(p));
 
           if (platforms.length > 0) {
             const { platformPublishingService } = await import('@/lib/publishing/platform-service');
@@ -786,22 +805,28 @@ export class WorkflowEngine {
    * Extract generation requirement from CSV row (legacy method, kept for compatibility)
    */
   private extractRequirementFromRow(
-    row: Record<string, any>,
+    row: Record<string, unknown>,
     columnMapping?: Record<string, string>
   ): string {
+    const takeString = (value: unknown): string => {
+      return typeof value === 'string' ? value : '';
+    };
+
     if (columnMapping) {
       const parts: string[] = [];
       for (const [csvCol, field] of Object.entries(columnMapping)) {
-        if (row[csvCol]) {
-          parts.push(`${field}: ${row[csvCol]}`);
+        const value = row[csvCol];
+        if (typeof value === 'string' && value.trim().length > 0) {
+          parts.push(`${field}: ${value}`);
         }
       }
       return parts.join(', ');
     }
 
     // Default: use product name and description
-    const productName = row.productName || row.name || row.product || '';
-    const description = row.description || row.desc || '';
+    const productName =
+      takeString(row.productName) || takeString(row.name) || takeString(row.product);
+    const description = takeString(row.description) || takeString(row.desc);
     return `${productName}${description ? ` - ${description}` : ''}`;
   }
 }

@@ -7,8 +7,8 @@
  */
 
 import { randomUUID } from 'node:crypto';
+import { resolve } from 'node:path';
 import { config } from 'dotenv';
-import { resolve } from 'path';
 import pg from 'pg';
 
 config({ path: resolve(process.cwd(), '.env.local'), override: true });
@@ -53,7 +53,9 @@ async function main() {
 
   try {
     console.log(`🔍 Looking up user ${email} ...`);
-    const userResult = await client.query('SELECT id FROM "user" WHERE email = $1 LIMIT 1', [email]);
+    const userResult = await client.query('SELECT id FROM "user" WHERE email = $1 LIMIT 1', [
+      email,
+    ]);
     const userRow = userResult.rows[0];
     if (!userRow) {
       console.error(`❌ No user found with email ${email}`);

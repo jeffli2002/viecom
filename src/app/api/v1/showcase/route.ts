@@ -1,6 +1,6 @@
 import { db } from '@/server/db';
-import { showcaseGallery, generatedAsset } from '@/server/db/schema';
-import { eq, and } from 'drizzle-orm';
+import { generatedAsset, showcaseGallery } from '@/server/db/schema';
+import { and, eq } from 'drizzle-orm';
 import { type NextRequest, NextResponse } from 'next/server';
 
 export const dynamic = 'force-dynamic';
@@ -17,12 +17,7 @@ export async function GET(_request: NextRequest) {
       })
       .from(showcaseGallery)
       .innerJoin(generatedAsset, eq(showcaseGallery.assetId, generatedAsset.id))
-      .where(
-        and(
-          eq(showcaseGallery.isActive, true),
-          eq(generatedAsset.status, 'completed')
-        )
-      )
+      .where(and(eq(showcaseGallery.isActive, true), eq(generatedAsset.status, 'completed')))
       .orderBy(showcaseGallery.displayOrder)
       .limit(12);
 

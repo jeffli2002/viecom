@@ -1,3 +1,4 @@
+import { randomUUID } from 'node:crypto';
 import { creditsConfig, getModelCost } from '@/config/credits.config';
 import { auth } from '@/lib/auth/auth';
 import { creditService } from '@/lib/credits';
@@ -5,11 +6,12 @@ import { getQuotaUsageByService, updateQuotaUsage } from '@/lib/quota/quota-serv
 import { checkAndAwardReferralReward } from '@/lib/rewards/referral-reward';
 import { db } from '@/server/db';
 import { generatedAsset } from '@/server/db/schema';
-import { randomUUID } from 'node:crypto';
 import { type NextRequest, NextResponse } from 'next/server';
 
 export const dynamic = 'force-dynamic';
 export const fetchCache = 'force-no-store';
+
+type KieApiService = Awaited<ReturnType<typeof import('@/lib/kie/kie-api')['getKieApiService']>>;
 
 const MODEL_ENDPOINTS: Record<string, string> = {
   'flux-1.1': 'https://api.bfl.ai/v1/flux-pro-1.1',
@@ -92,13 +94,12 @@ export async function POST(request: NextRequest) {
     const dailyPeriod = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
     const monthlyPeriod = new Date().toISOString().substring(0, 7); // YYYY-MM
 
-    const isStableDiffusion = model === 'stable-diffusion';
     const isNanoBanana = model === 'nano-banana';
     let sourceImagePublicUrl: string | undefined;
 
     if (isNanoBanana) {
       // Use KIE API for nano-banana image generation
-      let kieApiService;
+      let kieApiService: KieApiService | undefined;
       try {
         const { getKieApiService } = await import('@/lib/kie/kie-api');
         kieApiService = getKieApiService();
@@ -149,11 +150,16 @@ export async function POST(request: NextRequest) {
             if (base64Match) {
               const [, imageType, base64Data] = base64Match;
               const imageBuffer = Buffer.from(base64Data, 'base64');
-              
+
               // Determine file extension and content type
-              const extension = imageType === 'png' ? 'png' : imageType === 'jpeg' || imageType === 'jpg' ? 'jpeg' : 'png';
+              const extension =
+                imageType === 'png'
+                  ? 'png'
+                  : imageType === 'jpeg' || imageType === 'jpg'
+                    ? 'jpeg'
+                    : 'png';
               const contentType = `image/${extension}`;
-              
+
               // Check if R2 is properly configured
               const { env } = await import('@/env');
               const isR2Configured =
@@ -191,7 +197,10 @@ export async function POST(request: NextRequest) {
                 try {
                   signedUrl = await r2StorageService.getSignedUrl(r2Result.key, 3600);
                 } catch (signError) {
-                  console.error('Failed to create signed URL for input image (falling back to public URL):', signError);
+                  console.error(
+                    'Failed to create signed URL for input image (falling back to public URL):',
+                    signError
+                  );
                 }
 
                 imageUrlForKie = signedUrl || r2Result.url;
@@ -206,7 +215,10 @@ export async function POST(request: NextRequest) {
                 } catch (urlError) {
                   console.error('Invalid input image URL generated for KIE:', urlError);
                   return NextResponse.json(
-                    { error: 'Failed to prepare source image. Please try uploading the image again.' },
+                    {
+                      error:
+                        'Failed to prepare source image. Please try uploading the image again.',
+                    },
                     { status: 500 }
                   );
                 }
@@ -214,9 +226,13 @@ export async function POST(request: NextRequest) {
                 console.log(
                   `Prepared input image URL for KIE (${signedUrl ? 'signed' : 'public'}): ${imageUrlForKie}`
                 );
-              } catch (r2Error: any) {
+              } catch (r2Error: unknown) {
                 console.error('R2 upload error:', r2Error);
-                const errorCode = r2Error?.Code || r2Error?.code || 'Unknown';
+                const errorSource =
+                  typeof r2Error === 'object' && r2Error !== null
+                    ? (r2Error as { Code?: string; code?: string })
+                    : undefined;
+                const errorCode = errorSource?.Code || errorSource?.code || 'Unknown';
                 const errorMessage =
                   errorCode === 'Unauthorized'
                     ? 'R2 storage authentication failed. Please check your R2 credentials.'
@@ -224,10 +240,7 @@ export async function POST(request: NextRequest) {
                 return NextResponse.json({ error: errorMessage }, { status: 500 });
               }
             } else {
-              return NextResponse.json(
-                { error: 'Invalid base64 image format' },
-                { status: 400 }
-              );
+              return NextResponse.json({ error: 'Invalid base64 image format' }, { status: 400 });
             }
           } catch (error) {
             console.error('Error processing base64 image:', error);
@@ -254,7 +267,7 @@ export async function POST(request: NextRequest) {
             );
           }
           imageUrlForKie = image;
-              sourceImagePublicUrl = image;
+          sourceImagePublicUrl = image;
         } else {
           return NextResponse.json(
             { error: 'Invalid image URL format. Expected base64 data URL or HTTP/HTTPS URL.' },
@@ -264,7 +277,7 @@ export async function POST(request: NextRequest) {
       }
 
       // Create image generation task
-      let taskResponse;
+      let taskResponse: Awaited<ReturnType<KieApiService['generateImage']>> | undefined;
       try {
         taskResponse = await kieApiService.generateImage({
           prompt,
@@ -298,7 +311,7 @@ export async function POST(request: NextRequest) {
       ) {
         await new Promise((resolve) => setTimeout(resolve, 5000)); // Wait 5 seconds
 
-        let statusResponse;
+        let statusResponse: Awaited<ReturnType<KieApiService['getTaskStatus']>> | undefined;
         try {
           statusResponse = await kieApiService.getTaskStatus(taskId);
           // Use 'state' field (KIE API format) or fallback to 'status'

@@ -1,8 +1,8 @@
 import { creditsConfig } from '@/config/credits.config';
 import { creditService } from '@/lib/credits';
 import { db } from '@/server/db';
-import { userReferrals, creditTransactions } from '@/server/db/schema';
-import { eq, and, or } from 'drizzle-orm';
+import { creditTransactions, userReferrals } from '@/server/db/schema';
+import { and, eq, or } from 'drizzle-orm';
 
 /**
  * Check if this is the user's first successful generation and award referral credits
@@ -59,7 +59,7 @@ export async function checkAndAwardReferralReward(userId: string): Promise<void>
           userId: referralRecord.referrerId,
           amount: creditsToAward,
           source: 'referral',
-          description: `Referral reward - User completed first generation`,
+          description: 'Referral reward - User completed first generation',
           referenceId,
           metadata: {
             referralId: referralRecord.id,
@@ -88,4 +88,3 @@ export async function checkAndAwardReferralReward(userId: string): Promise<void>
     console.error('Error awarding referral reward:', error);
   }
 }
-

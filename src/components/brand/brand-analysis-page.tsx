@@ -1,14 +1,8 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useAuthStore } from '@/store/auth-store';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import {
   Dialog,
   DialogContent,
@@ -16,36 +10,42 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Progress } from '@/components/ui/progress';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useRouter } from '@/i18n/navigation';
+import { useAuthStore } from '@/store/auth-store';
 import {
-  Globe,
-  Sparkles,
-  Loader2,
-  CheckCircle2,
-  Palette,
-  Tag,
-  Zap,
-  Eye,
-  TrendingUp,
-  Copy,
-  Download,
-  FileText,
-  Users,
-  Target,
-  Heart,
-  MessageSquare,
-  Image as ImageIcon,
-  ChevronRight,
-  Star,
-  Lightbulb,
   Award,
   BarChart3,
-  Video,
+  CheckCircle2,
+  ChevronRight,
+  Copy,
+  Download,
+  Eye,
   FileSpreadsheet,
+  FileText,
+  Globe,
+  Heart,
+  Image as ImageIcon,
+  Lightbulb,
+  Loader2,
+  MessageSquare,
+  Palette,
+  Sparkles,
+  Star,
+  Tag,
+  Target,
+  TrendingUp,
+  Users,
+  Video,
+  Zap,
 } from 'lucide-react';
-import { motion, AnimatePresence } from 'motion/react';
+import { AnimatePresence, motion } from 'motion/react';
+import { useLocale, useTranslations } from 'next-intl';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { toast } from 'sonner';
-import { useTranslations, useLocale } from 'next-intl';
-import { useRouter } from '@/i18n/navigation';
 
 interface BrandAnalysisResult {
   brandName?: string;
@@ -215,16 +215,17 @@ export function BrandAnalysisPage() {
     (href: string) => {
       (router as unknown as { push: (path: string) => void }).push(href);
     },
-    [router],
+    [router]
   );
 
-  const hasImageRecommendations = Boolean(result?.recommendedImageStyles && result.recommendedImageStyles.length > 0);
-  const hasVideoRecommendations = Boolean(result?.recommendedVideoStyles && result.recommendedVideoStyles.length > 0);
+  const hasImageRecommendations = Boolean(
+    result?.recommendedImageStyles && result.recommendedImageStyles.length > 0
+  );
+  const hasVideoRecommendations = Boolean(
+    result?.recommendedVideoStyles && result.recommendedVideoStyles.length > 0
+  );
 
-  const {
-    safeAnalysisStepIndex,
-    currentAnalysisStep,
-  } = useMemo(() => {
+  const { safeAnalysisStepIndex, currentAnalysisStep } = useMemo(() => {
     if (analysisSteps.length === 0) {
       return {
         safeAnalysisStepIndex: 0,
@@ -276,11 +277,7 @@ export function BrandAnalysisPage() {
     };
   }, [result]);
 
-  const {
-    primaryColor,
-    secondaryColors,
-    accentColor,
-  } = useMemo(() => {
+  const { primaryColor, secondaryColors, accentColor } = useMemo(() => {
     if (!result) {
       return {
         primaryColor: '#9333EA',
@@ -291,9 +288,13 @@ export function BrandAnalysisPage() {
 
     const validPrimary = getValidHexColor(result.colors?.primary);
     const validSecondary = Array.isArray(result.colors?.secondary)
-      ? (result.colors.secondary.map((color) => getValidHexColor(color)).filter(Boolean) as string[])
+      ? (result.colors.secondary
+          .map((color) => getValidHexColor(color))
+          .filter(Boolean) as string[])
       : [];
-    const uniqueSecondary = [...new Set(validSecondary.filter((color) => color && color !== validPrimary))];
+    const uniqueSecondary = [
+      ...new Set(validSecondary.filter((color) => color && color !== validPrimary)),
+    ];
 
     const basePrimary = validPrimary ?? logoColor ?? '#9333EA';
     const accent =
@@ -410,7 +411,7 @@ export function BrandAnalysisPage() {
     // Store brand analysis data in sessionStorage with selected style
     const brandData = {
       ...result,
-      selectedStyle: selectedStyle || undefined,  // 带入选中的风格
+      selectedStyle: selectedStyle || undefined, // 带入选中的风格
     };
     sessionStorage.setItem('brandAnalysis', JSON.stringify(brandData));
 
@@ -508,9 +509,9 @@ export function BrandAnalysisPage() {
               <div className="space-y-3">
                 <p className="text-sm text-slate-600">{t('input.quickExamples')}</p>
                 <div className="grid grid-cols-3 gap-3">
-                  {quickExamples.map((example, index) => (
+                  {quickExamples.map((example) => (
                     <motion.button
-                      key={index}
+                      key={example.url}
                       onClick={() => {
                         setUrl(example.url);
                         handleAnalyze(example.url);
@@ -534,7 +535,8 @@ export function BrandAnalysisPage() {
                               if (parent && !parent.querySelector('.logo-fallback')) {
                                 target.style.display = 'none';
                                 const fallback = document.createElement('div');
-                                fallback.className = 'logo-fallback text-lg font-semibold text-slate-600';
+                                fallback.className =
+                                  'logo-fallback text-lg font-semibold text-slate-600';
                                 fallback.textContent = example.name.charAt(0);
                                 parent.appendChild(fallback);
                               }
@@ -569,17 +571,15 @@ export function BrandAnalysisPage() {
                       <span className="text-slate-900">
                         {t(`steps.${currentAnalysisStep.label}`)}
                       </span>
-                      <span className="text-violet-600">
-                        {currentAnalysisStep.progress}%
-                      </span>
+                      <span className="text-violet-600">{currentAnalysisStep.progress}%</span>
                     </div>
                     <Progress value={currentAnalysisStep.progress} className="h-3" />
                   </div>
 
                   <div className="grid grid-cols-5 gap-3">
-                    {analysisSteps.map((step, index) => (
+                    {analysisSteps.map((step) => (
                       <div
-                        key={index}
+                        key={step.label}
                         className={`
                           p-3 rounded-xl text-center transition-all
                           ${
@@ -598,9 +598,7 @@ export function BrandAnalysisPage() {
                         ) : (
                           <div className="size-6 mx-auto rounded-full border-2 border-slate-400" />
                         )}
-                        <p className="text-xs mt-2 text-slate-600">
-                          {t(`steps.${step.label}`)}
-                        </p>
+                        <p className="text-xs mt-2 text-slate-600">{t(`steps.${step.label}`)}</p>
                       </div>
                     ))}
                   </div>
@@ -666,11 +664,13 @@ export function BrandAnalysisPage() {
                     <div className="p-4 rounded-xl bg-white/80 border border-violet-200">
                       <div className="flex items-center gap-2 mb-2">
                         <Tag className="size-4 text-violet-600" />
-                        <span className="text-sm text-slate-600">{t('result.productCategory')}</span>
+                        <span className="text-sm text-slate-600">
+                          {t('result.productCategory')}
+                        </span>
                       </div>
                       <div className="flex flex-wrap gap-1">
-                        {result.productCategory.slice(0, 2).map((cat, index) => (
-                          <Badge key={index} variant="secondary" className="text-xs">
+                        {result.productCategory.slice(0, 2).map((cat) => (
+                          <Badge key={cat} variant="secondary" className="text-xs">
                             {cat}
                           </Badge>
                         ))}
@@ -704,40 +704,42 @@ export function BrandAnalysisPage() {
               {/* Tabs for detailed analysis */}
               <Tabs value={selectedTab} onValueChange={setSelectedTab}>
                 <TabsList className="grid w-full grid-cols-5 h-auto p-2 bg-white border-2 border-slate-200 rounded-xl shadow-lg">
-                  <TabsTrigger 
-                    value="overview" 
+                  <TabsTrigger
+                    value="overview"
                     className="gap-2 py-3 px-4 rounded-lg data-[state=active]:bg-gradient-to-br data-[state=active]:from-violet-600 data-[state=active]:to-violet-700 data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:shadow-violet-500/50 transition-all hover:scale-105 data-[state=inactive]:hover:bg-slate-100"
                   >
                     <BarChart3 className="size-4" />
                     <span className="hidden md:inline font-semibold">{t('tabs.overview')}</span>
                   </TabsTrigger>
-                  <TabsTrigger 
-                    value="visual" 
+                  <TabsTrigger
+                    value="visual"
                     className="gap-2 py-3 px-4 rounded-lg data-[state=active]:bg-gradient-to-br data-[state=active]:from-purple-600 data-[state=active]:to-purple-700 data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:shadow-purple-500/50 transition-all hover:scale-105 data-[state=inactive]:hover:bg-slate-100"
                   >
                     <Palette className="size-4" />
                     <span className="hidden md:inline font-semibold">{t('tabs.visual')}</span>
                   </TabsTrigger>
-                  <TabsTrigger 
-                    value="audience" 
+                  <TabsTrigger
+                    value="audience"
                     className="gap-2 py-3 px-4 rounded-lg data-[state=active]:bg-gradient-to-br data-[state=active]:from-blue-600 data-[state=active]:to-blue-700 data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:shadow-blue-500/50 transition-all hover:scale-105 data-[state=inactive]:hover:bg-slate-100"
                   >
                     <Target className="size-4" />
                     <span className="hidden md:inline font-semibold">{t('tabs.audience')}</span>
                   </TabsTrigger>
-                  <TabsTrigger 
-                    value="content" 
+                  <TabsTrigger
+                    value="content"
                     className="gap-2 py-3 px-4 rounded-lg data-[state=active]:bg-gradient-to-br data-[state=active]:from-amber-600 data-[state=active]:to-amber-700 data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:shadow-amber-500/50 transition-all hover:scale-105 data-[state=inactive]:hover:bg-slate-100"
                   >
                     <MessageSquare className="size-4" />
                     <span className="hidden md:inline font-semibold">{t('tabs.content')}</span>
                   </TabsTrigger>
-                  <TabsTrigger 
-                    value="recommendations" 
+                  <TabsTrigger
+                    value="recommendations"
                     className="gap-2 py-3 px-4 rounded-lg data-[state=active]:bg-gradient-to-br data-[state=active]:from-fuchsia-600 data-[state=active]:to-fuchsia-700 data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:shadow-fuchsia-500/50 transition-all hover:scale-105 data-[state=inactive]:hover:bg-slate-100"
                   >
                     <Lightbulb className="size-4" />
-                    <span className="hidden md:inline font-semibold">{t('tabs.recommendations')}</span>
+                    <span className="hidden md:inline font-semibold">
+                      {t('tabs.recommendations')}
+                    </span>
                   </TabsTrigger>
                 </TabsList>
 
@@ -760,9 +762,9 @@ export function BrandAnalysisPage() {
                         <div className="space-y-2">
                           <div className="text-sm text-slate-600">{t('overview.personality')}</div>
                           <div className="flex flex-wrap gap-2">
-                            {result.brandPersonality.map((trait, index) => (
+                            {result.brandPersonality.map((trait) => (
                               <Badge
-                                key={index}
+                                key={trait}
                                 className="bg-violet-100 text-violet-800 border-violet-200"
                               >
                                 {trait}
@@ -784,9 +786,9 @@ export function BrandAnalysisPage() {
                         </CardHeader>
                         <CardContent>
                           <div className="space-y-3">
-                            {result.competitiveAdvantage.map((advantage, index) => (
+                            {result.competitiveAdvantage.map((advantage) => (
                               <div
-                                key={index}
+                                key={advantage}
                                 className="flex items-start gap-3 p-3 rounded-lg bg-green-50 border border-green-200"
                               >
                                 <Star className="size-5 text-green-600 flex-shrink-0 mt-0.5" />
@@ -809,9 +811,9 @@ export function BrandAnalysisPage() {
                     </CardHeader>
                     <CardContent>
                       <div className="flex flex-wrap gap-3">
-                        {result.styleKeywords.map((keyword, index) => (
+                        {result.styleKeywords.map((keyword) => (
                           <Badge
-                            key={index}
+                            key={keyword}
                             variant="outline"
                             className="text-lg py-2 px-4 border-2 hover:bg-fuchsia-50 hover:border-fuchsia-300 cursor-pointer transition-colors"
                             onClick={() => copyToClipboard(keyword)}
@@ -850,11 +852,13 @@ export function BrandAnalysisPage() {
                         </div>
                         <div className="flex items-center gap-4">
                           <>
-                            <div
+                            <button
+                              type="button"
                               className="size-20 rounded-2xl border-4 border-white shadow-xl cursor-pointer hover:scale-110 transition-transform"
                               style={{ backgroundColor: primaryColor }}
                               onClick={() => copyToClipboard(primaryColor)}
                               title={t('visual.clickToCopy')}
+                              aria-label={t('visual.clickToCopy')}
                             />
                             <div>
                               <div className="text-2xl font-semibold text-slate-900 mb-1">
@@ -872,7 +876,9 @@ export function BrandAnalysisPage() {
 
                       <div className="space-y-3">
                         <div className="flex items-center justify-between">
-                          <span className="text-sm text-slate-600">{t('visual.secondaryColors')}</span>
+                          <span className="text-sm text-slate-600">
+                            {t('visual.secondaryColors')}
+                          </span>
                           <Button
                             variant="ghost"
                             size="sm"
@@ -889,11 +895,13 @@ export function BrandAnalysisPage() {
                           </p>
                         ) : (
                           <div className="flex flex-wrap gap-3">
-                            {secondaryColors.map((color, index) => (
-                              <div
-                                key={`${color}-${index}`}
-                                className="space-y-2 p-4 rounded-xl bg-slate-50 border-2 border-slate-200 hover:border-purple-300 transition-colors cursor-pointer"
+                            {secondaryColors.map((color) => (
+                              <button
+                                type="button"
+                                key={color}
+                                className="space-y-2 p-4 rounded-xl bg-slate-50 border-2 border-slate-200 hover:border-purple-300 transition-colors cursor-pointer text-left"
                                 onClick={() => copyToClipboard(color)}
+                                aria-label={t('visual.clickToCopy')}
                               >
                                 <div
                                   className="aspect-square rounded-xl border-4 border-slate-300 shadow-lg hover:scale-105 transition-transform"
@@ -901,18 +909,25 @@ export function BrandAnalysisPage() {
                                   title={t('visual.clickToCopy')}
                                 />
                                 <div className="text-center">
-                                  <div className="text-sm font-semibold text-slate-900">{color}</div>
-                                  <div className="text-xs text-slate-500">{t('visual.clickToCopy')}</div>
+                                  <div className="text-sm font-semibold text-slate-900">
+                                    {color}
+                                  </div>
+                                  <div className="text-xs text-slate-500">
+                                    {t('visual.clickToCopy')}
+                                  </div>
                                 </div>
-                              </div>
+                              </button>
                             ))}
                           </div>
                         )}
                       </div>
 
-                      <div 
-                        className="p-4 rounded-xl bg-amber-50 border-2 border-amber-200 cursor-pointer hover:border-amber-300 transition-colors"
+                      <button
+                        type="button"
+                        className="p-4 rounded-xl bg-amber-50 border-2 border-amber-200 cursor-pointer hover:border-amber-300 transition-colors text-left"
                         onClick={() => accentColor && copyToClipboard(accentColor)}
+                        disabled={!accentColor}
+                        aria-label={t('visual.clickToCopy')}
                       >
                         {accentColor ? (
                           <div className="flex items-center gap-3">
@@ -922,9 +937,15 @@ export function BrandAnalysisPage() {
                               title={t('visual.clickToCopy')}
                             />
                             <div>
-                              <div className="text-sm text-slate-600">{t('visual.accentColor')}</div>
-                              <div className="text-lg font-semibold text-slate-900">{accentColor}</div>
-                              <div className="text-xs text-slate-500 mt-1">{t('visual.clickToCopy')}</div>
+                              <div className="text-sm text-slate-600">
+                                {t('visual.accentColor')}
+                              </div>
+                              <div className="text-lg font-semibold text-slate-900">
+                                {accentColor}
+                              </div>
+                              <div className="text-xs text-slate-500 mt-1">
+                                {t('visual.clickToCopy')}
+                              </div>
                             </div>
                           </div>
                         ) : (
@@ -932,7 +953,7 @@ export function BrandAnalysisPage() {
                             {t('visual.noAccentColor')}
                           </p>
                         )}
-                      </div>
+                      </button>
                     </CardContent>
                   </Card>
 
@@ -1016,9 +1037,13 @@ export function BrandAnalysisPage() {
                         <div className="p-4 rounded-xl bg-white border-2 border-slate-200">
                           <div className="flex items-center gap-2 mb-2">
                             <Heart className="size-5 text-fuchsia-600" />
-                            <span className="text-sm text-slate-600">{t('audience.preference')}</span>
+                            <span className="text-sm text-slate-600">
+                              {t('audience.preference')}
+                            </span>
                           </div>
-                          <div className="text-2xl text-slate-900">{t('audience.qualityFirst')}</div>
+                          <div className="text-2xl text-slate-900">
+                            {t('audience.qualityFirst')}
+                          </div>
                         </div>
                       </div>
 
@@ -1029,8 +1054,12 @@ export function BrandAnalysisPage() {
                             <span className="text-sm text-slate-600">{t('audience.segments')}</span>
                           </div>
                           <div className="flex flex-wrap gap-2">
-                            {result.audienceSegments.map((segment, index) => (
-                              <Badge key={index} variant="outline" className="border-blue-200 text-blue-700">
+                            {result.audienceSegments.map((segment) => (
+                              <Badge
+                                key={segment}
+                                variant="outline"
+                                className="border-blue-200 text-blue-700"
+                              >
                                 {segment}
                               </Badge>
                             ))}
@@ -1053,9 +1082,9 @@ export function BrandAnalysisPage() {
                       </CardHeader>
                       <CardContent>
                         <div className="space-y-3">
-                          {result.contentThemes.map((theme, index) => (
+                          {result.contentThemes.map((theme) => (
                             <div
-                              key={index}
+                              key={theme}
                               className="p-3 rounded-lg bg-amber-50 border border-amber-200"
                             >
                               <div className="flex items-center gap-2">
@@ -1081,10 +1110,12 @@ export function BrandAnalysisPage() {
                         </p>
                         {result.marketingFocus && result.marketingFocus.length > 0 && (
                           <div className="space-y-2">
-                            <div className="text-sm text-slate-600">{t('content.marketingFocus')}</div>
+                            <div className="text-sm text-slate-600">
+                              {t('content.marketingFocus')}
+                            </div>
                             <div className="flex flex-wrap gap-2">
-                              {result.marketingFocus.map((focus, index) => (
-                                <Badge key={index} variant="secondary">
+                              {result.marketingFocus.map((focus) => (
+                                <Badge key={focus} variant="secondary">
                                   {focus}
                                 </Badge>
                               ))}
@@ -1114,19 +1145,22 @@ export function BrandAnalysisPage() {
                               {t('recommendations.imageStylesTitle')}
                             </h4>
                             <div className="grid md:grid-cols-2 gap-4">
-                              {result.recommendedImageStyles?.map((style, index) => {
+                              {result.recommendedImageStyles?.map((style) => {
                                 const isSelected = selectedStyle === style;
                                 return (
-                                  <div
-                                    key={`image-style-${index}`}
+                                  <button
+                                    type="button"
+                                    key={`image-style-${style}`}
                                     onClick={() => setSelectedStyle(isSelected ? null : style)}
                                     className={`
                                       p-4 rounded-xl cursor-pointer transition-all
-                                      ${isSelected 
-                                        ? 'bg-violet-50 border-2 border-violet-500 shadow-md' 
-                                        : 'bg-white/80 border border-violet-200 hover:border-violet-400 hover:shadow-sm'
+                                      ${
+                                        isSelected
+                                          ? 'bg-violet-50 border-2 border-violet-500 shadow-md'
+                                          : 'bg-white/80 border border-violet-200 hover:border-violet-400 hover:shadow-sm'
                                       }
                                     `}
+                                    aria-pressed={isSelected}
                                   >
                                     <div className="flex items-center gap-2 mb-2">
                                       {isSelected ? (
@@ -1134,14 +1168,20 @@ export function BrandAnalysisPage() {
                                       ) : (
                                         <ImageIcon className="size-4 text-violet-600" />
                                       )}
-                                      <span className={`text-sm font-medium ${isSelected ? 'text-violet-700' : 'text-slate-900'}`}>
+                                      <span
+                                        className={`text-sm font-medium ${isSelected ? 'text-violet-700' : 'text-slate-900'}`}
+                                      >
                                         {style}
                                       </span>
                                     </div>
-                                    <div className={`text-xs ${isSelected ? 'text-violet-600' : 'text-slate-600'}`}>
-                                      {isSelected ? t('recommendations.selected') || '已选择' : t('recommendations.clickToUse')}
+                                    <div
+                                      className={`text-xs ${isSelected ? 'text-violet-600' : 'text-slate-600'}`}
+                                    >
+                                      {isSelected
+                                        ? t('recommendations.selected') || '已选择'
+                                        : t('recommendations.clickToUse')}
                                     </div>
-                                  </div>
+                                  </button>
                                 );
                               })}
                             </div>
@@ -1154,19 +1194,22 @@ export function BrandAnalysisPage() {
                               {t('recommendations.videoStylesTitle')}
                             </h4>
                             <div className="grid md:grid-cols-2 gap-4">
-                              {result.recommendedVideoStyles?.map((style, index) => {
+                              {result.recommendedVideoStyles?.map((style) => {
                                 const isSelected = selectedStyle === style;
                                 return (
-                                  <div
-                                    key={`video-style-${index}`}
+                                  <button
+                                    type="button"
+                                    key={`video-style-${style}`}
                                     onClick={() => setSelectedStyle(isSelected ? null : style)}
                                     className={`
                                       p-4 rounded-xl cursor-pointer transition-all
-                                      ${isSelected 
-                                        ? 'bg-fuchsia-50 border-2 border-fuchsia-500 shadow-md' 
-                                        : 'bg-white/80 border border-fuchsia-200 hover:border-fuchsia-400 hover:shadow-sm'
+                                      ${
+                                        isSelected
+                                          ? 'bg-fuchsia-50 border-2 border-fuchsia-500 shadow-md'
+                                          : 'bg-white/80 border border-fuchsia-200 hover:border-fuchsia-400 hover:shadow-sm'
                                       }
                                     `}
+                                    aria-pressed={isSelected}
                                   >
                                     <div className="flex items-center gap-2 mb-2">
                                       {isSelected ? (
@@ -1174,14 +1217,20 @@ export function BrandAnalysisPage() {
                                       ) : (
                                         <Video className="size-4 text-fuchsia-600" />
                                       )}
-                                      <span className={`text-sm font-medium ${isSelected ? 'text-fuchsia-700' : 'text-slate-900'}`}>
+                                      <span
+                                        className={`text-sm font-medium ${isSelected ? 'text-fuchsia-700' : 'text-slate-900'}`}
+                                      >
                                         {style}
                                       </span>
                                     </div>
-                                    <div className={`text-xs ${isSelected ? 'text-fuchsia-600' : 'text-slate-600'}`}>
-                                      {isSelected ? t('recommendations.selected') || '已选择' : t('recommendations.clickToUse')}
+                                    <div
+                                      className={`text-xs ${isSelected ? 'text-fuchsia-600' : 'text-slate-600'}`}
+                                    >
+                                      {isSelected
+                                        ? t('recommendations.selected') || '已选择'
+                                        : t('recommendations.clickToUse')}
                                     </div>
-                                  </div>
+                                  </button>
                                 );
                               })}
                             </div>
@@ -1221,14 +1270,20 @@ export function BrandAnalysisPage() {
         <Dialog open={showGenerationDialog} onOpenChange={setShowGenerationDialog}>
           <DialogContent className="sm:max-w-[600px] bg-white border-2 border-slate-200">
             <DialogHeader>
-              <DialogTitle className="text-slate-900 text-xl">{t('generationDialog.title')}</DialogTitle>
-              <DialogDescription className="text-slate-600 text-base">{t('generationDialog.description')}</DialogDescription>
+              <DialogTitle className="text-slate-900 text-xl">
+                {t('generationDialog.title')}
+              </DialogTitle>
+              <DialogDescription className="text-slate-600 text-base">
+                {t('generationDialog.description')}
+              </DialogDescription>
             </DialogHeader>
 
             <div className="space-y-6 py-4">
               {/* Generation Type Selection */}
               <div className="space-y-3">
-                <Label className="text-base font-semibold text-slate-900">{t('generationDialog.selectType')}</Label>
+                <Label className="text-base font-semibold text-slate-900">
+                  {t('generationDialog.selectType')}
+                </Label>
                 <div className="grid grid-cols-2 gap-4">
                   <motion.button
                     type="button"
@@ -1251,7 +1306,9 @@ export function BrandAnalysisPage() {
                       >
                         <ImageIcon className="size-5" />
                       </div>
-                      <span className="font-semibold text-slate-900">{t('generationDialog.image')}</span>
+                      <span className="font-semibold text-slate-900">
+                        {t('generationDialog.image')}
+                      </span>
                     </div>
                     <p className="text-sm text-slate-600">{t('generationDialog.imageDesc')}</p>
                   </motion.button>
@@ -1277,7 +1334,9 @@ export function BrandAnalysisPage() {
                       >
                         <Video className="size-5" />
                       </div>
-                      <span className="font-semibold text-slate-900">{t('generationDialog.video')}</span>
+                      <span className="font-semibold text-slate-900">
+                        {t('generationDialog.video')}
+                      </span>
                     </div>
                     <p className="text-sm text-slate-600">{t('generationDialog.videoDesc')}</p>
                   </motion.button>
@@ -1287,7 +1346,9 @@ export function BrandAnalysisPage() {
               {/* Generation Mode Selection */}
               {generationType && (
                 <div className="space-y-3">
-                  <Label className="text-base font-semibold text-slate-900">{t('generationDialog.selectMode')}</Label>
+                  <Label className="text-base font-semibold text-slate-900">
+                    {t('generationDialog.selectMode')}
+                  </Label>
                   <div className="grid grid-cols-2 gap-4">
                     <motion.button
                       type="button"
@@ -1310,7 +1371,9 @@ export function BrandAnalysisPage() {
                         >
                           <Sparkles className="size-5" />
                         </div>
-                        <span className="font-semibold text-slate-900">{t('generationDialog.single')}</span>
+                        <span className="font-semibold text-slate-900">
+                          {t('generationDialog.single')}
+                        </span>
                       </div>
                       <p className="text-sm text-slate-600">{t('generationDialog.singleDesc')}</p>
                     </motion.button>
@@ -1336,7 +1399,9 @@ export function BrandAnalysisPage() {
                         >
                           <FileSpreadsheet className="size-5" />
                         </div>
-                        <span className="font-semibold text-slate-900">{t('generationDialog.batch')}</span>
+                        <span className="font-semibold text-slate-900">
+                          {t('generationDialog.batch')}
+                        </span>
                       </div>
                       <p className="text-sm text-slate-600">{t('generationDialog.batchDesc')}</p>
                     </motion.button>
@@ -1346,8 +1411,8 @@ export function BrandAnalysisPage() {
             </div>
 
             <div className="flex justify-end gap-3 pt-4 border-t border-slate-200">
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
                 onClick={() => setShowGenerationDialog(false)}
                 className="border-slate-300 text-slate-700 hover:bg-slate-50"
               >
@@ -1368,4 +1433,3 @@ export function BrandAnalysisPage() {
     </div>
   );
 }
-

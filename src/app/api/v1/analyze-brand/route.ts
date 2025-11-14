@@ -46,17 +46,21 @@ export interface BrandAnalysisResult {
 function transformAnalysisResult(
   analysis: Awaited<ReturnType<typeof analyzeBrandTone>>,
   websiteUrl: string,
-  locale: string = 'en'
+  locale = 'en'
 ): BrandAnalysisResult {
   const isZh = locale === 'zh';
   const separator = isZh ? '、' : ', ';
-  
+
   const brandToneList = Array.isArray(analysis.brandTone) ? analysis.brandTone.filter(Boolean) : [];
   const productFeatures = Array.isArray(analysis.productFeatures)
     ? analysis.productFeatures.filter(Boolean)
     : [];
-  const colorPalette = Array.isArray(analysis.colorPalette) ? analysis.colorPalette.filter(Boolean) : [];
-  const styleKeywords = Array.isArray(analysis.styleKeywords) ? analysis.styleKeywords.filter(Boolean) : [];
+  const colorPalette = Array.isArray(analysis.colorPalette)
+    ? analysis.colorPalette.filter(Boolean)
+    : [];
+  const styleKeywords = Array.isArray(analysis.styleKeywords)
+    ? analysis.styleKeywords.filter(Boolean)
+    : [];
 
   const brandName =
     analysis.brandName?.trim() ||
@@ -128,7 +132,12 @@ function transformAnalysisResult(
 
   const defaultImageStyles = isZh
     ? ['专业产品摄影', '现代办公场景', '用户使用场景', '简洁产品特写']
-    : ['Professional Product Photography', 'Modern Office Scenes', 'User Usage Scenarios', 'Clean Product Close-ups'];
+    : [
+        'Professional Product Photography',
+        'Modern Office Scenes',
+        'User Usage Scenarios',
+        'Clean Product Close-ups',
+      ];
   const defaultVideoStyles = isZh
     ? ['动态产品演示', '真实用户见证', '品牌故事短片']
     : ['Dynamic Product Demo', 'Authentic User Testimonials', 'Brand Story Short Film'];
@@ -161,9 +170,7 @@ function transformAnalysisResult(
       layout: isZh
         ? '简洁明了的布局，良好的视觉层次'
         : 'Clean and clear layout with good visual hierarchy',
-      typography: isZh
-        ? '现代无衬线字体，清晰易读'
-        : 'Modern sans-serif fonts, clear and readable',
+      typography: isZh ? '现代无衬线字体，清晰易读' : 'Modern sans-serif fonts, clear and readable',
     },
     competitiveAdvantage: isZh
       ? ['产品质量', '用户体验', '创新能力']
@@ -229,4 +236,3 @@ export async function POST(request: NextRequest) {
     );
   }
 }
-

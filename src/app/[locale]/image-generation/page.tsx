@@ -12,9 +12,7 @@ export default function ImageGenerationPage() {
     <div className="container mx-auto py-8">
       <div className="mb-8 text-center">
         <h1 className="mb-2 text-4xl font-bold">{t('title')}</h1>
-        <p className="text-gray-600">
-          {t('subtitle')}
-        </p>
+        <p className="text-gray-600">{t('subtitle')}</p>
       </div>
       <Suspense
         fallback={
@@ -28,5 +26,3 @@ export default function ImageGenerationPage() {
     </div>
   );
 }
-
-

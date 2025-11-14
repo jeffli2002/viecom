@@ -1,10 +1,10 @@
+import { randomUUID } from 'node:crypto';
 import { auth } from '@/lib/auth/auth';
 import { templateGenerator } from '@/lib/workflow/template-generator';
-import { type NextRequest, NextResponse } from 'next/server';
-import { randomUUID } from 'crypto';
 import { db } from '@/server/db';
 import { batchGenerationJob, generatedAsset } from '@/server/db/schema';
 import { eq } from 'drizzle-orm';
+import { type NextRequest, NextResponse } from 'next/server';
 
 export const dynamic = 'force-dynamic';
 
@@ -56,22 +56,24 @@ async function generateAssetWithRetry(
   const { r2StorageService } = await import('@/lib/storage/r2');
   const { creditsConfig } = await import('@/config/credits.config');
   const { creditService } = await import('@/lib/credits/credit-service');
-  
-  const kieApiService = getKieApiService();
+
+  type KieApiService = ReturnType<typeof getKieApiService>;
+  const kieApiService: KieApiService = getKieApiService();
+  type ImageTaskResponse = Awaited<ReturnType<KieApiService['generateImage']>>;
+  type VideoTaskResponse = Awaited<ReturnType<KieApiService['generateVideo']>>;
 
   let lastError: Error | null = null;
 
   for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
     try {
       // Auto-determine mode based on baseImage presence
-      const actualMode: 't2i' | 'i2i' | 't2v' | 'i2v' =
-        params.baseImage && params.baseImage.trim()
-          ? params.type === 'image'
-            ? 'i2i'
-            : 'i2v'
-          : params.type === 'image'
-            ? 't2i'
-            : 't2v';
+      const actualMode: 't2i' | 'i2i' | 't2v' | 'i2v' = params.baseImage?.trim()
+        ? params.type === 'image'
+          ? 'i2i'
+          : 'i2v'
+        : params.type === 'image'
+          ? 't2i'
+          : 't2v';
 
       console.log(
         `[Job ${jobId}] Row ${rowIndex}, Attempt ${attempt}/${MAX_RETRIES}: Generating ${params.type} (mode: ${actualMode})`
@@ -95,16 +97,22 @@ async function generateAssetWithRetry(
 
       const creditCost =
         params.type === 'image'
-          ? creditsConfig.consumption.imageGeneration[model as keyof typeof creditsConfig.consumption.imageGeneration] || 10
-          : creditsConfig.consumption.videoGeneration[model as keyof typeof creditsConfig.consumption.videoGeneration] || 50;
+          ? creditsConfig.consumption.imageGeneration[
+              model as keyof typeof creditsConfig.consumption.imageGeneration
+            ] || 10
+          : creditsConfig.consumption.videoGeneration[
+              model as keyof typeof creditsConfig.consumption.videoGeneration
+            ] || 50;
 
       if (creditAccount.balance < creditCost) {
-        throw new Error(`Insufficient credits. Required: ${creditCost}, Available: ${creditAccount.balance}`);
+        throw new Error(
+          `Insufficient credits. Required: ${creditCost}, Available: ${creditAccount.balance}`
+        );
       }
 
       // Process baseImage if provided (convert base64 to R2 URL if needed)
       let processedImageUrl: string | undefined = undefined;
-      if (params.baseImage && params.baseImage.trim()) {
+      if (params.baseImage?.trim()) {
         const baseImage = params.baseImage.trim();
 
         // Check if it's base64 image
@@ -114,7 +122,12 @@ async function generateAssetWithRetry(
             if (base64Match) {
               const [, imageType, base64Data] = base64Match;
               const imageBuffer = Buffer.from(base64Data, 'base64');
-              const extension = imageType === 'png' ? 'png' : imageType === 'jpeg' || imageType === 'jpg' ? 'jpeg' : 'png';
+              const extension =
+                imageType === 'png'
+                  ? 'png'
+                  : imageType === 'jpeg' || imageType === 'jpg'
+                    ? 'jpeg'
+                    : 'png';
               const contentType = `image/${extension}`;
 
               // Upload to R2
@@ -141,9 +154,9 @@ async function generateAssetWithRetry(
       }
 
       // Generate asset
-      let taskResponse;
+      let taskResponse: ImageTaskResponse | VideoTaskResponse | undefined;
       let assetUrl: string;
-      let assetId = randomUUID();
+      const assetId = randomUUID();
 
       if (params.type === 'image') {
         // Image generation
@@ -164,10 +177,7 @@ async function generateAssetWithRetry(
         });
 
         // Poll for image result
-        const imageResult = await kieApiService.pollTaskStatus(
-          taskResponse.data.taskId,
-          'image'
-        );
+        const imageResult = await kieApiService.pollTaskStatus(taskResponse.data.taskId, 'image');
         if (!imageResult.imageUrl) {
           throw new Error('Image generation failed: No image URL in response');
         }
@@ -202,10 +212,7 @@ async function generateAssetWithRetry(
         });
 
         // Poll for video result
-        const videoResult = await kieApiService.pollTaskStatus(
-          taskResponse.data.taskId,
-          'video'
-        );
+        const videoResult = await kieApiService.pollTaskStatus(taskResponse.data.taskId, 'video');
         if (!videoResult.videoUrl) {
           throw new Error('Video generation failed: No video URL in response');
         }
@@ -233,27 +240,29 @@ async function generateAssetWithRetry(
         referenceId: `batch-${jobId}-${rowIndex}`,
       });
 
-        // Save asset to database
-        await db.insert(generatedAsset).values({
-          id: assetId,
-          userId,
-          batchJobId: jobId,
-          assetType: params.type,
-          generationMode: actualMode, // Use auto-determined mode
-          prompt: params.prompt,
-          enhancedPrompt: params.enhancedPrompt,
-          baseImageUrl: processedImageUrl || params.baseImage, // Save processed image URL
-          r2Key: assetUrl.split('/').pop() || '',
-          publicUrl: assetUrl,
-          status: 'completed',
-          creditsSpent: creditCost,
-          model: model,
-          metadata: {
-            rowIndex,
-            productName: params.productName,
-            productDescription: params.productDescription,
-          } as any,
-        });
+      // Save asset to database
+      const metadata: Record<string, unknown> = {
+        rowIndex,
+        productName: params.productName,
+        productDescription: params.productDescription,
+      };
+
+      await db.insert(generatedAsset).values({
+        id: assetId,
+        userId,
+        batchJobId: jobId,
+        assetType: params.type,
+        generationMode: actualMode, // Use auto-determined mode
+        prompt: params.prompt,
+        enhancedPrompt: params.enhancedPrompt,
+        baseImageUrl: processedImageUrl || params.baseImage, // Save processed image URL
+        r2Key: assetUrl.split('/').pop() || '',
+        publicUrl: assetUrl,
+        status: 'completed',
+        creditsSpent: creditCost,
+        model: model,
+        metadata,
+      });
 
       console.log(`[Job ${jobId}] Row ${rowIndex}: Successfully generated ${params.type}`);
 
@@ -278,7 +287,7 @@ async function generateAssetWithRetry(
       }
 
       // Wait before retry (exponential backoff)
-      await new Promise((resolve) => setTimeout(resolve, Math.pow(2, attempt) * 1000));
+      await new Promise((resolve) => setTimeout(resolve, 2 ** attempt * 1000));
     }
   }
 
@@ -373,7 +382,7 @@ async function processBatchVideoGeneration(
     // 动态导入优先队列处理器
     const { PriorityQueueProcessor } = await import('@/lib/batch/priority-queue-processor');
     const { payment } = await import('@/server/db/schema');
-    
+
     // 获取用户套餐
     let userPlan = 'free';
     try {
@@ -383,16 +392,16 @@ async function processBatchVideoGeneration(
         .where(eq(payment.userId, userId))
         .orderBy(payment.createdAt)
         .limit(1);
-      
+
       if (userPayment.length > 0 && userPayment[0].plan) {
         userPlan = userPayment[0].plan;
       }
     } catch (error) {
       console.warn('Failed to get user plan, using free:', error);
     }
-    
+
     // 转换任务格式
-    const tasks = rows.map(row => ({
+    const tasks = rows.map((row) => ({
       rowIndex: row.rowIndex,
       model: row.model || options.defaultModel || 'sora-2',
       resolution: row.resolution || options.defaultResolution || '720p',
@@ -404,21 +413,20 @@ async function processBatchVideoGeneration(
       productName: row.productName,
       productDescription: row.productDescription,
     }));
-    
+
     console.log(
       `[Job ${jobId}] Starting priority queue processing: ` +
-      `${tasks.length} tasks, plan=${userPlan}`
+        `${tasks.length} tasks, plan=${userPlan}`
     );
-    
+
     // 创建处理器并执行
     const processor = new PriorityQueueProcessor(userId, jobId, userPlan);
     const stats = await processor.processBatch(tasks);
-    
+
     console.log(
       `[Job ${jobId}] Batch processing completed: ` +
-      `${stats.successful}/${stats.total} succeeded, ${stats.failed} failed`
+        `${stats.successful}/${stats.total} succeeded, ${stats.failed} failed`
     );
-    
   } catch (error) {
     console.error(`[Job ${jobId}] Batch video generation error:`, error);
     throw error;
@@ -443,7 +451,7 @@ async function processBatchGeneration(
   if (options.generationType === 'video') {
     return await processBatchVideoGeneration(jobId, userId, rows, options);
   }
-  
+
   // 对于图片，保持原有顺序处理逻辑
   let processedRows = 0;
   let successfulRows = 0;
@@ -500,7 +508,7 @@ async function processBatchGeneration(
               errorMessage: errorMsg,
               metadata: {
                 rowIndex: row.rowIndex,
-              } as any,
+              } satisfies Record<string, unknown>,
             });
           } catch (dbError) {
             console.error('Failed to save failed asset record:', dbError);
@@ -558,4 +566,3 @@ async function processBatchGeneration(
       .where(eq(batchGenerationJob.id, jobId));
   }
 }
-

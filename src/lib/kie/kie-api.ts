@@ -42,9 +42,9 @@ export interface KIEVideoGenerationParams {
   prompt: string;
   imageUrls?: string[]; // For I2V
   aspectRatio?: 'square' | 'portrait' | 'landscape';
-  quality?: 'standard' | 'high';  // standard=720P, high=1080P
-  duration?: 10 | 15;  // 视频时长（秒）
-  model?: 'sora-2' | 'sora-2-pro';  // 模型选择
+  quality?: 'standard' | 'high'; // standard=720P, high=1080P
+  duration?: 10 | 15; // 视频时长（秒）
+  model?: 'sora-2' | 'sora-2-pro'; // 模型选择
 }
 
 export interface KIETaskResponse {
@@ -72,6 +72,27 @@ export interface KIETaskStatus {
     failMsg?: string;
   };
 }
+
+type KIEImageTaskInput = {
+  prompt: string;
+  image_urls?: string[];
+  image_size?: KIEImageGenerationParams['imageSize'];
+  output_format?: KIEImageGenerationParams['outputFormat'];
+};
+
+type KIEImageTaskRequest = {
+  model: string;
+  input: KIEImageTaskInput;
+  callBackUrl?: string;
+};
+
+type KIEVideoTaskInput = {
+  prompt: string;
+  aspect_ratio: 'square' | 'portrait' | 'landscape';
+  quality?: 'standard' | 'high';
+  n_frames?: '10s' | '15s';
+  image_urls?: string[];
+};
 
 export class KIEAPIService {
   private apiKey: string | null = null;
@@ -130,7 +151,7 @@ export class KIEAPIService {
         }
 
         // Otherwise, try next model
-        console.log(`Retrying with next model in priority list...`);
+        console.log('Retrying with next model in priority list...');
       }
     }
 
@@ -146,7 +167,7 @@ export class KIEAPIService {
     params: KIEImageGenerationParams
   ): Promise<KIETaskResponse> {
     // KIE API format according to documentation
-    const input: any = {
+    const input: KIEImageTaskInput = {
       prompt: params.prompt,
     };
 
@@ -167,7 +188,7 @@ export class KIEAPIService {
     }
 
     // Build request body
-    const requestBody: any = {
+    const requestBody: KIEImageTaskRequest = {
       model,
       input,
     };
@@ -200,7 +221,7 @@ export class KIEAPIService {
     let data: KIETaskResponse;
     try {
       data = JSON.parse(responseText) as KIETaskResponse;
-    } catch (error) {
+    } catch (_error) {
       console.error(`KIE API parse error (${model}):`, responseText.substring(0, 500));
       throw new Error(`KIE API parse error (${model}): ${(responseText || '').slice(0, 200)}`);
     }
@@ -233,7 +254,7 @@ export class KIEAPIService {
     // 确定使用的模型
     const useProModel = params.model === 'sora-2-pro' || params.quality === 'high';
     const hasImage = params.imageUrls?.length;
-    
+
     let model: string;
     if (useProModel) {
       // Sora 2 Pro 支持720P和1080P
@@ -242,25 +263,25 @@ export class KIEAPIService {
       // Sora 2 仅支持720P
       model = hasImage ? 'sora-2-image-to-video' : 'sora-2-text-to-video';
     }
-    
+
     // 构建输入参数
-    const input: any = {
+    const input: KIEVideoTaskInput = {
       prompt: params.prompt,
       aspect_ratio: params.aspectRatio || 'landscape',
     };
-    
+
     // Sora 2 Pro 支持 quality 和 n_frames 参数
     if (useProModel) {
       input.quality = params.quality || 'standard';
-      
+
       // 根据 duration 设置 n_frames
       if (params.duration === 10) {
         input.n_frames = '10s';
       } else {
-        input.n_frames = '15s';  // 默认15秒
+        input.n_frames = '15s'; // 默认15秒
       }
     }
-    
+
     // 添加图片URL（如果有）
     if (hasImage) {
       input.image_urls = params.imageUrls;
@@ -332,7 +353,9 @@ export class KIEAPIService {
           ? 'completed'
           : data.data.state === 'fail'
             ? 'failed'
-            : (data.data.state as any);
+            : data.data.state === 'pending'
+              ? 'pending'
+              : 'processing';
     }
 
     return data;

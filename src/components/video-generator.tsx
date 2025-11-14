@@ -15,22 +15,22 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
 import { creditsConfig } from '@/config/credits.config';
+import { VIDEO_STYLES, getVideoStyle } from '@/config/styles.config';
 import { useUpgradePrompt } from '@/hooks/use-upgrade-prompt';
 import type { BrandToneAnalysis } from '@/lib/brand/brand-tone-analyzer';
 import { useAuthStore } from '@/store/auth-store';
-import { VIDEO_STYLES, getVideoStyle } from '@/config/styles.config';
 import {
   AlertCircle,
   Download,
-  Video as VideoIcon,
   Loader2,
   Share2,
   Sparkles,
   Upload,
+  Video as VideoIcon,
   X,
 } from 'lucide-react';
-import { useSearchParams } from 'next/navigation';
 import { useTranslations } from 'next-intl';
+import { useSearchParams } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 
 interface GenerationResult {
@@ -47,7 +47,7 @@ export default function VideoGenerator() {
   const searchParams = useSearchParams();
   const initialMode = (searchParams?.get('mode') as GenerationMode) || 'image-to-video';
 
-  const { user, isAuthenticated } = useAuthStore();
+  const { isAuthenticated } = useAuthStore();
   const { showUpgradePrompt, openUpgradePrompt, closeUpgradePrompt } = useUpgradePrompt();
   const [mode, setMode] = useState<GenerationMode>(initialMode);
   const [prompt, setPrompt] = useState('');
@@ -68,18 +68,17 @@ export default function VideoGenerator() {
   const [brandAnalysis, setBrandAnalysis] = useState<BrandToneAnalysis | null>(null);
 
   const maxPromptLength = 2000;
-  
+
   // Calculate video credit cost dynamically based on model, duration, and quality
   const getVideoCreditCost = () => {
     if (model === 'sora-2') {
       return creditsConfig.consumption.videoGeneration[`sora-2-720p-${duration}s`];
-    } else {
-      // Sora 2 Pro
-      const resolution = quality === 'standard' ? '720p' : '1080p';
-      return creditsConfig.consumption.videoGeneration[`sora-2-pro-${resolution}-${duration}s`];
     }
+
+    const resolution = quality === 'standard' ? '720p' : '1080p';
+    return creditsConfig.consumption.videoGeneration[`sora-2-pro-${resolution}-${duration}s`];
   };
-  
+
   const videoCreditCost = getVideoCreditCost();
   const textDefaultPrompt =
     'A professional product video showcasing a modern smartphone rotating smoothly, highlighting its sleek design and premium features, studio lighting, clean background';
@@ -156,12 +155,12 @@ export default function VideoGenerator() {
     }
   };
 
-  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+  const handleDragOver = (e: React.DragEvent<HTMLElement>) => {
     e.preventDefault();
     e.stopPropagation();
   };
 
-  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
+  const handleDrop = (e: React.DragEvent<HTMLElement>) => {
     e.preventDefault();
     e.stopPropagation();
 
@@ -187,6 +186,10 @@ export default function VideoGenerator() {
     reader.readAsDataURL(file);
   };
 
+  const triggerFileInput = () => {
+    fileInputRef.current?.click();
+  };
+
   const handleEnhancePrompt = async () => {
     if (!prompt.trim()) {
       alert('Please enter a prompt first');
@@ -195,7 +198,7 @@ export default function VideoGenerator() {
 
     setIsEnhancing(true);
     try {
-      const requestBody: any = {
+      const requestBody: Record<string, unknown> = {
         prompt: prompt.trim(),
         context: 'video', // Specify video context for proper system prompt
         aspectRatio: aspectRatio, // Pass user-selected aspect ratio
@@ -232,7 +235,7 @@ export default function VideoGenerator() {
   };
 
   const handleGenerate = async () => {
-    if (!user) {
+    if (!isAuthenticated) {
       openUpgradePrompt();
       return;
     }
@@ -280,7 +283,7 @@ export default function VideoGenerator() {
         finalPrompt = `${finalPrompt}\n\n[Image attached: ${imageFile?.name || 'uploaded image'}]`;
       }
 
-      const requestBody: any = {
+      const requestBody: Record<string, unknown> = {
         prompt: finalPrompt,
         model: model,
         aspect_ratio: aspectRatio,
@@ -380,441 +383,490 @@ export default function VideoGenerator() {
       />
       <div className="mx-auto max-w-7xl space-y-6">
         <div className="grid gap-8 lg:grid-cols-2">
-        <div className="space-y-6">
-          <Card className="p-6">
-            <div className="mb-6 space-y-4">
-              <Tabs value={mode} onValueChange={(value) => setMode(value as GenerationMode)}>
-                <TabsList className="grid w-full grid-cols-2 bg-transparent gap-3 p-0">
-                  <TabsTrigger 
-                    value="text-to-video"
-                    className="font-medium data-[state=active]:bg-purple-600 data-[state=active]:text-white data-[state=inactive]:border-2 data-[state=inactive]:border-gray-300 data-[state=inactive]:rounded-full data-[state=inactive]:bg-white data-[state=inactive]:text-gray-700 rounded-full py-3 transition-all"
-                  >
-                    <Sparkles className="mr-2 h-4 w-4" />
-                    {t('modeTextToVideo')}
-                  </TabsTrigger>
-                  <TabsTrigger 
-                    value="image-to-video"
-                    className="font-medium data-[state=active]:bg-purple-600 data-[state=active]:text-white data-[state=inactive]:border-2 data-[state=inactive]:border-gray-300 data-[state=inactive]:rounded-full data-[state=inactive]:bg-white data-[state=inactive]:text-gray-700 rounded-full py-3 transition-all"
-                  >
-                    <VideoIcon className="mr-2 h-4 w-4" />
-                    {t('modeImageToVideo')}
-                  </TabsTrigger>
-                </TabsList>
+          <div className="space-y-6">
+            <Card className="p-6">
+              <div className="mb-6 space-y-4">
+                <Tabs value={mode} onValueChange={(value) => setMode(value as GenerationMode)}>
+                  <TabsList className="grid w-full grid-cols-2 bg-transparent gap-3 p-0">
+                    <TabsTrigger
+                      value="text-to-video"
+                      className="font-medium data-[state=active]:bg-purple-600 data-[state=active]:text-white data-[state=inactive]:border-2 data-[state=inactive]:border-gray-300 data-[state=inactive]:rounded-full data-[state=inactive]:bg-white data-[state=inactive]:text-gray-700 rounded-full py-3 transition-all"
+                    >
+                      <Sparkles className="mr-2 h-4 w-4" />
+                      {t('modeTextToVideo')}
+                    </TabsTrigger>
+                    <TabsTrigger
+                      value="image-to-video"
+                      className="font-medium data-[state=active]:bg-purple-600 data-[state=active]:text-white data-[state=inactive]:border-2 data-[state=inactive]:border-gray-300 data-[state=inactive]:rounded-full data-[state=inactive]:bg-white data-[state=inactive]:text-gray-700 rounded-full py-3 transition-all"
+                    >
+                      <VideoIcon className="mr-2 h-4 w-4" />
+                      {t('modeImageToVideo')}
+                    </TabsTrigger>
+                  </TabsList>
 
-                <TabsContent value="text-to-video" className="mt-6 space-y-6">
-                  {brandAnalysis && (
-                    <div className="rounded-lg border border-purple-200 bg-purple-50 p-3">
-                      <div className="flex items-center gap-2">
-                        <Sparkles className="h-4 w-4 text-purple-600" />
-                        <span className="text-sm font-medium text-purple-900">
-                          Brand context will be automatically applied to your generation
-                        </span>
-                      </div>
-                      <p className="mt-1 text-xs text-purple-700">
-                        Style: {brandAnalysis.styleKeywords.slice(0, 3).join(', ')}
-                        {brandAnalysis.styleKeywords.length > 3 && '...'}
-                      </p>
-                    </div>
-                  )}
-                  <div className="space-y-2">
-                    <Label className="font-light text-gray-700 text-sm">
-                      {t('videoPrompt')} <span className="text-red-500">*</span>
-                    </Label>
-                    <div className="relative">
-                      <Textarea
-                        placeholder={textDefaultPrompt}
-                        value={prompt}
-                        onChange={(e) => setPrompt(e.target.value.slice(0, maxPromptLength))}
-                        rows={6}
-                        className="resize-none border-gray-200 pr-24 pb-12 font-light focus:border-purple-400 focus:ring-purple-400/20"
-                      />
-                      <Button
-                        onClick={handleEnhancePrompt}
-                        disabled={!prompt.trim() || isEnhancing}
-                        className="absolute right-2 bottom-2 inline-flex items-center gap-2 rounded-lg border-2 border-purple-500 bg-purple-50 px-3 py-1.5 font-medium text-purple-700 text-sm shadow-sm transition-all duration-300 hover:bg-purple-100"
-                      >
-                        {isEnhancing ? (
-                          <Loader2 className="h-4 w-4 animate-spin" />
-                        ) : (
-                          <Sparkles className="h-4 w-4" />
-                        )}
-                        {isEnhancing ? t('enhancing') : t('enhance')}
-                      </Button>
-                    </div>
-                    <div className="text-right font-light text-gray-400 text-xs">
-                      {prompt.length} / {maxPromptLength}
-                    </div>
-                    {enhancedPrompt && (
-                      <div className="mt-4 rounded-xl border border-purple-200 bg-purple-50 p-4 shadow-sm">
-                        <div className="mb-2 flex items-center justify-between">
-                          <h4 className="flex items-center gap-2 font-semibold text-purple-700 text-sm">
-                            <Sparkles className="h-4 w-4" />
-                            {t('enhancedPrompt')}
-                          </h4>
-                          <Button
-                            onClick={() => setEnhancedPrompt('')}
-                            size="sm"
-                            variant="ghost"
-                            className="h-6 w-6 p-0 text-gray-600"
-                          >
-                            <X className="h-4 w-4" />
-                          </Button>
+                  <TabsContent value="text-to-video" className="mt-6 space-y-6">
+                    {brandAnalysis && (
+                      <div className="rounded-lg border border-purple-200 bg-purple-50 p-3">
+                        <div className="flex items-center gap-2">
+                          <Sparkles className="h-4 w-4 text-purple-600" />
+                          <span className="text-sm font-medium text-purple-900">
+                            Brand context will be automatically applied to your generation
+                          </span>
                         </div>
-                        <Textarea
-                          value={enhancedPrompt}
-                          onChange={(e) => setEnhancedPrompt(e.target.value.slice(0, maxPromptLength))}
-                          className="resize-none border border-purple-200 bg-white text-sm"
-                          rows={5}
-                        />
-                        <p className="mt-1 text-right text-purple-600 text-xs">
-                          {enhancedPrompt.length} / {maxPromptLength}
+                        <p className="mt-1 text-xs text-purple-700">
+                          Style: {brandAnalysis.styleKeywords.slice(0, 3).join(', ')}
+                          {brandAnalysis.styleKeywords.length > 3 && '...'}
                         </p>
                       </div>
                     )}
-                  </div>
-                </TabsContent>
-
-                <TabsContent value="image-to-video" className="mt-0 space-y-6">
-                  {/* Warning Notice - No People/Faces */}
-                  <div className="rounded-lg border border-amber-200 bg-amber-50 p-4">
-                    <div className="flex items-start gap-3">
-                      <AlertCircle className="h-5 w-5 text-amber-600 flex-shrink-0 mt-0.5" />
-                      <div>
-                        <h4 className="font-semibold text-amber-900 text-sm mb-1">
-                          {t('importantNotice')}
-                        </h4>
-                        <p className="text-amber-800 text-xs leading-relaxed">
-                          {t('i2vWarning')}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label className="font-light text-gray-700 text-sm">{t('sourceImage')}</Label>
-
-                    {!imagePreview ? (
-                      <div
-                        onClick={() => fileInputRef.current?.click()}
-                        onDragOver={handleDragOver}
-                        onDrop={handleDrop}
-                        className="hover-card cursor-pointer rounded-xl border border-dashed border-gray-300 p-8 text-center transition-colors hover:border-purple-400"
-                      >
-                        <Upload className="mx-auto mb-3 h-12 w-12 text-gray-400" />
-                        <p className="mb-1 font-light text-gray-600 text-sm">
-                          {t('clickToUpload')}
-                        </p>
-                        <p className="font-light text-gray-400 text-xs">
-                          {t('imageFormatDesc')}
-                        </p>
-                      </div>
-                    ) : (
+                    <div className="space-y-2">
+                      <Label className="font-light text-gray-700 text-sm">
+                        {t('videoPrompt')} <span className="text-red-500">*</span>
+                      </Label>
                       <div className="relative">
-                        <img
-                          src={imagePreview}
-                          alt="Preview"
-                          className="w-full rounded-xl border border-gray-200"
+                        <Textarea
+                          placeholder={textDefaultPrompt}
+                          value={prompt}
+                          onChange={(e) => setPrompt(e.target.value.slice(0, maxPromptLength))}
+                          rows={6}
+                          className="resize-none border-gray-200 pr-24 pb-12 font-light focus:border-purple-400 focus:ring-purple-400/20"
                         />
-                        <button
-                          onClick={handleRemoveImage}
-                          className="absolute top-2 right-2 rounded-full bg-red-500 p-2 text-white transition-colors hover:bg-red-600"
+                        <Button
+                          onClick={handleEnhancePrompt}
+                          disabled={!prompt.trim() || isEnhancing}
+                          className="absolute right-2 bottom-2 inline-flex items-center gap-2 rounded-lg border-2 border-purple-500 bg-purple-50 px-3 py-1.5 font-medium text-purple-700 text-sm shadow-sm transition-all duration-300 hover:bg-purple-100"
                         >
-                          <X className="h-4 w-4" />
-                        </button>
+                          {isEnhancing ? (
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                          ) : (
+                            <Sparkles className="h-4 w-4" />
+                          )}
+                          {isEnhancing ? t('enhancing') : t('enhance')}
+                        </Button>
                       </div>
-                    )}
+                      <div className="text-right font-light text-gray-400 text-xs">
+                        {prompt.length} / {maxPromptLength}
+                      </div>
+                      {enhancedPrompt && (
+                        <div className="mt-4 rounded-xl border border-purple-200 bg-purple-50 p-4 shadow-sm">
+                          <div className="mb-2 flex items-center justify-between">
+                            <h4 className="flex items-center gap-2 font-semibold text-purple-700 text-sm">
+                              <Sparkles className="h-4 w-4" />
+                              {t('enhancedPrompt')}
+                            </h4>
+                            <Button
+                              onClick={() => setEnhancedPrompt('')}
+                              size="sm"
+                              variant="ghost"
+                              className="h-6 w-6 p-0 text-gray-600"
+                            >
+                              <X className="h-4 w-4" />
+                            </Button>
+                          </div>
+                          <Textarea
+                            value={enhancedPrompt}
+                            onChange={(e) =>
+                              setEnhancedPrompt(e.target.value.slice(0, maxPromptLength))
+                            }
+                            className="resize-none border border-purple-200 bg-white text-sm"
+                            rows={5}
+                          />
+                          <p className="mt-1 text-right text-purple-600 text-xs">
+                            {enhancedPrompt.length} / {maxPromptLength}
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  </TabsContent>
 
-                    <input
-                      ref={fileInputRef}
-                      type="file"
-                      accept="image/jpeg,image/png,image/webp,image/jpg"
-                      onChange={handleImageSelect}
-                      className="hidden"
-                    />
+                  <TabsContent value="image-to-video" className="mt-0 space-y-6">
+                    {/* Warning Notice - No People/Faces */}
+                    <div className="rounded-lg border border-amber-200 bg-amber-50 p-4">
+                      <div className="flex items-start gap-3">
+                        <AlertCircle className="h-5 w-5 text-amber-600 flex-shrink-0 mt-0.5" />
+                        <div>
+                          <h4 className="font-semibold text-amber-900 text-sm mb-1">
+                            {t('importantNotice')}
+                          </h4>
+                          <p className="text-amber-800 text-xs leading-relaxed">
+                            {t('i2vWarning')}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label className="font-light text-gray-700 text-sm">{t('sourceImage')}</Label>
+
+                      {!imagePreview ? (
+                        <button
+                          type="button"
+                          onClick={triggerFileInput}
+                          onDragOver={handleDragOver}
+                          onDrop={handleDrop}
+                          className="w-full hover-card cursor-pointer rounded-xl border border-dashed border-gray-300 p-8 text-center transition-colors hover:border-purple-400"
+                          aria-label={t('clickToUpload')}
+                        >
+                          <Upload className="mx-auto mb-3 h-12 w-12 text-gray-400" />
+                          <p className="mb-1 font-light text-gray-600 text-sm">
+                            {t('clickToUpload')}
+                          </p>
+                          <p className="font-light text-gray-400 text-xs">{t('imageFormatDesc')}</p>
+                        </button>
+                      ) : (
+                        <div className="relative">
+                          <img
+                            src={imagePreview}
+                            alt="Preview"
+                            className="w-full rounded-xl border border-gray-200"
+                          />
+                          <button
+                            type="button"
+                            onClick={handleRemoveImage}
+                            className="absolute top-2 right-2 rounded-full bg-red-500 p-2 text-white transition-colors hover:bg-red-600"
+                          >
+                            <X className="h-4 w-4" />
+                          </button>
+                        </div>
+                      )}
+
+                      <input
+                        ref={fileInputRef}
+                        type="file"
+                        accept="image/jpeg,image/png,image/webp,image/jpg"
+                        onChange={handleImageSelect}
+                        className="hidden"
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label className="font-light text-gray-700 text-sm">
+                        {t('videoPrompt')} <span className="text-red-500">*</span>
+                      </Label>
+                      <div className="relative">
+                        <Textarea
+                          placeholder={imageDefaultPrompt}
+                          value={prompt}
+                          onChange={(e) => setPrompt(e.target.value.slice(0, maxPromptLength))}
+                          rows={4}
+                          className="resize-none border-gray-200 pr-24 pb-12 font-light focus:border-purple-400 focus:ring-purple-400/20"
+                        />
+                        <Button
+                          onClick={handleEnhancePrompt}
+                          disabled={!prompt.trim() || isEnhancing}
+                          className="absolute right-2 bottom-2 inline-flex items-center gap-2 rounded-lg border-2 border-purple-500 bg-purple-50 px-3 py-1.5 font-medium text-purple-700 text-sm shadow-sm transition-all duration-300 hover:bg-purple-100"
+                        >
+                          {isEnhancing ? (
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                          ) : (
+                            <Sparkles className="h-4 w-4" />
+                          )}
+                          {isEnhancing ? t('enhancing') : t('enhance')}
+                        </Button>
+                      </div>
+                      <div className="text-right font-light text-gray-400 text-xs">
+                        {prompt.length} / {maxPromptLength}
+                      </div>
+                      {enhancedPrompt && (
+                        <div className="mt-4 rounded-xl border border-purple-200 bg-purple-50 p-4 shadow-sm">
+                          <div className="mb-2 flex items-center justify-between">
+                            <h4 className="flex items-center gap-2 font-semibold text-purple-700 text-sm">
+                              <Sparkles className="h-4 w-4" />
+                              {t('enhancedPrompt')}
+                            </h4>
+                            <Button
+                              onClick={() => setEnhancedPrompt('')}
+                              size="sm"
+                              variant="ghost"
+                              className="h-6 w-6 p-0 text-gray-600"
+                            >
+                              <X className="h-4 w-4" />
+                            </Button>
+                          </div>
+                          <Textarea
+                            value={enhancedPrompt}
+                            onChange={(e) =>
+                              setEnhancedPrompt(e.target.value.slice(0, maxPromptLength))
+                            }
+                            className="resize-none border border-purple-200 bg-white text-sm"
+                            rows={5}
+                          />
+                          <p className="mt-1 text-right text-purple-600 text-xs">
+                            {enhancedPrompt.length} / {maxPromptLength}
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  </TabsContent>
+                </Tabs>
+
+                {/* Video Style Selection */}
+                <div className="space-y-2">
+                  <Label className="font-light text-gray-700 text-sm">{t('videoStyle')}</Label>
+                  <Select value={videoStyle} onValueChange={setVideoStyle}>
+                    <SelectTrigger className="border-gray-200 font-light">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {VIDEO_STYLES.map((style) => (
+                        <SelectItem key={style.id} value={style.id} title={style.description}>
+                          {t(`videoStyles.${style.id}`)}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label className="font-light text-gray-700 text-sm">{t('model')}</Label>
+                    <Select
+                      value={model}
+                      onValueChange={(value) => {
+                        setModel(value as 'sora-2' | 'sora-2-pro');
+                        // Reset quality to standard when switching models
+                        if (value === 'sora-2') {
+                          setQuality('standard');
+                        }
+                      }}
+                    >
+                      <SelectTrigger className="border-gray-200 font-light">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="sora-2">Sora 2 - {videoCreditCost} credits</SelectItem>
+                        <SelectItem value="sora-2-pro">
+                          Sora 2 Pro - {videoCreditCost} credits
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
 
                   <div className="space-y-2">
-                    <Label className="font-light text-gray-700 text-sm">
-                      {t('videoPrompt')} <span className="text-red-500">*</span>
-                    </Label>
-                    <div className="relative">
-                      <Textarea
-                        placeholder={imageDefaultPrompt}
-                        value={prompt}
-                        onChange={(e) => setPrompt(e.target.value.slice(0, maxPromptLength))}
-                        rows={4}
-                        className="resize-none border-gray-200 pr-24 pb-12 font-light focus:border-purple-400 focus:ring-purple-400/20"
-                      />
-                      <Button
-                        onClick={handleEnhancePrompt}
-                        disabled={!prompt.trim() || isEnhancing}
-                        className="absolute right-2 bottom-2 inline-flex items-center gap-2 rounded-lg border-2 border-purple-500 bg-purple-50 px-3 py-1.5 font-medium text-purple-700 text-sm shadow-sm transition-all duration-300 hover:bg-purple-100"
-                      >
-                        {isEnhancing ? (
-                          <Loader2 className="h-4 w-4 animate-spin" />
-                        ) : (
-                          <Sparkles className="h-4 w-4" />
-                        )}
-                        {isEnhancing ? t('enhancing') : t('enhance')}
-                      </Button>
-                    </div>
-                    <div className="text-right font-light text-gray-400 text-xs">
-                      {prompt.length} / {maxPromptLength}
-                    </div>
-                    {enhancedPrompt && (
-                      <div className="mt-4 rounded-xl border border-purple-200 bg-purple-50 p-4 shadow-sm">
-                        <div className="mb-2 flex items-center justify-between">
-                          <h4 className="flex items-center gap-2 font-semibold text-purple-700 text-sm">
-                            <Sparkles className="h-4 w-4" />
-                            {t('enhancedPrompt')}
-                          </h4>
-                          <Button
-                            onClick={() => setEnhancedPrompt('')}
-                            size="sm"
-                            variant="ghost"
-                            className="h-6 w-6 p-0 text-gray-600"
-                          >
-                            <X className="h-4 w-4" />
-                          </Button>
-                        </div>
-                        <Textarea
-                          value={enhancedPrompt}
-                          onChange={(e) => setEnhancedPrompt(e.target.value.slice(0, maxPromptLength))}
-                          className="resize-none border border-purple-200 bg-white text-sm"
-                          rows={5}
-                        />
-                        <p className="mt-1 text-right text-purple-600 text-xs">
-                          {enhancedPrompt.length} / {maxPromptLength}
-                        </p>
-                      </div>
-                    )}
+                    <Label className="font-light text-gray-700 text-sm">{t('aspectRatio')}</Label>
+                    <Select value={aspectRatio} onValueChange={setAspectRatio}>
+                      <SelectTrigger className="border-gray-200 font-light">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="16:9">Landscape (16:9)</SelectItem>
+                        <SelectItem value="9:16">Portrait (9:16)</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
-                </TabsContent>
-              </Tabs>
-
-              {/* Video Style Selection */}
-              <div className="space-y-2">
-                <Label className="font-light text-gray-700 text-sm">{t('videoStyle')}</Label>
-                <Select value={videoStyle} onValueChange={setVideoStyle}>
-                  <SelectTrigger className="border-gray-200 font-light">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {VIDEO_STYLES.map((style) => (
-                      <SelectItem key={style.id} value={style.id} title={style.description}>
-                        {t(`videoStyles.${style.id}`)}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label className="font-light text-gray-700 text-sm">{t('model')}</Label>
-                  <Select 
-                    value={model} 
-                    onValueChange={(value) => {
-                      setModel(value as 'sora-2' | 'sora-2-pro');
-                      // Reset quality to standard when switching models
-                      if (value === 'sora-2') {
-                        setQuality('standard');
-                      }
-                    }}
-                  >
-                    <SelectTrigger className="border-gray-200 font-light">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="sora-2">
-                        Sora 2 - {videoCreditCost} credits
-                      </SelectItem>
-                      <SelectItem value="sora-2-pro">
-                        Sora 2 Pro - {videoCreditCost} credits
-                      </SelectItem>
-                    </SelectContent>
-                  </Select>
                 </div>
 
-                <div className="space-y-2">
-                  <Label className="font-light text-gray-700 text-sm">{t('aspectRatio')}</Label>
-                  <Select value={aspectRatio} onValueChange={setAspectRatio}>
-                    <SelectTrigger className="border-gray-200 font-light">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="16:9">Landscape (16:9)</SelectItem>
-                      <SelectItem value="9:16">Portrait (9:16)</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
+                {/* Quality Selector - Only show for Sora 2 Pro */}
+                {model === 'sora-2-pro' && (
+                  <div className="space-y-2">
+                    <Label className="font-light text-gray-700 text-sm">{t('quality')}</Label>
+                    <div className="grid grid-cols-2 gap-3">
+                      <button
+                        type="button"
+                        onClick={() => setQuality('standard')}
+                        className={`flex items-center justify-center rounded-lg border-2 py-3 px-4 text-sm font-medium transition-all ${
+                          quality === 'standard'
+                            ? 'border-purple-500 bg-purple-50 text-purple-700'
+                            : 'border-gray-200 bg-white text-gray-700 hover:border-purple-300'
+                        }`}
+                      >
+                        <span>Standard (720P)</span>
+                        {quality === 'standard' && (
+                          <svg
+                            className="ml-2 h-4 w-4"
+                            fill="currentColor"
+                            viewBox="0 0 20 20"
+                            role="img"
+                            aria-label="Selected quality"
+                          >
+                            <title>Selected quality</title>
+                            <path
+                              fillRule="evenodd"
+                              d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                              clipRule="evenodd"
+                            />
+                          </svg>
+                        )}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setQuality('high')}
+                        className={`flex items-center justify-center rounded-lg border-2 py-3 px-4 text-sm font-medium transition-all ${
+                          quality === 'high'
+                            ? 'border-purple-500 bg-purple-50 text-purple-700'
+                            : 'border-gray-200 bg-white text-gray-700 hover:border-purple-300'
+                        }`}
+                      >
+                        <span>High (1080P)</span>
+                        {quality === 'high' && (
+                          <svg
+                            className="ml-2 h-4 w-4"
+                            fill="currentColor"
+                            viewBox="0 0 20 20"
+                            role="img"
+                            aria-label="Selected quality"
+                          >
+                            <title>Selected quality</title>
+                            <path
+                              fillRule="evenodd"
+                              d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                              clipRule="evenodd"
+                            />
+                          </svg>
+                        )}
+                      </button>
+                    </div>
+                  </div>
+                )}
 
-              {/* Quality Selector - Only show for Sora 2 Pro */}
-              {model === 'sora-2-pro' && (
                 <div className="space-y-2">
-                  <Label className="font-light text-gray-700 text-sm">{t('quality')}</Label>
+                  <Label className="font-light text-gray-700 text-sm">{t('videoDuration')}</Label>
                   <div className="grid grid-cols-2 gap-3">
                     <button
                       type="button"
-                      onClick={() => setQuality('standard')}
+                      onClick={() => setDuration(10)}
                       className={`flex items-center justify-center rounded-lg border-2 py-3 px-4 text-sm font-medium transition-all ${
-                        quality === 'standard'
+                        duration === 10
                           ? 'border-purple-500 bg-purple-50 text-purple-700'
                           : 'border-gray-200 bg-white text-gray-700 hover:border-purple-300'
                       }`}
                     >
-                      <span>Standard (720P)</span>
-                      {quality === 'standard' && (
-                        <svg className="ml-2 h-4 w-4" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                      <span>10 seconds</span>
+                      {duration === 10 && (
+                        <svg
+                          className="ml-2 h-4 w-4"
+                          fill="currentColor"
+                          viewBox="0 0 20 20"
+                          role="img"
+                          aria-label="Selected duration"
+                        >
+                          <title>Selected duration</title>
+                          <path
+                            fillRule="evenodd"
+                            d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                            clipRule="evenodd"
+                          />
                         </svg>
                       )}
                     </button>
                     <button
                       type="button"
-                      onClick={() => setQuality('high')}
+                      onClick={() => setDuration(15)}
                       className={`flex items-center justify-center rounded-lg border-2 py-3 px-4 text-sm font-medium transition-all ${
-                        quality === 'high'
+                        duration === 15
                           ? 'border-purple-500 bg-purple-50 text-purple-700'
                           : 'border-gray-200 bg-white text-gray-700 hover:border-purple-300'
                       }`}
                     >
-                      <span>High (1080P)</span>
-                      {quality === 'high' && (
-                        <svg className="ml-2 h-4 w-4" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                      <span>15 seconds</span>
+                      {duration === 15 && (
+                        <svg
+                          className="ml-2 h-4 w-4"
+                          fill="currentColor"
+                          viewBox="0 0 20 20"
+                          role="img"
+                          aria-label="Selected duration"
+                        >
+                          <title>Selected duration</title>
+                          <path
+                            fillRule="evenodd"
+                            d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                            clipRule="evenodd"
+                          />
                         </svg>
                       )}
                     </button>
+                  </div>
+                </div>
+
+                <Button
+                  onClick={handleGenerate}
+                  disabled={isGenerating || !canGenerate}
+                  className="w-full transform border-0 bg-gradient-to-r from-purple-600 via-pink-600 to-purple-600 font-bold text-lg text-white shadow-2xl shadow-purple-500/50 transition-all duration-300 hover:scale-105 hover:from-purple-700 hover:via-pink-700 hover:to-purple-700"
+                  size="lg"
+                >
+                  {isGenerating ? (
+                    <>
+                      <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                      {t('generating')}
+                    </>
+                  ) : (
+                    <>
+                      <VideoIcon className="mr-2 h-5 w-5" />
+                      {t('generateVideo')}
+                    </>
+                  )}
+                </Button>
+              </div>
+            </Card>
+          </div>
+
+          <div className="lg:sticky lg:top-24 lg:h-fit">
+            <Card className="p-6">
+              {!result && !isGenerating && (
+                <div className="flex aspect-video items-center justify-center rounded-xl bg-gray-100">
+                  <div className="space-y-3 text-center">
+                    <VideoIcon className="mx-auto h-16 w-16 text-gray-400" />
+                    <p className="font-light text-gray-500 text-sm">{t('videoWillAppearHere')}</p>
                   </div>
                 </div>
               )}
 
-              <div className="space-y-2">
-                <Label className="font-light text-gray-700 text-sm">{t('videoDuration')}</Label>
-                <div className="grid grid-cols-2 gap-3">
-                  <button
-                    type="button"
-                    onClick={() => setDuration(10)}
-                    className={`flex items-center justify-center rounded-lg border-2 py-3 px-4 text-sm font-medium transition-all ${
-                      duration === 10
-                        ? 'border-purple-500 bg-purple-50 text-purple-700'
-                        : 'border-gray-200 bg-white text-gray-700 hover:border-purple-300'
-                    }`}
-                  >
-                    <span>10 seconds</span>
-                    {duration === 10 && (
-                      <svg className="ml-2 h-4 w-4" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                      </svg>
-                    )}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setDuration(15)}
-                    className={`flex items-center justify-center rounded-lg border-2 py-3 px-4 text-sm font-medium transition-all ${
-                      duration === 15
-                        ? 'border-purple-500 bg-purple-50 text-purple-700'
-                        : 'border-gray-200 bg-white text-gray-700 hover:border-purple-300'
-                    }`}
-                  >
-                    <span>15 seconds</span>
-                    {duration === 15 && (
-                      <svg className="ml-2 h-4 w-4" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                      </svg>
-                    )}
-                  </button>
+              {isGenerating && (
+                <div className="flex aspect-video flex-col items-center justify-center rounded-xl bg-gray-100">
+                  <Loader2 className="mb-4 h-12 w-12 animate-spin text-purple-600" />
+                  <p className="font-medium text-gray-700">{t('generatingVideo')}</p>
+                  <p className="mt-2 font-light text-gray-500 text-sm">
+                    {t('generatingTakeMinutes')}
+                  </p>
                 </div>
-              </div>
+              )}
 
-              <Button
-                onClick={handleGenerate}
-                disabled={isGenerating || !canGenerate}
-                className="w-full transform border-0 bg-gradient-to-r from-purple-600 via-pink-600 to-purple-600 font-bold text-lg text-white shadow-2xl shadow-purple-500/50 transition-all duration-300 hover:scale-105 hover:from-purple-700 hover:via-pink-700 hover:to-purple-700"
-                size="lg"
-              >
-                {isGenerating ? (
-                  <>
-                    <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                    {t('generating')}
-                  </>
-                ) : (
-                  <>
-                    <VideoIcon className="mr-2 h-5 w-5" />
-                    {t('generateVideo')}
-                  </>
-                )}
-              </Button>
-            </div>
-          </Card>
+              {result?.error && (
+                <div className="rounded-xl border border-red-200 bg-red-50 p-6">
+                  <div className="mb-2 flex items-center gap-2 text-red-700">
+                    <AlertCircle className="h-5 w-5" />
+                    <h3 className="font-semibold">{t('generationFailed')}</h3>
+                  </div>
+                  <p className="text-red-600 text-sm">{result.error}</p>
+                </div>
+              )}
+
+              {result && !result.error && result.videoUrl && (
+                <div className="space-y-4">
+                  <video
+                    src={result.videoUrl}
+                    controls
+                    className="w-full rounded-xl"
+                    poster={imagePreview || undefined}
+                  >
+                    <track kind="captions" src="data:text/vtt,WEBVTT" label="captions" />
+                    {t('browserNotSupport')}
+                  </video>
+                  <div className="grid grid-cols-2 gap-3">
+                    <Button
+                      onClick={() => handleDownload(result.videoUrl)}
+                      variant="outline"
+                      className="border-gray-200 font-light"
+                    >
+                      <Download className="mr-2 h-4 w-4" />
+                      {t('download')}
+                    </Button>
+                    <Button
+                      onClick={handleShare}
+                      variant="outline"
+                      className="border-gray-200 font-light"
+                    >
+                      <Share2 className="mr-2 h-4 w-4" />
+                      {t('share')}
+                    </Button>
+                  </div>
+                </div>
+              )}
+            </Card>
+          </div>
         </div>
-
-        <div className="lg:sticky lg:top-24 lg:h-fit">
-          <Card className="p-6">
-            {!result && !isGenerating && (
-              <div className="flex aspect-video items-center justify-center rounded-xl bg-gray-100">
-                <div className="space-y-3 text-center">
-                  <VideoIcon className="mx-auto h-16 w-16 text-gray-400" />
-                  <p className="font-light text-gray-500 text-sm">{t('videoWillAppearHere')}</p>
-                </div>
-              </div>
-            )}
-
-            {isGenerating && (
-              <div className="flex aspect-video flex-col items-center justify-center rounded-xl bg-gray-100">
-                <Loader2 className="mb-4 h-12 w-12 animate-spin text-purple-600" />
-                <p className="font-medium text-gray-700">{t('generatingVideo')}</p>
-                <p className="mt-2 font-light text-gray-500 text-sm">{t('generatingTakeMinutes')}</p>
-              </div>
-            )}
-
-            {result && result.error && (
-              <div className="rounded-xl border border-red-200 bg-red-50 p-6">
-                <div className="mb-2 flex items-center gap-2 text-red-700">
-                  <AlertCircle className="h-5 w-5" />
-                  <h3 className="font-semibold">{t('generationFailed')}</h3>
-                </div>
-                <p className="text-red-600 text-sm">{result.error}</p>
-              </div>
-            )}
-
-            {result && !result.error && result.videoUrl && (
-              <div className="space-y-4">
-                <video
-                  src={result.videoUrl}
-                  controls
-                  className="w-full rounded-xl"
-                  poster={imagePreview || undefined}
-                >
-                  {t('browserNotSupport')}
-                </video>
-                <div className="grid grid-cols-2 gap-3">
-                  <Button
-                    onClick={() => handleDownload(result.videoUrl)}
-                    variant="outline"
-                    className="border-gray-200 font-light"
-                  >
-                    <Download className="mr-2 h-4 w-4" />
-                    {t('download')}
-                  </Button>
-                  <Button
-                    onClick={handleShare}
-                    variant="outline"
-                    className="border-gray-200 font-light"
-                  >
-                    <Share2 className="mr-2 h-4 w-4" />
-                    {t('share')}
-                  </Button>
-                </div>
-              </div>
-            )}
-          </Card>
-        </div>
-      </div>
       </div>
     </>
   );
 }
-

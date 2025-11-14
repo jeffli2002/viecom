@@ -1,6 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Mail, MessageSquare, Globe, Clock } from 'lucide-react';
 import { creditsConfig } from '@/config/credits.config';
+import { Clock, Globe, Mail, MessageSquare } from 'lucide-react';
 
 export default function ContactPage() {
   const dailyCheckinCredits = creditsConfig.rewards.checkin.dailyCredits;
@@ -103,8 +103,8 @@ export default function ContactPage() {
             </h3>
             <p className="text-gray-700 text-sm">
               You can upgrade to a higher plan for more monthly credits, or you can earn credits
-              through daily check-ins, referrals, and social sharing. Free users receive {dailyCheckinCredits} credits
-              per day through daily check-in.
+              through daily check-ins, referrals, and social sharing. Free users receive{' '}
+              {dailyCheckinCredits} credits per day through daily check-in.
             </p>
           </div>
 
@@ -125,8 +125,8 @@ export default function ContactPage() {
             </h3>
             <p className="text-gray-700 text-sm">
               Our content is optimized for all major platforms including Amazon, Shopee, TikTok
-              Shop, Shopify, Taobao, Douyin, and Tmall. We provide platform-specific formatting
-              and optimization.
+              Shop, Shopify, Taobao, Douyin, and Tmall. We provide platform-specific formatting and
+              optimization.
             </p>
           </div>
 
@@ -139,13 +139,11 @@ export default function ContactPage() {
           </div>
 
           <div>
-            <h3 className="font-semibold text-gray-900 mb-2">
-              Do you offer refunds?
-            </h3>
+            <h3 className="font-semibold text-gray-900 mb-2">Do you offer refunds?</h3>
             <p className="text-gray-700 text-sm">
-              We offer a 7-day satisfaction guarantee for new subscriptions. If you're not
-              satisfied within the first 7 days, contact us for a full refund. After 7 days, all
-              fees are non-refundable.
+              We offer a 7-day satisfaction guarantee for new subscriptions. If you're not satisfied
+              within the first 7 days, contact us for a full refund. After 7 days, all fees are
+              non-refundable.
             </p>
           </div>
         </CardContent>
@@ -208,4 +206,3 @@ export default function ContactPage() {
     </div>
   );
 }
-

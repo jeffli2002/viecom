@@ -14,8 +14,8 @@ import {
 import { Download, FileSpreadsheet, FileText, Loader2, Upload } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useEffect, useState } from 'react';
-import { BatchResults } from './batch-results';
 import { BatchGenerationFlow } from './batch-generation-flow';
+import { BatchResults } from './batch-results';
 
 export function BatchImageUpload() {
   return <BatchGenerationFlow generationType="image" />;
@@ -23,7 +23,7 @@ export function BatchImageUpload() {
 
 // Legacy component - keeping for backward compatibility
 export function BatchImageUploadLegacy() {
-  const t = useTranslations('batchGeneration');
+  const _t = useTranslations('batchGeneration');
   const [file, setFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
@@ -164,7 +164,10 @@ export function BatchImageUploadLegacy() {
           <div className="grid grid-cols-2 gap-4">
             <div>
               <Label className="text-sm font-medium mb-2 block">生成模式</Label>
-              <Select value={generationMode} onValueChange={(value) => setGenerationMode(value as 't2i' | 'i2i')}>
+              <Select
+                value={generationMode}
+                onValueChange={(value) => setGenerationMode(value as 't2i' | 'i2i')}
+              >
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
@@ -229,7 +232,8 @@ export function BatchImageUploadLegacy() {
             </Button>
           </div>
           <p className="text-xs text-gray-500 mt-2">
-            模板包含字段：prompt（必需）, baseImageUrl（可选，用于图生图）, model（可选）, productSellingPoints（可选）
+            模板包含字段：prompt（必需）, baseImageUrl（可选，用于图生图）, model（可选）,
+            productSellingPoints（可选）
           </p>
         </div>
 
@@ -292,4 +296,3 @@ export function BatchImageUploadLegacy() {
     </Card>
   );
 }
-

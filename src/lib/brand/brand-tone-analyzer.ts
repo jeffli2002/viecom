@@ -1,6 +1,25 @@
 import { env } from '@/env';
 import Firecrawl from '@mendable/firecrawl-js';
 
+type FirecrawlScrapeOptions = {
+  formats: string[];
+  onlyMainContent?: boolean;
+};
+
+type FirecrawlScrapeResult = {
+  markdown?: string;
+  data?: {
+    markdown?: string;
+    metadata?: Record<string, string | undefined>;
+  };
+  metadata?: Record<string, string | undefined>;
+};
+
+type FirecrawlClient = {
+  scrapeUrl?: (url: string, options: FirecrawlScrapeOptions) => Promise<FirecrawlScrapeResult>;
+  scrape?: (url: string, options: FirecrawlScrapeOptions) => Promise<FirecrawlScrapeResult>;
+};
+
 export interface BrandToneAnalysis {
   brandName?: string;
   brandTone: string[];
@@ -27,7 +46,7 @@ export interface BrandToneAnalysis {
  */
 export async function analyzeBrandTone(
   websiteUrl: string,
-  locale: string = 'en'
+  locale = 'en'
 ): Promise<BrandToneAnalysis> {
   const isZh = locale === 'zh';
   const deepseekKey = env.DEEPSEEK_API_KEY;
@@ -148,7 +167,7 @@ All text must be in English.`,
       const jsonMatch = content.match(/```(?:json)?\s*(\{[\s\S]*\})\s*```/);
       const jsonString = jsonMatch ? jsonMatch[1] : content;
       analysis = JSON.parse(jsonString);
-    } catch (parseError) {
+    } catch (_parseError) {
       // Fallback: try to extract structured data from text
       console.warn('Failed to parse JSON, using fallback parsing');
       analysis = parseBrandAnalysisFromText(content);
@@ -168,7 +187,9 @@ All text must be in English.`,
       audienceDemographics: {
         ageRange: demographics.ageRange || '',
         incomeLevel: demographics.incomeLevel || '',
-        keySegments: Array.isArray(demographics.keySegments) ? demographics.keySegments.filter(Boolean) : [],
+        keySegments: Array.isArray(demographics.keySegments)
+          ? demographics.keySegments.filter(Boolean)
+          : [],
         geographicFocus: demographics.geographicFocus,
       },
       creativeGuidance: {
@@ -197,7 +218,7 @@ All text must be in English.`,
 
     if (needsAudienceEnhancement || needsCreativeEnhancement) {
       const searchContext = await fetchBrandSearchContext(
-        sanitizedAnalysis.brandName || new URL(websiteUrl).hostname.replace('www.', ''),
+        sanitizedAnalysis.brandName || new URL(websiteUrl).hostname.replace('www.', '')
       );
 
       const enhancement = await enhanceAnalysisWithDeepseek({
@@ -220,7 +241,7 @@ All text must be in English.`,
           keySegments: normalizeStringArray(
             (updated.keySegments && updated.keySegments.length > 0
               ? updated.keySegments
-              : current.keySegments) ?? [],
+              : current.keySegments) ?? []
           ),
           geographicFocus: updated.geographicFocus || current.geographicFocus,
         };
@@ -233,17 +254,17 @@ All text must be in English.`,
           imageStyles: normalizeStringArray(
             (updated.imageStyles && updated.imageStyles.length > 0
               ? updated.imageStyles
-              : current.imageStyles) ?? [],
+              : current.imageStyles) ?? []
           ),
           videoStyles: normalizeStringArray(
             (updated.videoStyles && updated.videoStyles.length > 0
               ? updated.videoStyles
-              : current.videoStyles) ?? [],
+              : current.videoStyles) ?? []
           ),
           messagingAngles: normalizeStringArray(
             (updated.messagingAngles && updated.messagingAngles.length > 0
               ? updated.messagingAngles
-              : current.messagingAngles) ?? [],
+              : current.messagingAngles) ?? []
           ),
         };
       }
@@ -261,8 +282,8 @@ function normalizeStringArray(values: string[]): string[] {
     new Set(
       values
         .map((value) => (typeof value === 'string' ? value.trim() : ''))
-        .filter((value) => value.length > 0),
-    ),
+        .filter((value) => value.length > 0)
+    )
   );
 }
 
@@ -280,7 +301,7 @@ async function fetchBrandSearchContext(query: string): Promise<string> {
           'User-Agent':
             'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/117.0 Safari/537.36',
         },
-      },
+      }
     );
 
     if (!response.ok) {
@@ -307,7 +328,7 @@ interface DeepseekEnhancementInput {
 }
 
 async function enhanceAnalysisWithDeepseek(
-  input: DeepseekEnhancementInput,
+  input: DeepseekEnhancementInput
 ): Promise<Partial<BrandToneAnalysis> | null> {
   const {
     deepseekKey,
@@ -429,14 +450,8 @@ async function fetchWebsiteContentWithFirecrawl(
   // If Firecrawl API key is available, use it for better scraping
   if (firecrawlKey) {
     try {
-      const firecrawl = new Firecrawl({ apiKey: firecrawlKey });
-
-      const scrapeMethod =
-        typeof (firecrawl as any).scrapeUrl === 'function'
-          ? (firecrawl as any).scrapeUrl.bind(firecrawl)
-          : typeof (firecrawl as any).scrape === 'function'
-            ? (firecrawl as any).scrape.bind(firecrawl)
-            : null;
+      const firecrawl = new Firecrawl({ apiKey: firecrawlKey }) as FirecrawlClient;
+      const scrapeMethod = firecrawl.scrapeUrl ?? firecrawl.scrape ?? null;
 
       const scrapeResult = scrapeMethod
         ? await scrapeMethod(url, {
@@ -445,19 +460,13 @@ async function fetchWebsiteContentWithFirecrawl(
           })
         : null;
 
-      // Handle the response - check for both success flag and data structure
-      if (scrapeResult && ((scrapeResult as any).markdown || (scrapeResult as any).data?.markdown)) {
-        // Get markdown content (could be in scrapeResult.markdown or scrapeResult.data.markdown)
-        const markdown =
-          (scrapeResult as any).markdown || (scrapeResult as any).data?.markdown || '';
-        
-        // Get metadata (could be in scrapeResult.metadata or scrapeResult.data?.metadata)
-        const metadata =
-          (scrapeResult as any).metadata || (scrapeResult as any).data?.metadata || {};
-        
+      if (scrapeResult?.markdown || scrapeResult?.data?.markdown) {
+        const markdown = scrapeResult.markdown ?? scrapeResult.data?.markdown ?? '';
+        const metadata = scrapeResult.metadata ?? scrapeResult.data?.metadata ?? {};
+
         // Combine markdown content with metadata for better context
         let content = markdown;
-        
+
         // Add metadata if available
         const metadataText = [
           metadata.title ? `Title: ${metadata.title}` : '',
@@ -466,7 +475,7 @@ async function fetchWebsiteContentWithFirecrawl(
         ]
           .filter(Boolean)
           .join('\n');
-        
+
         if (metadataText) {
           content = `${metadataText}\n\n${content}`;
         }

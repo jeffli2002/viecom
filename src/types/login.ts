@@ -27,5 +27,3 @@ export interface UseLoginReturn {
   handleClearError: () => void;
   getRedirectUrl: () => string;
 }
-
-

@@ -62,9 +62,13 @@ export async function POST(request: NextRequest) {
         }
 
         // Enhance prompt using DeepSeek
-        const enhancedPrompt = await deepSeekService.enhancePrompt(promptToEnhance, generationType, {
-          productSellingPoints: sellingPointsArray,
-        });
+        const enhancedPrompt = await deepSeekService.enhancePrompt(
+          promptToEnhance,
+          generationType,
+          {
+            productSellingPoints: sellingPointsArray,
+          }
+        );
 
         enhancedPrompts.push({
           rowIndex: row.rowIndex,
@@ -98,4 +102,3 @@ export async function POST(request: NextRequest) {
     );
   }
 }
-

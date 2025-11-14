@@ -1,14 +1,14 @@
+import { randomUUID } from 'node:crypto';
 import { getVideoModelInfo } from '@/config/credits.config';
 import { env } from '@/env';
 import { auth } from '@/lib/auth/auth';
 import { creditService } from '@/lib/credits';
 import { getKieApiService } from '@/lib/kie/kie-api';
-import { r2StorageService } from '@/lib/storage/r2';
 import { updateQuotaUsage } from '@/lib/quota/quota-service';
 import { checkAndAwardReferralReward } from '@/lib/rewards/referral-reward';
+import { r2StorageService } from '@/lib/storage/r2';
 import { db } from '@/server/db';
 import { generatedAsset } from '@/server/db/schema';
-import { randomUUID } from 'node:crypto';
 import { type NextRequest, NextResponse } from 'next/server';
 
 export const dynamic = 'force-dynamic';
@@ -82,9 +82,11 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const normalizedModel: 'sora-2' | 'sora-2-pro' = model === 'sora-2-pro' ? 'sora-2-pro' : 'sora-2';
+    const normalizedModel: 'sora-2' | 'sora-2-pro' =
+      model === 'sora-2-pro' ? 'sora-2-pro' : 'sora-2';
     const normalizedDuration: 10 | 15 = duration === 15 ? 15 : 10;
-    const normalizedQuality = normalizedModel === 'sora-2-pro' ? (quality === 'high' ? 'high' : 'standard') : 'standard';
+    const normalizedQuality =
+      normalizedModel === 'sora-2-pro' ? (quality === 'high' ? 'high' : 'standard') : 'standard';
     const resolution: '720p' | '1080p' =
       normalizedModel === 'sora-2-pro' ? (normalizedQuality === 'high' ? '1080p' : '720p') : '720p';
 
@@ -125,7 +127,10 @@ export async function POST(request: NextRequest) {
 
     if (generationMode === 'i2v') {
       if (!image) {
-        return NextResponse.json({ error: 'Image is required for image-to-video mode' }, { status: 400 });
+        return NextResponse.json(
+          { error: 'Image is required for image-to-video mode' },
+          { status: 400 }
+        );
       }
 
       if (typeof image === 'string' && image.startsWith('data:image/')) {
@@ -150,7 +155,11 @@ export async function POST(request: NextRequest) {
         const [, imageType, base64Data] = base64Match;
         const imageBuffer = Buffer.from(base64Data, 'base64');
         const extension =
-          imageType === 'png' ? 'png' : imageType === 'jpeg' || imageType === 'jpg' ? 'jpeg' : 'png';
+          imageType === 'png'
+            ? 'png'
+            : imageType === 'jpeg' || imageType === 'jpg'
+              ? 'jpeg'
+              : 'png';
         const contentType = `image/${extension}`;
 
         try {
@@ -166,13 +175,18 @@ export async function POST(request: NextRequest) {
           try {
             imageUrlForKie = await r2StorageService.getSignedUrl(uploadResult.key, 3600);
           } catch (signError) {
-            console.error('Failed to create signed URL for video input image (fallback to public URL):', signError);
+            console.error(
+              'Failed to create signed URL for video input image (fallback to public URL):',
+              signError
+            );
             imageUrlForKie = uploadResult.url;
           }
 
           const parsed = new URL(imageUrlForKie);
           if (parsed.protocol !== 'https:') {
-            throw new Error(`Input image URL must use HTTPS. Current protocol: ${parsed.protocol || 'unknown'}`);
+            throw new Error(
+              `Input image URL must use HTTPS. Current protocol: ${parsed.protocol || 'unknown'}`
+            );
           }
         } catch (error) {
           console.error('Failed to upload input image for video generation:', error);
@@ -181,14 +195,14 @@ export async function POST(request: NextRequest) {
             { status: 500 }
           );
         }
-      } else if (typeof image === 'string' && (image.startsWith('http://') || image.startsWith('https://'))) {
+      } else if (
+        typeof image === 'string' &&
+        (image.startsWith('http://') || image.startsWith('https://'))
+      ) {
         try {
           const parsed = new URL(image);
           if (parsed.protocol !== 'https:') {
-            return NextResponse.json(
-              { error: 'Input image URL must use HTTPS.' },
-              { status: 400 }
-            );
+            return NextResponse.json({ error: 'Input image URL must use HTTPS.' }, { status: 400 });
           }
         } catch {
           return NextResponse.json({ error: 'Invalid input image URL.' }, { status: 400 });
@@ -225,10 +239,7 @@ export async function POST(request: NextRequest) {
 
     const videoResponse = await fetch(videoResult.videoUrl);
     if (!videoResponse.ok) {
-      return NextResponse.json(
-        { error: 'Failed to download generated video' },
-        { status: 500 }
-      );
+      return NextResponse.json({ error: 'Failed to download generated video' }, { status: 500 });
     }
 
     const videoBuffer = Buffer.from(await videoResponse.arrayBuffer());

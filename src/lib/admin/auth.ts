@@ -1,5 +1,5 @@
-import { cookies } from 'next/headers';
 import { jwtVerify } from 'jose';
+import { cookies } from 'next/headers';
 
 const JWT_SECRET = process.env.ADMIN_JWT_SECRET || 'your-admin-secret-key-change-in-production';
 
@@ -20,7 +20,7 @@ export async function verifyAdminToken(): Promise<AdminTokenPayload | null> {
 
     const secret = new TextEncoder().encode(JWT_SECRET);
     const { payload } = await jwtVerify(token, secret);
-    
+
     if (payload.role !== 'admin') {
       return null;
     }
@@ -34,11 +34,10 @@ export async function verifyAdminToken(): Promise<AdminTokenPayload | null> {
 
 export async function requireAdmin(): Promise<AdminTokenPayload> {
   const admin = await verifyAdminToken();
-  
+
   if (!admin) {
     throw new Error('Unauthorized: Admin access required');
   }
 
   return admin;
 }
-

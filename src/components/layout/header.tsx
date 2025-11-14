@@ -1,5 +1,6 @@
 'use client';
 
+import { CheckinDropdown } from '@/components/rewards/checkin-dropdown';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import {
@@ -18,8 +19,8 @@ import {
   NavigationMenuList,
   NavigationMenuTrigger,
 } from '@/components/ui/navigation-menu';
-import { CheckinDropdown } from '@/components/rewards/checkin-dropdown';
 import { LanguageSwitcher } from '@/components/widget/language-switcher';
+import { Link, usePathname } from '@/i18n/navigation';
 import { routing } from '@/i18n/routing';
 import { useAuthStore } from '@/store/auth-store';
 import {
@@ -33,7 +34,6 @@ import {
   X,
 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { Link, usePathname } from '@/i18n/navigation';
 import { useState } from 'react';
 
 export function Header() {
@@ -155,7 +155,11 @@ export function Header() {
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" className="relative h-10 w-10 rounded-full p-0">
                     <Avatar className="h-10 w-10 border-2 border-purple-500">
-                      <AvatarImage src={user.image || ''} alt={user.name || ''} className="rounded-full" />
+                      <AvatarImage
+                        src={user.image || ''}
+                        alt={user.name || ''}
+                        className="rounded-full"
+                      />
                       <AvatarFallback className="bg-purple-600 text-white rounded-full">
                         {user.name?.charAt(0).toUpperCase() || <User className="h-4 w-4" />}
                       </AvatarFallback>

@@ -403,5 +403,3 @@ export const useRefreshSession = () => useAuthStore((state) => state.refreshSess
 export const useEmailSignup = () => useAuthStore((state) => state.signUp);
 export const useSetError = () => useAuthStore((state) => state.setError);
 export const useUpdateUser = () => useAuthStore((state) => state.updateUser);
-
-

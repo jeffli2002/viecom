@@ -1,8 +1,8 @@
-import { db } from '@/server/db';
-import { user, subscription, userCredits } from '@/server/db/schema';
 import { requireAdmin } from '@/lib/admin/auth';
+import { db } from '@/server/db';
+import { subscription, user, userCredits } from '@/server/db/schema';
+import { desc, eq, gte, like, sql } from 'drizzle-orm';
 import { NextResponse } from 'next/server';
-import { eq, like, desc, sql, gte } from 'drizzle-orm';
 
 export async function GET(request: Request) {
   try {
@@ -12,8 +12,8 @@ export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);
     const search = searchParams.get('search') || '';
     const range = searchParams.get('range') || 'all';
-    const limit = parseInt(searchParams.get('limit') || '100');
-    const offset = parseInt(searchParams.get('offset') || '0');
+    const limit = Number.parseInt(searchParams.get('limit') || '100');
+    const offset = Number.parseInt(searchParams.get('offset') || '0');
 
     // Calculate date range
     let startDate: Date | null = null;
@@ -49,7 +49,7 @@ export async function GET(request: Request) {
     // Add date range filter
     if (startDate) {
       query = query.where(
-        search 
+        search
           ? sql`${user.email} LIKE ${`%${search}%`} AND ${user.createdAt} >= ${startDate}`
           : sql`${user.createdAt} >= ${startDate}`
       );
@@ -60,9 +60,7 @@ export async function GET(request: Request) {
     const usersList = await query;
 
     // Get total count
-    let totalCountQuery = db
-      .select({ count: sql<number>`count(*)` })
-      .from(user);
+    let totalCountQuery = db.select({ count: sql<number>`count(*)` }).from(user);
 
     if (startDate && search) {
       totalCountQuery = totalCountQuery.where(
@@ -86,22 +84,15 @@ export async function GET(request: Request) {
     // Prevent caching of admin data
     response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0');
     response.headers.set('Pragma', 'no-cache');
-    
+
     return response;
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Admin users list error:', error);
-    
-    if (error.message?.includes('Unauthorized')) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      );
+
+    if (error instanceof Error && error.message.includes('Unauthorized')) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    return NextResponse.json(
-      { error: 'Failed to fetch users' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Failed to fetch users' }, { status: 500 });
   }
 }
-

@@ -69,6 +69,14 @@ CREEM_PROPLUS_PLAN_PRODUCT_KEY_MONTHLY="proplus-monthly-key"
 CREEM_PRO_PLAN_PRODUCT_KEY_YEARLY="pro-yearly-key"
 CREEM_PROPLUS_PLAN_PRODUCT_KEY_YEARLY="proplus-yearly-key"
 NEXT_PUBLIC_CREEM_TEST_MODE="false"
+NEXT_PUBLIC_CREEM_PRICE_PRO_MONTHLY="creem-price-pro-monthly"
+NEXT_PUBLIC_CREEM_PRICE_PRO_YEARLY="creem-price-pro-yearly"
+NEXT_PUBLIC_CREEM_PRICE_PROPLUS_MONTHLY="creem-price-proplus-monthly"
+NEXT_PUBLIC_CREEM_PRICE_PROPLUS_YEARLY="creem-price-proplus-yearly"
+NEXT_PUBLIC_CREEM_PRICE_PACK_1000="creem-price-pack-1000"
+NEXT_PUBLIC_CREEM_PRICE_PACK_2000="creem-price-pack-2000"
+NEXT_PUBLIC_CREEM_PRICE_PACK_5000="creem-price-pack-5000"
+NEXT_PUBLIC_CREEM_PRICE_PACK_10000="creem-price-pack-10000"
 ```
 
 ## 📝 How to Set Environment Variables

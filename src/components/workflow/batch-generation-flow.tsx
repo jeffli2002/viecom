@@ -1,10 +1,14 @@
 'use client';
 
+import UpgradePrompt from '@/components/auth/UpgradePrompt';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Badge } from '@/components/ui/badge';
+import { Progress } from '@/components/ui/progress';
 import {
   Select,
   SelectContent,
@@ -13,35 +17,25 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Progress } from '@/components/ui/progress';
+import { creditsConfig } from '@/config/credits.config';
+import { IMAGE_STYLES, VIDEO_STYLES } from '@/config/styles.config';
+import { useUpgradePrompt } from '@/hooks/use-upgrade-prompt';
+import { useAuthStore } from '@/store/auth-store';
 import {
   AlertCircle,
+  CheckCircle2,
   Download,
   FileSpreadsheet,
   FileText,
   Loader2,
-  Upload,
-  CheckCircle2,
-  XCircle,
-  Sparkles,
   Maximize2,
+  Sparkles,
+  Upload,
+  XCircle,
   Zap,
 } from 'lucide-react';
-import { useState, useEffect, useRef } from 'react';
 import { useTranslations } from 'next-intl';
-import { IMAGE_STYLES, VIDEO_STYLES } from '@/config/styles.config';
-import { creditsConfig } from '@/config/credits.config';
-import { useUpgradePrompt } from '@/hooks/use-upgrade-prompt';
-import UpgradePrompt from '@/components/auth/UpgradePrompt';
-import { useAuthStore } from '@/store/auth-store';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
-import { CardContent } from '@/components/ui/card';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import * as XLSX from 'xlsx';
 
 interface RowData {
@@ -59,7 +53,43 @@ interface RowData {
   assetR2Key?: string;
   error?: string;
   progress?: number; // 0-100, for generation progress
+  publishPlatforms?: string;
+  publishMode?: 'media-only' | 'product';
+  productTitle?: string;
+  productCategory?: string;
+  productBrand?: string;
+  productModel?: string;
+  productSku?: string;
+  productUpc?: string;
+  productCountryOfOrigin?: string;
+  standardPrice?: number;
+  salePrice?: number;
+  currency?: string;
+  inventoryQuantity?: number;
+  minPurchaseQuantity?: number;
+  maxPurchaseQuantity?: number;
+  productTags?: string;
+  generationMode?: 't2i' | 'i2i' | 't2v' | 'i2v';
+  model?: string;
+  aspectRatio?: string;
 }
+
+type ValidatedRowResponse = Partial<RowData>;
+type EnhancedPromptResponse = {
+  rowIndex: number;
+  enhancedPrompt: string;
+};
+type AssetResponse = {
+  rowIndex?: number;
+  prompt?: string;
+  enhancedPrompt?: string;
+  status?: 'completed' | 'failed' | 'processing';
+  publicUrl?: string;
+  url?: string;
+  previewUrl?: string;
+  r2Key?: string;
+  error?: string;
+};
 
 type GenerationType = 'image' | 'video';
 
@@ -74,7 +104,9 @@ export function BatchGenerationFlow({ generationType }: BatchGenerationFlowProps
   const [isValidating, setIsValidating] = useState(false);
   const [isEnhancingAll, setIsEnhancingAll] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
-  const [validationErrors, setValidationErrors] = useState<Array<{ row: number; field: string; message: string }>>([]);
+  const [validationErrors, setValidationErrors] = useState<
+    Array<{ row: number; field: string; message: string }>
+  >([]);
   const [generationMode, setGenerationMode] = useState<'t2i' | 'i2i' | 't2v' | 'i2v'>(
     generationType === 'image' ? 'i2i' : 'i2v'
   );
@@ -90,25 +122,30 @@ export function BatchGenerationFlow({ generationType }: BatchGenerationFlowProps
   const [videoModel, setVideoModel] = useState<'sora-2' | 'sora-2-pro'>('sora-2');
   const [videoDuration, setVideoDuration] = useState<10 | 15>(10);
   const [videoQuality, setVideoQuality] = useState<'standard' | 'high'>('standard');
-  const [jobId, setJobId] = useState<string | null>(null);
   const [pollingInterval, setPollingInterval] = useState<NodeJS.Timeout | null>(null);
-  const [generationProgress, setGenerationProgress] = useState<{ current: number; total: number }>({ current: 0, total: 0 });
+  const [generationProgress, setGenerationProgress] = useState<{ current: number; total: number }>({
+    current: 0,
+    total: 0,
+  });
   const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const [previewAsset, setPreviewAsset] = useState<{ url: string; type: 'image' | 'video'; rowIndex: number } | null>(null);
+  const [previewAsset, setPreviewAsset] = useState<{
+    url: string;
+    type: 'image' | 'video';
+    rowIndex: number;
+  } | null>(null);
   const { showUpgradePrompt, openUpgradePrompt, closeUpgradePrompt } = useUpgradePrompt();
-  const { user, isAuthenticated } = useAuthStore();
+  const { isAuthenticated } = useAuthStore();
   const progressIntervalsRef = useRef<Map<number, NodeJS.Timeout[]>>(new Map());
   const [userCredits, setUserCredits] = useState<number>(0);
-  
+
   // Calculate dynamic video credit cost based on model, duration, and quality
   const getVideoCreditCost = () => {
     if (videoModel === 'sora-2') {
       return creditsConfig.consumption.videoGeneration[`sora-2-720p-${videoDuration}s`];
-    } else {
-      const resolution = videoQuality === 'standard' ? '720p' : '1080p';
-      return creditsConfig.consumption.videoGeneration[`sora-2-pro-${resolution}-${videoDuration}s`];
     }
+    const resolution = videoQuality === 'standard' ? '720p' : '1080p';
+    return creditsConfig.consumption.videoGeneration[`sora-2-pro-${resolution}-${videoDuration}s`];
   };
   const [brandInfo, setBrandInfo] = useState<{
     brandName?: string;
@@ -120,31 +157,32 @@ export function BatchGenerationFlow({ generationType }: BatchGenerationFlowProps
   const styles = generationType === 'image' ? IMAGE_STYLES : VIDEO_STYLES;
 
   // Cache key for localStorage
-const cacheKey = `batch-generation-${generationType}-cache`;
+  const cacheKey = `batch-generation-${generationType}-cache`;
 
-const getRowPreviewUrl = (row: RowData) => {
-  if (row.assetPreviewUrl) {
-    return row.assetPreviewUrl;
-  }
-  if (row.assetUrl?.startsWith('/api/v1/media') && row.assetR2Key) {
-    return `/api/v1/media?key=${encodeURIComponent(row.assetR2Key)}`;
-  }
-  return row.assetUrl;
-};
+  const getRowPreviewUrl = (row: RowData) => {
+    if (row.assetPreviewUrl) {
+      return row.assetPreviewUrl;
+    }
+    if (row.assetUrl?.startsWith('/api/v1/media') && row.assetR2Key) {
+      return `/api/v1/media?key=${encodeURIComponent(row.assetR2Key)}`;
+    }
+    return row.assetUrl;
+  };
 
-const getRowDownloadUrl = (row: RowData) => {
-  if (row.assetR2Key) {
-    return `/api/v1/media?key=${encodeURIComponent(row.assetR2Key)}&download=1`;
-  }
-  const preview = getRowPreviewUrl(row);
-  if (preview?.startsWith('/api/v1/media')) {
-    return `${preview}${preview.includes('?') ? '&' : '?'}download=1`;
-  }
-  return row.assetUrl || preview || '';
-};
+  const getRowDownloadUrl = (row: RowData) => {
+    if (row.assetR2Key) {
+      return `/api/v1/media?key=${encodeURIComponent(row.assetR2Key)}&download=1`;
+    }
+    const preview = getRowPreviewUrl(row);
+    if (preview?.startsWith('/api/v1/media')) {
+      return `${preview}${preview.includes('?') ? '&' : '?'}download=1`;
+    }
+    return row.assetUrl || preview || '';
+  };
 
-const hasCompletedAsset = (row: RowData) =>
-  row.status === 'completed' && Boolean(getRowPreviewUrl(row));
+  const hasCompletedAsset = (row: RowData) =>
+    row.status === 'completed' && Boolean(getRowPreviewUrl(row));
+  const rowsLength = rows.length;
 
   // Fetch user credits on mount and when user changes
   useEffect(() => {
@@ -158,7 +196,7 @@ const hasCompletedAsset = (row: RowData) =>
         const response = await fetch('/api/credits/balance', {
           credentials: 'include',
         });
-        
+
         if (response.ok) {
           const data = await response.json();
           setUserCredits(data.data?.balance || 0);
@@ -174,7 +212,7 @@ const hasCompletedAsset = (row: RowData) =>
     };
 
     fetchCredits();
-  }, [isAuthenticated, user?.id]);
+  }, [isAuthenticated]);
 
   // Load brand analysis from sessionStorage if coming from brand analysis page
   useEffect(() => {
@@ -190,10 +228,12 @@ const hasCompletedAsset = (row: RowData) =>
             colors: brandData.colors,
           });
           console.log('Loaded brand analysis:', brandData.brandName, brandData.selectedStyle);
-          
+
           // Apply selected style if available
           if (brandData.selectedStyle) {
-            const matchedStyle = styles.find(s => s.name === brandData.selectedStyle || s.name.includes(brandData.selectedStyle));
+            const matchedStyle = styles.find(
+              (s) => s.name === brandData.selectedStyle || s.name.includes(brandData.selectedStyle)
+            );
             if (matchedStyle) {
               setStyle(matchedStyle.id);
               console.log('Applied style from brand analysis:', matchedStyle.id);
@@ -204,7 +244,7 @@ const hasCompletedAsset = (row: RowData) =>
         console.error('Failed to load brand analysis from sessionStorage:', error);
       }
     }
-  }, [generationType, styles]);
+  }, [styles]);
 
   // Load cached data on mount
   useEffect(() => {
@@ -216,7 +256,7 @@ const hasCompletedAsset = (row: RowData) =>
           // Check if cache is still valid (within 24 hours)
           const cacheAge = Date.now() - (data.timestamp || 0);
           const maxAge = 24 * 60 * 60 * 1000; // 24 hours
-          
+
           if (cacheAge < maxAge) {
             setRows(data.rows);
             console.log('Restored cached data:', data.rows.length, 'rows');
@@ -248,14 +288,6 @@ const hasCompletedAsset = (row: RowData) =>
     }
   }, [rows, file, cacheKey]);
 
-  // Auto-validate when file is selected
-  useEffect(() => {
-    if (file && !isValidating && rows.length === 0) {
-      handleValidate();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [file]);
-
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0];
     if (selectedFile) {
@@ -272,7 +304,6 @@ const hasCompletedAsset = (row: RowData) =>
       setFile(selectedFile);
       setRows([]);
       setValidationErrors([]);
-      setJobId(null);
       setGenerationProgress({ current: 0, total: 0 });
       // Clear cache when new file is selected
       localStorage.removeItem(cacheKey);
@@ -311,14 +342,27 @@ const hasCompletedAsset = (row: RowData) =>
       setFile(droppedFile);
       setRows([]);
       setValidationErrors([]);
-      setJobId(null);
       setGenerationProgress({ current: 0, total: 0 });
       // Clear cache when new file is dropped
       localStorage.removeItem(cacheKey);
     }
   };
 
-  const handleValidate = async () => {
+  const triggerFileDialog = () => {
+    if (isValidating || isGenerating) {
+      return;
+    }
+    fileInputRef.current?.click();
+  };
+
+  const handleDropZoneKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      triggerFileDialog();
+    }
+  };
+
+  const handleValidate = useCallback(async () => {
     if (!file) {
       return;
     }
@@ -349,16 +393,38 @@ const hasCompletedAsset = (row: RowData) =>
         return;
       }
 
-      // Convert validated rows to RowData format
-      const validatedRows: RowData[] = data.data.rows.map((row: any, index: number) => ({
+      const rowsPayload: ValidatedRowResponse[] = Array.isArray(data?.data?.rows)
+        ? data.data.rows
+        : [];
+
+      const validatedRows: RowData[] = rowsPayload.map((row, index) => ({
         rowIndex: index + 1,
-        productName: row.productName || row.productTitle || '',
-        productDescription: row.productDescription || '',
-        prompt: row.prompt || '',
+        productName: row.productName ?? row.productTitle ?? '',
+        productDescription: row.productDescription ?? '',
+        prompt: row.prompt ?? '',
         baseImageUrl: row.baseImageUrl,
         productSellingPoints: row.productSellingPoints,
+        publishPlatforms: row.publishPlatforms,
+        publishMode: row.publishMode,
+        productTitle: row.productTitle,
+        productCategory: row.productCategory,
+        productBrand: row.productBrand,
+        productModel: row.productModel,
+        productSku: row.productSku,
+        productUpc: row.productUpc,
+        productCountryOfOrigin: row.productCountryOfOrigin,
+        standardPrice: row.standardPrice,
+        salePrice: row.salePrice,
+        currency: row.currency,
+        inventoryQuantity: row.inventoryQuantity,
+        minPurchaseQuantity: row.minPurchaseQuantity,
+        maxPurchaseQuantity: row.maxPurchaseQuantity,
+        productTags: row.productTags,
+        generationMode: row.generationMode,
+        model: row.model,
+        aspectRatio: row.aspectRatio,
         isSelected: true,
-        status: 'pending' as const,
+        status: 'pending',
       }));
 
       setRows(validatedRows);
@@ -368,7 +434,14 @@ const hasCompletedAsset = (row: RowData) =>
     } finally {
       setIsValidating(false);
     }
-  };
+  }, [file, generationType]);
+
+  // Auto-validate when file is selected
+  useEffect(() => {
+    if (file && !isValidating && rowsLength === 0) {
+      void handleValidate();
+    }
+  }, [file, handleValidate, isValidating, rowsLength]);
 
   const handleEnhanceSinglePrompt = async (rowIndex: number) => {
     const row = rows.find((r) => r.rowIndex === rowIndex);
@@ -379,9 +452,7 @@ const hasCompletedAsset = (row: RowData) =>
 
     // Update row status to enhancing
     setRows((prev) =>
-      prev.map((r) =>
-        r.rowIndex === rowIndex ? { ...r, status: 'enhancing' as const } : r
-      )
+      prev.map((r) => (r.rowIndex === rowIndex ? { ...r, status: 'enhancing' as const } : r))
     );
 
     try {
@@ -416,9 +487,7 @@ const hasCompletedAsset = (row: RowData) =>
       console.error('Enhancement error:', error);
       alert(error instanceof Error ? error.message : 'Prompt增强失败');
       setRows((prev) =>
-        prev.map((r) =>
-          r.rowIndex === rowIndex ? { ...r, status: 'pending' as const } : r
-        )
+        prev.map((r) => (r.rowIndex === rowIndex ? { ...r, status: 'pending' as const } : r))
       );
     }
   };
@@ -439,9 +508,7 @@ const hasCompletedAsset = (row: RowData) =>
 
     // Update all rows to enhancing status
     setRows((prev) =>
-      prev.map((row) =>
-        row.prompt.trim() ? { ...row, status: 'enhancing' as const } : row
-      )
+      prev.map((row) => (row.prompt.trim() ? { ...row, status: 'enhancing' as const } : row))
     );
 
     try {
@@ -467,9 +534,10 @@ const hasCompletedAsset = (row: RowData) =>
       }
 
       // Update rows with enhanced prompts
-      const enhancedMap = new Map(
-        data.data.enhancedPrompts.map((ep: any) => [ep.rowIndex, ep.enhancedPrompt])
-      );
+      const enhancedResponses: EnhancedPromptResponse[] = Array.isArray(data?.data?.enhancedPrompts)
+        ? data.data.enhancedPrompts
+        : [];
+      const enhancedMap = new Map(enhancedResponses.map((ep) => [ep.rowIndex, ep.enhancedPrompt]));
 
       setRows((prev) =>
         prev.map((row) => ({
@@ -505,15 +573,20 @@ const hasCompletedAsset = (row: RowData) =>
 
     // Calculate total credit cost
     // Note: For batch generation, we use nano-banana for images and sora-2 for videos
-    const creditCostPerItem = generationType === 'image' 
-      ? creditsConfig.consumption.imageGeneration['nano-banana'] || 5
-      : creditsConfig.consumption.videoGeneration['sora-2'] || 20;
-    
+    const creditCostPerItem =
+      generationType === 'image'
+        ? creditsConfig.consumption.imageGeneration['nano-banana'] || 5
+        : creditsConfig.consumption.videoGeneration['sora-2'] || 20;
+
     const totalCreditCost = selectedRows.length * creditCostPerItem;
 
     // Check user credits
-    console.log('Checking credits:', { userCredits, totalCreditCost, selectedRows: selectedRows.length });
-    
+    console.log('Checking credits:', {
+      userCredits,
+      totalCreditCost,
+      selectedRows: selectedRows.length,
+    });
+
     if (userCredits < totalCreditCost) {
       // Show upgrade prompt
       console.log('Insufficient credits, showing upgrade prompt');
@@ -528,15 +601,12 @@ const hasCompletedAsset = (row: RowData) =>
 
   const proceedWithGeneration = async (selectedRows: RowData[]) => {
     setIsGenerating(true);
-    setJobId(null);
     setGenerationProgress({ current: 0, total: selectedRows.length });
 
     // Update rows to generating status with initial progress
     setRows((prev) =>
       prev.map((row) =>
-        row.isSelected
-          ? { ...row, status: 'generating' as const, progress: 0 }
-          : row
+        row.isSelected ? { ...row, status: 'generating' as const, progress: 0 } : row
       )
     );
 
@@ -585,15 +655,12 @@ const hasCompletedAsset = (row: RowData) =>
         throw new Error(data.error || t('batchGenerationFailed'));
       }
 
-      setJobId(data.data.jobId);
       startPolling(data.data.jobId, selectedRows.length);
     } catch (error) {
       console.error('Generation error:', error);
       alert(error instanceof Error ? error.message : t('batchGenerationFailed'));
       setRows((prev) =>
-        prev.map((row) =>
-          row.isSelected ? { ...row, status: 'pending' as const } : row
-        )
+        prev.map((row) => (row.isSelected ? { ...row, status: 'pending' as const } : row))
       );
       setIsGenerating(false);
     }
@@ -601,20 +668,21 @@ const hasCompletedAsset = (row: RowData) =>
 
   const handleContinueWithLimitedCredits = async () => {
     closeUpgradePrompt();
-    
+
     // Get all selected rows
     const selectedRows = rows.filter((row) => row.isSelected);
     if (selectedRows.length === 0) return;
 
     // Calculate credit cost per item
     // Note: For batch generation, we use nano-banana for images and sora-2 for videos
-    const creditCostPerItem = generationType === 'image' 
-      ? creditsConfig.consumption.imageGeneration['nano-banana'] || 5
-      : creditsConfig.consumption.videoGeneration['sora-2'] || 20;
-    
+    const creditCostPerItem =
+      generationType === 'image'
+        ? creditsConfig.consumption.imageGeneration['nano-banana'] || 5
+        : creditsConfig.consumption.videoGeneration['sora-2'] || 20;
+
     // Calculate how many items can be generated with available credits
     const maxAffordableItems = Math.floor(userCredits / creditCostPerItem);
-    
+
     if (maxAffordableItems === 0) {
       alert('积分不足，无法生成任何内容');
       return;
@@ -622,7 +690,7 @@ const hasCompletedAsset = (row: RowData) =>
 
     // Limit rows to what can be afforded
     const affordableRows = selectedRows.slice(0, maxAffordableItems);
-    
+
     if (affordableRows.length < selectedRows.length) {
       const confirmMessage = `您的积分只能生成 ${affordableRows.length} 个内容（共选择了 ${selectedRows.length} 个）。是否继续？`;
       if (!confirm(confirmMessage)) {
@@ -690,16 +758,19 @@ const hasCompletedAsset = (row: RowData) =>
         const assetsData = await assetsResponse.json();
 
         // Update rows with asset URLs and status
-        if (assetsData.success && assetsData.data.assets) {
+        if (assetsData.success && assetsData.data?.assets) {
+          const assetList: AssetResponse[] = Array.isArray(assetsData.data.assets)
+            ? assetsData.data.assets
+            : [];
           let completedCount = 0;
           let processingCount = 0;
-          
+
           setRows((prev) =>
             prev.map((row) => {
               const asset =
-                assetsData.data.assets.find((a: any) => a.rowIndex === row.rowIndex) ||
-                assetsData.data.assets.find(
-                  (a: any) => a.prompt === row.prompt || a.enhancedPrompt === row.enhancedPrompt
+                assetList.find((a) => a.rowIndex === row.rowIndex) ||
+                assetList.find(
+                  (a) => a.prompt === row.prompt || a.enhancedPrompt === row.enhancedPrompt
                 );
               if (asset) {
                 if (asset.status === 'completed') {
@@ -714,7 +785,8 @@ const hasCompletedAsset = (row: RowData) =>
                     error: asset.error,
                     progress: 100,
                   };
-                } else if (asset.status === 'failed') {
+                }
+                if (asset.status === 'failed') {
                   return {
                     ...row,
                     status: 'failed' as const,
@@ -724,7 +796,8 @@ const hasCompletedAsset = (row: RowData) =>
                     error: asset.error,
                     progress: 0,
                   };
-                } else if (asset.status === 'processing') {
+                }
+                if (asset.status === 'processing') {
                   processingCount++;
                   // Keep progress simulation running for processing assets
                   // Don't update status or progress here, let simulateRowProgress handle it
@@ -734,8 +807,10 @@ const hasCompletedAsset = (row: RowData) =>
               return row;
             })
           );
-          
-          console.log(`Batch progress: ${completedCount} completed, ${processingCount} processing, total: ${totalRows}`);
+
+          console.log(
+            `Batch progress: ${completedCount} completed, ${processingCount} processing, total: ${totalRows}`
+          );
           setGenerationProgress({ current: completedCount, total: totalRows });
         }
 
@@ -743,7 +818,7 @@ const hasCompletedAsset = (row: RowData) =>
           setIsGenerating(false);
           clearInterval(interval);
           setPollingInterval(null);
-          
+
           // Refresh user credits after generation completes
           try {
             const creditsResponse = await fetch('/api/credits/balance', {
@@ -838,7 +913,7 @@ const hasCompletedAsset = (row: RowData) =>
 
     const workbook = XLSX.utils.book_new();
     const worksheet = XLSX.utils.aoa_to_sheet([headers, ...data]);
-    
+
     // Set column widths
     const colWidths = [
       { wch: 30 }, // productName
@@ -851,7 +926,7 @@ const hasCompletedAsset = (row: RowData) =>
       { wch: 50 }, // generatedAssetUrl
     ];
     worksheet['!cols'] = colWidths;
-    
+
     XLSX.utils.book_append_sheet(workbook, worksheet, 'Batch Results');
 
     const buffer = XLSX.write(workbook, { type: 'buffer', bookType: 'xlsx' });
@@ -869,8 +944,6 @@ const hasCompletedAsset = (row: RowData) =>
   };
 
   // Get completed assets for display
-  const completedAssets = rows.filter(hasCompletedAsset);
-
   // Calculate statistics
   const totalRows = rows.length;
   const completedCount = rows.filter((r) => r.status === 'completed').length;
@@ -894,9 +967,7 @@ const hasCompletedAsset = (row: RowData) =>
                     <h3 className="text-lg font-bold text-slate-900">
                       {t('brandContext') || '品牌上下文已应用'}
                     </h3>
-                    <p className="text-sm text-slate-700 font-medium">
-                      {brandInfo.brandName}
-                    </p>
+                    <p className="text-sm text-slate-700 font-medium">{brandInfo.brandName}</p>
                   </div>
                 </div>
                 <div className="flex flex-wrap gap-2 mt-3">
@@ -908,13 +979,16 @@ const hasCompletedAsset = (row: RowData) =>
                   )}
                   {brandInfo.brandTone && (
                     <Badge className="bg-purple-100 text-purple-700 hover:bg-purple-200 border border-purple-200">
-                      {t('brandTone') || '品牌调性'}: {typeof brandInfo.brandTone === 'string' ? brandInfo.brandTone : brandInfo.brandTone?.slice(0, 3).join('、')}
+                      {t('brandTone') || '品牌调性'}:{' '}
+                      {typeof brandInfo.brandTone === 'string'
+                        ? brandInfo.brandTone
+                        : brandInfo.brandTone?.slice(0, 3).join('、')}
                     </Badge>
                   )}
                   {brandInfo.colors?.primary && (
                     <Badge className="bg-blue-100 text-blue-700 hover:bg-blue-200 border border-blue-200">
-                      <div 
-                        className="w-3 h-3 rounded-full mr-1 border border-slate-300" 
+                      <div
+                        className="w-3 h-3 rounded-full mr-1 border border-slate-300"
                         style={{ backgroundColor: brandInfo.colors.primary }}
                       />
                       {t('primaryColor') || '主色调'}
@@ -943,490 +1017,554 @@ const hasCompletedAsset = (row: RowData) =>
         <div className="lg:col-span-2">
           <Card className="p-6">
             <div className="space-y-6">
-            <div>
-              <h2 className="text-2xl font-bold mb-2">
-                {generationType === 'image' ? t('titleImage') : t('titleVideo')}
-              </h2>
-              <p className="text-gray-600">
-                {generationType === 'image' ? t('subtitleImage') : t('subtitleVideo')}
-              </p>
-            </div>
-
-            {/* Generation Settings */}
-            <div className="border rounded-lg p-4 bg-gray-50 space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label className="text-sm font-medium mb-2 block">{t('generationMode')}</Label>
-                  <Select
-                    value={generationMode}
-                    onValueChange={(value) => setGenerationMode(value as typeof generationMode)}
-                    disabled={isGenerating}
-                  >
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {generationType === 'image' ? (
-                        <>
-                          <SelectItem value="t2i">{t('t2i')}</SelectItem>
-                          <SelectItem value="i2i">{t('i2i')}</SelectItem>
-                        </>
-                      ) : (
-                        <>
-                          <SelectItem value="t2v">{t('t2v')}</SelectItem>
-                          <SelectItem value="i2v">{t('i2v')}</SelectItem>
-                        </>
-                      )}
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div>
-                  <Label className="text-sm font-medium mb-2 block">{t('aspectRatio')}</Label>
-                  <Select value={aspectRatio} onValueChange={setAspectRatio} disabled={isGenerating}>
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {generationType === 'image' ? (
-                        <>
-                          <SelectItem value="1:1">{t('aspectRatio1:1')}</SelectItem>
-                          <SelectItem value="16:9">{t('aspectRatio16:9')}</SelectItem>
-                          <SelectItem value="9:16">{t('aspectRatio9:16')}</SelectItem>
-                          <SelectItem value="4:3">{t('aspectRatio4:3')}</SelectItem>
-                          <SelectItem value="3:4">{t('aspectRatio3:4')}</SelectItem>
-                        </>
-                      ) : (
-                        <>
-                          <SelectItem value="16:9">{t('aspectRatio16:9')}</SelectItem>
-                          <SelectItem value="9:16">{t('aspectRatio9:16')}</SelectItem>
-                        </>
-                      )}
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
               <div>
-                <Label className="text-sm font-medium mb-2 block">
-                  {generationType === 'image' ? t('imageStyle') : t('videoStyle')}
-                </Label>
-                <Select value={style} onValueChange={setStyle} disabled={isGenerating}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {styles.map((s) => (
-                      <SelectItem key={s.id} value={s.id} title={s.description}>
-                        {generationType === 'image' 
-                          ? t(`imageStyles.${s.id}`) 
-                          : t(`videoStyles.${s.id}`)}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <h2 className="text-2xl font-bold mb-2">
+                  {generationType === 'image' ? t('titleImage') : t('titleVideo')}
+                </h2>
+                <p className="text-gray-600">
+                  {generationType === 'image' ? t('subtitleImage') : t('subtitleVideo')}
+                </p>
               </div>
 
-              {/* Image-specific settings */}
-              {generationType === 'image' && (
-                <div>
-                  <Label className="text-sm font-medium mb-2 block">Output Format</Label>
-                  <div className="grid grid-cols-2 gap-3">
-                    <button
-                      type="button"
-                      onClick={() => setOutputFormat('PNG')}
-                      disabled={isGenerating}
-                      className={`flex items-center justify-center rounded-lg border-2 py-2.5 px-4 text-sm font-medium transition-all ${
-                        outputFormat === 'PNG'
-                          ? 'border-purple-500 bg-purple-50 text-purple-700'
-                          : 'border-gray-200 bg-white text-gray-700 hover:border-purple-300'
-                      } disabled:opacity-50 disabled:cursor-not-allowed`}
-                    >
-                      <span>PNG</span>
-                      {outputFormat === 'PNG' && (
-                        <svg className="ml-2 h-4 w-4" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                        </svg>
-                      )}
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setOutputFormat('JPEG')}
-                      disabled={isGenerating}
-                      className={`flex items-center justify-center rounded-lg border-2 py-2.5 px-4 text-sm font-medium transition-all ${
-                        outputFormat === 'JPEG'
-                          ? 'border-purple-500 bg-purple-50 text-purple-700'
-                          : 'border-gray-200 bg-white text-gray-700 hover:border-purple-300'
-                      } disabled:opacity-50 disabled:cursor-not-allowed`}
-                    >
-                      <span>JPEG</span>
-                      {outputFormat === 'JPEG' && (
-                        <svg className="ml-2 h-4 w-4" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                        </svg>
-                      )}
-                    </button>
-                  </div>
-                </div>
-              )}
-
-              {/* Video-specific settings */}
-              {generationType === 'video' && (
-                <>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <Label className="text-sm font-medium mb-2 block">{t('model')}</Label>
-                      <Select 
-                        value={videoModel} 
-                        onValueChange={(value) => {
-                          setVideoModel(value as 'sora-2' | 'sora-2-pro');
-                          if (value === 'sora-2') {
-                            setVideoQuality('standard');
-                          }
-                        }}
-                        disabled={isGenerating}
-                      >
-                        <SelectTrigger>
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="sora-2">
-                            Sora 2 - {videoModel === 'sora-2' ? getVideoCreditCost() : creditsConfig.consumption.videoGeneration[`sora-2-720p-${videoDuration}s`]} credits
-                          </SelectItem>
-                          <SelectItem value="sora-2-pro">
-                            Sora 2 Pro - {videoModel === 'sora-2-pro' ? getVideoCreditCost() : creditsConfig.consumption.videoGeneration[`sora-2-pro-${videoQuality === 'standard' ? '720p' : '1080p'}-${videoDuration}s`]} credits
-                          </SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div>
-                      <Label className="text-sm font-medium mb-2 block">{t('duration')}</Label>
-                      <div className="grid grid-cols-2 gap-2">
-                        <button
-                          type="button"
-                          onClick={() => setVideoDuration(10)}
-                          disabled={isGenerating}
-                          className={`flex items-center justify-center rounded-lg border-2 py-2 px-3 text-sm font-medium transition-all ${
-                            videoDuration === 10
-                              ? 'border-purple-500 bg-purple-50 text-purple-700'
-                              : 'border-gray-200 bg-white text-gray-700 hover:border-purple-300'
-                          } disabled:opacity-50 disabled:cursor-not-allowed`}
-                        >
-                          10s
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => setVideoDuration(15)}
-                          disabled={isGenerating}
-                          className={`flex items-center justify-center rounded-lg border-2 py-2 px-3 text-sm font-medium transition-all ${
-                            videoDuration === 15
-                              ? 'border-purple-500 bg-purple-50 text-purple-700'
-                              : 'border-gray-200 bg-white text-gray-700 hover:border-purple-300'
-                          } disabled:opacity-50 disabled:cursor-not-allowed`}
-                        >
-                          15s
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Quality selector - only for Sora 2 Pro */}
-                  {videoModel === 'sora-2-pro' && (
-                    <div>
-                      <Label className="text-sm font-medium mb-2 block">{t('quality')}</Label>
-                      <div className="grid grid-cols-2 gap-3">
-                        <button
-                          type="button"
-                          onClick={() => setVideoQuality('standard')}
-                          disabled={isGenerating}
-                          className={`flex items-center justify-center rounded-lg border-2 py-2.5 px-4 text-sm font-medium transition-all ${
-                            videoQuality === 'standard'
-                              ? 'border-purple-500 bg-purple-50 text-purple-700'
-                              : 'border-gray-200 bg-white text-gray-700 hover:border-purple-300'
-                          } disabled:opacity-50 disabled:cursor-not-allowed`}
-                        >
-                          <span>Standard (720P)</span>
-                          {videoQuality === 'standard' && (
-                            <svg className="ml-2 h-4 w-4" fill="currentColor" viewBox="0 0 20 20">
-                              <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                            </svg>
-                          )}
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => setVideoQuality('high')}
-                          disabled={isGenerating}
-                          className={`flex items-center justify-center rounded-lg border-2 py-2.5 px-4 text-sm font-medium transition-all ${
-                            videoQuality === 'high'
-                              ? 'border-purple-500 bg-purple-50 text-purple-700'
-                              : 'border-gray-200 bg-white text-gray-700 hover:border-purple-300'
-                          } disabled:opacity-50 disabled:cursor-not-allowed`}
-                        >
-                          <span>High (1080P)</span>
-                          {videoQuality === 'high' && (
-                            <svg className="ml-2 h-4 w-4" fill="currentColor" viewBox="0 0 20 20">
-                              <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                            </svg>
-                          )}
-                        </button>
-                      </div>
-                    </div>
-                  )}
-                </>
-              )}
-            </div>
-
-            {/* Template Download */}
-            <div className="border rounded-lg p-4 bg-gray-50">
-              <Label className="text-sm font-medium mb-3 block">{t('downloadTemplate')}</Label>
-              <div className="flex gap-3">
-                <Button
-                  variant="outline"
-                  onClick={() => handleDownloadTemplate('excel')}
-                  className="flex items-center gap-2"
-                >
-                  <FileSpreadsheet className="w-4 h-4" />
-                  {t('downloadExcel')}
-                </Button>
-                <Button
-                  variant="outline"
-                  onClick={() => handleDownloadTemplate('csv')}
-                  className="flex items-center gap-2"
-                >
-                  <FileText className="w-4 h-4" />
-                  {t('downloadCSV')}
-                </Button>
-              </div>
-            </div>
-
-            {/* I2V Restriction Warning */}
-            {generationMode === 'i2v' && (
-              <div className="rounded-lg border border-amber-200 bg-amber-50 p-4">
-                <div className="flex items-start gap-3">
-                  <AlertCircle className="h-5 w-5 text-amber-600 flex-shrink-0 mt-0.5" />
+              {/* Generation Settings */}
+              <div className="border rounded-lg p-4 bg-gray-50 space-y-4">
+                <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <h4 className="font-semibold text-amber-900 text-sm mb-1">
-                      {t('importantNotice')}
-                    </h4>
-                    <p className="text-amber-800 text-xs leading-relaxed">
-                      {t('i2vWarning')}
-                    </p>
+                    <Label className="text-sm font-medium mb-2 block">{t('generationMode')}</Label>
+                    <Select
+                      value={generationMode}
+                      onValueChange={(value) => setGenerationMode(value as typeof generationMode)}
+                      disabled={isGenerating}
+                    >
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {generationType === 'image' ? (
+                          <>
+                            <SelectItem value="t2i">{t('t2i')}</SelectItem>
+                            <SelectItem value="i2i">{t('i2i')}</SelectItem>
+                          </>
+                        ) : (
+                          <>
+                            <SelectItem value="t2v">{t('t2v')}</SelectItem>
+                            <SelectItem value="i2v">{t('i2v')}</SelectItem>
+                          </>
+                        )}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <Label className="text-sm font-medium mb-2 block">{t('aspectRatio')}</Label>
+                    <Select
+                      value={aspectRatio}
+                      onValueChange={setAspectRatio}
+                      disabled={isGenerating}
+                    >
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {generationType === 'image' ? (
+                          <>
+                            <SelectItem value="1:1">{t('aspectRatio1:1')}</SelectItem>
+                            <SelectItem value="16:9">{t('aspectRatio16:9')}</SelectItem>
+                            <SelectItem value="9:16">{t('aspectRatio9:16')}</SelectItem>
+                            <SelectItem value="4:3">{t('aspectRatio4:3')}</SelectItem>
+                            <SelectItem value="3:4">{t('aspectRatio3:4')}</SelectItem>
+                          </>
+                        ) : (
+                          <>
+                            <SelectItem value="16:9">{t('aspectRatio16:9')}</SelectItem>
+                            <SelectItem value="9:16">{t('aspectRatio9:16')}</SelectItem>
+                          </>
+                        )}
+                      </SelectContent>
+                    </Select>
                   </div>
                 </div>
-              </div>
-            )}
+                <div>
+                  <Label className="text-sm font-medium mb-2 block">
+                    {generationType === 'image' ? t('imageStyle') : t('videoStyle')}
+                  </Label>
+                  <Select value={style} onValueChange={setStyle} disabled={isGenerating}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {styles.map((s) => (
+                        <SelectItem key={s.id} value={s.id} title={s.description}>
+                          {generationType === 'image'
+                            ? t(`imageStyles.${s.id}`)
+                            : t(`videoStyles.${s.id}`)}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
 
-            {/* File Upload */}
-            <div className="space-y-4">
-              <div>
-                <Label htmlFor="file-input" className="text-sm font-medium mb-2 block">
-                  {t('uploadFile')}
-                </Label>
-                <div
-                  onDragOver={handleDragOver}
-                  onDragLeave={handleDragLeave}
-                  onDrop={handleDrop}
-                  onClick={() => fileInputRef.current?.click()}
-                  className={`
-                    relative cursor-pointer rounded-xl border-2 border-dashed transition-all duration-300
-                    ${isDragging 
-                      ? 'border-violet-500 bg-gradient-to-br from-violet-50 to-purple-50 scale-[1.02]' 
-                      : 'border-violet-300 bg-gradient-to-br from-violet-50/50 to-purple-50/50 hover:border-violet-400 hover:from-violet-50 hover:to-purple-50'
-                    }
-                    ${file ? 'border-violet-500 bg-gradient-to-br from-violet-50 to-purple-50' : ''}
-                  `}
-                >
-                  <div className="p-8 text-center">
-                    <Upload className={`mx-auto mb-3 h-12 w-12 ${isDragging || file ? 'text-violet-500' : 'text-violet-400'}`} />
-                    {file ? (
-                      <>
-                        <p className="text-sm font-medium text-violet-700 mb-1">
-                          {t('fileSelected')}: {file.name}
-                        </p>
-                        <p className="text-xs text-violet-600">
-                          {(file.size / 1024).toFixed(2)} KB
-                          {isValidating && ` - ${t('validating')}`}
-                        </p>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          className="mt-3"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setFile(null);
-                            setRows([]);
-                            setValidationErrors([]);
-                            setJobId(null);
-                            setGenerationProgress({ current: 0, total: 0 });
-                            localStorage.removeItem(cacheKey);
-                            if (fileInputRef.current) {
-                              fileInputRef.current.value = '';
+                {/* Image-specific settings */}
+                {generationType === 'image' && (
+                  <div>
+                    <Label className="text-sm font-medium mb-2 block">Output Format</Label>
+                    <div className="grid grid-cols-2 gap-3">
+                      <button
+                        type="button"
+                        onClick={() => setOutputFormat('PNG')}
+                        disabled={isGenerating}
+                        className={`flex items-center justify-center rounded-lg border-2 py-2.5 px-4 text-sm font-medium transition-all ${
+                          outputFormat === 'PNG'
+                            ? 'border-purple-500 bg-purple-50 text-purple-700'
+                            : 'border-gray-200 bg-white text-gray-700 hover:border-purple-300'
+                        } disabled:opacity-50 disabled:cursor-not-allowed`}
+                      >
+                        <span>PNG</span>
+                        {outputFormat === 'PNG' && (
+                          <svg
+                            className="ml-2 h-4 w-4"
+                            fill="currentColor"
+                            viewBox="0 0 20 20"
+                            role="img"
+                            aria-label={t('selected') || 'Selected'}
+                          >
+                            <title>{t('selected') || 'Selected'}</title>
+                            <path
+                              fillRule="evenodd"
+                              d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                              clipRule="evenodd"
+                            />
+                          </svg>
+                        )}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setOutputFormat('JPEG')}
+                        disabled={isGenerating}
+                        className={`flex items-center justify-center rounded-lg border-2 py-2.5 px-4 text-sm font-medium transition-all ${
+                          outputFormat === 'JPEG'
+                            ? 'border-purple-500 bg-purple-50 text-purple-700'
+                            : 'border-gray-200 bg-white text-gray-700 hover:border-purple-300'
+                        } disabled:opacity-50 disabled:cursor-not-allowed`}
+                      >
+                        <span>JPEG</span>
+                        {outputFormat === 'JPEG' && (
+                          <svg
+                            className="ml-2 h-4 w-4"
+                            fill="currentColor"
+                            viewBox="0 0 20 20"
+                            role="img"
+                            aria-label={t('selected') || 'Selected'}
+                          >
+                            <title>{t('selected') || 'Selected'}</title>
+                            <path
+                              fillRule="evenodd"
+                              d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                              clipRule="evenodd"
+                            />
+                          </svg>
+                        )}
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                {/* Video-specific settings */}
+                {generationType === 'video' && (
+                  <>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <Label className="text-sm font-medium mb-2 block">{t('model')}</Label>
+                        <Select
+                          value={videoModel}
+                          onValueChange={(value) => {
+                            setVideoModel(value as 'sora-2' | 'sora-2-pro');
+                            if (value === 'sora-2') {
+                              setVideoQuality('standard');
                             }
                           }}
+                          disabled={isGenerating}
                         >
-                          {t('reselectFile')}
-                        </Button>
-                      </>
-                    ) : (
-                      <>
-                        <p className="text-sm font-medium text-violet-700 mb-1">
-                          {t('clickToUpload')}
-                        </p>
-                        <p className="text-xs text-violet-600">
-                          {t('fileTypes')}
-                        </p>
-                      </>
+                          <SelectTrigger>
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="sora-2">
+                              Sora 2 -{' '}
+                              {videoModel === 'sora-2'
+                                ? getVideoCreditCost()
+                                : creditsConfig.consumption.videoGeneration[
+                                    `sora-2-720p-${videoDuration}s`
+                                  ]}{' '}
+                              credits
+                            </SelectItem>
+                            <SelectItem value="sora-2-pro">
+                              Sora 2 Pro -{' '}
+                              {videoModel === 'sora-2-pro'
+                                ? getVideoCreditCost()
+                                : creditsConfig.consumption.videoGeneration[
+                                    `sora-2-pro-${videoQuality === 'standard' ? '720p' : '1080p'}-${videoDuration}s`
+                                  ]}{' '}
+                              credits
+                            </SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div>
+                        <Label className="text-sm font-medium mb-2 block">{t('duration')}</Label>
+                        <div className="grid grid-cols-2 gap-2">
+                          <button
+                            type="button"
+                            onClick={() => setVideoDuration(10)}
+                            disabled={isGenerating}
+                            className={`flex items-center justify-center rounded-lg border-2 py-2 px-3 text-sm font-medium transition-all ${
+                              videoDuration === 10
+                                ? 'border-purple-500 bg-purple-50 text-purple-700'
+                                : 'border-gray-200 bg-white text-gray-700 hover:border-purple-300'
+                            } disabled:opacity-50 disabled:cursor-not-allowed`}
+                          >
+                            10s
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setVideoDuration(15)}
+                            disabled={isGenerating}
+                            className={`flex items-center justify-center rounded-lg border-2 py-2 px-3 text-sm font-medium transition-all ${
+                              videoDuration === 15
+                                ? 'border-purple-500 bg-purple-50 text-purple-700'
+                                : 'border-gray-200 bg-white text-gray-700 hover:border-purple-300'
+                            } disabled:opacity-50 disabled:cursor-not-allowed`}
+                          >
+                            15s
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Quality selector - only for Sora 2 Pro */}
+                    {videoModel === 'sora-2-pro' && (
+                      <div>
+                        <Label className="text-sm font-medium mb-2 block">{t('quality')}</Label>
+                        <div className="grid grid-cols-2 gap-3">
+                          <button
+                            type="button"
+                            onClick={() => setVideoQuality('standard')}
+                            disabled={isGenerating}
+                            className={`flex items-center justify-center rounded-lg border-2 py-2.5 px-4 text-sm font-medium transition-all ${
+                              videoQuality === 'standard'
+                                ? 'border-purple-500 bg-purple-50 text-purple-700'
+                                : 'border-gray-200 bg-white text-gray-700 hover:border-purple-300'
+                            } disabled:opacity-50 disabled:cursor-not-allowed`}
+                          >
+                            <span>Standard (720P)</span>
+                            {videoQuality === 'standard' && (
+                              <svg
+                                className="ml-2 h-4 w-4"
+                                fill="currentColor"
+                                viewBox="0 0 20 20"
+                                role="img"
+                                aria-label={t('selected') || 'Selected'}
+                              >
+                                <title>{t('selected') || 'Selected'}</title>
+                                <path
+                                  fillRule="evenodd"
+                                  d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                                  clipRule="evenodd"
+                                />
+                              </svg>
+                            )}
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setVideoQuality('high')}
+                            disabled={isGenerating}
+                            className={`flex items-center justify-center rounded-lg border-2 py-2.5 px-4 text-sm font-medium transition-all ${
+                              videoQuality === 'high'
+                                ? 'border-purple-500 bg-purple-50 text-purple-700'
+                                : 'border-gray-200 bg-white text-gray-700 hover:border-purple-300'
+                            } disabled:opacity-50 disabled:cursor-not-allowed`}
+                          >
+                            <span>High (1080P)</span>
+                            {videoQuality === 'high' && (
+                              <svg
+                                className="ml-2 h-4 w-4"
+                                fill="currentColor"
+                                viewBox="0 0 20 20"
+                                role="img"
+                                aria-label={t('selected') || 'Selected'}
+                              >
+                                <title>{t('selected') || 'Selected'}</title>
+                                <path
+                                  fillRule="evenodd"
+                                  d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                                  clipRule="evenodd"
+                                />
+                              </svg>
+                            )}
+                          </button>
+                        </div>
+                      </div>
                     )}
-                  </div>
-                </div>
-                <input
-                  ref={fileInputRef}
-                  id="file-input"
-                  type="file"
-                  accept=".csv,.xlsx,.xls"
-                  onChange={handleFileChange}
-                  disabled={isValidating || isGenerating}
-                  className="hidden"
-                />
+                  </>
+                )}
               </div>
 
-              {validationErrors.length > 0 && (
-                <div className="rounded-lg border border-red-200 bg-red-50 p-4">
-                  <h4 className="font-medium text-red-800 mb-2">{t('validationErrors')}</h4>
-                  <ul className="text-sm text-red-700 space-y-1">
-                    {validationErrors.slice(0, 10).map((error, index) => (
-                      <li key={index}>
-                        {t('row')} {error.row} {t('rows')}, {error.field}: {error.message}
-                      </li>
-                    ))}
-                    {validationErrors.length > 10 && (
-                      <li>...{validationErrors.length - 10} {t('moreErrors')}</li>
-                    )}
-                  </ul>
+              {/* Template Download */}
+              <div className="border rounded-lg p-4 bg-gray-50">
+                <Label className="text-sm font-medium mb-3 block">{t('downloadTemplate')}</Label>
+                <div className="flex gap-3">
+                  <Button
+                    variant="outline"
+                    onClick={() => handleDownloadTemplate('excel')}
+                    className="flex items-center gap-2"
+                  >
+                    <FileSpreadsheet className="w-4 h-4" />
+                    {t('downloadExcel')}
+                  </Button>
+                  <Button
+                    variant="outline"
+                    onClick={() => handleDownloadTemplate('csv')}
+                    className="flex items-center gap-2"
+                  >
+                    <FileText className="w-4 h-4" />
+                    {t('downloadCSV')}
+                  </Button>
+                </div>
+              </div>
+
+              {/* I2V Restriction Warning */}
+              {generationMode === 'i2v' && (
+                <div className="rounded-lg border border-amber-200 bg-amber-50 p-4">
+                  <div className="flex items-start gap-3">
+                    <AlertCircle className="h-5 w-5 text-amber-600 flex-shrink-0 mt-0.5" />
+                    <div>
+                      <h4 className="font-semibold text-amber-900 text-sm mb-1">
+                        {t('importantNotice')}
+                      </h4>
+                      <p className="text-amber-800 text-xs leading-relaxed">{t('i2vWarning')}</p>
+                    </div>
+                  </div>
                 </div>
               )}
+
+              {/* File Upload */}
+              <div className="space-y-4">
+                <div>
+                  <Label htmlFor="file-input" className="text-sm font-medium mb-2 block">
+                    {t('uploadFile')}
+                  </Label>
+                  <button
+                    type="button"
+                    onDragOver={handleDragOver}
+                    onDragLeave={handleDragLeave}
+                    onDrop={handleDrop}
+                    onClick={(event) => {
+                      event.preventDefault();
+                      triggerFileDialog();
+                    }}
+                    onKeyDown={handleDropZoneKeyDown}
+                    aria-label={
+                      file
+                        ? `${t('fileSelected') || 'Selected file'}: ${file.name}`
+                        : t('clickToUpload') || 'Upload file'
+                    }
+                    className={`
+                      relative w-full rounded-xl border-2 border-dashed transition-all duration-300
+                      ${
+                        isDragging
+                          ? 'border-violet-500 bg-gradient-to-br from-violet-50 to-purple-50 scale-[1.02]'
+                          : 'border-violet-300 bg-gradient-to-br from-violet-50/50 to-purple-50/50 hover:border-violet-400 hover:from-violet-50 hover:to-purple-50'
+                      }
+                      ${file ? 'border-violet-500 bg-gradient-to-br from-violet-50 to-purple-50' : ''}
+                    `}
+                  >
+                    <div className="p-8 text-center">
+                      <Upload
+                        className={`mx-auto mb-3 h-12 w-12 ${isDragging || file ? 'text-violet-500' : 'text-violet-400'}`}
+                      />
+                      {file ? (
+                        <>
+                          <p className="text-sm font-medium text-violet-700 mb-1">
+                            {t('fileSelected')}: {file.name}
+                          </p>
+                          <p className="text-xs text-violet-600">
+                            {(file.size / 1024).toFixed(2)} KB
+                            {isValidating && ` - ${t('validating')}`}
+                          </p>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="mt-3"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setFile(null);
+                              setRows([]);
+                              setValidationErrors([]);
+                              setGenerationProgress({ current: 0, total: 0 });
+                              localStorage.removeItem(cacheKey);
+                              if (fileInputRef.current) {
+                                fileInputRef.current.value = '';
+                              }
+                            }}
+                          >
+                            {t('reselectFile')}
+                          </Button>
+                        </>
+                      ) : (
+                        <>
+                          <p className="text-sm font-medium text-violet-700 mb-1">
+                            {t('clickToUpload')}
+                          </p>
+                          <p className="text-xs text-violet-600">{t('fileTypes')}</p>
+                        </>
+                      )}
+                    </div>
+                  </button>
+                  <input
+                    ref={fileInputRef}
+                    id="file-input"
+                    type="file"
+                    accept=".csv,.xlsx,.xls"
+                    onChange={handleFileChange}
+                    disabled={isValidating || isGenerating}
+                    className="hidden"
+                  />
+                </div>
+
+                {validationErrors.length > 0 && (
+                  <div className="rounded-lg border border-red-200 bg-red-50 p-4">
+                    <h4 className="font-medium text-red-800 mb-2">{t('validationErrors')}</h4>
+                    <ul className="text-sm text-red-700 space-y-1">
+                      {validationErrors.slice(0, 10).map((error, index) => (
+                        <li key={`${error.row}-${error.field}-${index}`}>
+                          {t('row')} {error.row} {t('rows')}, {error.field}: {error.message}
+                        </li>
+                      ))}
+                      {validationErrors.length > 10 && (
+                        <li>
+                          ...{validationErrors.length - 10} {t('moreErrors')}
+                        </li>
+                      )}
+                    </ul>
+                  </div>
+                )}
+              </div>
             </div>
-          </div>
           </Card>
         </div>
 
         {/* Right Column: Summary Statistics - 1/3 width */}
         <div className="lg:col-span-1">
-        <Card className="p-6 sticky top-6">
-          <h3 className="text-lg font-semibold mb-4">{t('summary')}</h3>
-          
-          {/* Overall Statistics */}
-          <div className="space-y-4">
-            <div className="grid grid-cols-2 gap-3">
-              <div className="bg-gray-50 rounded-lg p-3 border border-slate-200">
-                <div className="text-2xl font-bold text-slate-700">{totalRows}</div>
-                <div className="text-xs text-slate-600 mt-1">{t('total')}</div>
-              </div>
-              <div className="bg-gray-50 rounded-lg p-3 border border-slate-200">
-                <div className="text-2xl font-bold text-green-600">{completedCount}</div>
-                <div className="text-xs text-slate-600 mt-1">{t('completed')}</div>
-              </div>
-              <div className="bg-gray-50 rounded-lg p-3 border border-slate-200">
-                <div className="text-2xl font-bold text-amber-600">{generatingCount}</div>
-                <div className="text-xs text-slate-600 mt-1">{t('generatingStatus')}</div>
-              </div>
-              <div className="bg-gray-50 rounded-lg p-3 border border-slate-200">
-                <div className="text-2xl font-bold text-red-600">{failedCount}</div>
-                <div className="text-xs text-slate-600 mt-1">{t('failed')}</div>
-              </div>
-            </div>
+          <Card className="p-6 sticky top-6">
+            <h3 className="text-lg font-semibold mb-4">{t('summary')}</h3>
 
-            {/* Overall Progress */}
-            {isGenerating && generationProgress.total > 0 && (
-              <div className="space-y-2 pt-2 border-t">
-                <div className="flex items-center justify-between text-sm">
-                  <span className="text-gray-600">{t('overallProgress')}</span>
-                  <span className="font-medium">
-                    {generationProgress.current} / {generationProgress.total}
-                  </span>
+            {/* Overall Statistics */}
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 gap-3">
+                <div className="bg-gray-50 rounded-lg p-3 border border-slate-200">
+                  <div className="text-2xl font-bold text-slate-700">{totalRows}</div>
+                  <div className="text-xs text-slate-600 mt-1">{t('total')}</div>
                 </div>
-                <Progress
-                  value={(generationProgress.current / generationProgress.total) * 100}
-                  className="h-2"
-                />
-                <p className="text-xs text-gray-500 text-center">
-                  {Math.round((generationProgress.current / generationProgress.total) * 100)}% {t('completedPercentage')}
-                </p>
-              </div>
-            )}
-
-            {/* Completion Rate */}
-            {totalRows > 0 && (
-              <div className="pt-2 border-t">
-                <div className="flex items-center justify-between text-sm mb-2">
-                  <span className="text-gray-600">{t('completionRate')}</span>
-                  <span className="font-medium">
-                    {Math.round((completedCount / totalRows) * 100)}%
-                  </span>
+                <div className="bg-gray-50 rounded-lg p-3 border border-slate-200">
+                  <div className="text-2xl font-bold text-green-600">{completedCount}</div>
+                  <div className="text-xs text-slate-600 mt-1">{t('completed')}</div>
                 </div>
-                <Progress
-                  value={(completedCount / totalRows) * 100}
-                  className="h-2"
-                />
+                <div className="bg-gray-50 rounded-lg p-3 border border-slate-200">
+                  <div className="text-2xl font-bold text-amber-600">{generatingCount}</div>
+                  <div className="text-xs text-slate-600 mt-1">{t('generatingStatus')}</div>
+                </div>
+                <div className="bg-gray-50 rounded-lg p-3 border border-slate-200">
+                  <div className="text-2xl font-bold text-red-600">{failedCount}</div>
+                  <div className="text-xs text-slate-600 mt-1">{t('failed')}</div>
+                </div>
               </div>
-            )}
 
-            {/* Status Breakdown */}
-            <div className="pt-2 border-t space-y-2">
-              <h4 className="text-sm font-medium text-gray-700">{t('statusDistribution')}</h4>
-              <div className="space-y-1.5">
-                {completedCount > 0 && (
-                  <div className="flex items-center justify-between text-xs">
-                    <div className="flex items-center gap-2">
-                      <CheckCircle2 className="w-3 h-3 text-green-500" />
-                      <span className="text-gray-600">{t('completed')}</span>
-                    </div>
-                    <span className="font-medium">{completedCount}</span>
+              {/* Overall Progress */}
+              {isGenerating && generationProgress.total > 0 && (
+                <div className="space-y-2 pt-2 border-t">
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-gray-600">{t('overallProgress')}</span>
+                    <span className="font-medium">
+                      {generationProgress.current} / {generationProgress.total}
+                    </span>
                   </div>
-                )}
-                {generatingCount > 0 && (
-                  <div className="flex items-center justify-between text-xs">
-                    <div className="flex items-center gap-2">
-                      <Loader2 className="w-3 h-3 text-blue-500 animate-spin" />
-                      <span className="text-gray-600">{t('generatingStatus')}</span>
-                    </div>
-                    <span className="font-medium">{generatingCount}</span>
+                  <Progress
+                    value={(generationProgress.current / generationProgress.total) * 100}
+                    className="h-2"
+                  />
+                  <p className="text-xs text-gray-500 text-center">
+                    {Math.round((generationProgress.current / generationProgress.total) * 100)}%{' '}
+                    {t('completedPercentage')}
+                  </p>
+                </div>
+              )}
+
+              {/* Completion Rate */}
+              {totalRows > 0 && (
+                <div className="pt-2 border-t">
+                  <div className="flex items-center justify-between text-sm mb-2">
+                    <span className="text-gray-600">{t('completionRate')}</span>
+                    <span className="font-medium">
+                      {Math.round((completedCount / totalRows) * 100)}%
+                    </span>
                   </div>
-                )}
-                {failedCount > 0 && (
-                  <div className="flex items-center justify-between text-xs">
-                    <div className="flex items-center gap-2">
-                      <XCircle className="w-3 h-3 text-red-500" />
-                      <span className="text-gray-600">{t('failed')}</span>
+                  <Progress value={(completedCount / totalRows) * 100} className="h-2" />
+                </div>
+              )}
+
+              {/* Status Breakdown */}
+              <div className="pt-2 border-t space-y-2">
+                <h4 className="text-sm font-medium text-gray-700">{t('statusDistribution')}</h4>
+                <div className="space-y-1.5">
+                  {completedCount > 0 && (
+                    <div className="flex items-center justify-between text-xs">
+                      <div className="flex items-center gap-2">
+                        <CheckCircle2 className="w-3 h-3 text-green-500" />
+                        <span className="text-gray-600">{t('completed')}</span>
+                      </div>
+                      <span className="font-medium">{completedCount}</span>
                     </div>
-                    <span className="font-medium">{failedCount}</span>
-                  </div>
-                )}
-                {pendingCount > 0 && (
-                  <div className="flex items-center justify-between text-xs">
-                    <div className="flex items-center gap-2">
-                      <Upload className="w-3 h-3 text-gray-400" />
-                      <span className="text-gray-600">{t('waiting')}</span>
+                  )}
+                  {generatingCount > 0 && (
+                    <div className="flex items-center justify-between text-xs">
+                      <div className="flex items-center gap-2">
+                        <Loader2 className="w-3 h-3 text-blue-500 animate-spin" />
+                        <span className="text-gray-600">{t('generatingStatus')}</span>
+                      </div>
+                      <span className="font-medium">{generatingCount}</span>
                     </div>
-                    <span className="font-medium">{pendingCount}</span>
-                  </div>
-                )}
+                  )}
+                  {failedCount > 0 && (
+                    <div className="flex items-center justify-between text-xs">
+                      <div className="flex items-center gap-2">
+                        <XCircle className="w-3 h-3 text-red-500" />
+                        <span className="text-gray-600">{t('failed')}</span>
+                      </div>
+                      <span className="font-medium">{failedCount}</span>
+                    </div>
+                  )}
+                  {pendingCount > 0 && (
+                    <div className="flex items-center justify-between text-xs">
+                      <div className="flex items-center gap-2">
+                        <Upload className="w-3 h-3 text-gray-400" />
+                        <span className="text-gray-600">{t('waiting')}</span>
+                      </div>
+                      <span className="font-medium">{pendingCount}</span>
+                    </div>
+                  )}
+                </div>
               </div>
+
+              {/* Quick Actions */}
+              {completedCount > 0 && (
+                <div className="pt-2 border-t">
+                  <Button onClick={handleDownloadResults} className="w-full" variant="default">
+                    <Download className="w-4 h-4 mr-2" />
+                    {t('downloadAllResults')}
+                  </Button>
+                </div>
+              )}
             </div>
-
-            {/* Quick Actions */}
-            {completedCount > 0 && (
-              <div className="pt-2 border-t">
-                <Button
-                  onClick={handleDownloadResults}
-                  className="w-full"
-                  variant="default"
-                >
-                  <Download className="w-4 h-4 mr-2" />
-                  {t('downloadAllResults')}
-                </Button>
-              </div>
-            )}
-          </div>
-        </Card>
+          </Card>
         </div>
       </div>
 
@@ -1437,11 +1575,11 @@ const hasCompletedAsset = (row: RowData) =>
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <h3 className="font-medium text-lg">{t('dataPreview')} ({rows.length} {t('rows')})</h3>
+                  <h3 className="font-medium text-lg">
+                    {t('dataPreview')} ({rows.length} {t('rows')})
+                  </h3>
                   {!file && (
-                    <p className="text-xs text-violet-600 mt-1">
-                      📦 {t('recoveredFromCache')}
-                    </p>
+                    <p className="text-xs text-violet-600 mt-1">📦 {t('recoveredFromCache')}</p>
                   )}
                 </div>
                 <div className="flex gap-2">
@@ -1449,11 +1587,16 @@ const hasCompletedAsset = (row: RowData) =>
                     size="sm"
                     variant="outline"
                     onClick={() => {
-                      if (confirm(generationType === 'image' ? '确定要清除所有数据并重新开始吗？' : '确定要清除所有数据并重新开始吗？')) {
+                      if (
+                        confirm(
+                          generationType === 'image'
+                            ? '确定要清除所有数据并重新开始吗？'
+                            : '确定要清除所有数据并重新开始吗？'
+                        )
+                      ) {
                         setFile(null);
                         setRows([]);
                         setValidationErrors([]);
-                        setJobId(null);
                         setGenerationProgress({ current: 0, total: 0 });
                         localStorage.removeItem(cacheKey);
                         if (fileInputRef.current) {
@@ -1481,7 +1624,11 @@ const hasCompletedAsset = (row: RowData) =>
                   <Button
                     size="sm"
                     onClick={handleEnhanceAllPrompts}
-                    disabled={isEnhancingAll || rows.some((r) => r.status === 'enhancing') || rows.length === 0}
+                    disabled={
+                      isEnhancingAll ||
+                      rows.some((r) => r.status === 'enhancing') ||
+                      rows.length === 0
+                    }
                   >
                     {isEnhancingAll ? (
                       <>
@@ -1524,9 +1671,7 @@ const hasCompletedAsset = (row: RowData) =>
                       {generationProgress.current} / {generationProgress.total}
                     </span>
                   </div>
-                  <Progress
-                    value={(generationProgress.current / generationProgress.total) * 100}
-                  />
+                  <Progress value={(generationProgress.current / generationProgress.total) * 100} />
                 </div>
               )}
 
@@ -1554,127 +1699,133 @@ const hasCompletedAsset = (row: RowData) =>
                             disabled={row.status === 'generating' || row.status === 'completed'}
                           />
                           <div className="flex-1 space-y-3">
-                        {row.productName && (
-                          <div>
-                            <Label className="text-xs text-gray-500">{t('productName')}</Label>
-                            <p className="text-sm font-medium">{row.productName}</p>
-                          </div>
-                        )}
-                        {row.productDescription && (
-                          <div>
-                            <Label className="text-xs text-gray-500">{t('productDescription')}</Label>
-                            <p className="text-sm">{row.productDescription}</p>
-                          </div>
-                        )}
-                        <div>
-                          <div className="flex items-center justify-between mb-1">
-                            <Label className="text-xs text-gray-500">
-                              {t('originalPrompt')} ({t('rowNumber')} {row.rowIndex})
-                            </Label>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              className="h-6 px-2 text-xs text-gray-500 hover:text-gray-700"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                const textarea = document.getElementById(`prompt-${row.rowIndex}`) as HTMLTextAreaElement;
-                                if (textarea) {
-                                  textarea.select();
-                                  textarea.focus();
-                                }
-                              }}
-                            >
-                              {t('selectAll')}
-                            </Button>
-                          </div>
-                          <div className="relative">
-                            <Textarea
-                              id={`prompt-${row.rowIndex}`}
-                              value={row.prompt}
-                              onChange={(e) =>
-                                setRows((prev) =>
-                                  prev.map((r) =>
-                                    r.rowIndex === row.rowIndex
-                                      ? { ...r, prompt: e.target.value }
-                                      : r
-                                  )
-                                )
-                              }
-                              onSelect={(e) => {
-                                // Allow text selection
-                                e.stopPropagation();
-                              }}
-                              className="text-sm min-h-[80px] pr-28 select-text"
-                              disabled={row.status === 'generating'}
-                            />
-                            <Button
-                              onClick={() => handleEnhanceSinglePrompt(row.rowIndex)}
-                              disabled={
-                                row.status === 'enhancing' ||
-                                row.status === 'generating' ||
-                                !row.prompt.trim()
-                              }
-                              size="sm"
-                              className="absolute right-2 bottom-2 bg-gradient-to-br from-violet-50 to-purple-50 border-violet-300 text-violet-700 hover:from-violet-100 hover:to-purple-100 hover:border-violet-400"
-                            >
-                              {row.status === 'enhancing' ? (
-                                <>
-                                  <Loader2 className="w-3 h-3 mr-1 animate-spin" />
-                                  {t('generating')}
-                                </>
-                              ) : (
-                                <>
-                                  <Sparkles className="w-3 h-3 mr-1" />
-                                  {t('enhance')}
-                                </>
-                              )}
-                            </Button>
-                          </div>
-                        </div>
-                        <div className="flex-1 flex flex-col mt-auto">
-                          <div className="flex items-center justify-between mb-1">
-                            <Label className="text-xs text-gray-500">
-                              {t('enhancePrompt')}
-                            </Label>
-                            {row.enhancedPrompt && (
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                className="h-6 px-2 text-xs text-gray-500 hover:text-gray-700"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  const textarea = document.getElementById(`enhanced-prompt-${row.rowIndex}`) as HTMLTextAreaElement;
-                                  if (textarea) {
-                                    textarea.select();
-                                    textarea.focus();
-                                  }
-                                }}
-                              >
-                                {t('selectAll')}
-                              </Button>
+                            {row.productName && (
+                              <div>
+                                <Label className="text-xs text-gray-500">{t('productName')}</Label>
+                                <p className="text-sm font-medium">{row.productName}</p>
+                              </div>
                             )}
-                          </div>
-                          <Textarea
-                            id={`enhanced-prompt-${row.rowIndex}`}
-                            value={row.enhancedPrompt || ''}
-                            onChange={(e) =>
-                              setRows((prev) =>
-                                prev.map((r) =>
-                                  r.rowIndex === row.rowIndex
-                                    ? { ...r, enhancedPrompt: e.target.value }
-                                    : r
-                                )
-                              )
-                            }
-                            onSelect={(e) => {
-                              // Allow text selection
-                              e.stopPropagation();
-                            }}
-                            className="text-sm flex-1 select-text resize-none"
-                            disabled={row.status === 'generating'}
-                            placeholder={t('enhancePromptPlaceholder')}
-                          />
-                        </div>
+                            {row.productDescription && (
+                              <div>
+                                <Label className="text-xs text-gray-500">
+                                  {t('productDescription')}
+                                </Label>
+                                <p className="text-sm">{row.productDescription}</p>
+                              </div>
+                            )}
+                            <div>
+                              <div className="flex items-center justify-between mb-1">
+                                <Label className="text-xs text-gray-500">
+                                  {t('originalPrompt')} ({t('rowNumber')} {row.rowIndex})
+                                </Label>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  className="h-6 px-2 text-xs text-gray-500 hover:text-gray-700"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    const textarea = document.getElementById(
+                                      `prompt-${row.rowIndex}`
+                                    ) as HTMLTextAreaElement;
+                                    if (textarea) {
+                                      textarea.select();
+                                      textarea.focus();
+                                    }
+                                  }}
+                                >
+                                  {t('selectAll')}
+                                </Button>
+                              </div>
+                              <div className="relative">
+                                <Textarea
+                                  id={`prompt-${row.rowIndex}`}
+                                  value={row.prompt}
+                                  onChange={(e) =>
+                                    setRows((prev) =>
+                                      prev.map((r) =>
+                                        r.rowIndex === row.rowIndex
+                                          ? { ...r, prompt: e.target.value }
+                                          : r
+                                      )
+                                    )
+                                  }
+                                  onSelect={(e) => {
+                                    // Allow text selection
+                                    e.stopPropagation();
+                                  }}
+                                  className="text-sm min-h-[80px] pr-28 select-text"
+                                  disabled={row.status === 'generating'}
+                                />
+                                <Button
+                                  onClick={() => handleEnhanceSinglePrompt(row.rowIndex)}
+                                  disabled={
+                                    row.status === 'enhancing' ||
+                                    row.status === 'generating' ||
+                                    !row.prompt.trim()
+                                  }
+                                  size="sm"
+                                  className="absolute right-2 bottom-2 bg-gradient-to-br from-violet-50 to-purple-50 border-violet-300 text-violet-700 hover:from-violet-100 hover:to-purple-100 hover:border-violet-400"
+                                >
+                                  {row.status === 'enhancing' ? (
+                                    <>
+                                      <Loader2 className="w-3 h-3 mr-1 animate-spin" />
+                                      {t('generating')}
+                                    </>
+                                  ) : (
+                                    <>
+                                      <Sparkles className="w-3 h-3 mr-1" />
+                                      {t('enhance')}
+                                    </>
+                                  )}
+                                </Button>
+                              </div>
+                            </div>
+                            <div className="flex-1 flex flex-col mt-auto">
+                              <div className="flex items-center justify-between mb-1">
+                                <Label className="text-xs text-gray-500">
+                                  {t('enhancePrompt')}
+                                </Label>
+                                {row.enhancedPrompt && (
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    className="h-6 px-2 text-xs text-gray-500 hover:text-gray-700"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      const textarea = document.getElementById(
+                                        `enhanced-prompt-${row.rowIndex}`
+                                      ) as HTMLTextAreaElement;
+                                      if (textarea) {
+                                        textarea.select();
+                                        textarea.focus();
+                                      }
+                                    }}
+                                  >
+                                    {t('selectAll')}
+                                  </Button>
+                                )}
+                              </div>
+                              <Textarea
+                                id={`enhanced-prompt-${row.rowIndex}`}
+                                value={row.enhancedPrompt || ''}
+                                onChange={(e) =>
+                                  setRows((prev) =>
+                                    prev.map((r) =>
+                                      r.rowIndex === row.rowIndex
+                                        ? { ...r, enhancedPrompt: e.target.value }
+                                        : r
+                                    )
+                                  )
+                                }
+                                onSelect={(e) => {
+                                  // Allow text selection
+                                  e.stopPropagation();
+                                }}
+                                className="text-sm flex-1 select-text resize-none"
+                                disabled={row.status === 'generating'}
+                                placeholder={t('enhancePromptPlaceholder')}
+                              />
+                            </div>
                           </div>
                         </div>
                       </div>
@@ -1696,10 +1847,15 @@ const hasCompletedAsset = (row: RowData) =>
                                   controls
                                   className="w-full h-full object-contain"
                                 >
+                                  <track
+                                    kind="captions"
+                                    src="data:text/vtt,WEBVTT"
+                                    label="captions"
+                                  />
                                   您的浏览器不支持视频播放
                                 </video>
                               )}
-                              
+
                               {/* Hover Overlay */}
                               <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center gap-2">
                                 <Button
@@ -1739,7 +1895,9 @@ const hasCompletedAsset = (row: RowData) =>
                             </div>
                             <div className="mt-3 flex items-center justify-center gap-2">
                               <CheckCircle2 className="w-4 h-4 text-green-500" />
-                              <span className="text-sm text-gray-600 font-medium">{t('generationComplete')}</span>
+                              <span className="text-sm text-gray-600 font-medium">
+                                {t('generationComplete')}
+                              </span>
                             </div>
                           </div>
                         ) : row.status === 'generating' ? (
@@ -1750,7 +1908,9 @@ const hasCompletedAsset = (row: RowData) =>
                             <div className="space-y-2 w-full">
                               <div className="flex items-center justify-center gap-2 text-sm text-blue-600">
                                 <span>生成中...</span>
-                                {row.progress !== undefined && <span className="font-medium">{row.progress}%</span>}
+                                {row.progress !== undefined && (
+                                  <span className="font-medium">{row.progress}%</span>
+                                )}
                               </div>
                               {row.progress !== undefined && (
                                 <Progress value={row.progress} className="h-2" />
@@ -1763,7 +1923,9 @@ const hasCompletedAsset = (row: RowData) =>
                               <XCircle className="w-12 h-12 text-red-500" />
                             </div>
                             <div className="text-center">
-                              <p className="text-sm text-red-600 font-medium">{t('generationFailed')}</p>
+                              <p className="text-sm text-red-600 font-medium">
+                                {t('generationFailed')}
+                              </p>
                               {row.error && (
                                 <p className="text-xs text-red-500 mt-1 max-w-xs">{row.error}</p>
                               )}
@@ -1787,10 +1949,7 @@ const hasCompletedAsset = (row: RowData) =>
                 <div className="flex gap-3 pt-4 border-t">
                   <Button
                     onClick={handleGenerate}
-                    disabled={
-                      isGenerating ||
-                      rows.filter((r) => r.isSelected).length === 0
-                    }
+                    disabled={isGenerating || rows.filter((r) => r.isSelected).length === 0}
                     className="flex-1"
                   >
                     {isGenerating ? (
@@ -1801,11 +1960,12 @@ const hasCompletedAsset = (row: RowData) =>
                     ) : (
                       <>
                         <Upload className="w-4 h-4 mr-2" />
-                        {t('startBatchGeneration')} (
-                        {rows.filter((r) => r.isSelected).length} {t('rowsSelected')})
+                        {t('startBatchGeneration')} ({rows.filter((r) => r.isSelected).length}{' '}
+                        {t('rowsSelected')})
                         {rows.filter((r) => r.isSelected && r.enhancedPrompt).length > 0 && (
                           <span className="text-xs text-violet-600 ml-1">
-                            ({rows.filter((r) => r.isSelected && r.enhancedPrompt).length} {t('enhanced')})
+                            ({rows.filter((r) => r.isSelected && r.enhancedPrompt).length}{' '}
+                            {t('enhanced')})
                           </span>
                         )}
                       </>
@@ -1829,23 +1989,18 @@ const hasCompletedAsset = (row: RowData) =>
         <DialogContent className="max-w-4xl">
           <DialogHeader>
             <DialogTitle>
-              {t('previewTitle')} - {previewAsset?.type === 'image' ? t('imageStyle') : t('videoStyle')} ({t('rowNumber')} {previewAsset?.rowIndex})
+              {t('previewTitle')} -{' '}
+              {previewAsset?.type === 'image' ? t('imageStyle') : t('videoStyle')} ({t('rowNumber')}{' '}
+              {previewAsset?.rowIndex})
             </DialogTitle>
           </DialogHeader>
           {previewAsset && (
             <div className="mt-4">
               {previewAsset.type === 'image' ? (
-                <img
-                  src={previewAsset.url}
-                  alt="Preview"
-                  className="w-full rounded-lg"
-                />
+                <img src={previewAsset.url} alt="Preview" className="w-full rounded-lg" />
               ) : (
-                <video
-                  src={previewAsset.url}
-                  controls
-                  className="w-full rounded-lg"
-                >
+                <video src={previewAsset.url} controls className="w-full rounded-lg">
+                  <track kind="captions" src="data:text/vtt,WEBVTT" label="captions" />
                   {t('browserNotSupportVideo')}
                 </video>
               )}

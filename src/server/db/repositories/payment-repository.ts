@@ -52,7 +52,7 @@ export class PaymentRepository {
     const [result] = await db
       .insert(payment)
       .values({
-        id: data.id || randomUUID(),
+        id: paymentId,
         provider: data.provider || 'stripe',
         priceId: data.priceId,
         productId: data.productId || null,
@@ -304,7 +304,7 @@ export class PaymentRepository {
   async updateSubscriptionStatus(
     subscriptionId: string,
     newStatus: PaymentStatus,
-    metadata?: Record<string, any>
+    metadata?: Record<string, unknown>
   ): Promise<PaymentRecord | null> {
     const current = await this.findBySubscriptionId(subscriptionId);
 
@@ -366,5 +366,3 @@ export class PaymentRepository {
 
 // Export singleton instance
 export const paymentRepository = new PaymentRepository();
-
-

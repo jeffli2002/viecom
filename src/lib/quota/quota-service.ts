@@ -291,5 +291,3 @@ export const quotaService = {
   // Reset monthly usage
   resetMonthlyUsage: (userId: string, period?: string) => resetQuotaUsage(userId, period),
 };
-
-

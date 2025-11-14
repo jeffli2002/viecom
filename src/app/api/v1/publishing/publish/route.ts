@@ -6,6 +6,39 @@ import { generatedAsset, platformPublish } from '@/server/db/schema';
 import { eq } from 'drizzle-orm';
 import { type NextRequest, NextResponse } from 'next/server';
 
+type PublishMode = 'media-only' | 'product';
+
+interface ProductInfo {
+  productId?: string;
+  title?: string;
+  description?: string;
+  category?: string;
+  brand?: string;
+  model?: string;
+  sku?: string;
+  upc?: string;
+  countryOfOrigin?: string;
+  standardPrice?: number;
+  salePrice?: number;
+  currency?: string;
+  inventoryQuantity?: number;
+  minPurchaseQuantity?: number;
+  maxPurchaseQuantity?: number;
+  imageId?: string;
+  videoId?: string;
+}
+
+interface PublishRequest {
+  assetId: string;
+  assetUrl: string | null;
+  assetType: 'image' | 'video';
+  platform: string;
+  publishMode: PublishMode;
+  productInfo?: ProductInfo;
+  publishOptions?: Record<string, unknown>;
+  platformAccountId?: string | null;
+}
+
 export const dynamic = 'force-dynamic';
 export const fetchCache = 'force-no-store';
 
@@ -26,6 +59,12 @@ export async function POST(request: NextRequest) {
       publishMode = 'media-only', // 'media-only' or 'product'
       productInfo,
       publishOptions,
+    }: {
+      assetId: string;
+      platforms: string[];
+      publishMode?: PublishMode;
+      productInfo?: ProductInfo;
+      publishOptions?: Record<string, unknown>;
     } = body;
 
     if (!assetId) {
@@ -56,13 +95,13 @@ export async function POST(request: NextRequest) {
     }
 
     // Create publish requests
-    const publishRequests = platforms.map((platform: string) => ({
+    const publishRequests: PublishRequest[] = platforms.map((platformName) => ({
       assetId: asset.id,
       assetUrl: asset.publicUrl,
       assetType: asset.assetType as 'image' | 'video',
-      platform: platform as any,
-      publishMode, // Include publish mode
-      productInfo: publishMode === 'product' ? productInfo : undefined, // Only include product info if product mode
+      platform: platformName,
+      publishMode,
+      productInfo: publishMode === 'product' ? productInfo : undefined,
       publishOptions,
     }));
 
@@ -71,36 +110,36 @@ export async function POST(request: NextRequest) {
 
     // Save publish records with product information
     const publishRecords = results.map((result, index) => {
-      const request = publishRequests[index]!;
-      const productInfo = request.productInfo || {};
+      const request = publishRequests[index];
+      const requestProductInfo: ProductInfo = request?.productInfo || {};
 
       return {
         id: randomUUID(),
         userId: session.user.id,
         assetId: asset.id,
-        platform: request.platform,
-        platformAccountId: request.platformAccountId || null,
+        platform: request?.platform || 'unknown',
+        platformAccountId: request?.platformAccountId || null,
         // Product Information
-        productId: productInfo.productId || null,
-        productName: productInfo.title || null,
-        productDescription: productInfo.description || null,
-        productCategory: productInfo.category || null,
-        productBrand: productInfo.brand || null,
-        productModel: productInfo.model || null,
-        productSku: productInfo.sku || null,
-        productUpc: productInfo.upc || null,
-        productCountryOfOrigin: productInfo.countryOfOrigin || null,
+        productId: requestProductInfo.productId || null,
+        productName: requestProductInfo.title || null,
+        productDescription: requestProductInfo.description || null,
+        productCategory: requestProductInfo.category || null,
+        productBrand: requestProductInfo.brand || null,
+        productModel: requestProductInfo.model || null,
+        productSku: requestProductInfo.sku || null,
+        productUpc: requestProductInfo.upc || null,
+        productCountryOfOrigin: requestProductInfo.countryOfOrigin || null,
         // Pricing
-        standardPrice: productInfo.standardPrice?.toString() || null,
-        salePrice: productInfo.salePrice?.toString() || null,
-        currency: productInfo.currency || 'USD',
+        standardPrice: requestProductInfo.standardPrice?.toString() || null,
+        salePrice: requestProductInfo.salePrice?.toString() || null,
+        currency: requestProductInfo.currency || 'USD',
         // Inventory
-        inventoryQuantity: productInfo.inventoryQuantity || null,
-        minPurchaseQuantity: productInfo.minPurchaseQuantity || 1,
-        maxPurchaseQuantity: productInfo.maxPurchaseQuantity || null,
+        inventoryQuantity: requestProductInfo.inventoryQuantity || null,
+        minPurchaseQuantity: requestProductInfo.minPurchaseQuantity || 1,
+        maxPurchaseQuantity: requestProductInfo.maxPurchaseQuantity || null,
         // Media IDs
-        imageId: result.metadata?.imageId || productInfo.imageId || null,
-        videoId: result.metadata?.videoId || productInfo.videoId || null,
+        imageId: result.metadata?.imageId || requestProductInfo.imageId || null,
+        videoId: result.metadata?.videoId || requestProductInfo.videoId || null,
         // Publishing Status
         publishStatus: result.success ? 'published' : 'failed',
         publishUrl: result.publishUrl || null,
@@ -117,7 +156,7 @@ export async function POST(request: NextRequest) {
       success: true,
       data: {
         results: results.map((result, index) => ({
-          platform: publishRequests[index]!.platform,
+          platform: publishRequests[index]?.platform || 'unknown',
           ...result,
         })),
       },

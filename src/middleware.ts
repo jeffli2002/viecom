@@ -1,8 +1,8 @@
 import { routing } from '@/i18n/routing';
+import { jwtVerify } from 'jose';
 import createMiddleware from 'next-intl/middleware';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
-import { jwtVerify } from 'jose';
 
 const intlMiddleware = createMiddleware(routing);
 
@@ -24,16 +24,17 @@ export default async function middleware(request: NextRequest) {
     }
 
     try {
-      const JWT_SECRET = process.env.ADMIN_JWT_SECRET || 'your-admin-secret-key-change-in-production';
+      const JWT_SECRET =
+        process.env.ADMIN_JWT_SECRET || 'your-admin-secret-key-change-in-production';
       const secret = new TextEncoder().encode(JWT_SECRET);
       const { payload } = await jwtVerify(token, secret);
-      
+
       if (payload.role !== 'admin') {
         return NextResponse.redirect(new URL('/admin/login', request.url));
       }
 
       return NextResponse.next();
-    } catch (error) {
+    } catch (_error) {
       return NextResponse.redirect(new URL('/admin/login', request.url));
     }
   }

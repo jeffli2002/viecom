@@ -138,7 +138,7 @@ export function LoginForm({
 
               <div className="relative py-6">
                 <div className="absolute inset-0 flex items-center">
-                  <div className="w-full border-t border-gray-200"></div>
+                  <div className="w-full border-t border-gray-200" />
                 </div>
                 <div className="relative flex justify-center text-sm">
                   <span className="bg-white px-4 text-gray-500 font-medium">Or use email</span>
@@ -205,5 +205,3 @@ export function LoginForm({
     </div>
   );
 }
-
-

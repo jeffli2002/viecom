@@ -14,5 +14,3 @@ export const locales = [
   { name: 'English', locale: 'en' },
   { name: '中文', locale: 'zh' },
 ];
-
-

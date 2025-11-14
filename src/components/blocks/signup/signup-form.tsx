@@ -50,7 +50,7 @@ export function SignupForm({ className, ...props }: React.ComponentProps<'div'>)
     }
   }, [isAuthenticated, router, getRedirectUrl]);
 
-  const handleSocialLogin = async (provider: 'google') => {
+  const handleSocialLogin = async (_provider: 'google') => {
     try {
       clearError();
       const redirectUrl = getRedirectUrl();
@@ -231,5 +231,3 @@ export function SignupForm({ className, ...props }: React.ComponentProps<'div'>)
     </div>
   );
 }
-
-

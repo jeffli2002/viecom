@@ -3,17 +3,15 @@
  * Loads environment variables and runs Drizzle migrations
  */
 
+import { resolve } from 'node:path';
+import { neon } from '@neondatabase/serverless';
 import { config } from 'dotenv';
-import { resolve } from 'path';
+import { drizzle } from 'drizzle-orm/neon-http';
+import { migrate } from 'drizzle-orm/postgres-js/migrator';
+import { env } from '../src/env';
 
 // Load .env.local file
 config({ path: resolve(process.cwd(), '.env.local') });
-
-// Import after loading env vars
-import { migrate } from 'drizzle-orm/postgres-js/migrator';
-import { neon } from '@neondatabase/serverless';
-import { drizzle } from 'drizzle-orm/neon-http';
-import { env } from '../src/env';
 
 async function runMigrations() {
   console.log('🔄 Starting database migration...');
@@ -35,6 +33,3 @@ async function runMigrations() {
 }
 
 runMigrations();
-
-
-

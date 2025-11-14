@@ -4,9 +4,10 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
 import { Loader2 } from 'lucide-react';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 import { toast } from 'sonner';
 
 export default function AdminLoginPage() {
@@ -91,9 +92,9 @@ export default function AdminLoginPage() {
                 />
                 Remember me
               </label>
-              <a href="#" className="text-sm text-purple-600 hover:underline">
+              <Link href="/reset-password" className="text-sm text-purple-600 hover:underline">
                 Forgot password?
-              </a>
+              </Link>
             </div>
 
             <Button type="submit" className="w-full" disabled={isLoading}>
@@ -112,4 +113,3 @@ export default function AdminLoginPage() {
     </div>
   );
 }
-

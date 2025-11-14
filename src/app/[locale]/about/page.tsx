@@ -1,5 +1,16 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { buildLocaleCanonicalMetadata } from '@/lib/seo/metadata';
 import { Sparkles, Target, Users, Zap } from 'lucide-react';
+import type { Metadata } from 'next';
+
+export function generateMetadata({
+  params,
+}: {
+  params: { locale: string };
+}): Metadata {
+  const { locale } = params;
+  return buildLocaleCanonicalMetadata(locale, '/about');
+}
 
 export default function AboutPage() {
   return (
@@ -53,8 +64,8 @@ export default function AboutPage() {
                 customizable styles and backgrounds
               </li>
               <li>
-                <strong>AI Video Generation</strong> - Produce engaging product showcase videos
-                for social media and product pages
+                <strong>AI Video Generation</strong> - Produce engaging product showcase videos for
+                social media and product pages
               </li>
               <li>
                 <strong>Brand Analysis</strong> - Automatically analyze your brand tone and style
@@ -90,9 +101,7 @@ export default function AboutPage() {
               </div>
               <div className="space-y-2">
                 <h4 className="font-semibold text-gray-900">Fast & Scalable</h4>
-                <p className="text-sm">
-                  Create hundreds of product visuals in minutes, not days
-                </p>
+                <p className="text-sm">Create hundreds of product visuals in minutes, not days</p>
               </div>
               <div className="space-y-2">
                 <h4 className="font-semibold text-gray-900">Brand Consistency</h4>
@@ -143,8 +152,8 @@ export default function AboutPage() {
               technologies to ensure fast, reliable, and scalable service.
             </p>
             <p>
-              Every image and video is optimized for e-commerce use cases, with attention to
-              product clarity, professional aesthetics, and platform-specific requirements.
+              Every image and video is optimized for e-commerce use cases, with attention to product
+              clarity, professional aesthetics, and platform-specific requirements.
             </p>
           </CardContent>
         </Card>
@@ -174,4 +183,3 @@ export default function AboutPage() {
     </div>
   );
 }
-

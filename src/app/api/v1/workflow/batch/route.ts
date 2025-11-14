@@ -188,7 +188,6 @@ async function processBatchJob(
     const { db } = await import('@/server/db');
     const { batchGenerationJob } = await import('@/server/db/schema');
     const { eq } = await import('drizzle-orm');
-    const { r2StorageService } = await import('@/lib/storage/r2');
 
     // Update job status
     await db
@@ -217,7 +216,11 @@ async function processBatchJob(
       })
     );
 
-    const fileBuffer = Buffer.from(await getObjectResponse.Body!.transformToByteArray());
+    if (!getObjectResponse.Body) {
+      throw new Error('Missing batch file payload');
+    }
+
+    const fileBuffer = Buffer.from(await getObjectResponse.Body.transformToByteArray());
 
     // Process batch file with auto-publish option
     const result = await workflowEngine.processBatchFile(userId, fileBuffer, 'batch.csv', {
@@ -228,24 +231,7 @@ async function processBatchJob(
 
     // Save generated assets to database
     if (result.results && result.results.length > 0) {
-      const { generatedAsset } = await import('@/server/db/schema');
-      const assetsToInsert = result.results
-        .filter((r) => r.assetId)
-        .map((r, index) => ({
-          id: r.assetId,
-          userId,
-          batchJobId: jobId,
-          assetType: 'image' as const, // Will be updated based on actual asset type
-          generationMode: 't2i' as const, // Will be updated based on actual mode
-          prompt: '', // Will be updated
-          r2Key: '', // Will be updated
-          publicUrl: '', // Will be updated
-          status: 'completed' as const,
-          creditsSpent: 0,
-        }));
-
-      // Note: In production, we should fetch actual asset data from workflow result
-      // For now, we'll update the job status and let the frontend fetch assets separately
+      // TODO: Persist generated assets once workflow returns structured metadata
     }
 
     // Update job status

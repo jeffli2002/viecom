@@ -3,8 +3,8 @@
  * Run with: pnpm tsx scripts/test-checkin.ts
  */
 
+import { resolve } from 'node:path';
 import { config } from 'dotenv';
-import { resolve } from 'path';
 
 // Load environment variables
 config({ path: resolve(process.cwd(), '.env.local') });
@@ -17,7 +17,7 @@ async function testCheckinAPI() {
   // Note: This test requires authentication
   // You'll need to provide a valid session cookie or use a test user
   const testUserId = process.env.TEST_USER_ID;
-  
+
   if (!testUserId) {
     console.log('⚠️  TEST_USER_ID not set in .env.local');
     console.log('📝 To test the API:');
@@ -76,7 +76,7 @@ async function testCheckinAPI() {
     } else {
       const errorText = await postResponse.text();
       console.log('❌ POST failed:', postResponse.status, errorText);
-      
+
       if (postResponse.status === 400 && errorText.includes('Already checked in')) {
         console.log('ℹ️  This is expected if you already checked in today');
       }
@@ -97,11 +97,9 @@ async function testCheckinAPI() {
     } else {
       console.log('❌ Balance fetch failed:', balanceResponse.status);
     }
-
   } catch (error) {
     console.error('❌ Test error:', error);
   }
 }
 
 testCheckinAPI();
-

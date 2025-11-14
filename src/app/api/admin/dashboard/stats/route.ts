@@ -1,8 +1,8 @@
-import { db } from '@/server/db';
-import { user, subscription, payment, creditTransactions } from '@/server/db/schema';
 import { requireAdmin } from '@/lib/admin/auth';
+import { db } from '@/server/db';
+import { creditTransactions, payment, subscription, user } from '@/server/db/schema';
+import { and, eq, gte, sql } from 'drizzle-orm';
 import { NextResponse } from 'next/server';
-import { eq, gte, and, sql } from 'drizzle-orm';
 
 export async function GET(request: Request) {
   try {
@@ -101,22 +101,15 @@ export async function GET(request: Request) {
     // Prevent caching of admin data
     response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0');
     response.headers.set('Pragma', 'no-cache');
-    
+
     return response;
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Admin stats error:', error);
-    
-    if (error.message?.includes('Unauthorized')) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      );
+
+    if (error instanceof Error && error.message.includes('Unauthorized')) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    return NextResponse.json(
-      { error: 'Failed to fetch stats' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Failed to fetch stats' }, { status: 500 });
   }
 }
-

@@ -7,10 +7,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { usePathname, useRouter } from '@/i18n/navigation';
 import { routing } from '@/i18n/routing';
 import { Globe } from 'lucide-react';
 import { useLocale } from 'next-intl';
-import { usePathname, useRouter } from '@/i18n/navigation';
 
 export function LanguageSwitcher() {
   const locale = useLocale();

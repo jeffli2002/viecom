@@ -18,17 +18,17 @@ export async function GET(request: NextRequest) {
           'Content-Disposition': `attachment; filename="${filename}"`,
         },
       });
-    } else {
-      // Excel format
-      const buffer = templateGenerator.generateExcelTemplate(generationType);
-      const filename = `batch-${generationType}-generation-template.xlsx`;
-      return new NextResponse(buffer, {
-        headers: {
-          'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-          'Content-Disposition': `attachment; filename="${filename}"`,
-        },
-      });
     }
+
+    // Excel format
+    const buffer = templateGenerator.generateExcelTemplate(generationType);
+    const filename = `batch-${generationType}-generation-template.xlsx`;
+    return new NextResponse(buffer, {
+      headers: {
+        'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        'Content-Disposition': `attachment; filename="${filename}"`,
+      },
+    });
   } catch (error) {
     console.error('Template download error:', error);
     return NextResponse.json(

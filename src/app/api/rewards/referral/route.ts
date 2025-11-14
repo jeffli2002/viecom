@@ -1,11 +1,11 @@
+import { randomUUID } from 'node:crypto';
 import { creditsConfig } from '@/config/credits.config';
 import { auth } from '@/lib/auth/auth';
 import { creditService } from '@/lib/credits';
 import { db } from '@/server/db';
 import { userReferrals } from '@/server/db/schema';
 import { eq } from 'drizzle-orm';
-import { randomUUID } from 'node:crypto';
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 
 /**
  * Register a referral when a new user signs up with a referral code
@@ -38,10 +38,7 @@ export async function POST(request: NextRequest) {
     // TODO: Implement proper referral code lookup if using custom codes
 
     if (referrerId === referredUserId) {
-      return NextResponse.json(
-        { success: false, error: 'Cannot refer yourself' },
-        { status: 400 }
-      );
+      return NextResponse.json({ success: false, error: 'Cannot refer yourself' }, { status: 400 });
     }
 
     // Check if referral already exists
@@ -139,4 +136,3 @@ export async function GET(request: NextRequest) {
     );
   }
 }
-

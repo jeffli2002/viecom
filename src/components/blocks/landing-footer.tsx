@@ -5,7 +5,7 @@ import { useTranslations } from 'next-intl';
 
 export function LandingFooter() {
   const t = useTranslations('nav');
-  
+
   return (
     <footer className="border-t border-gray-200/50 bg-white dark:border-gray-800/50 dark:bg-gray-50">
       <div className="container py-16 md:py-20">
@@ -39,12 +39,18 @@ export function LandingFooter() {
                 </Link>
               </li>
               <li>
-                <Link href="/batch-image-generation" className="text-muted-foreground hover:text-primary">
+                <Link
+                  href="/batch-image-generation"
+                  className="text-muted-foreground hover:text-primary"
+                >
                   {t('batchImageGeneration')}
                 </Link>
               </li>
               <li>
-                <Link href="/batch-video-generation" className="text-muted-foreground hover:text-primary">
+                <Link
+                  href="/batch-video-generation"
+                  className="text-muted-foreground hover:text-primary"
+                >
                   {t('batchVideoGeneration')}
                 </Link>
               </li>

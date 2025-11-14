@@ -15,10 +15,10 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
 import { creditsConfig } from '@/config/credits.config';
+import { IMAGE_STYLES, getImageStyle } from '@/config/styles.config';
 import { useUpgradePrompt } from '@/hooks/use-upgrade-prompt';
 import type { BrandToneAnalysis } from '@/lib/brand/brand-tone-analyzer';
 import { useAuthStore } from '@/store/auth-store';
-import { IMAGE_STYLES, getImageStyle } from '@/config/styles.config';
 import {
   AlertCircle,
   Download,
@@ -29,8 +29,8 @@ import {
   Upload,
   X,
 } from 'lucide-react';
-import { useSearchParams } from 'next/navigation';
 import { useTranslations } from 'next-intl';
+import { useSearchParams } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 
 interface GenerationResult {
@@ -48,7 +48,7 @@ export default function ImageGenerator() {
   const searchParams = useSearchParams();
   const initialMode = (searchParams?.get('mode') as GenerationMode) || 'image-to-image';
 
-  const { user, isAuthenticated } = useAuthStore();
+  const { isAuthenticated } = useAuthStore();
   const { showUpgradePrompt, openUpgradePrompt, closeUpgradePrompt } = useUpgradePrompt();
   const [mode, setMode] = useState<GenerationMode>(initialMode);
   const [prompt, setPrompt] = useState('');
@@ -71,7 +71,6 @@ export default function ImageGenerator() {
   const [brandAnalysis, setBrandAnalysis] = useState<BrandToneAnalysis | null>(null);
 
   const maxPromptLength = 2000;
-  const imageCreditCost = creditsConfig.consumption.imageGeneration['nano-banana'];
   const textDefaultPrompt =
     'A serene Japanese garden with cherry blossoms in full bloom, koi fish swimming in a crystal-clear pond, traditional wooden bridge, soft morning light filtering through maple trees, ultra-realistic, high detail';
   const imageDefaultPrompt =
@@ -118,11 +117,14 @@ export default function ImageGenerator() {
     }
   }, [searchParams]);
 
+  const imageReference = result?.imageUrl ?? null;
+
   useEffect(() => {
+    void imageReference;
     setShareStatus('idle');
     setShareMessage(null);
     shareReferenceRef.current = null;
-  }, [result?.imageUrl]);
+  }, [imageReference]);
 
   const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -153,6 +155,10 @@ export default function ImageGenerator() {
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
+  };
+
+  const triggerFileInput = () => {
+    fileInputRef.current?.click();
   };
 
   const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
@@ -194,7 +200,7 @@ export default function ImageGenerator() {
 
     setIsEnhancing(true);
     try {
-      const requestBody: any = {
+      const requestBody: Record<string, unknown> = {
         prompt: prompt.trim(),
         context: 'image',
         aspectRatio: aspectRatio, // Pass user-selected aspect ratio
@@ -231,7 +237,7 @@ export default function ImageGenerator() {
   };
 
   const handleGenerate = async () => {
-    if (!user) {
+    if (!isAuthenticated) {
       openUpgradePrompt();
       return;
     }
@@ -279,7 +285,7 @@ export default function ImageGenerator() {
         finalPrompt = `${finalPrompt}\n\n[Image attached: ${imageFile?.name || 'uploaded image'}]`;
       }
 
-      const requestBody: any = {
+      const requestBody: Record<string, unknown> = {
         prompt: finalPrompt,
         model: model,
         aspect_ratio: aspectRatio,
@@ -336,7 +342,7 @@ export default function ImageGenerator() {
     if (imageUrl.startsWith('/api/v1/media')) {
       return `${imageUrl}${imageUrl.includes('?') ? '&' : '?'}download=1`;
     }
-    if (previewUrl && previewUrl.startsWith('/api/v1/media')) {
+    if (previewUrl?.startsWith('/api/v1/media')) {
       return `${previewUrl}${previewUrl.includes('?') ? '&' : '?'}download=1`;
     }
     return imageUrl;
@@ -364,7 +370,7 @@ export default function ImageGenerator() {
 
   const awardShareReward = async () => {
     if (!result?.imageUrl) return;
-    if (!user) {
+    if (!isAuthenticated) {
       setShareStatus('error');
       setShareMessage(t('shareLoginRequired'));
       return;
@@ -415,9 +421,7 @@ export default function ImageGenerator() {
     } catch (error) {
       console.error('Share reward error:', error);
       setShareStatus('error');
-      setShareMessage(
-        error instanceof Error ? error.message : t('shareRewardFailed')
-      );
+      setShareMessage(error instanceof Error ? error.message : t('shareRewardFailed'));
     }
   };
 
@@ -460,15 +464,15 @@ export default function ImageGenerator() {
     <div className="mx-auto max-w-7xl">
       <Tabs value={mode} onValueChange={(v) => setMode(v as GenerationMode)} className="w-full">
         <TabsList className="mx-auto mb-8 grid w-full max-w-md grid-cols-2 bg-transparent gap-3 p-0">
-          <TabsTrigger 
-            value="text-to-image" 
+          <TabsTrigger
+            value="text-to-image"
             className="font-medium data-[state=active]:bg-purple-600 data-[state=active]:text-white data-[state=inactive]:border-2 data-[state=inactive]:border-gray-300 data-[state=inactive]:rounded-full data-[state=inactive]:bg-white data-[state=inactive]:text-gray-700 rounded-full py-3 transition-all"
           >
             <Sparkles className="mr-2 h-4 w-4" />
             {t('modeTextToImage')}
           </TabsTrigger>
-          <TabsTrigger 
-            value="image-to-image" 
+          <TabsTrigger
+            value="image-to-image"
             className="font-medium data-[state=active]:bg-purple-600 data-[state=active]:text-white data-[state=inactive]:border-2 data-[state=inactive]:border-gray-300 data-[state=inactive]:rounded-full data-[state=inactive]:bg-white data-[state=inactive]:text-gray-700 rounded-full py-3 transition-all"
           >
             <ImageIcon className="mr-2 h-4 w-4" />
@@ -556,20 +560,18 @@ export default function ImageGenerator() {
                 <Label className="font-light text-gray-700 text-sm">{t('sourceImage')}</Label>
 
                 {!imagePreview ? (
-                  <div
-                    onClick={() => fileInputRef.current?.click()}
+                  <button
+                    type="button"
+                    onClick={triggerFileInput}
                     onDragOver={handleDragOver}
                     onDrop={handleDrop}
-                    className="hover-card cursor-pointer rounded-xl border border-dashed border-gray-300 p-8 text-center transition-colors hover:border-purple-400"
+                    className="hover-card cursor-pointer rounded-xl border border-dashed border-gray-300 p-8 text-center transition-colors hover:border-purple-400 w-full"
+                    aria-label={t('clickToUpload')}
                   >
                     <Upload className="mx-auto mb-3 h-12 w-12 text-gray-400" />
-                    <p className="mb-1 font-light text-gray-600 text-sm">
-                      {t('clickToUpload')}
-                    </p>
-                    <p className="font-light text-gray-400 text-xs">
-                      {t('imageFormatDesc')}
-                    </p>
-                  </div>
+                    <p className="mb-1 font-light text-gray-600 text-sm">{t('clickToUpload')}</p>
+                    <p className="font-light text-gray-400 text-xs">{t('imageFormatDesc')}</p>
+                  </button>
                 ) : (
                   <div className="relative">
                     <img
@@ -578,6 +580,7 @@ export default function ImageGenerator() {
                       className="w-full rounded-xl border border-gray-200"
                     />
                     <button
+                      type="button"
                       onClick={handleRemoveImage}
                       className="absolute top-2 right-2 rounded-full bg-red-500 p-2 text-white transition-colors hover:bg-red-600"
                     >
@@ -680,7 +683,8 @@ export default function ImageGenerator() {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="nano-banana">
-                      Nano Banana - {creditsConfig.consumption.imageGeneration['nano-banana']} credits
+                      Nano Banana - {creditsConfig.consumption.imageGeneration['nano-banana']}{' '}
+                      credits
                     </SelectItem>
                   </SelectContent>
                 </Select>
@@ -717,8 +721,19 @@ export default function ImageGenerator() {
                 >
                   <span>PNG</span>
                   {outputFormat === 'PNG' && (
-                    <svg className="ml-2 h-4 w-4" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                    <svg
+                      className="ml-2 h-4 w-4"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                      role="img"
+                      aria-label="Selected format"
+                    >
+                      <title>Selected format</title>
+                      <path
+                        fillRule="evenodd"
+                        d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                        clipRule="evenodd"
+                      />
                     </svg>
                   )}
                 </button>
@@ -733,8 +748,19 @@ export default function ImageGenerator() {
                 >
                   <span>JPEG</span>
                   {outputFormat === 'JPEG' && (
-                    <svg className="ml-2 h-4 w-4" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                    <svg
+                      className="ml-2 h-4 w-4"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                      role="img"
+                      aria-label="Selected format"
+                    >
+                      <title>Selected format</title>
+                      <path
+                        fillRule="evenodd"
+                        d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                        clipRule="evenodd"
+                      />
                     </svg>
                   )}
                 </button>
@@ -767,9 +793,7 @@ export default function ImageGenerator() {
                 <div className="flex aspect-square items-center justify-center rounded-xl bg-gray-100">
                   <div className="space-y-3 text-center">
                     <ImageIcon className="mx-auto h-16 w-16 text-gray-400" />
-                    <p className="font-light text-gray-500 text-sm">
-                      {t('imageWillAppearHere')}
-                    </p>
+                    <p className="font-light text-gray-500 text-sm">{t('imageWillAppearHere')}</p>
                   </div>
                 </div>
               )}

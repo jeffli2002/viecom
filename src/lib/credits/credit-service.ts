@@ -478,5 +478,3 @@ export class CreditService {
 
 // Export singleton instance
 export const creditService = new CreditService();
-
-

@@ -13,14 +13,14 @@ interface ValidationResult {
   valid: boolean;
   totalRows: number;
   errors: ValidationError[];
-  rows: Array<Record<string, any>>;
+  rows: Array<Record<string, unknown>>;
 }
 
 export async function POST(request: NextRequest) {
   try {
     const formData = await request.formData();
     const file = formData.get('file') as File | null;
-    const generationType = (formData.get('generationType') as 'image' | 'video') || 'image';
+    const _generationType = (formData.get('generationType') as 'image' | 'video') || 'image';
 
     if (!file) {
       return NextResponse.json({ error: 'File is required' }, { status: 400 });
@@ -31,7 +31,7 @@ export async function POST(request: NextRequest) {
     // Parse file
     const rows = templateGenerator.parseTemplateFile(fileBuffer, file.name);
     const errors: ValidationError[] = [];
-    const validatedRows: Array<Record<string, any>> = [];
+    const validatedRows: Array<Record<string, unknown>> = [];
 
     // Validate each row
     rows.forEach((row, index) => {
@@ -49,12 +49,10 @@ export async function POST(request: NextRequest) {
 
       // Validate baseImageUrl if provided
       // Can be HTTP/HTTPS URL or base64 image data URL
-      if (row.baseImageUrl && row.baseImageUrl.trim()) {
+      if (row.baseImageUrl?.trim()) {
         const url = row.baseImageUrl.trim();
         const isValidUrl =
-          url.startsWith('http://') ||
-          url.startsWith('https://') ||
-          url.startsWith('data:image/');
+          url.startsWith('http://') || url.startsWith('https://') || url.startsWith('data:image/');
         if (!isValidUrl) {
           rowErrors.push({
             row: rowNumber,
@@ -65,7 +63,7 @@ export async function POST(request: NextRequest) {
       }
 
       // Validate aspectRatio if provided
-      if (row.aspectRatio && row.aspectRatio.trim()) {
+      if (row.aspectRatio?.trim()) {
         const validRatios = ['1:1', '16:9', '9:16', '4:3', '3:4'];
         if (!validRatios.includes(row.aspectRatio.trim())) {
           rowErrors.push({
@@ -107,4 +105,3 @@ export async function POST(request: NextRequest) {
     );
   }
 }
-

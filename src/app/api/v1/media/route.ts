@@ -1,6 +1,6 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { r2StorageService } from '@/lib/storage/r2';
 import { Readable } from 'node:stream';
+import { r2StorageService } from '@/lib/storage/r2';
+import { type NextRequest, NextResponse } from 'next/server';
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
@@ -51,4 +51,3 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: 'Failed to fetch asset' }, { status: 500 });
   }
 }
-

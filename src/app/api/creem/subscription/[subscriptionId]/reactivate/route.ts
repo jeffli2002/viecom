@@ -39,7 +39,7 @@ export async function POST(
       );
     }
 
-    await paymentRepository.update(subscriptionId, {
+    await paymentRepository.update(paymentRecord.id, {
       cancelAtPeriodEnd: false,
       status: 'active',
     });

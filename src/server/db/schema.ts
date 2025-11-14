@@ -94,7 +94,16 @@ export const creditTransactions = pgTable(
     amount: integer('amount').notNull(),
     balanceAfter: integer('balance_after').notNull(),
     source: text('source', {
-      enum: ['subscription', 'api_call', 'admin', 'storage', 'bonus', 'checkin', 'referral', 'social_share'],
+      enum: [
+        'subscription',
+        'api_call',
+        'admin',
+        'storage',
+        'bonus',
+        'checkin',
+        'referral',
+        'social_share',
+      ],
     }).notNull(),
     description: text('description'),
     referenceId: text('reference_id'),
@@ -468,94 +477,108 @@ export const platformAccount = pgTable('platform_account', {
 // Reward System Tables
 
 // Daily Check-in tracking
-export const userDailyCheckin = pgTable('user_daily_checkin', {
-  id: text('id').primaryKey(),
-  userId: text('user_id')
-    .notNull()
-    .references(() => user.id, { onDelete: 'cascade' }),
-  checkinDate: text('checkin_date').notNull(), // Format: YYYY-MM-DD
-  consecutiveDays: integer('consecutive_days').notNull().default(1),
-  creditsEarned: integer('credits_earned').notNull().default(0),
-  weeklyBonusEarned: boolean('weekly_bonus_earned').notNull().default(false),
-  createdAt: timestamp('created_at')
-    .$defaultFn(() => new Date())
-    .notNull(),
-}, (table) => ({
-  // One checkin per user per day
-  userDateUnique: {
-    name: 'user_daily_checkin_user_date_unique',
-    columns: [table.userId, table.checkinDate],
-    unique: true,
+export const userDailyCheckin = pgTable(
+  'user_daily_checkin',
+  {
+    id: text('id').primaryKey(),
+    userId: text('user_id')
+      .notNull()
+      .references(() => user.id, { onDelete: 'cascade' }),
+    checkinDate: text('checkin_date').notNull(), // Format: YYYY-MM-DD
+    consecutiveDays: integer('consecutive_days').notNull().default(1),
+    creditsEarned: integer('credits_earned').notNull().default(0),
+    weeklyBonusEarned: boolean('weekly_bonus_earned').notNull().default(false),
+    createdAt: timestamp('created_at')
+      .$defaultFn(() => new Date())
+      .notNull(),
   },
-  userIdIdx: {
-    name: 'user_daily_checkin_user_id_idx',
-    columns: [table.userId],
-  },
-}));
+  (table) => ({
+    // One checkin per user per day
+    userDateUnique: {
+      name: 'user_daily_checkin_user_date_unique',
+      columns: [table.userId, table.checkinDate],
+      unique: true,
+    },
+    userIdIdx: {
+      name: 'user_daily_checkin_user_id_idx',
+      columns: [table.userId],
+    },
+  })
+);
 
 // User Referrals tracking
-export const userReferrals = pgTable('user_referrals', {
-  id: text('id').primaryKey(),
-  referrerId: text('referrer_id')
-    .notNull()
-    .references(() => user.id, { onDelete: 'cascade' }),
-  referredId: text('referred_id')
-    .notNull()
-    .unique()
-    .references(() => user.id, { onDelete: 'cascade' }),
-  referralCode: text('referral_code').notNull(), // Unique code for referrer
-  creditsAwarded: boolean('credits_awarded').notNull().default(false),
-  referredUserFirstGenerationCompleted: boolean('referred_user_first_generation_completed')
-    .notNull()
-    .default(false),
-  createdAt: timestamp('created_at')
-    .$defaultFn(() => new Date())
-    .notNull(),
-  creditsAwardedAt: timestamp('credits_awarded_at'),
-}, (table) => ({
-  referrerIdIdx: {
-    name: 'user_referrals_referrer_id_idx',
-    columns: [table.referrerId],
+export const userReferrals = pgTable(
+  'user_referrals',
+  {
+    id: text('id').primaryKey(),
+    referrerId: text('referrer_id')
+      .notNull()
+      .references(() => user.id, { onDelete: 'cascade' }),
+    referredId: text('referred_id')
+      .notNull()
+      .unique()
+      .references(() => user.id, { onDelete: 'cascade' }),
+    referralCode: text('referral_code').notNull(), // Unique code for referrer
+    creditsAwarded: boolean('credits_awarded').notNull().default(false),
+    referredUserFirstGenerationCompleted: boolean('referred_user_first_generation_completed')
+      .notNull()
+      .default(false),
+    createdAt: timestamp('created_at')
+      .$defaultFn(() => new Date())
+      .notNull(),
+    creditsAwardedAt: timestamp('credits_awarded_at'),
   },
-  referralCodeIdx: {
-    name: 'user_referrals_referral_code_idx',
-    columns: [table.referralCode],
-    unique: true,
-  },
-}));
+  (table) => ({
+    referrerIdIdx: {
+      name: 'user_referrals_referrer_id_idx',
+      columns: [table.referrerId],
+    },
+    referralCodeIdx: {
+      name: 'user_referrals_referral_code_idx',
+      columns: [table.referralCode],
+      unique: true,
+    },
+  })
+);
 
 // Social Media Shares tracking
-export const socialShares = pgTable('social_shares', {
-  id: text('id').primaryKey(),
-  userId: text('user_id')
-    .notNull()
-    .references(() => user.id, { onDelete: 'cascade' }),
-  assetId: text('asset_id'), // Reference to generated asset
-  platform: text('platform', {
-    enum: ['twitter', 'facebook', 'instagram', 'linkedin', 'pinterest', 'tiktok', 'other'],
-  }).notNull(),
-  shareUrl: text('share_url'), // URL of the shared content
-  creditsEarned: integer('credits_earned').notNull().default(0),
-  referenceId: text('reference_id'), // For idempotency (e.g., platform post ID)
-  createdAt: timestamp('created_at')
-    .$defaultFn(() => new Date())
-    .notNull(),
-}, (table) => ({
-  userIdIdx: {
-    name: 'social_shares_user_id_idx',
-    columns: [table.userId],
+export const socialShares = pgTable(
+  'social_shares',
+  {
+    id: text('id').primaryKey(),
+    userId: text('user_id')
+      .notNull()
+      .references(() => user.id, { onDelete: 'cascade' }),
+    assetId: text('asset_id'), // Reference to generated asset
+    platform: text('platform', {
+      enum: ['twitter', 'facebook', 'instagram', 'linkedin', 'pinterest', 'tiktok', 'other'],
+    }).notNull(),
+    shareUrl: text('share_url'), // URL of the shared content
+    creditsEarned: integer('credits_earned').notNull().default(0),
+    referenceId: text('reference_id'), // For idempotency (e.g., platform post ID)
+    createdAt: timestamp('created_at')
+      .$defaultFn(() => new Date())
+      .notNull(),
   },
-  // Prevent duplicate rewards for same share
-  userReferenceUnique: {
-    name: 'social_shares_user_reference_unique',
-    columns: [table.userId, table.referenceId],
-    unique: true,
-  },
-}));
+  (table) => ({
+    userIdIdx: {
+      name: 'social_shares_user_id_idx',
+      columns: [table.userId],
+    },
+    // Prevent duplicate rewards for same share
+    userReferenceUnique: {
+      name: 'social_shares_user_reference_unique',
+      columns: [table.userId, table.referenceId],
+      unique: true,
+    },
+  })
+);
 
 // Admin users table
 export const admins = pgTable('admins', {
-  id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
+  id: text('id')
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
   email: text('email').notNull().unique(),
   name: text('name'),
   passwordHash: text('password_hash').notNull(),

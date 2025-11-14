@@ -1,13 +1,13 @@
 'use client';
 
 import { Badge } from '@/components/ui/badge';
-import { CheckCircle2, FileSpreadsheet, Wand2, Award } from 'lucide-react';
+import { Award, CheckCircle2, FileSpreadsheet, Wand2 } from 'lucide-react';
 import { motion } from 'motion/react';
 import { useTranslations } from 'next-intl';
 
 export function LandingFeatures() {
   const t = useTranslations('features');
-  
+
   return (
     <section className="py-32 px-6 bg-gradient-to-b from-white to-slate-50">
       <div className="container mx-auto max-w-6xl">
@@ -27,9 +27,7 @@ export function LandingFeatures() {
               {t('titleHighlight')}
             </span>
           </h2>
-          <p className="text-xl text-slate-600 max-w-3xl mx-auto">
-            {t('subtitle')}
-          </p>
+          <p className="text-xl text-slate-600 max-w-3xl mx-auto">{t('subtitle')}</p>
         </motion.div>
 
         {/* Feature 1 - Batch Generation */}
@@ -47,9 +45,7 @@ export function LandingFeatures() {
             <h3 className="text-slate-900" style={{ fontSize: 'clamp(1.875rem, 5vw, 3.75rem)' }}>
               {t('batch.title')}
             </h3>
-            <p className="text-lg text-slate-600 leading-relaxed">
-              {t('batch.description')}
-            </p>
+            <p className="text-lg text-slate-600 leading-relaxed">{t('batch.description')}</p>
             <ul className="space-y-4">
               <li className="flex items-start gap-3">
                 <CheckCircle2 className="size-6 text-violet-600 flex-shrink-0 mt-0.5" />
@@ -143,9 +139,7 @@ export function LandingFeatures() {
             <h3 className="text-slate-900" style={{ fontSize: 'clamp(1.875rem, 5vw, 3.75rem)' }}>
               {t('brand.title')}
             </h3>
-            <p className="text-lg text-slate-600 leading-relaxed">
-              {t('brand.description')}
-            </p>
+            <p className="text-lg text-slate-600 leading-relaxed">{t('brand.description')}</p>
             <ul className="space-y-4">
               <li className="flex items-start gap-3">
                 <CheckCircle2 className="size-6 text-fuchsia-600 flex-shrink-0 mt-0.5" />
@@ -187,9 +181,7 @@ export function LandingFeatures() {
             <h3 className="text-slate-900" style={{ fontSize: 'clamp(1.875rem, 5vw, 3.75rem)' }}>
               {t('quality.title')}
             </h3>
-            <p className="text-lg text-slate-600 leading-relaxed">
-              {t('quality.description')}
-            </p>
+            <p className="text-lg text-slate-600 leading-relaxed">{t('quality.description')}</p>
             <ul className="space-y-4">
               <li className="flex items-start gap-3">
                 <CheckCircle2 className="size-6 text-purple-600 flex-shrink-0 mt-0.5" />

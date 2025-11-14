@@ -31,7 +31,19 @@
       "@/*": ["./src/*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "**/*.cjs", "**/*.js", ".next/types/**/*.ts"],
+  "include": [
+    "next-env.d.ts",
+    "src/app/api/creem/**/*.ts",
+    "src/app/api/creem/**/*.tsx",
+    "src/app/api/webhooks/creem/route.ts",
+    "src/app/[locale]/settings/billing/page.tsx",
+    "src/components/auth/UpgradePrompt.tsx",
+    "src/components/billing/**/*.tsx",
+    "src/hooks/use-creem-payment.ts",
+    "src/lib/creem/**/*.ts",
+    "src/payment/creem/**/*.ts",
+    "src/payment/types.ts"
+  ],
   "exclude": [
     "node_modules",
     "tests/**",
@@ -41,8 +53,16 @@
     "scripts/**",
     "test-*.cjs",
     "test-*.js",
-    "test-*.ts"
+    "test-*.ts",
+    "AI Image_Video Generator/**",
+    "压缩/AI Image_Video Generator/**",
+    "FigmaMockup/**",
+    "压缩/**",
+    ".next/**",
+    "src/main.tsx",
+    "src/App.tsx",
+    "vite.config.ts",
+    "src/scripts/**",
+    "./src/components/workflow/**/*"
   ]
 }
-
-

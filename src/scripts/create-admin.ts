@@ -12,19 +12,22 @@ async function createAdmin() {
     const passwordHash = await bcrypt.hash(password, 10);
 
     // Create admin
-    const result = await db.insert(admins).values({
-      email,
-      passwordHash,
-      name,
-    }).returning();
+    const result = await db
+      .insert(admins)
+      .values({
+        email,
+        passwordHash,
+        name,
+      })
+      .returning();
 
     console.log('✅ Admin user created successfully:');
     console.log('Email:', email);
     console.log('Password:', password);
     console.log('ID:', result[0].id);
     console.log('\n⚠️ Please change the password after first login!');
-  } catch (error: any) {
-    if (error.code === '23505') {
+  } catch (error: unknown) {
+    if (error instanceof Error && (error as { code?: string }).code === '23505') {
       console.log('ℹ️ Admin user already exists with email:', email);
     } else {
       console.error('❌ Failed to create admin:', error);
@@ -35,4 +38,3 @@ async function createAdmin() {
 }
 
 createAdmin();
-

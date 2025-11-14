@@ -1,4 +1,5 @@
 import { randomUUID } from 'node:crypto';
+import type { Readable } from 'node:stream';
 import { env } from '@/env';
 import {
   DeleteObjectCommand,
@@ -6,7 +7,6 @@ import {
   PutObjectCommand,
   S3Client,
 } from '@aws-sdk/client-s3';
-import type { Readable } from 'node:stream';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 
 const s3Client = new S3Client({
@@ -96,9 +96,7 @@ export class R2StorageService {
   /**
    * Fetch an asset stream from R2
    */
-  async getAsset(
-    key: string
-  ): Promise<{
+  async getAsset(key: string): Promise<{
     body: Readable | ReadableStream<Uint8Array>;
     contentType?: string;
     contentLength?: number;
@@ -120,7 +118,8 @@ export class R2StorageService {
     return {
       body: response.Body as Readable | ReadableStream<Uint8Array>,
       contentType: response.ContentType ?? undefined,
-      contentLength: typeof response.ContentLength === 'number' ? response.ContentLength : undefined,
+      contentLength:
+        typeof response.ContentLength === 'number' ? response.ContentLength : undefined,
       cacheControl: response.CacheControl ?? undefined,
       lastModified: response.LastModified ?? undefined,
       etag: response.ETag ?? undefined,

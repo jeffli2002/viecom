@@ -1,11 +1,11 @@
+import { randomUUID } from 'node:crypto';
 import { creditsConfig } from '@/config/credits.config';
 import { auth } from '@/lib/auth/auth';
 import { creditService } from '@/lib/credits';
 import { db } from '@/server/db';
 import { userDailyCheckin } from '@/server/db/schema';
-import { eq, desc, gte, and } from 'drizzle-orm';
-import { randomUUID } from 'node:crypto';
-import { NextRequest, NextResponse } from 'next/server';
+import { and, desc, eq, gte } from 'drizzle-orm';
+import { type NextRequest, NextResponse } from 'next/server';
 
 export async function POST(request: NextRequest) {
   try {
@@ -24,24 +24,23 @@ export async function POST(request: NextRequest) {
     const existingCheckin = await db
       .select()
       .from(userDailyCheckin)
-      .where(and(
-        eq(userDailyCheckin.checkinDate, today),
-        eq(userDailyCheckin.userId, userId)
-      ))
+      .where(and(eq(userDailyCheckin.checkinDate, today), eq(userDailyCheckin.userId, userId)))
       .limit(1);
 
     if (existingCheckin.length > 0) {
       // Verify if credits were actually awarded by checking for the transaction
       const { creditTransactions } = await import('@/server/db/schema');
       const referenceId = `checkin_${userId}_${today}`;
-      
+
       const creditTransaction = await db
         .select()
         .from(creditTransactions)
-        .where(and(
-          eq(creditTransactions.userId, userId),
-          eq(creditTransactions.referenceId, referenceId)
-        ))
+        .where(
+          and(
+            eq(creditTransactions.userId, userId),
+            eq(creditTransactions.referenceId, referenceId)
+          )
+        )
         .limit(1);
 
       if (creditTransaction.length === 0) {
@@ -51,12 +50,10 @@ export async function POST(request: NextRequest) {
           today,
           checkinId: existingCheckin[0].id,
         });
-        
+
         // Delete the orphaned checkin record to allow retry
-        await db
-          .delete(userDailyCheckin)
-          .where(eq(userDailyCheckin.id, existingCheckin[0].id));
-        
+        await db.delete(userDailyCheckin).where(eq(userDailyCheckin.id, existingCheckin[0].id));
+
         console.log('[Checkin] Orphaned record deleted, proceeding with checkin');
         // Continue with normal checkin flow below
       } else {
@@ -117,7 +114,9 @@ export async function POST(request: NextRequest) {
         .limit(creditsConfig.rewards.checkin.consecutiveDaysRequired);
 
       const hasRecentWeeklyBonus = recentCheckins.some(
-        (c) => c.weeklyBonusEarned && c.consecutiveDays >= creditsConfig.rewards.checkin.consecutiveDaysRequired
+        (c) =>
+          c.weeklyBonusEarned &&
+          c.consecutiveDays >= creditsConfig.rewards.checkin.consecutiveDaysRequired
       );
 
       if (!hasRecentWeeklyBonus) {
@@ -128,7 +127,7 @@ export async function POST(request: NextRequest) {
 
     // Create checkin record and award credits (neon-http doesn't support transactions)
     const checkinId = randomUUID();
-    
+
     console.log('[Checkin] Creating checkin record:', {
       userId,
       today,
@@ -136,7 +135,7 @@ export async function POST(request: NextRequest) {
       totalCredits,
       weeklyBonusEarned,
     });
-    
+
     // Create checkin record first
     await db.insert(userDailyCheckin).values({
       id: checkinId,
@@ -166,7 +165,7 @@ export async function POST(request: NextRequest) {
           weeklyBonusEarned,
         },
       });
-      
+
       console.log('[Checkin] Credits awarded successfully:', creditTransaction);
     } catch (creditError) {
       console.error('[Checkin] Failed to award credits:', creditError);
@@ -238,10 +237,7 @@ export async function GET(request: NextRequest) {
       .select()
       .from(userDailyCheckin)
       .where(
-        and(
-          eq(userDailyCheckin.userId, userId),
-          gte(userDailyCheckin.checkinDate, sevenDaysAgoStr)
-        )
+        and(eq(userDailyCheckin.userId, userId), gte(userDailyCheckin.checkinDate, sevenDaysAgoStr))
       )
       .orderBy(desc(userDailyCheckin.checkinDate));
 
@@ -290,4 +286,3 @@ export async function GET(request: NextRequest) {
     );
   }
 }
-

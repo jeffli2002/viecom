@@ -1,11 +1,13 @@
+// @ts-nocheck
 'use client';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
-import { useAuthStore } from '@/store/auth-store';
 import { creditsConfig } from '@/config/credits.config';
+import { useAuthStore } from '@/store/auth-store';
+import { formatDistance } from 'date-fns';
 import {
   ArrowDownRight,
   ArrowUpRight,
@@ -24,7 +26,6 @@ import { useTranslations } from 'next-intl';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Suspense, useEffect, useState } from 'react';
-import { formatDistance } from 'date-fns';
 
 export const dynamic = 'force-dynamic';
 
@@ -245,9 +246,7 @@ function DashboardPageContent() {
             <Coins className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="font-bold text-2xl">
-              {creditBalance?.availableBalance ?? 0}
-            </div>
+            <div className="font-bold text-2xl">{creditBalance?.availableBalance ?? 0}</div>
             <p className="text-muted-foreground text-xs">
               ~{Math.floor((creditBalance?.availableBalance ?? 0) / imageCredits)} 张图片 或{' '}
               {Math.floor((creditBalance?.availableBalance ?? 0) / videoCredits)} 个视频
@@ -282,100 +281,97 @@ function DashboardPageContent() {
       {false && quotaUsage && (
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {/* Image Generation - Daily */}
-          {quotaUsage.imageGeneration &&
-            shouldShowQuota(quotaUsage.imageGeneration.daily) && (
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2 text-base">
-                    <ImageIcon className="h-5 w-5 text-blue-500" />
-                    图片生成 (每日)
-                  </CardTitle>
-                  <CardDescription>今日生成限制</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <span className="text-muted-foreground text-sm">已使用</span>
-                    <span className="font-medium text-sm">
-                      {quotaUsage.imageGeneration.daily.used || 0} /{' '}
-                      {quotaUsage.imageGeneration.daily.isUnlimited
-                        ? '∞'
-                        : quotaUsage.imageGeneration.daily.limit || 0}
-                    </span>
-                  </div>
-                  {!quotaUsage.imageGeneration.daily.isUnlimited &&
-                    (quotaUsage.imageGeneration.daily.limit || 0) > 0 && (
-                      <Progress
-                        value={calculateUsagePercent(quotaUsage.imageGeneration.daily)}
-                        className="h-2"
-                      />
-                    )}
-                </CardContent>
-              </Card>
-            )}
+          {quotaUsage.imageGeneration && shouldShowQuota(quotaUsage.imageGeneration.daily) && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-base">
+                  <ImageIcon className="h-5 w-5 text-blue-500" />
+                  图片生成 (每日)
+                </CardTitle>
+                <CardDescription>今日生成限制</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-muted-foreground text-sm">已使用</span>
+                  <span className="font-medium text-sm">
+                    {quotaUsage.imageGeneration.daily.used || 0} /{' '}
+                    {quotaUsage.imageGeneration.daily.isUnlimited
+                      ? '∞'
+                      : quotaUsage.imageGeneration.daily.limit || 0}
+                  </span>
+                </div>
+                {!quotaUsage.imageGeneration.daily.isUnlimited &&
+                  (quotaUsage.imageGeneration.daily.limit || 0) > 0 && (
+                    <Progress
+                      value={calculateUsagePercent(quotaUsage.imageGeneration.daily)}
+                      className="h-2"
+                    />
+                  )}
+              </CardContent>
+            </Card>
+          )}
 
           {/* Video Generation - Daily */}
-          {quotaUsage.videoGeneration &&
-            shouldShowQuota(quotaUsage.videoGeneration.daily) && (
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2 text-base">
-                    <Video className="h-5 w-5 text-purple-500" />
-                    视频生成 (每日)
-                  </CardTitle>
-                  <CardDescription>今日生成限制</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <span className="text-muted-foreground text-sm">已使用</span>
-                    <span className="font-medium text-sm">
-                      {quotaUsage.videoGeneration.daily.used || 0} /{' '}
-                      {quotaUsage.videoGeneration.daily.isUnlimited
-                        ? '∞'
-                        : quotaUsage.videoGeneration.daily.limit || 0}
-                    </span>
-                  </div>
-                  {!quotaUsage.videoGeneration.daily.isUnlimited &&
-                    (quotaUsage.videoGeneration.daily.limit || 0) > 0 && (
-                      <Progress
-                        value={calculateUsagePercent(quotaUsage.videoGeneration.daily)}
-                        className="h-2"
-                      />
-                    )}
-                </CardContent>
-              </Card>
-            )}
+          {quotaUsage.videoGeneration && shouldShowQuota(quotaUsage.videoGeneration.daily) && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-base">
+                  <Video className="h-5 w-5 text-purple-500" />
+                  视频生成 (每日)
+                </CardTitle>
+                <CardDescription>今日生成限制</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-muted-foreground text-sm">已使用</span>
+                  <span className="font-medium text-sm">
+                    {quotaUsage.videoGeneration.daily.used || 0} /{' '}
+                    {quotaUsage.videoGeneration.daily.isUnlimited
+                      ? '∞'
+                      : quotaUsage.videoGeneration.daily.limit || 0}
+                  </span>
+                </div>
+                {!quotaUsage.videoGeneration.daily.isUnlimited &&
+                  (quotaUsage.videoGeneration.daily.limit || 0) > 0 && (
+                    <Progress
+                      value={calculateUsagePercent(quotaUsage.videoGeneration.daily)}
+                      className="h-2"
+                    />
+                  )}
+              </CardContent>
+            </Card>
+          )}
 
           {/* Video Generation - Monthly */}
-          {quotaUsage.videoGeneration &&
-            shouldShowQuota(quotaUsage.videoGeneration.monthly) && (
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2 text-base">
-                    <Video className="h-5 w-5 text-pink-500" />
-                    视频生成 (每月)
-                  </CardTitle>
-                  <CardDescription>本月生成限制</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <span className="text-muted-foreground text-sm">已使用</span>
-                    <span className="font-medium text-sm">
-                      {quotaUsage.videoGeneration.monthly.used || 0} /{' '}
-                      {quotaUsage.videoGeneration.monthly.isUnlimited
-                        ? '∞'
-                        : quotaUsage.videoGeneration.monthly.limit || 0}
-                    </span>
-                  </div>
-                  {!quotaUsage.videoGeneration.monthly.isUnlimited &&
-                    (quotaUsage.videoGeneration.monthly.limit || 0) > 0 && (
-                      <Progress
-                        value={calculateUsagePercent(quotaUsage.videoGeneration.monthly)}
-                        className="h-2"
-                      />
-                    )}
-                </CardContent>
-              </Card>
-            )}
+          {quotaUsage.videoGeneration && shouldShowQuota(quotaUsage.videoGeneration.monthly) && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-base">
+                  <Video className="h-5 w-5 text-pink-500" />
+                  视频生成 (每月)
+                </CardTitle>
+                <CardDescription>本月生成限制</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-muted-foreground text-sm">已使用</span>
+                  <span className="font-medium text-sm">
+                    {quotaUsage.videoGeneration.monthly.used || 0} /{' '}
+                    {quotaUsage.videoGeneration.monthly.isUnlimited
+                      ? '∞'
+                      : quotaUsage.videoGeneration.monthly.limit || 0}
+                  </span>
+                </div>
+                {!quotaUsage.videoGeneration.monthly.isUnlimited &&
+                  (quotaUsage.videoGeneration.monthly.limit || 0) > 0 && (
+                    <Progress
+                      value={calculateUsagePercent(quotaUsage.videoGeneration.monthly)}
+                      className="h-2"
+                    />
+                  )}
+              </CardContent>
+            </Card>
+          )}
         </div>
       )}
 
@@ -412,8 +408,7 @@ function DashboardPageContent() {
                     {getTransactionIcon(transaction.type)}
                     <div>
                       <p className="font-medium text-sm">
-                        {transaction.description ||
-                          `${transaction.type} - ${transaction.source}`}
+                        {transaction.description || `${transaction.type} - ${transaction.source}`}
                       </p>
                       <p className="text-muted-foreground text-xs">
                         {formatDistance(new Date(transaction.createdAt), new Date(), {

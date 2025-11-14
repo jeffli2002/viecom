@@ -172,19 +172,21 @@ export function BatchResults({ jobId, assets: initialAssets }: BatchResultsProps
         if (data.success) {
           setJobStatus(data.data.jobStatus);
           if (data.data.assets) {
-            const formattedAssets: GeneratedAsset[] = data.data.assets.map((asset: any) => ({
-              id: asset.id,
-              url: asset.url,
-              type: asset.type,
-              prompt: asset.prompt,
-              enhancedPrompt: asset.enhancedPrompt,
-              model: asset.model,
-              status: asset.status,
-              error: asset.error,
-              rowIndex: asset.rowIndex,
-              previewUrl: asset.previewUrl,
-              r2Key: asset.r2Key,
-            }));
+            const formattedAssets: GeneratedAsset[] = data.data.assets.map(
+              (asset: GeneratedAsset) => ({
+                id: asset.id,
+                url: asset.url,
+                type: asset.type,
+                prompt: asset.prompt,
+                enhancedPrompt: asset.enhancedPrompt,
+                model: asset.model,
+                status: asset.status,
+                error: asset.error,
+                rowIndex: asset.rowIndex,
+                previewUrl: asset.previewUrl,
+                r2Key: asset.r2Key,
+              })
+            );
             setAssets(formattedAssets);
             setIsLoading(false);
           }
@@ -343,7 +345,9 @@ export function BatchResults({ jobId, assets: initialAssets }: BatchResultsProps
                         src={getAssetPreviewUrl(asset)}
                         controls
                         className="w-full h-full object-contain transition-transform duration-300"
-                      />
+                      >
+                        <track kind="captions" src="data:text/vtt,WEBVTT" label="captions" />
+                      </video>
                     )}
                   </div>
                 ) : (

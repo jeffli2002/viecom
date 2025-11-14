@@ -8,7 +8,7 @@
  *   npm run test:generation
  */
 
-import path from 'path';
+import path from 'node:path';
 import dotenv from 'dotenv';
 
 // Load environment variables
@@ -29,7 +29,7 @@ async function waitForServer(maxAttempts = 20, delay = 2000): Promise<boolean> {
         console.log('✅ Server is ready!');
         return true;
       }
-    } catch (error) {
+    } catch (_error) {
       // Try root path as fallback
       try {
         const response = await fetch(BASE_URL, {
@@ -40,7 +40,7 @@ async function waitForServer(maxAttempts = 20, delay = 2000): Promise<boolean> {
           console.log('✅ Server is ready!');
           return true;
         }
-      } catch (e) {
+      } catch (_e) {
         // Server not ready yet
       }
     }
@@ -59,13 +59,13 @@ interface TestResult {
   name: string;
   success: boolean;
   error?: string;
-  data?: any;
+  data?: unknown;
   duration?: number;
 }
 
 const results: TestResult[] = [];
 
-async function test(name: string, testFn: () => Promise<any>): Promise<void> {
+async function test(name: string, testFn: () => Promise<unknown>): Promise<void> {
   const start = Date.now();
   try {
     console.log(`\n🧪 Testing: ${name}`);
@@ -73,13 +73,14 @@ async function test(name: string, testFn: () => Promise<any>): Promise<void> {
     const duration = Date.now() - start;
     results.push({ name, success: true, data, duration });
     console.log(`✅ Success (${duration}ms)`);
-    if (data) {
-      console.log(`   Result:`, JSON.stringify(data, null, 2).substring(0, 200));
+    if (data !== undefined) {
+      console.log('   Result:', JSON.stringify(data, null, 2).substring(0, 200));
     }
-  } catch (error: any) {
+  } catch (error: unknown) {
     const duration = Date.now() - start;
-    results.push({ name, success: false, error: error.message, duration });
-    console.log(`❌ Failed (${duration}ms): ${error.message}`);
+    const message = error instanceof Error ? error.message : String(error);
+    results.push({ name, success: false, error: message, duration });
+    console.log(`❌ Failed (${duration}ms): ${message}`);
   }
 }
 
@@ -107,7 +108,7 @@ async function testPromptEnhancement() {
       try {
         const error = await response.json();
         errorMessage = `API error: ${JSON.stringify(error)}`;
-      } catch (e) {
+      } catch (_e) {
         // Ignore JSON parse error
       }
     } else {
@@ -145,7 +146,7 @@ async function testSingleImageT2I() {
       try {
         const error = await response.json();
         errorMessage = `API error: ${JSON.stringify(error)}`;
-      } catch (e) {
+      } catch (_e) {
         // Ignore JSON parse error
       }
     } else {
@@ -187,7 +188,7 @@ async function testSingleImageI2I() {
       try {
         const error = await response.json();
         errorMessage = `API error: ${JSON.stringify(error)}`;
-      } catch (e) {
+      } catch (_e) {
         // Ignore JSON parse error
       }
     } else {
@@ -225,7 +226,7 @@ async function testSingleVideoT2V() {
       try {
         const error = await response.json();
         errorMessage = `API error: ${JSON.stringify(error)}`;
-      } catch (e) {
+      } catch (_e) {
         // Ignore JSON parse error
       }
     } else {
@@ -265,7 +266,7 @@ async function testSingleVideoI2V() {
       try {
         const error = await response.json();
         errorMessage = `API error: ${JSON.stringify(error)}`;
-      } catch (e) {
+      } catch (_e) {
         // Ignore JSON parse error
       }
     } else {
@@ -303,7 +304,7 @@ async function testBatchImageGeneration() {
       ...TEST_MODE_HEADER,
       // FormData will set Content-Type automatically with boundary
     },
-    body: formData as any, // formdata-node is compatible with fetch
+    body: formData as unknown as BodyInit, // formdata-node is compatible with fetch
   });
 
   if (!response.ok) {
@@ -381,7 +382,7 @@ async function testBatchVideoGeneration() {
       ...TEST_MODE_HEADER,
       // FormData will set Content-Type automatically with boundary
     },
-    body: formData as any, // formdata-node is compatible with fetch
+    body: formData as unknown as BodyInit, // formdata-node is compatible with fetch
   });
 
   if (!response.ok) {
@@ -449,15 +450,23 @@ async function runTests() {
 
   console.log('');
 
-  // Test single image generation only
+  // Prompt enhancement
+  await test('Prompt Enhancement (DeepSeek)', testPromptEnhancement);
+
+  // Test single image generation
   await test('Single Image - Text to Image (KIE)', testSingleImageT2I);
   await test('Single Image - Image to Image (KIE)', testSingleImageI2I);
 
-  // Test batch image generation
+  // Video generation
+  await test('Single Video - Text to Video (KIE)', testSingleVideoT2V);
+  await test('Single Video - Image to Video (KIE)', testSingleVideoI2V);
+
+  // Batch generation
   await test('Batch Image Generation', testBatchImageGeneration);
+  await test('Batch Video Generation', testBatchVideoGeneration);
 
   // Print summary
-  console.log('\n' + '='.repeat(60));
+  console.log(`\n${'='.repeat(60)}`);
   console.log('📊 Test Summary');
   console.log('='.repeat(60));
 

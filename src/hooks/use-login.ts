@@ -1,3 +1,4 @@
+import { useRouter } from '@/i18n/navigation';
 import {
   useAuthError,
   useAuthLoading,
@@ -7,7 +8,6 @@ import {
   useSignInWithGoogle,
 } from '@/store/auth-store';
 import type { UseLoginReturn } from '@/types/login';
-import { useRouter } from '@/i18n/navigation';
 import { useSearchParams } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
 
@@ -42,7 +42,7 @@ export function useLogin(): UseLoginReturn {
   }, [isAuthenticated, router, getRedirectUrl]);
 
   // Handle social login
-  const handleSocialLogin = async (provider: 'google') => {
+  const handleSocialLogin = async (_provider: 'google') => {
     try {
       clearError();
       const redirectUrl = getRedirectUrl();

@@ -1,11 +1,11 @@
+import { randomUUID } from 'node:crypto';
 import { creditsConfig } from '@/config/credits.config';
 import { auth } from '@/lib/auth/auth';
 import { creditService } from '@/lib/credits';
 import { db } from '@/server/db';
 import { socialShares } from '@/server/db/schema';
-import { eq, and } from 'drizzle-orm';
-import { randomUUID } from 'node:crypto';
-import { NextRequest, NextResponse } from 'next/server';
+import { and, eq } from 'drizzle-orm';
+import { type NextRequest, NextResponse } from 'next/server';
 
 export async function POST(request: NextRequest) {
   try {
@@ -21,14 +21,19 @@ export async function POST(request: NextRequest) {
     const { platform, assetId, shareUrl, referenceId } = await request.json();
 
     if (!platform || typeof platform !== 'string') {
-      return NextResponse.json(
-        { success: false, error: 'Platform is required' },
-        { status: 400 }
-      );
+      return NextResponse.json({ success: false, error: 'Platform is required' }, { status: 400 });
     }
 
     // Validate platform
-    const validPlatforms = ['twitter', 'facebook', 'instagram', 'linkedin', 'pinterest', 'tiktok', 'other'];
+    const validPlatforms = [
+      'twitter',
+      'facebook',
+      'instagram',
+      'linkedin',
+      'pinterest',
+      'tiktok',
+      'other',
+    ];
     if (!validPlatforms.includes(platform)) {
       return NextResponse.json(
         { success: false, error: `Invalid platform. Must be one of: ${validPlatforms.join(', ')}` },
@@ -153,4 +158,3 @@ export async function GET(request: NextRequest) {
     );
   }
 }
-

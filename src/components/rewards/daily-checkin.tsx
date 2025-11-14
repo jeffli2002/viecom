@@ -6,8 +6,8 @@ import { Card } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { creditsConfig } from '@/config/credits.config';
 import { Calendar, Flame, Gift, Sparkles } from 'lucide-react';
-import { toast } from 'sonner';
 import { useEffect, useState } from 'react';
+import { toast } from 'sonner';
 
 interface CheckinStatus {
   checkedInToday: boolean;
@@ -116,7 +116,7 @@ export function DailyCheckin({ className }: DailyCheckinProps) {
           description: `Your streak: ${data.data?.consecutiveDays || 1} days`,
           duration: 5000,
         });
-        
+
         // Refresh status and balance
         await Promise.all([fetchCheckinStatus(), fetchCreditBalance()]);
       } else {
@@ -138,8 +138,8 @@ export function DailyCheckin({ className }: DailyCheckinProps) {
     return (
       <Card className="p-6">
         <div className="animate-pulse space-y-4">
-          <div className="h-4 bg-gray-200 rounded w-1/4"></div>
-          <div className="h-20 bg-gray-200 rounded"></div>
+          <div className="h-4 bg-gray-200 rounded w-1/4" />
+          <div className="h-20 bg-gray-200 rounded" />
         </div>
       </Card>
     );
@@ -189,7 +189,9 @@ export function DailyCheckin({ className }: DailyCheckinProps) {
             <Calendar className="h-5 w-5 text-purple-600" />
             <h3 className="text-xl font-bold text-gray-900">Daily Check-In</h3>
           </div>
-          <p className="text-sm text-gray-500">Check in daily to earn credits and build your streak</p>
+          <p className="text-sm text-gray-500">
+            Check in daily to earn credits and build your streak
+          </p>
         </div>
         {creditBalance && (
           <Badge className="bg-gradient-to-r from-purple-500 to-pink-500 text-white border-0 px-4 py-2">
@@ -234,7 +236,10 @@ export function DailyCheckin({ className }: DailyCheckinProps) {
         <p className="text-sm font-medium text-gray-900 mb-3">Last 7 Days</p>
         <div className="grid grid-cols-7 gap-2">
           {last7Days.map((day, index) => (
-            <div key={index} className="flex flex-col items-center">
+            <div
+              key={day.checkinDate ?? `${day.dayName}-${index}`}
+              className="flex flex-col items-center"
+            >
               <span className="text-xs text-gray-600 mb-2">{day.dayName}</span>
               <div
                 className={`w-10 h-10 rounded-full flex items-center justify-center border-2 ${
@@ -286,4 +291,3 @@ export function DailyCheckin({ className }: DailyCheckinProps) {
     </Card>
   );
 }
-

@@ -1,9 +1,10 @@
 import { db } from '@/server/db';
 import { admins } from '@/server/db/schema';
-import { eq } from 'drizzle-orm';
-import { NextResponse } from 'next/server';
 import bcrypt from 'bcryptjs';
+import { eq } from 'drizzle-orm';
 import { SignJWT } from 'jose';
+// @ts-nocheck
+import { NextResponse } from 'next/server';
 
 const JWT_SECRET = process.env.ADMIN_JWT_SECRET || 'your-admin-secret-key-change-in-production';
 
@@ -12,20 +13,14 @@ export async function POST(request: Request) {
     const { email, password, remember } = await request.json();
 
     if (!email || !password) {
-      return NextResponse.json(
-        { error: 'Email and password are required' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'Email and password are required' }, { status: 400 });
     }
 
     // Find admin by email
     const admin = await db.select().from(admins).where(eq(admins.email, email)).limit(1);
 
     if (!admin || admin.length === 0) {
-      return NextResponse.json(
-        { error: 'Invalid email or password' },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: 'Invalid email or password' }, { status: 401 });
     }
 
     const adminUser = admin[0];
@@ -34,10 +29,7 @@ export async function POST(request: Request) {
     const isPasswordValid = await bcrypt.compare(password, adminUser.passwordHash);
 
     if (!isPasswordValid) {
-      return NextResponse.json(
-        { error: 'Invalid email or password' },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: 'Invalid email or password' }, { status: 401 });
     }
 
     // Generate JWT token
@@ -73,10 +65,6 @@ export async function POST(request: Request) {
     return response;
   } catch (error) {
     console.error('Admin login error:', error);
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
-

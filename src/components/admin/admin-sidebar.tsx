@@ -1,15 +1,8 @@
 'use client';
 
+import { CreditCard, DollarSign, LayoutDashboard, Settings, Users, Zap } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { 
-  LayoutDashboard, 
-  Users, 
-  CreditCard, 
-  DollarSign, 
-  Zap, 
-  Settings 
-} from 'lucide-react';
 
 const menuItems = [
   {
@@ -53,7 +46,7 @@ export function AdminSidebar() {
         <h2 className="font-bold text-xl text-gray-900">Viecom Admin</h2>
         <p className="text-sm text-gray-500">Management Portal</p>
       </div>
-      
+
       <nav className="flex flex-col gap-1">
         {menuItems.map((item) => {
           const isActive = pathname === item.href;
@@ -76,4 +69,3 @@ export function AdminSidebar() {
     </aside>
   );
 }
-

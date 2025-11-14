@@ -47,12 +47,13 @@ export function HowItWorks() {
     <section className="section-container relative overflow-hidden bg-gradient-to-b from-white to-slate-50 py-24">
       <div className="container relative">
         <div className="mb-16 text-center">
-          <h2 className="mb-4 font-bold tracking-tight text-slate-900" style={{ fontSize: 'clamp(1.875rem, 5vw, 3.75rem)' }}>
+          <h2
+            className="mb-4 font-bold tracking-tight text-slate-900"
+            style={{ fontSize: 'clamp(1.875rem, 5vw, 3.75rem)' }}
+          >
             {t('title')}
           </h2>
-          <p className="mx-auto max-w-2xl text-lg text-slate-600 md:text-xl">
-            {t('subtitle')}
-          </p>
+          <p className="mx-auto max-w-2xl text-lg text-slate-600 md:text-xl">{t('subtitle')}</p>
         </div>
 
         <div className="mx-auto max-w-5xl">
@@ -64,14 +65,18 @@ export function HowItWorks() {
               >
                 {/* Step Number Badge */}
                 <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
-                  <div className={`flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-r ${step.color} text-base font-bold text-white shadow-lg`}>
+                  <div
+                    className={`flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-r ${step.color} text-base font-bold text-white shadow-lg`}
+                  >
                     {index + 1}
                   </div>
                 </div>
 
                 {/* Icon */}
                 <div className="mb-6 mt-4 flex justify-center">
-                  <div className={`flex h-20 w-20 items-center justify-center rounded-2xl ${step.bgColor} transition-all duration-300 group-hover:scale-110 group-hover:rotate-3`}>
+                  <div
+                    className={`flex h-20 w-20 items-center justify-center rounded-2xl ${step.bgColor} transition-all duration-300 group-hover:scale-110 group-hover:rotate-3`}
+                  >
                     <step.icon className={`h-10 w-10 ${step.iconColor}`} />
                   </div>
                 </div>
@@ -82,9 +87,7 @@ export function HowItWorks() {
                 </h3>
 
                 {/* Description */}
-                <p className="text-slate-600 leading-relaxed">
-                  {step.description}
-                </p>
+                <p className="text-slate-600 leading-relaxed">{step.description}</p>
               </div>
             ))}
           </div>

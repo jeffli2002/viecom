@@ -182,7 +182,9 @@ export function PreviewPublishDialog({
                   unoptimized
                 />
               ) : (
-                <video src={assetUrl} controls className="w-full h-full object-contain" />
+                <video src={assetUrl} controls className="w-full h-full object-contain">
+                  <track kind="captions" src="data:text/vtt,WEBVTT" label="captions" />
+                </video>
               )}
             </div>
           </div>
@@ -191,11 +193,13 @@ export function PreviewPublishDialog({
           <div>
             <Label className="text-sm font-medium mb-3 block">{t('publishMode')}</Label>
             <div className="grid grid-cols-2 gap-3">
-              <div
-                className={`border rounded-lg p-3 cursor-pointer transition-colors ${
+              <button
+                type="button"
+                className={`border rounded-lg p-3 cursor-pointer transition-colors text-left ${
                   publishMode === 'media-only' ? 'border-primary bg-primary/5' : 'hover:bg-gray-50'
                 }`}
                 onClick={() => setPublishMode('media-only')}
+                aria-pressed={publishMode === 'media-only'}
               >
                 <div className="flex items-center gap-2">
                   <div
@@ -212,12 +216,14 @@ export function PreviewPublishDialog({
                     <div className="text-xs text-gray-500">{t('mediaOnlyDesc')}</div>
                   </div>
                 </div>
-              </div>
-              <div
-                className={`border rounded-lg p-3 cursor-pointer transition-colors ${
+              </button>
+              <button
+                type="button"
+                className={`border rounded-lg p-3 cursor-pointer transition-colors text-left ${
                   publishMode === 'product' ? 'border-primary bg-primary/5' : 'hover:bg-gray-50'
                 }`}
                 onClick={() => setPublishMode('product')}
+                aria-pressed={publishMode === 'product'}
               >
                 <div className="flex items-center gap-2">
                   <div
@@ -234,7 +240,7 @@ export function PreviewPublishDialog({
                     <div className="text-xs text-gray-500">{t('fullProductDesc')}</div>
                   </div>
                 </div>
-              </div>
+              </button>
             </div>
           </div>
 
@@ -243,14 +249,16 @@ export function PreviewPublishDialog({
             <Label className="text-sm font-medium mb-3 block">{t('selectPlatforms')}</Label>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
               {availablePlatforms.map(([platform, config]) => (
-                <div
+                <button
                   key={platform}
-                  className={`border rounded-lg p-3 cursor-pointer transition-colors ${
+                  type="button"
+                  className={`border rounded-lg p-3 cursor-pointer transition-colors text-left ${
                     selectedPlatforms.includes(platform)
                       ? 'border-primary bg-primary/5'
                       : 'hover:bg-gray-50'
                   }`}
                   onClick={() => togglePlatform(platform)}
+                  aria-pressed={selectedPlatforms.includes(platform)}
                 >
                   <div className="flex items-center gap-2">
                     <Checkbox
@@ -260,7 +268,7 @@ export function PreviewPublishDialog({
                     <span className="text-2xl">{config.icon}</span>
                     <span className="text-sm font-medium">{config.name}</span>
                   </div>
-                </div>
+                </button>
               ))}
             </div>
           </div>

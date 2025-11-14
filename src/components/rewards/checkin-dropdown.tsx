@@ -9,12 +9,12 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Progress } from '@/components/ui/progress';
 import { creditsConfig } from '@/config/credits.config';
-import { useAuthStore } from '@/store/auth-store';
 import { useRouter } from '@/i18n/navigation';
-import { useTranslations } from 'next-intl';
+import { useAuthStore } from '@/store/auth-store';
 import { Calendar, Flame, Gift, Sparkles } from 'lucide-react';
-import { toast } from 'sonner';
+import { useTranslations } from 'next-intl';
 import { useEffect, useState } from 'react';
+import { toast } from 'sonner';
 
 interface CheckinStatus {
   checkedInToday: boolean;
@@ -53,7 +53,7 @@ export function CheckinDropdown() {
   const router = useRouter();
   const [checkinStatus, setCheckinStatus] = useState<CheckinStatus | null>(null);
   const [creditBalance, setCreditBalance] = useState<CreditBalance | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [_isLoading, setIsLoading] = useState(true);
   const [isCheckingIn, setIsCheckingIn] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
 
@@ -119,13 +119,13 @@ export function CheckinDropdown() {
   };
 
   const handleCheckin = async () => {
-    console.log('🎯 handleCheckin called:', { 
-      isAuthenticated, 
-      isCheckingIn, 
+    console.log('🎯 handleCheckin called:', {
+      isAuthenticated,
+      isCheckingIn,
       checkedInToday: checkinStatus?.checkedInToday,
       todayCheckin: checkinStatus?.todayCheckin,
     });
-    
+
     // Check if user is authenticated first
     if (!isAuthenticated) {
       console.log('❌ User not authenticated');
@@ -144,7 +144,10 @@ export function CheckinDropdown() {
 
     // Show message if already checked in
     if (checkinStatus?.checkedInToday) {
-      console.log('⚠️ Already checked in today. Credits earned:', checkinStatus.todayCheckin?.creditsEarned);
+      console.log(
+        '⚠️ Already checked in today. Credits earned:',
+        checkinStatus.todayCheckin?.creditsEarned
+      );
       toast.info('Already checked in today!', {
         description: `You earned ${checkinStatus.todayCheckin?.creditsEarned || 0} credits. Come back tomorrow!`,
       });
@@ -165,16 +168,16 @@ export function CheckinDropdown() {
       });
 
       const data = await response.json();
-      console.log('📥 Checkin API response:', { 
-        status: response.status, 
-        success: data.success, 
+      console.log('📥 Checkin API response:', {
+        status: response.status,
+        success: data.success,
         data: data.data,
         error: data.error,
       });
 
       if (response.ok && data.success) {
         console.log('✅ Checkin successful! Refreshing data...');
-        
+
         // Show success message
         const creditsEarned = data.data?.creditsEarned || dailyCredits;
         const bonusMessage = data.data?.weeklyBonusEarned
@@ -228,7 +231,7 @@ export function CheckinDropdown() {
       isAuthenticated,
       checkinStatus,
     });
-    
+
     // Only allow clicking today's date if not already checked in
     if (day.isToday && !day.isCheckedIn && !isCheckingIn) {
       handleCheckin();
@@ -251,7 +254,7 @@ export function CheckinDropdown() {
       const dateStr = date.toISOString().split('T')[0];
       const dayName = dayNames[date.getDay()];
       const isToday = i === 0;
-      
+
       // Check if this day is checked in
       let isCheckedIn = false;
       if (isToday && checkinStatus?.checkedInToday) {
@@ -265,7 +268,12 @@ export function CheckinDropdown() {
         isCheckedIn = true;
       }
 
-      console.log(`Day ${dateStr}:`, { isToday, isCheckedIn, dateStr, todayCheckinDate: checkinStatus?.todayCheckin?.checkinDate });
+      console.log(`Day ${dateStr}:`, {
+        isToday,
+        isCheckedIn,
+        dateStr,
+        todayCheckinDate: checkinStatus?.todayCheckin?.checkinDate,
+      });
 
       days.push({
         dayName,
@@ -346,7 +354,10 @@ export function CheckinDropdown() {
               {last7Days.map((day, index) => {
                 const isClickable = day.isToday && !day.isCheckedIn && !isCheckingIn;
                 return (
-                  <div key={index} className="flex flex-col items-center">
+                  <div
+                    key={day.checkinDate ?? `${day.dayName}-${index}`}
+                    className="flex flex-col items-center"
+                  >
                     <span className="text-xs text-gray-600 mb-1">{day.dayName}</span>
                     <button
                       type="button"
@@ -399,4 +410,3 @@ export function CheckinDropdown() {
     </DropdownMenu>
   );
 }
-

@@ -69,5 +69,3 @@ export async function getSessionFromRequest(requestHeaders: Headers): Promise<Se
     headers: requestHeaders,
   });
 }
-
-

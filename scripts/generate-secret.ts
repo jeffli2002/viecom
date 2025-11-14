@@ -13,5 +13,3 @@ console.log(secret);
 console.log('='.repeat(60));
 console.log('\n📝 Copy this value to your .env.local file:');
 console.log(`BETTER_AUTH_SECRET="${secret}"\n`);
-
-

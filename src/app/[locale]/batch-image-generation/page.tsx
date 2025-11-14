@@ -5,7 +5,7 @@ import { useTranslations } from 'next-intl';
 
 export default function BatchImageGenerationPage() {
   const t = useTranslations('batchGeneration');
-  
+
   return (
     <div className="container mx-auto py-8">
       <div className="mb-8 text-center">
@@ -16,6 +16,3 @@ export default function BatchImageGenerationPage() {
     </div>
   );
 }
-
-
-
