@@ -6,6 +6,8 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { creditsConfig } from '@/config/credits.config';
+import { useSubscription } from '@/hooks/use-subscription';
+import { resolvePlanByIdentifier, resolvePlanByProductId } from '@/lib/creem/plan-utils';
 import { useAuthStore } from '@/store/auth-store';
 import { formatDistance } from 'date-fns';
 import {
@@ -98,9 +100,9 @@ function DashboardPageContent() {
   const [creditBalance, setCreditBalance] = useState<CreditBalance | null>(null);
   const [quotaUsage, setQuotaUsage] = useState<QuotaUsage | null>(null);
   const [transactions, setTransactions] = useState<CreditTransaction[]>([]);
-  const [subscriptionPlan, setSubscriptionPlan] = useState<string>('Free');
   const [isLoading, setIsLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const { planId, loading: subLoading } = useSubscription();
 
   useEffect(() => {
     if (!authLoading && !isAuthenticated) {
@@ -148,16 +150,7 @@ function DashboardPageContent() {
         }
       }
 
-      // Fetch subscription info
-      const billingResponse = await fetch('/api/creem/subscription', {
-        credentials: 'include',
-      });
-      if (billingResponse.ok) {
-        const billingData = await billingResponse.json();
-        if (billingData.subscription) {
-          setSubscriptionPlan(billingData.subscription.plan || 'Free');
-        }
-      }
+      // 订阅信息由 useSubscription 统一提供
     } catch (error) {
       console.error('Failed to fetch dashboard data:', error);
     } finally {
@@ -213,7 +206,7 @@ function DashboardPageContent() {
   const imageCredits = creditsConfig.consumption.imageGeneration['nano-banana'];
   const videoCredits = creditsConfig.consumption.videoGeneration['sora-2-720p-15s'];
 
-  if (authLoading || isLoading) {
+  if (authLoading || isLoading || subLoading) {
     return (
       <div className="container mx-auto py-8">
         <div className="flex items-center justify-center py-12">
@@ -440,9 +433,11 @@ function DashboardPageContent() {
             <div>
               <p className="text-sm text-muted-foreground mb-1">{t('subscriptionPlan')}</p>
               <div className="flex items-center gap-2">
-                <p className="text-2xl font-bold">{subscriptionPlan}</p>
-                <Badge variant={subscriptionPlan === 'Free' ? 'secondary' : 'default'}>
-                  {subscriptionPlan === 'Free' ? t('free') : t('paid')}
+                <p className="text-2xl font-bold capitalize">
+                  {planId === 'proplus' ? 'Pro Plus' : planId === 'pro' ? 'Pro' : 'Free'}
+                </p>
+                <Badge variant={planId === 'free' ? 'secondary' : 'default'}>
+                  {planId === 'free' ? t('free') : t('paid')}
                 </Badge>
               </div>
             </div>
@@ -450,11 +445,23 @@ function DashboardPageContent() {
               <CreditCard className="h-6 w-6 text-primary" />
             </div>
           </div>
-          <Link href="/settings/billing">
-            <Button variant="ghost" className="mt-4 w-full">
-              {t('manageSubscription')}
+          <div className="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-2">
+            <Button variant="ghost" className="w-full" asChild>
+              <Link href="/settings/billing">{t('manageSubscription')}</Link>
             </Button>
-          </Link>
+            <Button variant="outline" className="w-full" asChild>
+              <Link href="/pricing">
+                {planId === 'free'
+                  ? t('upgradeNow', { defaultValue: 'Upgrade Plan' })
+                  : t('upgradeNow', { defaultValue: 'Upgrade Plan' })}
+              </Link>
+            </Button>
+            <Button variant="secondary" className="w-full sm:col-span-2" asChild>
+              <Link href="/pricing#credit-packs">
+                {t('buyCredits', { defaultValue: 'Buy Credits' })}
+              </Link>
+            </Button>
+          </div>
         </Card>
 
         <Card className="p-6">

@@ -14,11 +14,7 @@
     "noUncheckedIndexedAccess": true,
     "checkJs": true,
     /* Bundled projects */
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "ES2022"
-    ],
+    "lib": ["dom", "dom.iterable", "ES2022"],
     "noEmit": true,
     "module": "ESNext",
     "moduleResolution": "Bundler",
@@ -32,12 +28,8 @@
     /* Path Aliases */
     "baseUrl": ".",
     "paths": {
-      "@/.source": [
-        "./.source/index.ts"
-      ],
-      "@/*": [
-        "./src/*"
-      ]
+      "@/.source": ["./.source/index.ts"],
+      "@/*": ["./src/*"]
     }
   },
   "include": [
@@ -47,6 +39,8 @@
     "src/app/api/creem/**/*.tsx",
     "src/app/api/webhooks/creem/route.ts",
     "src/components/auth/UpgradePrompt.tsx",
+    "src/components/pricing/**/*.tsx",
+    "src/app/api/payment/**/*.ts",
     "src/components/billing/**/*.tsx",
     "src/hooks/use-creem-payment.ts",
     "src/lib/creem/**/*.ts",

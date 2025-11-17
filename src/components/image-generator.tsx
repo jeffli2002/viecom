@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Progress } from '@/components/ui/progress';
 import {
   Select,
   SelectContent,
@@ -16,6 +17,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
 import { creditsConfig } from '@/config/credits.config';
 import { IMAGE_STYLES, getImageStyle } from '@/config/styles.config';
+import { useGenerationProgress } from '@/hooks/use-generation-progress';
 import { useUpgradePrompt } from '@/hooks/use-upgrade-prompt';
 import type { BrandToneAnalysis } from '@/lib/brand/brand-tone-analyzer';
 import { useAuthStore } from '@/store/auth-store';
@@ -46,6 +48,7 @@ interface GenerationResult {
 }
 
 type GenerationMode = 'text-to-image' | 'image-to-image';
+type SourceImage = { name: string; dataUrl: string };
 
 const createClientRequestId = () => {
   if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
@@ -53,6 +56,10 @@ const createClientRequestId = () => {
   }
   return `img-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
 };
+
+const MAX_SOURCE_IMAGES = 3;
+const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/jpg'];
+const MAX_IMAGE_FILE_SIZE = 10 * 1024 * 1024;
 
 const isRecoverableNetworkError = (message: string | undefined) => {
   if (!message) {
@@ -73,8 +80,7 @@ export default function ImageGenerator() {
   const [prompt, setPrompt] = useState('');
   const [enhancedPrompt, setEnhancedPrompt] = useState('');
   const [isEnhancing, setIsEnhancing] = useState(false);
-  const [imageFile, setImageFile] = useState<File | null>(null);
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [sourceImages, setSourceImages] = useState<SourceImage[]>([]);
   const [aspectRatio, setAspectRatio] = useState<string>('1:1');
   const [model, setModel] = useState<string>('nano-banana');
   const [imageStyle, setImageStyle] = useState<string>('studio-shot'); // Image style selection
@@ -86,6 +92,14 @@ export default function ImageGenerator() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const shareReferenceRef = useRef<string | null>(null);
   const activeRequestIdRef = useRef<string | null>(null);
+  const {
+    progressValue,
+    progressMessage,
+    startProgress,
+    advanceProgress,
+    completeProgress,
+    failProgress,
+  } = useGenerationProgress();
 
   // Brand analysis data (loaded from sessionStorage, no UI)
   const [brandAnalysis, setBrandAnalysis] = useState<BrandToneAnalysis | null>(null);
@@ -185,32 +199,79 @@ export default function ImageGenerator() {
     }
   };
 
-  const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+  const addSourceImages = (files: File[]) => {
+    if (files.length === 0) return;
 
-    if (!['image/jpeg', 'image/png', 'image/webp', 'image/jpg'].includes(file.type)) {
-      alert('Please select a valid image file (JPEG, PNG, or WebP)');
+    const remainingSlots = MAX_SOURCE_IMAGES - sourceImages.length;
+    if (remainingSlots <= 0) {
+      alert(`You can upload up to ${MAX_SOURCE_IMAGES} images for image-to-image mode.`);
       return;
     }
 
-    if (file.size > 10 * 1024 * 1024) {
-      alert('Image file must be less than 10MB');
+    const validFiles: File[] = [];
+    let rejectedType = false;
+    let rejectedSize = false;
+
+    for (const file of files) {
+      if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
+        rejectedType = true;
+        continue;
+      }
+      if (file.size > MAX_IMAGE_FILE_SIZE) {
+        rejectedSize = true;
+        continue;
+      }
+      validFiles.push(file);
+      if (validFiles.length >= remainingSlots) {
+        break;
+      }
+    }
+
+    if (rejectedType) {
+      alert('Some files were skipped because only JPEG, PNG, or WebP formats are supported.');
+    }
+    if (rejectedSize) {
+      alert('Some files were skipped because they exceed the 10MB size limit.');
+    }
+
+    if (validFiles.length === 0) {
       return;
     }
 
-    setImageFile(file);
-
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      setImagePreview(reader.result as string);
-    };
-    reader.readAsDataURL(file);
+    validFiles.forEach((file) => {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        if (typeof reader.result === 'string') {
+          setSourceImages((prev) => {
+            if (prev.length >= MAX_SOURCE_IMAGES) {
+              return prev;
+            }
+            return [
+              ...prev,
+              { name: file.name || `image-${prev.length + 1}`, dataUrl: reader.result as string },
+            ];
+          });
+        }
+      };
+      reader.onerror = () => {
+        console.error('Failed to read source image:', reader.error);
+      };
+      reader.readAsDataURL(file);
+    });
   };
 
-  const handleRemoveImage = () => {
-    setImageFile(null);
-    setImagePreview(null);
+  const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files ?? []);
+    if (files.length > 0) {
+      addSourceImages(files);
+    }
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
+  const handleRemoveImage = (index: number) => {
+    setSourceImages((prev) => prev.filter((_, i) => i !== index));
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
@@ -229,26 +290,10 @@ export default function ImageGenerator() {
     e.preventDefault();
     e.stopPropagation();
 
-    const file = e.dataTransfer.files?.[0];
-    if (!file) return;
+    const files = Array.from(e.dataTransfer.files ?? []);
+    if (files.length === 0) return;
 
-    if (!['image/jpeg', 'image/png', 'image/webp', 'image/jpg'].includes(file.type)) {
-      alert('Please select a valid image file (JPEG, PNG, or WebP)');
-      return;
-    }
-
-    if (file.size > 10 * 1024 * 1024) {
-      alert('Image file must be less than 10MB');
-      return;
-    }
-
-    setImageFile(file);
-
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      setImagePreview(reader.result as string);
-    };
-    reader.readAsDataURL(file);
+    addSourceImages(files);
   };
 
   const handleEnhancePrompt = async () => {
@@ -306,7 +351,7 @@ export default function ImageGenerator() {
       return;
     }
 
-    if (mode === 'image-to-image' && !imageFile && !imagePreview) {
+    if (mode === 'image-to-image' && sourceImages.length === 0) {
       alert('Please upload an image for image-to-image generation');
       return;
     }
@@ -315,6 +360,9 @@ export default function ImageGenerator() {
     activeRequestIdRef.current = requestId;
     setIsGenerating(true);
     setResult(null);
+    startProgress(
+      mode === 'image-to-image' ? t('progressUploadingImages') : t('progressPreparingRequest')
+    );
 
     try {
       let finalPrompt = enhancedPrompt || prompt.trim();
@@ -342,8 +390,13 @@ export default function ImageGenerator() {
         finalPrompt = `${finalPrompt}, ${selectedStyle.promptEnhancement}`;
       }
 
-      if (mode === 'image-to-image' && imagePreview) {
-        finalPrompt = `${finalPrompt}\n\n[Image attached: ${imageFile?.name || 'uploaded image'}]`;
+      if (mode === 'image-to-image' && sourceImages.length > 0) {
+        const attachedNames = sourceImages.map((image) => image.name).filter(Boolean);
+        const attachmentLabel =
+          attachedNames.length > 0
+            ? attachedNames.join(', ')
+            : `${sourceImages.length} uploaded image${sourceImages.length > 1 ? 's' : ''}`;
+        finalPrompt = `${finalPrompt}\n\n[Source images: ${attachmentLabel}]`;
       }
 
       const requestBody: Record<string, unknown> = {
@@ -355,8 +408,8 @@ export default function ImageGenerator() {
         clientRequestId: requestId,
       };
 
-      if (mode === 'image-to-image' && imagePreview) {
-        requestBody.image = imagePreview;
+      if (mode === 'image-to-image' && sourceImages.length > 0) {
+        requestBody.images = sourceImages.slice(0, MAX_SOURCE_IMAGES).map((image) => image.dataUrl);
       }
 
       let response: Response;
@@ -378,6 +431,8 @@ export default function ImageGenerator() {
       const timeoutId = setTimeout(() => controller.abort(), 6 * 60 * 1000);
 
       try {
+        advanceProgress(25, t('progressSubmitting'));
+        advanceProgress(45, t('progressWaiting'));
         response = await fetch('/api/v1/generate-image', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -410,6 +465,8 @@ export default function ImageGenerator() {
         throw new Error(`Server returned invalid response (${response.status}). Please try again.`);
       }
 
+      advanceProgress(75, t('progressFinalizing'));
+
       if (!response.ok) {
         if (response.status === 429 || response.status === 402) {
           openUpgradePrompt();
@@ -431,6 +488,7 @@ export default function ImageGenerator() {
 
       const resolvedRequestId = data.clientRequestId ?? requestId;
       activeRequestIdRef.current = resolvedRequestId;
+      completeProgress(t('progressReady'));
 
       setResult({
         imageUrl: data.imageUrl,
@@ -442,26 +500,27 @@ export default function ImageGenerator() {
         assetId: data.assetId ?? null,
         creditsUsed: data.creditsUsed,
       });
-
-      setIsGenerating(false);
     } catch (error) {
       const currentRequestId = activeRequestIdRef.current;
       if (error instanceof Error && isRecoverableNetworkError(error.message) && currentRequestId) {
         const recovered = await tryRecoverResult(currentRequestId);
         if (recovered) {
+          completeProgress(t('progressRecovered'));
           setResult(recovered);
-          setIsGenerating(false);
           return;
         }
       }
 
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      failProgress(errorMessage);
       setResult({
         imageUrl: '',
         previewUrl: undefined,
         prompt: prompt,
-        model: 'nano-banana',
-        error: error instanceof Error ? error.message : 'Unknown error',
+        model: model,
+        error: errorMessage,
       });
+    } finally {
       setIsGenerating(false);
     }
   };
@@ -586,7 +645,8 @@ export default function ImageGenerator() {
     }
   };
 
-  const canGenerate = prompt.trim().length > 0;
+  const canGenerate =
+    prompt.trim().length > 0 && (mode === 'text-to-image' || sourceImages.length > 0);
 
   return (
     <div className="mx-auto max-w-7xl">
@@ -685,42 +745,89 @@ export default function ImageGenerator() {
 
             <TabsContent value="image-to-image" className="mt-0 space-y-6">
               <div className="space-y-2">
-                <Label className="font-light text-gray-700 text-sm">{t('sourceImage')}</Label>
+                <Label className="font-light text-gray-700 text-sm">
+                  {t('sourceImage')}{' '}
+                  <span className="text-gray-400">(up to {MAX_SOURCE_IMAGES})</span>
+                </Label>
 
-                {!imagePreview ? (
+                <div
+                  className="rounded-xl border border-dashed border-gray-300 p-4 transition-colors hover:border-purple-400"
+                  onDragOver={handleDragOver}
+                  onDrop={handleDrop}
+                >
+                  {sourceImages.length === 0 ? (
+                    <button
+                      type="button"
+                      className="hover-card cursor-pointer rounded-xl border border-dashed border-gray-300 p-8 text-center transition-colors hover:border-purple-400 w-full"
+                      onClick={triggerFileInput}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          e.preventDefault();
+                          triggerFileInput();
+                        }
+                      }}
+                    >
+                      <Upload className="mx-auto mb-3 h-12 w-12 text-gray-400" />
+                      <p className="mb-1 font-light text-gray-600 text-sm">{t('clickToUpload')}</p>
+                      <p className="font-light text-gray-400 text-xs">{t('imageFormatDesc')}</p>
+                      <p className="mt-2 text-xs text-gray-400">
+                        Drag & drop images or click to upload (JPEG, PNG, WebP, max 10MB each)
+                      </p>
+                    </button>
+                  ) : (
+                    <div className="grid gap-4 sm:grid-cols-2">
+                      {sourceImages.map((image, idx) => (
+                        <div
+                          key={image.dataUrl || image.name || `source-image-${idx}`}
+                          className="relative"
+                        >
+                          <img
+                            src={image.dataUrl}
+                            alt={`Source ${idx + 1}`}
+                            className="h-48 w-full rounded-xl border border-gray-200 object-cover"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => handleRemoveImage(idx)}
+                            className="absolute top-2 right-2 rounded-full bg-red-500 p-2 text-white transition-colors hover:bg-red-600"
+                            aria-label="Remove source image"
+                          >
+                            <X className="h-4 w-4" />
+                          </button>
+                        </div>
+                      ))}
+                      {sourceImages.length < MAX_SOURCE_IMAGES && (
+                        <button
+                          type="button"
+                          onClick={triggerFileInput}
+                          className="flex h-48 w-full flex-col items-center justify-center rounded-xl border border-dashed border-gray-300 text-gray-500 transition-colors hover:border-purple-400 hover:text-purple-600"
+                        >
+                          <Upload className="mb-2 h-8 w-8" />
+                          <span className="text-sm font-medium">Add another image</span>
+                        </button>
+                      )}
+                    </div>
+                  )}
+                </div>
+
+                <div className="flex items-center justify-between text-xs text-gray-500">
+                  <span>
+                    {sourceImages.length} / {MAX_SOURCE_IMAGES} images selected
+                  </span>
                   <button
                     type="button"
                     onClick={triggerFileInput}
-                    onDragOver={handleDragOver}
-                    onDrop={handleDrop}
-                    className="hover-card cursor-pointer rounded-xl border border-dashed border-gray-300 p-8 text-center transition-colors hover:border-purple-400 w-full"
-                    aria-label={t('clickToUpload')}
+                    className="text-purple-600 font-medium hover:underline"
                   >
-                    <Upload className="mx-auto mb-3 h-12 w-12 text-gray-400" />
-                    <p className="mb-1 font-light text-gray-600 text-sm">{t('clickToUpload')}</p>
-                    <p className="font-light text-gray-400 text-xs">{t('imageFormatDesc')}</p>
+                    Upload images
                   </button>
-                ) : (
-                  <div className="relative">
-                    <img
-                      src={imagePreview}
-                      alt="Preview"
-                      className="w-full rounded-xl border border-gray-200"
-                    />
-                    <button
-                      type="button"
-                      onClick={handleRemoveImage}
-                      className="absolute top-2 right-2 rounded-full bg-red-500 p-2 text-white transition-colors hover:bg-red-600"
-                    >
-                      <X className="h-4 w-4" />
-                    </button>
-                  </div>
-                )}
+                </div>
 
                 <input
                   ref={fileInputRef}
                   type="file"
                   accept="image/jpeg,image/png,image/webp,image/jpg"
+                  multiple
                   onChange={handleImageSelect}
                   className="hidden"
                 />
@@ -927,12 +1034,20 @@ export default function ImageGenerator() {
               )}
 
               {isGenerating && (
-                <div className="flex aspect-square items-center justify-center rounded-xl bg-gray-100">
-                  <div className="space-y-4 text-center">
-                    <Loader2 className="mx-auto h-12 w-12 animate-spin text-purple-600" />
-                    <p className="font-light text-base text-gray-700">{t('generatingImage')}</p>
-                    <p className="font-light text-gray-500 text-xs">{t('generatingTakeMoments')}</p>
+                <div className="flex aspect-square flex-col items-center justify-center rounded-xl bg-gray-100 p-6 text-center">
+                  <Loader2 className="mb-4 h-12 w-12 animate-spin text-purple-600" />
+                  <p className="font-medium text-gray-700">
+                    {progressMessage || t('generatingImage')}
+                  </p>
+                  <div className="mt-4 w-full max-w-xs space-y-2">
+                    <Progress value={progressValue} className="h-2" />
+                    <p className="text-xs font-medium text-gray-500">
+                      {Math.round(progressValue)}%
+                    </p>
                   </div>
+                  <p className="mt-3 font-light text-gray-500 text-xs">
+                    {t('generatingTakeMoments')}
+                  </p>
                 </div>
               )}
 

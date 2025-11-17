@@ -4,12 +4,12 @@ import AssetsPageClient from './assets-client';
 
 export const dynamic = 'force-dynamic';
 
-export function generateMetadata({
+export async function generateMetadata({
   params,
 }: {
-  params: { locale: string };
-}): Metadata {
-  const { locale } = params;
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
   return buildLocaleCanonicalMetadata(locale, '/assets');
 }
 

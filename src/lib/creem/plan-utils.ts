@@ -49,6 +49,61 @@ export function resolvePlanByIdentifier(
   return null;
 }
 
+/**
+ * Resolve plan by known product identifiers (e.g., Creem product keys).
+ * Useful when database stores productId rather than priceId.
+ */
+export function resolvePlanByProductId(
+  productId?: string,
+  interval?: BillingInterval
+): ResolvedPlan | null {
+  if (!productId) return null;
+
+  // Map known Creem product keys to plan ids
+  const productKeyToPlanId: Record<string, { id: 'pro' | 'proplus'; interval: BillingInterval }> =
+    {};
+
+  if (paymentConfig.creem.proProductKeyMonthly) {
+    productKeyToPlanId[paymentConfig.creem.proProductKeyMonthly] = { id: 'pro', interval: 'month' };
+  }
+  if (paymentConfig.creem.proProductKeyYearly) {
+    productKeyToPlanId[paymentConfig.creem.proProductKeyYearly] = { id: 'pro', interval: 'year' };
+  }
+  if (paymentConfig.creem.proplusProductKeyMonthly) {
+    productKeyToPlanId[paymentConfig.creem.proplusProductKeyMonthly] = {
+      id: 'proplus',
+      interval: 'month',
+    };
+  }
+  if (paymentConfig.creem.proplusProductKeyYearly) {
+    productKeyToPlanId[paymentConfig.creem.proplusProductKeyYearly] = {
+      id: 'proplus',
+      interval: 'year',
+    };
+  }
+
+  // Debug: log mapping table and lookup
+  if (Object.keys(productKeyToPlanId).length > 0) {
+    console.log('[Plan Utils] Product mapping table:', Object.keys(productKeyToPlanId));
+    console.log('[Plan Utils] Looking up productId:', productId);
+  }
+
+  const mapped = productKeyToPlanId[productId];
+  if (!mapped) {
+    console.log('[Plan Utils] No mapping found for productId:', productId);
+    return null;
+  }
+
+  const plan = paymentConfig.plans.find((p) => p.id === mapped.id);
+  if (!plan) return null;
+
+  return {
+    plan,
+    interval: interval || mapped.interval,
+    identifier: productId,
+  };
+}
+
 export interface PlanCreditInfo {
   plan: (typeof paymentConfig.plans)[number] | null;
   planId: string;
@@ -59,9 +114,16 @@ export interface PlanCreditInfo {
 
 /**
  * Calculate the credit allocation for a plan/price identifier.
+ * Tries resolvePlanByIdentifier first, then resolvePlanByProductId as fallback.
  */
 export function getCreditsForPlan(identifier: string, interval?: BillingInterval): PlanCreditInfo {
-  const resolved = resolvePlanByIdentifier(identifier, interval);
+  // Try to resolve by identifier (priceId) first
+  let resolved = resolvePlanByIdentifier(identifier, interval);
+
+  // If not resolved and identifier looks like a product ID (starts with 'prod_'), try product ID resolution
+  if (!resolved && identifier.startsWith('prod_')) {
+    resolved = resolvePlanByProductId(identifier, interval);
+  }
 
   if (!resolved) {
     return {
@@ -99,5 +161,3 @@ export function formatPlanName(
 
   return fallback.replace(/_/g, ' ').replace(/\b\w/g, (char) => char.toUpperCase());
 }
-
-

@@ -2,7 +2,7 @@ import { randomUUID } from 'node:crypto';
 import type { PaymentInterval, PaymentRecord, PaymentStatus, PaymentType } from '@/payment/types';
 import { db } from '@/server/db';
 import { payment, paymentEvent } from '@/server/db/schema';
-import { and, desc, eq, inArray } from 'drizzle-orm';
+import { and, desc, eq, inArray, not } from 'drizzle-orm';
 
 export interface CreatePaymentData {
   id?: string;
@@ -127,7 +127,8 @@ export class PaymentRepository {
 
   /**
    * 获取用户的活跃订阅
-   * Excludes subscriptions that are set to cancel at period end
+   * Returns active subscriptions even if cancelAtPeriodEnd is true,
+   * as the user still has access until the period ends
    */
   async findActiveSubscriptionByUserId(userId: string): Promise<PaymentRecord | null> {
     const results = await db
@@ -142,9 +143,9 @@ export class PaymentRepository {
       )
       .orderBy(desc(payment.createdAt));
 
-    // Filter out subscriptions that are set to cancel at period end
-    // and return the most recent truly active subscription
-    const activeSubscription = results.find((sub) => !sub.cancelAtPeriodEnd);
+    // Return the most recent active subscription, even if cancelAtPeriodEnd is true
+    // because the user still has access until the period ends
+    const activeSubscription = results[0];
 
     return activeSubscription ? this.mapToPaymentRecord(activeSubscription) : null;
   }
@@ -237,6 +238,27 @@ export class PaymentRepository {
       );
 
     return result.rowCount;
+  }
+
+  /**
+   * Cancel all other active subscriptions for a user except the specified payment ID
+   */
+  async cancelOtherActiveSubscriptions(userId: string, keepPaymentId: string): Promise<void> {
+    await db
+      .update(payment)
+      .set({
+        status: 'canceled',
+        cancelAtPeriodEnd: false,
+        updatedAt: new Date(),
+      })
+      .where(
+        and(
+          eq(payment.userId, userId),
+          eq(payment.type, 'subscription'),
+          not(eq(payment.id, keepPaymentId)),
+          inArray(payment.status, ['active', 'trialing', 'past_due'])
+        )
+      );
   }
 
   /**
@@ -346,6 +368,7 @@ export class PaymentRepository {
     return {
       id: record.id,
       priceId: record.priceId,
+      productId: record.productId || undefined,
       type: record.type as PaymentType,
       interval: record.interval as PaymentInterval,
       userId: record.userId,

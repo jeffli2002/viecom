@@ -1,5 +1,6 @@
 import { auth } from '@/lib/auth/auth';
 import { creditService } from '@/lib/credits';
+import { ensureSubscriptionCredits } from '@/lib/credits/ensure-subscription-credits';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 
@@ -14,7 +15,12 @@ export async function GET(request: NextRequest) {
     }
 
     const userId = session.user.id;
-    const account = await creditService.getOrCreateCreditAccount(userId);
+    let account = await creditService.getOrCreateCreditAccount(userId);
+
+    const granted = await ensureSubscriptionCredits(userId);
+    if (granted) {
+      account = await creditService.getOrCreateCreditAccount(userId);
+    }
 
     return NextResponse.json({
       success: true,

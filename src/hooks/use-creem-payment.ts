@@ -1,12 +1,13 @@
 'use client';
 
+import { env } from '@/env';
 import { useState } from 'react';
 
 type PlanId = 'pro' | 'proplus';
 type BillingInterval = 'month' | 'year';
 
 interface CheckoutParams {
-  planId: PlanId;
+  planId?: PlanId;
   interval?: BillingInterval;
   successUrl?: string;
   cancelUrl?: string;
@@ -26,7 +27,9 @@ export function useCreemPayment() {
     setError(null);
 
     try {
-      const response = await fetch('/api/creem/checkout', {
+      const fallbackOrigin =
+        typeof window !== 'undefined' ? window.location.origin : env.NEXT_PUBLIC_APP_URL;
+      const response = await fetch('/api/payment/create-checkout', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -35,8 +38,8 @@ export function useCreemPayment() {
         body: JSON.stringify({
           planId,
           interval,
-          successUrl,
-          cancelUrl,
+          successUrl: successUrl || `${fallbackOrigin}/settings/billing?success=true`,
+          cancelUrl: cancelUrl || `${fallbackOrigin}/settings/billing?canceled=true`,
         }),
       });
 

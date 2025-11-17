@@ -87,42 +87,45 @@ export function LandingHeader() {
               // Show default state during SSR to prevent hydration mismatch
               <>
                 <LanguageSwitcher />
-                <Link href="/login">
-                  <Button variant="ghost" size="sm" className="hidden sm:inline-flex">
-                    {t('login')}
-                  </Button>
-                </Link>
-                <Link href="/signup">
-                  <Button className="bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-700 hover:to-fuchsia-700 text-white shadow-lg shadow-violet-500/25">
+                <Button variant="ghost" size="sm" className="hidden sm:inline-flex" asChild>
+                  <Link href="/login">{t('login')}</Link>
+                </Button>
+                <Button
+                  className="bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-700 hover:to-fuchsia-700 text-white shadow-lg shadow-violet-500/25"
+                  asChild
+                >
+                  <Link href="/signup">
                     {t('getStarted')}
                     <ArrowRight className="size-4 ml-2" />
-                  </Button>
-                </Link>
+                  </Link>
+                </Button>
               </>
             ) : isAuthenticated ? (
               <>
                 <CheckinDropdown />
                 <LanguageSwitcher />
-                <Link href="/dashboard">
-                  <Button className="bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-700 hover:to-fuchsia-700 text-white shadow-lg shadow-violet-500/25">
-                    {t('dashboard')}
-                  </Button>
-                </Link>
+                <Button
+                  className="bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-700 hover:to-fuchsia-700 text-white shadow-lg shadow-violet-500/25"
+                  asChild
+                >
+                  <Link href="/dashboard">{t('dashboard')}</Link>
+                </Button>
               </>
             ) : (
               <>
                 <LanguageSwitcher />
-                <Link href="/login">
-                  <Button variant="ghost" size="sm" className="hidden sm:inline-flex">
-                    {t('login')}
-                  </Button>
-                </Link>
-                <Link href="/signup">
-                  <Button className="bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-700 hover:to-fuchsia-700 text-white shadow-lg shadow-violet-500/25">
+                <Button variant="ghost" size="sm" className="hidden sm:inline-flex" asChild>
+                  <Link href="/login">{t('login')}</Link>
+                </Button>
+                <Button
+                  className="bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-700 hover:to-fuchsia-700 text-white shadow-lg shadow-violet-500/25"
+                  asChild
+                >
+                  <Link href="/signup">
                     {t('getStarted')}
                     <ArrowRight className="size-4 ml-2" />
-                  </Button>
-                </Link>
+                  </Link>
+                </Button>
               </>
             )}
 

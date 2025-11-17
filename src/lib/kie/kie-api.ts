@@ -325,10 +325,26 @@ export class KIEAPIService {
 
     const responseText = await response.text();
     if (!response.ok || !responseText) {
+      console.error(`[KIE API] getTaskStatus failed for task ${taskId}:`, {
+        status: response.status,
+        statusText: response.statusText,
+        responseText: responseText.substring(0, 500),
+      });
       throw new Error(`KIE API error: ${responseText || response.statusText}`);
     }
 
-    const data = JSON.parse(responseText) as KIETaskStatus;
+    let data: KIETaskStatus;
+    try {
+      data = JSON.parse(responseText) as KIETaskStatus;
+    } catch (parseError) {
+      console.error(`[KIE API] Failed to parse response for task ${taskId}:`, {
+        responseText: responseText.substring(0, 500),
+        error: parseError instanceof Error ? parseError.message : String(parseError),
+      });
+      throw new Error(
+        `KIE API response parse error: ${parseError instanceof Error ? parseError.message : String(parseError)}`
+      );
+    }
 
     // Parse resultJson if present (for image generation)
     if (data.data?.resultJson) {

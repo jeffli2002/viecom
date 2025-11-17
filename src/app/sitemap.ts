@@ -1,6 +1,6 @@
-import type { MetadataRoute } from 'next';
-import { getMetadataBase } from '@/lib/seo/metadata';
 import { locales, routing } from '@/i18n/routing';
+import { getMetadataBase } from '@/lib/seo/metadata';
+import type { MetadataRoute } from 'next';
 
 const PUBLIC_PATHS: string[] = [
   '/',
@@ -38,9 +38,7 @@ function buildLocalizedPaths(path: string): string[] {
   for (const locale of localeCodes) {
     if (locale === defaultLocale) continue;
     const prefix = locale ? `/${locale}` : '';
-    localizedPaths.push(
-      normalizedPath ? `${prefix}${normalizedPath}` : `${prefix || '/'}`
-    );
+    localizedPaths.push(normalizedPath ? `${prefix}${normalizedPath}` : `${prefix || '/'}`);
   }
 
   return localizedPaths;
@@ -57,5 +55,3 @@ export default function sitemap(): MetadataRoute.Sitemap {
     }))
   );
 }
-
-

@@ -3,140 +3,61 @@ import { randomUUID } from 'node:crypto';
 import { paymentConfig } from '@/config/payment.config';
 import { env } from '@/env';
 import { creemService } from '@/lib/creem/creem-service';
-import { type BillingInterval, formatPlanName, getCreditsForPlan } from '@/lib/creem/plan-utils';
-import type { PaymentStatus } from '@/payment/types';
+import {
+  type BillingInterval,
+  formatPlanName,
+  getCreditsForPlan,
+  resolvePlanByIdentifier,
+  resolvePlanByProductId,
+} from '@/lib/creem/plan-utils';
+import { normalizeCreemStatus } from '@/lib/creem/status-utils';
+import { grantSubscriptionCredits } from '@/lib/creem/subscription-credits';
 import { db } from '@/server/db';
 import { paymentRepository } from '@/server/db/repositories/payment-repository';
 import { creditTransactions, userCredits } from '@/server/db/schema';
-import { eq } from 'drizzle-orm';
+import { and, desc, eq } from 'drizzle-orm';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 
 export const dynamic = 'force-dynamic';
 
 /**
- * Grant subscription credits to user with idempotency
- * Returns true if credits were granted, false if already granted
- */
-async function grantSubscriptionCredits(
-  userId: string,
-  planIdentifier: string,
-  subscriptionId: string,
-  interval?: BillingInterval,
-  isRenewal = false
-): Promise<boolean> {
-  const creditInfo = getCreditsForPlan(planIdentifier, interval);
-
-  if (!creditInfo.plan || creditInfo.amount <= 0) {
-    console.log(
-      `[Creem Webhook] No credits to grant for identifier ${planIdentifier} (interval=${interval || 'auto'})`
-    );
-    return false;
-  }
-
-  const normalizedPlanId = creditInfo.planId;
-  const isYearly = creditInfo.interval === 'year';
-  const creditsToGrant = creditInfo.amount;
-  const planDisplayName = formatPlanName(creditInfo.plan, normalizedPlanId);
-
-  try {
-    // Create idempotent reference ID
-    const referenceId = `creem_${subscriptionId}_${isRenewal ? 'renewal' : 'initial'}_${Date.now()}`;
-
-    const granted = await db.transaction(async (tx) => {
-      // Check if credits already granted (idempotency)
-      const [existingTransaction] = await tx
-        .select()
-        .from(creditTransactions)
-        .where(eq(creditTransactions.referenceId, referenceId))
-        .limit(1);
-
-      if (existingTransaction) {
-        console.log(`[Creem Webhook] Credits already granted for reference ${referenceId}`);
-        return false;
-      }
-
-      const [userCredit] = await tx
-        .select()
-        .from(userCredits)
-        .where(eq(userCredits.userId, userId))
-        .limit(1);
-
-      const newBalance = (userCredit?.balance || 0) + creditsToGrant;
-
-      if (userCredit) {
-        await tx
-          .update(userCredits)
-          .set({
-            balance: newBalance,
-            totalEarned: userCredit.totalEarned + creditsToGrant,
-            updatedAt: new Date(),
-          })
-          .where(eq(userCredits.userId, userId));
-      } else {
-        await tx.insert(userCredits).values({
-          id: randomUUID(),
-          userId,
-          balance: creditsToGrant,
-          totalEarned: creditsToGrant,
-          totalSpent: 0,
-          frozenBalance: 0,
-        });
-      }
-
-      await tx.insert(creditTransactions).values({
-        id: randomUUID(),
-        userId,
-        type: 'earn',
-        amount: creditsToGrant,
-        balanceAfter: newBalance,
-        source: 'subscription',
-        description: `${planDisplayName} subscription ${isRenewal ? 'renewal' : 'credits'} (Creem)`,
-        referenceId,
-        metadata: JSON.stringify({
-          planId: normalizedPlanId,
-          planIdentifier,
-          isYearly,
-          subscriptionId,
-          provider: 'creem',
-          isRenewal,
-        }),
-      });
-
-      return true;
-    });
-
-    if (granted) {
-      console.log(
-        `[Creem Webhook] Granted ${creditsToGrant} credits to user ${userId} for ${normalizedPlanId} ${isRenewal ? 'renewal' : 'subscription'}`
-      );
-    }
-
-    return granted;
-  } catch (error) {
-    console.error('[Creem Webhook] Error granting subscription credits:', error);
-    return false;
-  }
-}
-
-/**
- * Adjust credits when changing plans (upgrade/downgrade)
+ * Adjust credits when changing plans (upgrade/downgrade) or intervals
  */
 async function adjustCreditsForPlanChange(
   userId: string,
   oldPlanIdentifier: string,
   newPlanIdentifier: string,
   subscriptionId: string,
-  isYearly: boolean
+  oldInterval?: BillingInterval,
+  newInterval?: BillingInterval
 ) {
   try {
-    const interval: BillingInterval = isYearly ? 'year' : 'month';
-    const oldCreditInfo = getCreditsForPlan(oldPlanIdentifier, interval);
-    const newCreditInfo = getCreditsForPlan(newPlanIdentifier, interval);
+    // Use provided intervals or default to month
+    const oldIntervalValue: BillingInterval = oldInterval || 'month';
+    const newIntervalValue: BillingInterval = newInterval || 'month';
 
-    if (!oldCreditInfo.plan || !newCreditInfo.plan) {
+    // Calculate credits using respective intervals for old and new plans
+    // Handle 'free' plan explicitly
+    const oldPlanId =
+      oldPlanIdentifier === 'free' || !oldPlanIdentifier ? 'free' : oldPlanIdentifier;
+    const newPlanId =
+      newPlanIdentifier === 'free' || !newPlanIdentifier ? 'free' : newPlanIdentifier;
+
+    const oldCreditInfo = getCreditsForPlan(oldPlanId, oldIntervalValue);
+    const newCreditInfo = getCreditsForPlan(newPlanId, newIntervalValue);
+
+    // Allow adjustment even if one plan is 'free' (no plan resolved)
+    if (!oldCreditInfo.plan && oldPlanId !== 'free') {
       console.log(
-        `[Creem Webhook] Unable to resolve plans for credit adjustment (${oldPlanIdentifier} → ${newPlanIdentifier})`
+        `[Creem Webhook] Unable to resolve old plan for credit adjustment: ${oldPlanIdentifier}`
+      );
+      return;
+    }
+
+    if (!newCreditInfo.plan && newPlanId !== 'free') {
+      console.log(
+        `[Creem Webhook] Unable to resolve new plan for credit adjustment: ${newPlanIdentifier}`
       );
       return;
     }
@@ -190,13 +111,15 @@ async function adjustCreditsForPlanChange(
         amount: Math.abs(creditDifference),
         balanceAfter: newBalance,
         source: 'subscription',
-        description: `Plan ${creditDifference > 0 ? 'upgrade' : 'downgrade'}: ${oldCreditInfo.planId} → ${newCreditInfo.planId}`,
+        description: `Plan ${creditDifference > 0 ? 'upgrade' : 'downgrade'}: ${oldCreditInfo.planId} ${oldIntervalValue} → ${newCreditInfo.planId} ${newIntervalValue}`,
         referenceId,
         metadata: JSON.stringify({
           oldPlanId: oldCreditInfo.planId,
           newPlanId: newCreditInfo.planId,
           oldPlanIdentifier,
           newPlanIdentifier,
+          oldInterval: oldIntervalValue,
+          newInterval: newIntervalValue,
           subscriptionId,
           provider: 'creem',
           creditDifference,
@@ -205,10 +128,54 @@ async function adjustCreditsForPlanChange(
     });
 
     console.log(
-      `[Creem Webhook] Adjusted credits by ${creditDifference} for user ${userId} (${oldCreditInfo.planId} → ${newCreditInfo.planId})`
+      `[Creem Webhook] Adjusted credits by ${creditDifference} for user ${userId} (${oldCreditInfo.planId} ${oldIntervalValue} → ${newCreditInfo.planId} ${newIntervalValue})`
     );
   } catch (error) {
     console.error('[Creem Webhook] Error adjusting credits:', error);
+  }
+}
+
+async function hasInitialSubscriptionCreditGrant(userId: string, subscriptionId: string) {
+  try {
+    const transactions = await db
+      .select({
+        metadata: creditTransactions.metadata,
+      })
+      .from(creditTransactions)
+      .where(
+        and(eq(creditTransactions.userId, userId), eq(creditTransactions.source, 'subscription'))
+      )
+      .orderBy(desc(creditTransactions.createdAt))
+      .limit(20);
+
+    return transactions.some((transaction) => {
+      if (!transaction.metadata) {
+        return false;
+      }
+
+      try {
+        const metadata = JSON.parse(transaction.metadata);
+        return (
+          metadata?.subscriptionId === subscriptionId &&
+          metadata?.provider === 'creem' &&
+          !metadata?.isRenewal
+        );
+      } catch (error) {
+        console.warn('[Creem Webhook] Unable to parse credit transaction metadata', {
+          userId,
+          subscriptionId,
+          error,
+        });
+        return false;
+      }
+    });
+  } catch (error) {
+    console.error('[Creem Webhook] Error checking existing credit grants:', {
+      userId,
+      subscriptionId,
+      error,
+    });
+    return false;
   }
 }
 
@@ -358,7 +325,15 @@ export async function POST(request: NextRequest) {
 }
 
 async function handleCheckoutComplete(data: CreemWebhookData) {
-  const { userId, customerId, subscriptionId, planId, trialEnd } = data;
+  const {
+    userId,
+    customerId,
+    subscriptionId,
+    planId,
+    trialEnd,
+    billingInterval,
+    status: incomingStatus,
+  } = data;
 
   if (!userId || !planId) {
     console.error('[Creem Webhook] Missing required data for checkout complete');
@@ -369,7 +344,9 @@ async function handleCheckoutComplete(data: CreemWebhookData) {
     if (subscriptionId) {
       const existingRecord = await paymentRepository.findBySubscriptionId(subscriptionId);
       if (!existingRecord) {
-        const status: PaymentStatus = trialEnd ? 'trialing' : 'active';
+        const normalizedStatus = normalizeCreemStatus(
+          incomingStatus || (trialEnd ? 'trialing' : 'active')
+        );
 
         await paymentRepository.create({
           id: subscriptionId,
@@ -379,12 +356,14 @@ async function handleCheckoutComplete(data: CreemWebhookData) {
           userId,
           customerId: customerId || '',
           subscriptionId,
-          status,
+          status: normalizedStatus,
+          interval: billingInterval === 'year' ? 'year' : 'month',
           trialEnd: trialEnd ? new Date(trialEnd) : undefined,
         });
+        await paymentRepository.cancelOtherActiveSubscriptions(userId, subscriptionId);
 
         // Grant credits immediately for non-trial subscriptions
-        if (!trialEnd) {
+        if (normalizedStatus !== 'trialing') {
           await grantSubscriptionCredits(userId, planId, subscriptionId, data.interval, false);
         } else {
           console.log(
@@ -397,7 +376,7 @@ async function handleCheckoutComplete(data: CreemWebhookData) {
     }
 
     console.log(
-      `[Creem Webhook] Checkout completed for user ${userId} (${trialEnd ? 'trial' : 'active'})`
+      `[Creem Webhook] Checkout completed for user ${userId} (${incomingStatus || (trialEnd ? 'trial' : 'active')})`
     );
   } catch (error) {
     console.error('[Creem Webhook] Error in handleCheckoutComplete:', error);
@@ -416,6 +395,7 @@ async function handleSubscriptionCreated(data: CreemWebhookData) {
     currentPeriodEnd,
     trialStart,
     trialEnd,
+    interval,
   } = data;
 
   if (!subscriptionId || !customerId) {
@@ -426,26 +406,31 @@ async function handleSubscriptionCreated(data: CreemWebhookData) {
   try {
     const existingRecord = await paymentRepository.findBySubscriptionId(subscriptionId);
 
+    const normalizedStatus = normalizeCreemStatus(status);
+
     if (!existingRecord) {
+      const ownerUserId = userId || customerId;
       await paymentRepository.create({
         id: subscriptionId,
         provider: 'creem',
         priceId: planId || '',
         type: 'subscription',
-        userId: userId || customerId,
+        userId: ownerUserId,
         customerId,
         subscriptionId,
-        status: (status as PaymentStatus) || 'active',
-        periodStart: currentPeriodStart,
-        periodEnd: currentPeriodEnd,
-        trialStart,
-        trialEnd,
+        status: normalizedStatus,
+        interval: interval === 'year' ? 'year' : 'month',
+        periodStart: currentPeriodStart ? new Date(currentPeriodStart) : undefined,
+        periodEnd: currentPeriodEnd ? new Date(currentPeriodEnd) : undefined,
+        trialStart: trialStart ? new Date(trialStart) : undefined,
+        trialEnd: trialEnd ? new Date(trialEnd) : undefined,
       });
+      await paymentRepository.cancelOtherActiveSubscriptions(ownerUserId, subscriptionId);
 
       // Only grant credits if not in trial or if trial just ended
-      if (planId && userId && status !== 'trialing') {
+      if (planId && userId && normalizedStatus !== 'trialing') {
         await grantSubscriptionCredits(userId, planId, subscriptionId, data.interval, false);
-      } else if (status === 'trialing') {
+      } else if (normalizedStatus === 'trialing') {
         console.log(
           '[Creem Webhook] Trial subscription created - credits will be granted after trial ends'
         );
@@ -455,7 +440,7 @@ async function handleSubscriptionCreated(data: CreemWebhookData) {
 
       // Update existing record if status changed
       await paymentRepository.update(subscriptionId, {
-        status: (status as PaymentStatus) || existingRecord.status,
+        status: normalizedStatus || existingRecord.status,
         periodStart: currentPeriodStart,
         periodEnd: currentPeriodEnd,
         trialStart,
@@ -470,7 +455,9 @@ async function handleSubscriptionCreated(data: CreemWebhookData) {
       eventData: JSON.stringify(data),
     });
 
-    console.log(`[Creem Webhook] Created subscription ${subscriptionId} with status ${status}`);
+    console.log(
+      `[Creem Webhook] Created subscription ${subscriptionId} with status ${normalizedStatus}`
+    );
   } catch (error) {
     console.error('[Creem Webhook] Error in handleSubscriptionCreated:', error);
     throw error;
@@ -517,47 +504,173 @@ async function handleSubscriptionUpdate(data: CreemWebhookData) {
     // If no specific subscription found, find the active one
     if (!targetSubscription) {
       const subscriptions = await paymentRepository.findByUserId(actualUserId);
-      targetSubscription = subscriptions.find(
-        (s) => s.status === 'active' || s.status === 'trialing'
-      );
+      targetSubscription = subscriptions.find((s) => {
+        const normalized = normalizeCreemStatus(s.status);
+        return normalized === 'active' || normalized === 'trialing';
+      });
     }
 
     if (targetSubscription) {
-      const oldPlanId = targetSubscription.priceId;
-      const newPlanId = planId || oldPlanId;
-      const oldStatus = targetSubscription.status;
-      const newStatus = status as PaymentStatus;
+      const oldPriceId = targetSubscription.priceId;
+      const oldProductId = targetSubscription.productId;
+      const oldInterval = targetSubscription.interval || 'month';
+      const newPriceId = planId || oldPriceId;
+      const newProductId = data.productId || oldProductId;
+      const newInterval = data.interval || targetSubscription.interval || 'month';
+      const oldStatus = normalizeCreemStatus(targetSubscription.status);
+      const newStatus = normalizeCreemStatus(status);
 
-      // Detect plan change (upgrade/downgrade)
-      if (oldPlanId !== newPlanId) {
-        console.log(`[Creem Webhook] Plan change detected: ${oldPlanId} → ${newPlanId}`);
-        await adjustCreditsForPlanChange(
-          actualUserId,
-          oldPlanId,
-          newPlanId,
-          targetSubscription.id,
-          (targetSubscription.interval || data.interval) === 'year'
+      // Resolve plan IDs from identifiers (priceId or productId)
+      const oldPlanResolved =
+        resolvePlanByIdentifier(oldPriceId, oldInterval) ||
+        resolvePlanByProductId(oldProductId, oldInterval);
+      const newPlanResolved =
+        resolvePlanByIdentifier(newPriceId, newInterval) ||
+        resolvePlanByProductId(newProductId, newInterval);
+
+      const oldPlanId = oldPlanResolved?.plan?.id || oldPriceId || 'free';
+      const newPlanId = newPlanResolved?.plan?.id || newPriceId || 'free';
+
+      // Detect plan or interval change (upgrade/downgrade)
+      const planChanged = oldPlanId !== newPlanId;
+      const intervalChanged = oldInterval !== newInterval;
+
+      if (planChanged || intervalChanged) {
+        console.log(
+          `[Creem Webhook] Plan/interval change detected: ${oldPlanId} ${oldInterval} → ${newPlanId} ${newInterval} (from priceId: ${oldPriceId} → ${newPriceId})`
         );
+
+        // Calculate credit difference using resolved plan IDs with their respective intervals
+        const oldCreditInfo = getCreditsForPlan(oldPlanId, oldInterval);
+        const newCreditInfo = getCreditsForPlan(newPlanId, newInterval);
+        const creditDifference = newCreditInfo.amount - oldCreditInfo.amount;
+
+        if (creditDifference !== 0) {
+          const isDowngrade = creditDifference < 0;
+
+          if (isDowngrade) {
+            // Downgrade: Schedule for period end, don't deduct credits immediately
+            // The downgrade will be processed when the period ends (in renewal detection)
+            console.log(
+              `[Creem Webhook] Downgrade detected (${creditDifference} credits). Scheduled for period end. Credits will be adjusted at renewal.`
+            );
+            // Set cancelAtPeriodEnd to indicate downgrade is scheduled
+            await paymentRepository.update(targetSubscription.id, {
+              cancelAtPeriodEnd: true,
+            });
+          } else {
+            // Upgrade: Apply credit difference immediately
+            console.log(
+              `[Creem Webhook] Upgrade detected: ${creditDifference} credits. Applying immediately.`
+            );
+            await adjustCreditsForPlanChange(
+              actualUserId,
+              oldPlanId,
+              newPlanId,
+              targetSubscription.id,
+              oldInterval,
+              newInterval
+            );
+          }
+        } else {
+          console.log('[Creem Webhook] No credit adjustment needed (same credit amount)');
+        }
       }
 
-      // Detect status change from trialing to active (trial ended, grant credits)
-      if (oldStatus === 'trialing' && newStatus === 'active') {
-        console.log(`[Creem Webhook] Trial ended, granting credits for ${newPlanId}`);
-        await grantSubscriptionCredits(
-          actualUserId,
-          newPlanId,
-          targetSubscription.id,
-          targetSubscription.interval || data.interval,
-          false
-        );
+      const initialGrantExists = await hasInitialSubscriptionCreditGrant(
+        actualUserId,
+        targetSubscription.id
+      );
+
+      if (newStatus === 'active') {
+        if (initialGrantExists) {
+          console.log(
+            `[Creem Webhook] Active status detected for ${newPlanId}, but initial credits already exist. Skipping duplicate grant.`
+          );
+        } else {
+          console.log(
+            `[Creem Webhook] Initial credits missing for ${newPlanId} (previous status ${oldStatus}). Granting now.`
+          );
+          await grantSubscriptionCredits(
+            actualUserId,
+            newPlanId,
+            targetSubscription.id,
+            targetSubscription.interval || data.interval,
+            false
+          );
+        }
       }
 
-      await paymentRepository.update(targetSubscription.id, {
-        status: newStatus,
-        periodEnd: currentPeriodEnd,
-        cancelAtPeriodEnd: cancelAtPeriodEnd,
-        priceId: newPlanId,
-      });
+      const nextPeriodEnd = currentPeriodEnd ? new Date(currentPeriodEnd) : undefined;
+      const previousPeriodEnd = targetSubscription.periodEnd;
+
+      const hasRenewed =
+        newStatus === 'active' &&
+        nextPeriodEnd &&
+        previousPeriodEnd &&
+        nextPeriodEnd.getTime() - previousPeriodEnd.getTime() > 60 * 1000;
+
+      if (hasRenewed) {
+        console.log(
+          `[Creem Webhook] Renewal detected for ${newPlanId} (period ${previousPeriodEnd?.toISOString()} → ${nextPeriodEnd.toISOString()})`
+        );
+
+        // Check if this is a downgrade that was scheduled for period end
+        const wasScheduledDowngrade = targetSubscription.cancelAtPeriodEnd && planChanged;
+
+        if (wasScheduledDowngrade) {
+          // Downgrade scheduled for period end: grant full credits for new plan
+          // This is like starting a new subscription with the new plan
+          console.log(
+            `[Creem Webhook] Processing scheduled downgrade: old plan ${oldPlanId} ${oldInterval} ended, starting new plan ${newPlanId} ${newInterval}`
+          );
+
+          // Grant full credits for the new plan (like a new subscription)
+          await grantSubscriptionCredits(
+            actualUserId,
+            newPlanId || 'free',
+            targetSubscription.id,
+            newInterval,
+            false // Not a renewal, it's a new plan start
+          );
+
+          // Update plan info now that period has ended
+          await paymentRepository.update(targetSubscription.id, {
+            status: newStatus,
+            periodEnd: nextPeriodEnd,
+            cancelAtPeriodEnd: false, // Clear the downgrade flag
+            priceId: newPlanId,
+            interval: newInterval,
+          });
+        } else {
+          // Normal renewal: grant full credits for the new period
+          await grantSubscriptionCredits(
+            actualUserId,
+            newPlanId,
+            targetSubscription.id,
+            newInterval,
+            true
+          );
+
+          // Update subscription info
+          await paymentRepository.update(targetSubscription.id, {
+            status: newStatus,
+            periodEnd: nextPeriodEnd,
+            cancelAtPeriodEnd: cancelAtPeriodEnd,
+            priceId: newPlanId,
+            interval: newInterval,
+          });
+        }
+      } else {
+        // No renewal detected, just update subscription info
+        await paymentRepository.update(targetSubscription.id, {
+          status: newStatus,
+          periodEnd: nextPeriodEnd,
+          cancelAtPeriodEnd: cancelAtPeriodEnd,
+          priceId: newPlanId,
+          interval: newInterval,
+        });
+      }
 
       console.log(
         `[Creem Webhook] Updated subscription ${targetSubscription.id} for user ${actualUserId} (status: ${newStatus})`

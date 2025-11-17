@@ -15,6 +15,8 @@ export const maxDuration = 300;
 
 type KieApiService = Awaited<ReturnType<typeof import('@/lib/kie/kie-api')['getKieApiService']>>;
 
+const MAX_SOURCE_IMAGES = 3;
+
 const MODEL_ENDPOINTS: Record<string, string> = {
   'flux-1.1': 'https://api.bfl.ai/v1/flux-pro-1.1',
   'flux-1.1-pro': 'https://api.bfl.ai/v1/flux-pro-1.1',
@@ -61,6 +63,7 @@ export async function POST(request: NextRequest) {
       safety_tolerance = 2,
       output_format = 'jpeg',
       image,
+      images,
       style,
       enhancedPrompt: enhancedPromptInput,
       clientRequestId,
@@ -73,7 +76,15 @@ export async function POST(request: NextRequest) {
         ? clientRequestId
         : randomUUID();
 
-    const generationMode = image ? 'i2i' : 't2i';
+    const incomingImages = Array.isArray(images)
+      ? images.filter((entry): entry is string => typeof entry === 'string' && entry.length > 0)
+      : [];
+    if (typeof image === 'string' && image.length > 0) {
+      incomingImages.unshift(image);
+    }
+    const sourceImageInputs = incomingImages.slice(0, MAX_SOURCE_IMAGES);
+
+    const generationMode = sourceImageInputs.length > 0 ? 'i2i' : 't2i';
 
     if (!prompt || typeof prompt !== 'string') {
       return NextResponse.json(
@@ -105,8 +116,6 @@ export async function POST(request: NextRequest) {
     const monthlyPeriod = new Date().toISOString().substring(0, 7); // YYYY-MM
 
     const isNanoBanana = model === 'nano-banana';
-    let sourceImagePublicUrl: string | undefined;
-
     if (isNanoBanana) {
       // Use KIE API for nano-banana image generation
       let kieApiService: KieApiService | undefined;
@@ -149,19 +158,45 @@ export async function POST(request: NextRequest) {
       };
       const kieOutputFormat = outputFormatMap[output_format || 'jpeg'] || 'jpeg';
 
-      // Process image URL for I2I: convert base64/blob to HTTP URL if needed
-      let imageUrlForKie: string | undefined = undefined;
-      if (image) {
-        // Check if image is base64 data URL (data:image/...)
-        if (typeof image === 'string' && image.startsWith('data:image/')) {
-          try {
-            // Extract base64 data and content type
-            const base64Match = image.match(/^data:image\/(\w+);base64,(.+)$/);
-            if (base64Match) {
+      // Process image URLs for I2I: convert base64/blob to HTTP URLs if needed
+      const sourceImagePublicUrls: string[] = [];
+      const imageUrlsForKie: string[] = [];
+      if (sourceImageInputs.length > 0) {
+        const { env } = await import('@/env');
+        const isR2Configured =
+          env.R2_BUCKET_NAME &&
+          env.R2_BUCKET_NAME !== 'dummy' &&
+          env.R2_ACCESS_KEY_ID &&
+          env.R2_ACCESS_KEY_ID !== 'dummy' &&
+          env.R2_SECRET_ACCESS_KEY &&
+          env.R2_SECRET_ACCESS_KEY !== 'dummy' &&
+          env.R2_ENDPOINT &&
+          env.R2_ENDPOINT !== 'https://dummy.r2.cloudflarestorage.com';
+
+        for (const rawImage of sourceImageInputs) {
+          if (typeof rawImage !== 'string' || rawImage.length === 0) {
+            continue;
+          }
+
+          if (rawImage.startsWith('data:image/')) {
+            if (!isR2Configured) {
+              return NextResponse.json(
+                {
+                  error:
+                    'R2 storage is not configured. Please configure R2 credentials in environment variables to use image-to-image generation.',
+                },
+                { status: 500 }
+              );
+            }
+
+            try {
+              const base64Match = rawImage.match(/^data:image\/(\w+);base64,(.+)$/);
+              if (!base64Match) {
+                return NextResponse.json({ error: 'Invalid base64 image format' }, { status: 400 });
+              }
+
               const [, imageType, base64Data] = base64Match;
               const imageBuffer = Buffer.from(base64Data, 'base64');
-
-              // Determine file extension and content type
               const extension =
                 imageType === 'png'
                   ? 'png'
@@ -170,117 +205,88 @@ export async function POST(request: NextRequest) {
                     : 'png';
               const contentType = `image/${extension}`;
 
-              // Check if R2 is properly configured
-              const { env } = await import('@/env');
-              const isR2Configured =
-                env.R2_BUCKET_NAME &&
-                env.R2_BUCKET_NAME !== 'dummy' &&
-                env.R2_ACCESS_KEY_ID &&
-                env.R2_ACCESS_KEY_ID !== 'dummy' &&
-                env.R2_SECRET_ACCESS_KEY &&
-                env.R2_SECRET_ACCESS_KEY !== 'dummy' &&
-                env.R2_ENDPOINT &&
-                env.R2_ENDPOINT !== 'https://dummy.r2.cloudflarestorage.com';
+              const r2Result = await r2StorageService.uploadAsset(
+                imageBuffer,
+                `input-image-${randomUUID()}.${extension}`,
+                contentType,
+                'image'
+              );
 
-              if (!isR2Configured) {
+              sourceImagePublicUrls.push(r2Result.url);
+
+              let signedUrl: string | null = null;
+              try {
+                signedUrl = await r2StorageService.getSignedUrl(r2Result.key, 3600);
+              } catch (signError) {
+                console.error(
+                  'Failed to create signed URL for input image (falling back to public URL):',
+                  signError
+                );
+              }
+
+              const preparedUrl = signedUrl || r2Result.url;
+              try {
+                const parsed = new URL(preparedUrl);
+                if (parsed.protocol !== 'https:') {
+                  throw new Error(
+                    `Input image URL must use HTTPS. Current protocol: ${parsed.protocol || 'unknown'}`
+                  );
+                }
+              } catch (urlError) {
+                console.error('Invalid input image URL generated for KIE:', urlError);
                 return NextResponse.json(
                   {
-                    error:
-                      'R2 storage is not configured. Please configure R2 credentials in environment variables to use image-to-image generation.',
+                    error: 'Failed to prepare source image. Please try uploading the image again.',
                   },
                   { status: 500 }
                 );
               }
 
-              // Upload to R2 to get public URL
-              try {
-                const r2Result = await r2StorageService.uploadAsset(
-                  imageBuffer,
-                  `input-image-${randomUUID()}.${extension}`,
-                  contentType,
-                  'image'
-                );
-
-                sourceImagePublicUrl = r2Result.url;
-
-                let signedUrl: string | null = null;
-                try {
-                  signedUrl = await r2StorageService.getSignedUrl(r2Result.key, 3600);
-                } catch (signError) {
-                  console.error(
-                    'Failed to create signed URL for input image (falling back to public URL):',
-                    signError
-                  );
-                }
-
-                imageUrlForKie = signedUrl || r2Result.url;
-
-                try {
-                  const parsed = new URL(imageUrlForKie);
-                  if (parsed.protocol !== 'https:') {
-                    throw new Error(
-                      `Input image URL must use HTTPS. Current protocol: ${parsed.protocol || 'unknown'}`
-                    );
-                  }
-                } catch (urlError) {
-                  console.error('Invalid input image URL generated for KIE:', urlError);
-                  return NextResponse.json(
-                    {
-                      error:
-                        'Failed to prepare source image. Please try uploading the image again.',
-                    },
-                    { status: 500 }
-                  );
-                }
-
-                console.log(
-                  `Prepared input image URL for KIE (${signedUrl ? 'signed' : 'public'}): ${imageUrlForKie}`
-                );
-              } catch (r2Error: unknown) {
-                console.error('R2 upload error:', r2Error);
-                const errorSource =
-                  typeof r2Error === 'object' && r2Error !== null
-                    ? (r2Error as { Code?: string; code?: string })
-                    : undefined;
-                const errorCode = errorSource?.Code || errorSource?.code || 'Unknown';
-                const errorMessage =
-                  errorCode === 'Unauthorized'
-                    ? 'R2 storage authentication failed. Please check your R2 credentials.'
-                    : 'Failed to upload image to R2 storage. Please check your R2 configuration.';
-                return NextResponse.json({ error: errorMessage }, { status: 500 });
-              }
-            } else {
-              return NextResponse.json({ error: 'Invalid base64 image format' }, { status: 400 });
+              imageUrlsForKie.push(preparedUrl);
+              console.log(
+                `Prepared input image URL for KIE (${signedUrl ? 'signed' : 'public'}): ${preparedUrl}`
+              );
+            } catch (uploadError) {
+              console.error('R2 upload error:', uploadError);
+              const errorSource =
+                typeof uploadError === 'object' && uploadError !== null
+                  ? (uploadError as { Code?: string; code?: string })
+                  : undefined;
+              const errorCode = errorSource?.Code || errorSource?.code || 'Unknown';
+              const errorMessage =
+                errorCode === 'Unauthorized'
+                  ? 'R2 storage authentication failed. Please check your R2 credentials.'
+                  : 'Failed to upload image to R2 storage. Please check your R2 configuration.';
+              return NextResponse.json({ error: errorMessage }, { status: 500 });
             }
-          } catch (error) {
-            console.error('Error processing base64 image:', error);
+          } else if (rawImage.startsWith('blob:')) {
             return NextResponse.json(
-              { error: 'Failed to process uploaded image' },
-              { status: 500 }
+              { error: 'Blob URLs are not supported. Please upload the image file directly.' },
+              { status: 400 }
             );
-          }
-        } else if (typeof image === 'string' && image.startsWith('blob:')) {
-          // Blob URLs are not accessible from server, return error
-          return NextResponse.json(
-            { error: 'Blob URLs are not supported. Please upload the image file directly.' },
-            { status: 400 }
-          );
-        } else if (
-          typeof image === 'string' &&
-          (image.startsWith('http://') || image.startsWith('https://'))
-        ) {
-          // Already a URL supplied by client
-          if (image.startsWith('http://')) {
+          } else if (rawImage.startsWith('http://') || rawImage.startsWith('https://')) {
+            if (rawImage.startsWith('http://')) {
+              return NextResponse.json(
+                { error: 'Source image URL must use HTTPS for image-to-image generation.' },
+                { status: 400 }
+              );
+            }
+            sourceImagePublicUrls.push(rawImage);
+            imageUrlsForKie.push(rawImage);
+          } else {
             return NextResponse.json(
-              { error: 'Source image URL must use HTTPS for image-to-image generation.' },
+              { error: 'Invalid image URL format. Expected base64 data URL or HTTP/HTTPS URL.' },
               { status: 400 }
             );
           }
-          imageUrlForKie = image;
-          sourceImagePublicUrl = image;
-        } else {
+        }
+
+        if (imageUrlsForKie.length === 0) {
           return NextResponse.json(
-            { error: 'Invalid image URL format. Expected base64 data URL or HTTP/HTTPS URL.' },
+            {
+              error:
+                'No valid source images were processed. Please re-upload your reference images and try again.',
+            },
             { status: 400 }
           );
         }
@@ -291,7 +297,7 @@ export async function POST(request: NextRequest) {
       try {
         taskResponse = await kieApiService.generateImage({
           prompt,
-          imageUrl: imageUrlForKie, // Use processed URL (R2 URL for base64, or original HTTP URL)
+          imageUrls: imageUrlsForKie.length > 0 ? imageUrlsForKie : undefined,
           imageSize: kieImageSize,
           outputFormat: kieOutputFormat,
         });
@@ -302,7 +308,7 @@ export async function POST(request: NextRequest) {
           prompt: prompt.substring(0, 100),
           model,
           generationMode,
-          hasImage: !!imageUrlForKie,
+          hasImage: imageUrlsForKie.length > 0,
         });
         return NextResponse.json(
           {
@@ -455,7 +461,7 @@ export async function POST(request: NextRequest) {
                 generationMode,
                 prompt,
                 enhancedPrompt: enhancedPromptInput,
-                baseImageUrl: sourceImagePublicUrl,
+                baseImageUrl: sourceImagePublicUrls[0],
                 styleId: typeof style === 'string' ? style : null,
                 r2Key: r2Result.key,
                 publicUrl: r2Result.url,
@@ -480,6 +486,7 @@ export async function POST(request: NextRequest) {
                   taskId,
                   generationMode,
                   clientRequestId: requestId,
+                  sourceImages: sourceImagePublicUrls,
                 },
               });
             } catch (saveError) {

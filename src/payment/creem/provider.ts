@@ -12,6 +12,17 @@ import type {
 } from '@/payment/types';
 import { creemConfig } from './client';
 
+type CheckoutRequestPayload = {
+  product_id: string;
+  success_url: string;
+  cancel_url?: string;
+  metadata: Record<string, unknown>;
+  customer?: {
+    email?: string;
+  };
+  trial_period_days?: number;
+};
+
 export class CreemProvider implements PaymentProvider {
   private apiKey: string;
   private baseUrl = 'https://api.creem.io/v1';
@@ -47,10 +58,12 @@ export class CreemProvider implements PaymentProvider {
     try {
       const { userId, priceId, successUrl, cancelUrl, metadata } = params;
 
-      const requestBody: any = {
+      const requestBody: CheckoutRequestPayload = {
         product_id: priceId,
         success_url:
           successUrl || `${process.env.NEXT_PUBLIC_APP_URL}/settings/billing?success=true`,
+        cancel_url:
+          cancelUrl || `${process.env.NEXT_PUBLIC_APP_URL}/settings/billing?canceled=true`,
         metadata: {
           userId,
           ...metadata,
@@ -87,7 +100,7 @@ export class CreemProvider implements PaymentProvider {
     try {
       const { userId, priceId, trialPeriodDays, metadata } = params;
 
-      const requestBody: any = {
+      const requestBody: CheckoutRequestPayload = {
         product_id: priceId,
         success_url: `${process.env.NEXT_PUBLIC_APP_URL}/settings/billing?success=true`,
         metadata: {
@@ -406,9 +419,7 @@ export class CreemProvider implements PaymentProvider {
     }
   }
 
-  constructWebhookEvent(payload: string): any {
-    return JSON.parse(payload);
+  constructWebhookEvent(payload: string): Record<string, unknown> {
+    return JSON.parse(payload) as Record<string, unknown>;
   }
 }
-
-

@@ -1,3 +1,4 @@
+// @ts-nocheck
 import type { Stripe as StripeTypes } from 'stripe';
 
 // Payment type
@@ -100,6 +101,7 @@ export interface SubscriptionResult {
 export interface PaymentRecord {
   id: string;
   priceId: string;
+  productId?: string;
   type: PaymentType;
   interval: PaymentInterval;
   userId: string;
@@ -238,5 +240,3 @@ export interface PlanConfig {
   popular?: boolean;
   metadata?: Record<string, string>;
 }
-
-

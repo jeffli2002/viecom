@@ -8,7 +8,7 @@ import { Switch } from '@/components/ui/switch';
 import { useCreemPayment } from '@/hooks/use-creem-payment';
 import { useAuthStore } from '@/store/auth-store';
 import { Check, CreditCard, Loader2, RefreshCcw } from 'lucide-react';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { toast } from 'sonner';
 
@@ -73,14 +73,15 @@ const formatDate = (value?: string | null) => {
 const BillingClient = ({ plans }: BillingClientProps) => {
   const router = useRouter();
   const { createCheckoutSession, openCustomerPortal } = useCreemPayment();
-  const { isAuthenticated, isInitialized } = useAuthStore((state) => ({
-    isAuthenticated: state.isAuthenticated,
-    isInitialized: state.isInitialized,
-  }));
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  const isInitialized = useAuthStore((state) => state.isInitialized);
+  const searchParams = useSearchParams();
+  const pathname = usePathname();
   const [subscription, setSubscription] = useState<SubscriptionSummary | null>(null);
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(false);
   const [interval, setInterval] = useState<'month' | 'year'>('month');
+  const [isSyncingCheckout, setIsSyncingCheckout] = useState(false);
 
   const fetchSubscription = useCallback(async () => {
     setLoading(true);
@@ -116,6 +117,64 @@ const BillingClient = ({ plans }: BillingClientProps) => {
 
     void fetchSubscription();
   }, [fetchSubscription, isAuthenticated, isInitialized, router]);
+
+  useEffect(() => {
+    if (!isInitialized || !isAuthenticated) {
+      return;
+    }
+
+    const successFlag = searchParams.get('success');
+    const subscriptionId = searchParams.get('subscription_id');
+    const productId = searchParams.get('product_id');
+    const customerId = searchParams.get('customer_id');
+    const checkoutId = searchParams.get('checkout_id');
+
+    if (successFlag === 'true' && subscriptionId && !isSyncingCheckout) {
+      setIsSyncingCheckout(true);
+      fetch('/api/creem/sync-checkout', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({
+          subscriptionId,
+          productId,
+          customerId,
+          checkoutId,
+        }),
+      })
+        .then(async (response) => {
+          if (!response.ok) {
+            const data = await response.json().catch(() => ({}));
+            throw new Error(data.error || 'Failed to sync subscription');
+          }
+        })
+        .then(async () => {
+          toast.success('Subscription data synced');
+          await fetchSubscription();
+        })
+        .catch((error) => {
+          toast.error(
+            error instanceof Error ? error.message : 'Failed to sync subscription. Please refresh.'
+          );
+        })
+        .finally(() => {
+          setIsSyncingCheckout(false);
+          if (pathname) {
+            router.replace(pathname);
+          }
+        });
+    }
+  }, [
+    searchParams,
+    isInitialized,
+    isAuthenticated,
+    isSyncingCheckout,
+    fetchSubscription,
+    router,
+    pathname,
+  ]);
 
   const handleUpgrade = async (planId: PlanId) => {
     if (!isAuthenticated) {
@@ -235,7 +294,7 @@ const BillingClient = ({ plans }: BillingClientProps) => {
 
   const isCurrentPlan = (planId: PlanId) => normalizedPlanId === planId;
 
-  const isDowngraded = subscription?.cancelAtPeriodEnd;
+  const hasScheduledChange = Boolean(subscription?.cancelAtPeriodEnd);
   const nextRenewalDate = formatDate(subscription?.periodEnd);
   const currentStatusLabel = subscription?.status
     ? statusLabels[subscription.status] || subscription.status
@@ -281,6 +340,17 @@ const BillingClient = ({ plans }: BillingClientProps) => {
             <>
               <div className="grid gap-4 md:grid-cols-3">
                 <div className="rounded-lg border p-4">
+                  <p className="text-sm text-gray-500">Plan</p>
+                  <p className="mt-1 font-semibold text-gray-900">
+                    {subscription.planName || 'Creem Subscription'}
+                  </p>
+                  {subscription.interval && (
+                    <p className="text-xs text-gray-500">
+                      {intervalLabels[subscription.interval] || subscription.interval}
+                    </p>
+                  )}
+                </div>
+                <div className="rounded-lg border p-4">
                   <p className="text-sm text-gray-500">Status</p>
                   <p className="mt-1 font-semibold text-gray-900">{currentStatusLabel}</p>
                   {isDowngraded && (
@@ -289,23 +359,31 @@ const BillingClient = ({ plans }: BillingClientProps) => {
                 </div>
                 <div className="rounded-lg border p-4">
                   <p className="text-sm text-gray-500">Next renewal</p>
-                  <p className="mt-1 font-semibold text-gray-900">{nextRenewalDate}</p>
-                  {subscription.interval && (
-                    <p className="text-xs text-gray-500">
-                      {intervalLabels[subscription.interval] || subscription.interval}
-                    </p>
+                  {subscription.periodEnd ? (
+                    <>
+                      <p className="mt-1 font-semibold text-gray-900">{nextRenewalDate}</p>
+                      {subscription.interval && (
+                        <p className="text-xs text-gray-500">
+                          {intervalLabels[subscription.interval] || subscription.interval}
+                        </p>
+                      )}
+                    </>
+                  ) : (
+                    <p className="mt-1 text-sm text-gray-500">Not applicable</p>
                   )}
                 </div>
-                <div className="rounded-lg border p-4">
-                  <p className="text-sm text-gray-500">Plan</p>
-                  <p className="mt-1 font-semibold text-gray-900">
-                    {subscription.planName || 'Creem Subscription'}
-                  </p>
-                  <p className="text-xs text-gray-500">
-                    {subscription.subscriptionId || 'Subscription ID unavailable'}
+              </div>
+
+              {hasScheduledChange && (
+                <div className="rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900">
+                  <p className="font-semibold">Plan change scheduled</p>
+                  <p className="mt-1">
+                    Your current {subscription.planName || 'plan'} stays active until{' '}
+                    <span className="font-medium">{nextRenewalDate}</span>. The new subscription
+                    will take effect right after this billing period ends.
                   </p>
                 </div>
-              </div>
+              )}
 
               <div className="flex flex-wrap gap-3">
                 <Button
@@ -322,7 +400,7 @@ const BillingClient = ({ plans }: BillingClientProps) => {
                   Manage payment method
                 </Button>
 
-                {!isDowngraded && (
+                {!hasScheduledChange && (
                   <Button
                     variant="outline"
                     onClick={() => handleDowngradeToFree(true)}
@@ -332,9 +410,9 @@ const BillingClient = ({ plans }: BillingClientProps) => {
                   </Button>
                 )}
 
-                {isDowngraded && (
+                {hasScheduledChange && (
                   <Button variant="outline" onClick={handleReactivate} disabled={actionLoading}>
-                    Reactivate subscription
+                    Keep current plan
                   </Button>
                 )}
               </div>
@@ -352,7 +430,8 @@ const BillingClient = ({ plans }: BillingClientProps) => {
           <div>
             <CardTitle>Available plans</CardTitle>
             <CardDescription>
-              Switch plans at any time. Changes take effect immediately unless noted otherwise.
+              Switch plans at any time. Changes apply at the start of your next billing period so
+              you can finish the current cycle before moving.
             </CardDescription>
           </div>
           <div className="flex items-center gap-3 rounded-full border px-4 py-2">

@@ -1,0 +1,117 @@
+import { randomUUID } from 'node:crypto';
+import { type BillingInterval, formatPlanName, getCreditsForPlan } from '@/lib/creem/plan-utils';
+import { db } from '@/server/db';
+import { creditTransactions, userCredits } from '@/server/db/schema';
+import { eq } from 'drizzle-orm';
+
+/**
+ * Grant subscription credits to user with idempotency
+ * Returns true if credits were granted, false if already granted or none configured
+ */
+export async function grantSubscriptionCredits(
+  userId: string,
+  planIdentifier: string,
+  subscriptionId: string,
+  interval?: BillingInterval,
+  isRenewal = false
+): Promise<boolean> {
+  const creditInfo = getCreditsForPlan(planIdentifier, interval);
+
+  console.log('[Creem Credits] getCreditsForPlan result:', {
+    planIdentifier,
+    interval,
+    planId: creditInfo.planId,
+    plan: creditInfo.plan ? { id: creditInfo.plan.id, name: creditInfo.plan.name } : null,
+    amount: creditInfo.amount,
+  });
+
+  if (!creditInfo.plan || creditInfo.amount <= 0) {
+    console.log(
+      `[Creem Credits] No credits to grant for identifier ${planIdentifier} (interval=${interval || 'auto'})`,
+      { plan: creditInfo.plan, amount: creditInfo.amount }
+    );
+    return false;
+  }
+
+  const normalizedPlanId = creditInfo.planId;
+  const isYearly = creditInfo.interval === 'year';
+  const creditsToGrant = creditInfo.amount;
+  const planDisplayName = formatPlanName(creditInfo.plan, normalizedPlanId);
+
+  try {
+    const referenceId = `creem_${subscriptionId}_${isRenewal ? 'renewal' : 'initial'}_${Date.now()}`;
+
+    const granted = await db.transaction(async (tx) => {
+      const [existingTransaction] = await tx
+        .select()
+        .from(creditTransactions)
+        .where(eq(creditTransactions.referenceId, referenceId))
+        .limit(1);
+
+      if (existingTransaction) {
+        console.log(`[Creem Credits] Credits already granted for reference ${referenceId}`);
+        return false;
+      }
+
+      const [userCredit] = await tx
+        .select()
+        .from(userCredits)
+        .where(eq(userCredits.userId, userId))
+        .limit(1);
+
+      const newBalance = (userCredit?.balance || 0) + creditsToGrant;
+
+      if (userCredit) {
+        await tx
+          .update(userCredits)
+          .set({
+            balance: newBalance,
+            totalEarned: userCredit.totalEarned + creditsToGrant,
+            updatedAt: new Date(),
+          })
+          .where(eq(userCredits.userId, userId));
+      } else {
+        await tx.insert(userCredits).values({
+          id: randomUUID(),
+          userId,
+          balance: creditsToGrant,
+          totalEarned: creditsToGrant,
+          totalSpent: 0,
+          frozenBalance: 0,
+        });
+      }
+
+      await tx.insert(creditTransactions).values({
+        id: randomUUID(),
+        userId,
+        type: 'earn',
+        amount: creditsToGrant,
+        balanceAfter: newBalance,
+        source: 'subscription',
+        description: `${planDisplayName} subscription ${isRenewal ? 'renewal' : 'credits'} (Creem)`,
+        referenceId,
+        metadata: JSON.stringify({
+          planId: normalizedPlanId,
+          planIdentifier,
+          isYearly,
+          subscriptionId,
+          provider: 'creem',
+          isRenewal,
+        }),
+      });
+
+      return true;
+    });
+
+    if (granted) {
+      console.log(
+        `[Creem Credits] Granted ${creditsToGrant} credits to user ${userId} for ${normalizedPlanId} ${isRenewal ? 'renewal' : 'subscription'}`
+      );
+    }
+
+    return granted;
+  } catch (error) {
+    console.error('[Creem Credits] Error granting subscription credits:', error);
+    return false;
+  }
+}

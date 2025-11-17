@@ -10,5 +10,3 @@ export const creemConfig = {
 };
 
 export const isCreemConfigured = !!creemConfig.apiKey && !!creemConfig.webhookSecret;
-
-

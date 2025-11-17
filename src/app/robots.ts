@@ -1,5 +1,5 @@
-import type { MetadataRoute } from 'next';
 import { getMetadataBase } from '@/lib/seo/metadata';
+import type { MetadataRoute } from 'next';
 
 const DISALLOWED_PATHS = ['/admin', '/api/admin', '/api/creem', '/api/rewards'];
 
@@ -18,5 +18,3 @@ export default function robots(): MetadataRoute.Robots {
     sitemap: [`${baseUrl}/sitemap.xml`],
   };
 }
-
-

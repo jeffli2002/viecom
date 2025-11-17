@@ -64,5 +64,3 @@ export function isSubscriptionActive(subscription: PaymentRecord): boolean {
 export function willCancelAtPeriodEnd(subscription: PaymentRecord): boolean {
   return subscription?.cancelAtPeriodEnd === true;
 }
-
-

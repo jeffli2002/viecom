@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Progress } from '@/components/ui/progress';
 import {
   Select,
   SelectContent,
@@ -16,6 +17,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
 import { creditsConfig } from '@/config/credits.config';
 import { VIDEO_STYLES, getVideoStyle } from '@/config/styles.config';
+import { useGenerationProgress } from '@/hooks/use-generation-progress';
 import { useUpgradePrompt } from '@/hooks/use-upgrade-prompt';
 import type { BrandToneAnalysis } from '@/lib/brand/brand-tone-analyzer';
 import { useAuthStore } from '@/store/auth-store';
@@ -63,6 +65,14 @@ export default function VideoGenerator() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [result, setResult] = useState<GenerationResult | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const {
+    progressValue,
+    progressMessage,
+    startProgress,
+    advanceProgress,
+    completeProgress,
+    failProgress,
+  } = useGenerationProgress();
 
   // Brand analysis data (loaded from sessionStorage, no UI)
   const [brandAnalysis, setBrandAnalysis] = useState<BrandToneAnalysis | null>(null);
@@ -252,6 +262,9 @@ export default function VideoGenerator() {
 
     setIsGenerating(true);
     setResult(null);
+    startProgress(
+      mode === 'image-to-video' ? t('progressUploadingImage') : t('progressPreparingRequest')
+    );
 
     try {
       let finalPrompt = enhancedPrompt || prompt.trim();
@@ -297,6 +310,9 @@ export default function VideoGenerator() {
         requestBody.image = imagePreview;
       }
 
+      advanceProgress(25, t('progressSubmitting'));
+      advanceProgress(45, t('progressRendering'));
+
       const response = await fetch('/api/v1/generate-video', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -318,20 +334,24 @@ export default function VideoGenerator() {
         throw new Error('No video URL in response');
       }
 
+      advanceProgress(80, t('progressFinalizing'));
+      completeProgress(t('progressReady'));
+
       setResult({
         videoUrl: data.videoUrl,
         prompt: prompt,
-        model: data.model,
+        model: data.model ?? model,
       });
-
-      setIsGenerating(false);
     } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      failProgress(errorMessage);
       setResult({
         videoUrl: '',
         prompt: prompt,
-        model: 'sora-2',
-        error: error instanceof Error ? error.message : 'Unknown error',
+        model: model,
+        error: errorMessage,
       });
+    } finally {
       setIsGenerating(false);
     }
   };
@@ -813,10 +833,18 @@ export default function VideoGenerator() {
               )}
 
               {isGenerating && (
-                <div className="flex aspect-video flex-col items-center justify-center rounded-xl bg-gray-100">
+                <div className="flex aspect-video flex-col items-center justify-center rounded-xl bg-gray-100 p-6 text-center">
                   <Loader2 className="mb-4 h-12 w-12 animate-spin text-purple-600" />
-                  <p className="font-medium text-gray-700">{t('generatingVideo')}</p>
-                  <p className="mt-2 font-light text-gray-500 text-sm">
+                  <p className="font-medium text-gray-700">
+                    {progressMessage || t('generatingVideo')}
+                  </p>
+                  <div className="mt-4 w-full max-w-md space-y-2">
+                    <Progress value={progressValue} className="h-2" />
+                    <p className="text-xs font-medium text-gray-500">
+                      {Math.round(progressValue)}%
+                    </p>
+                  </div>
+                  <p className="mt-3 font-light text-gray-500 text-sm">
                     {t('generatingTakeMinutes')}
                   </p>
                 </div>

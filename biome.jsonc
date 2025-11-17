@@ -9,6 +9,8 @@
     "ignoreUnknown": false,
     "ignore": [
       "node_modules/**",
+      "**/.pnpm-store/**",
+      "D.pnpm-store/**",
       ".next/**",
       "dist/**",
       "build/**",

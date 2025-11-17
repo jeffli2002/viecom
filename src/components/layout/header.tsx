@@ -192,14 +192,12 @@ export function Header() {
             <>
               <LanguageSwitcher />
               <div className="flex items-center space-x-2">
-                <Link href="/login">
-                  <Button variant="ghost" size="sm">
-                    {t('login')}
-                  </Button>
-                </Link>
-                <Link href="/signup">
-                  <Button size="sm">{t('signup')}</Button>
-                </Link>
+                <Button variant="ghost" size="sm" asChild>
+                  <Link href="/login">{t('login')}</Link>
+                </Button>
+                <Button size="sm" asChild>
+                  <Link href="/signup">{t('signup')}</Link>
+                </Button>
               </div>
             </>
           )}
