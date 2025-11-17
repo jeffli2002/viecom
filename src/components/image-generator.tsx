@@ -38,10 +38,29 @@ interface GenerationResult {
   previewUrl?: string;
   prompt: string;
   model: string;
+  taskId?: string | null;
+  requestId?: string | null;
+  assetId?: string | null;
+  creditsUsed?: number;
   error?: string;
 }
 
 type GenerationMode = 'text-to-image' | 'image-to-image';
+
+const createClientRequestId = () => {
+  if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+    return crypto.randomUUID();
+  }
+  return `img-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
+};
+
+const isRecoverableNetworkError = (message: string | undefined) => {
+  if (!message) {
+    return false;
+  }
+  const normalized = message.toLowerCase();
+  return normalized.includes('network error') || normalized.includes('failed to fetch');
+};
 
 export default function ImageGenerator() {
   const t = useTranslations('imageGeneration');
@@ -66,6 +85,7 @@ export default function ImageGenerator() {
   const [shareMessage, setShareMessage] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const shareReferenceRef = useRef<string | null>(null);
+  const activeRequestIdRef = useRef<string | null>(null);
 
   // Brand analysis data (loaded from sessionStorage, no UI)
   const [brandAnalysis, setBrandAnalysis] = useState<BrandToneAnalysis | null>(null);
@@ -125,6 +145,45 @@ export default function ImageGenerator() {
     setShareMessage(null);
     shareReferenceRef.current = null;
   }, [imageReference]);
+
+  const tryRecoverResult = async (requestId: string): Promise<GenerationResult | null> => {
+    try {
+      const response = await fetch(
+        `/api/v1/generate-image/result?requestId=${encodeURIComponent(requestId)}`
+      );
+      if (!response.ok) {
+        return null;
+      }
+      const data: {
+        imageUrl?: string;
+        previewUrl?: string;
+        model?: string;
+        prompt?: string;
+        taskId?: string;
+        assetId?: string;
+        clientRequestId?: string;
+        creditsUsed?: number;
+      } = await response.json();
+
+      if (!data.imageUrl) {
+        return null;
+      }
+
+      return {
+        imageUrl: data.imageUrl,
+        previewUrl: data.previewUrl ?? data.imageUrl,
+        model: data.model ?? model,
+        prompt: data.prompt ?? prompt,
+        taskId: data.taskId,
+        requestId: data.clientRequestId ?? requestId,
+        assetId: data.assetId ?? null,
+        creditsUsed: data.creditsUsed,
+      };
+    } catch (recoveryError) {
+      console.error('Recovery request failed:', recoveryError);
+      return null;
+    }
+  };
 
   const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -252,6 +311,8 @@ export default function ImageGenerator() {
       return;
     }
 
+    const requestId = createClientRequestId();
+    activeRequestIdRef.current = requestId;
     setIsGenerating(true);
     setResult(null);
 
@@ -291,19 +352,63 @@ export default function ImageGenerator() {
         aspect_ratio: aspectRatio,
         style: imageStyle, // Pass style to API
         output_format: outputFormat.toLowerCase(), // Pass output format (png or jpeg)
+        clientRequestId: requestId,
       };
 
       if (mode === 'image-to-image' && imagePreview) {
         requestBody.image = imagePreview;
       }
 
-      const response = await fetch('/api/v1/generate-image', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(requestBody),
-      });
+      let response: Response;
+      let data: {
+        imageUrl?: string;
+        previewUrl?: string;
+        model?: string;
+        error?: string;
+        details?: string;
+        taskId?: string;
+        status?: string;
+        clientRequestId?: string;
+        assetId?: string | null;
+        creditsUsed?: number;
+      };
 
-      const data = await response.json();
+      // Create AbortController with 6 minute timeout (5 min generation + 1 min buffer)
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 6 * 60 * 1000);
+
+      try {
+        response = await fetch('/api/v1/generate-image', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(requestBody),
+          signal: controller.signal,
+        });
+        clearTimeout(timeoutId);
+      } catch (fetchError) {
+        clearTimeout(timeoutId);
+        console.error('Fetch error:', fetchError);
+
+        // Check if it's an abort error (timeout)
+        if (fetchError instanceof Error && fetchError.name === 'AbortError') {
+          throw new Error(
+            'Request timeout. Image generation is taking longer than expected. Please try again or check the task status.'
+          );
+        }
+
+        throw new Error(
+          fetchError instanceof Error
+            ? `Network error: ${fetchError.message}`
+            : 'Failed to connect to server. Please check your internet connection and try again.'
+        );
+      }
+
+      try {
+        data = await response.json();
+      } catch (parseError) {
+        console.error('Response parse error:', parseError);
+        throw new Error(`Server returned invalid response (${response.status}). Please try again.`);
+      }
 
       if (!response.ok) {
         if (response.status === 429 || response.status === 402) {
@@ -311,22 +416,45 @@ export default function ImageGenerator() {
           throw new Error(data.error || 'Image generation limit reached');
         }
 
-        throw new Error(data.error || 'Failed to generate image');
+        const errorMessage = data.error || data.details || 'Failed to generate image';
+        console.error('Image generation API error:', {
+          status: response.status,
+          error: data.error,
+          details: data.details,
+        });
+        throw new Error(errorMessage);
       }
 
       if (!data.imageUrl) {
         throw new Error('No image URL in response');
       }
 
+      const resolvedRequestId = data.clientRequestId ?? requestId;
+      activeRequestIdRef.current = resolvedRequestId;
+
       setResult({
         imageUrl: data.imageUrl,
         previewUrl: data.previewUrl ?? data.imageUrl,
         prompt: prompt,
-        model: data.model,
+        model: data.model ?? model,
+        taskId: data.taskId ?? null,
+        requestId: resolvedRequestId,
+        assetId: data.assetId ?? null,
+        creditsUsed: data.creditsUsed,
       });
 
       setIsGenerating(false);
     } catch (error) {
+      const currentRequestId = activeRequestIdRef.current;
+      if (error instanceof Error && isRecoverableNetworkError(error.message) && currentRequestId) {
+        const recovered = await tryRecoverResult(currentRequestId);
+        if (recovered) {
+          setResult(recovered);
+          setIsGenerating(false);
+          return;
+        }
+      }
+
       setResult({
         imageUrl: '',
         previewUrl: undefined,

@@ -10,6 +10,8 @@ import { type NextRequest, NextResponse } from 'next/server';
 
 export const dynamic = 'force-dynamic';
 export const fetchCache = 'force-no-store';
+// Set max duration to 5 minutes (300 seconds) for image generation polling
+export const maxDuration = 300;
 
 type KieApiService = Awaited<ReturnType<typeof import('@/lib/kie/kie-api')['getKieApiService']>>;
 
@@ -61,7 +63,15 @@ export async function POST(request: NextRequest) {
       image,
       style,
       enhancedPrompt: enhancedPromptInput,
+      clientRequestId,
     } = await request.json();
+
+    const requestId =
+      typeof clientRequestId === 'string' &&
+      clientRequestId.length > 0 &&
+      clientRequestId.length <= 128
+        ? clientRequestId
+        : randomUUID();
 
     const generationMode = image ? 'i2i' : 't2i';
 
@@ -286,7 +296,14 @@ export async function POST(request: NextRequest) {
           outputFormat: kieOutputFormat,
         });
       } catch (error) {
-        console.error('KIE API generateImage error:', error);
+        console.error('[Image Generation] KIE API generateImage error:', {
+          error: error instanceof Error ? error.message : String(error),
+          stack: error instanceof Error ? error.stack : undefined,
+          prompt: prompt.substring(0, 100),
+          model,
+          generationMode,
+          hasImage: !!imageUrlForKie,
+        });
         return NextResponse.json(
           {
             error:
@@ -318,8 +335,18 @@ export async function POST(request: NextRequest) {
           state = statusResponse.data.state || statusResponse.data.status;
           console.log(`Task ${taskId} status: ${state} (attempt ${attempts + 1}/${maxAttempts})`);
         } catch (error) {
-          console.error('KIE API getTaskStatus error:', error);
-          return NextResponse.json({ error: 'Failed to check task status' }, { status: 500 });
+          console.error(`[Image Generation] KIE API getTaskStatus error for task ${taskId}:`, {
+            taskId,
+            error: error instanceof Error ? error.message : String(error),
+            stack: error instanceof Error ? error.stack : undefined,
+          });
+          return NextResponse.json(
+            {
+              error: 'Failed to check task status',
+              details: error instanceof Error ? error.message : String(error),
+            },
+            { status: 500 }
+          );
         }
 
         if (state === 'success' || state === 'completed') {
@@ -452,6 +479,7 @@ export async function POST(request: NextRequest) {
                   previewUrl,
                   taskId,
                   generationMode,
+                  clientRequestId: requestId,
                 },
               });
             } catch (saveError) {
@@ -459,7 +487,7 @@ export async function POST(request: NextRequest) {
             }
           }
 
-          return NextResponse.json({
+          const responseData = {
             imageUrl: r2Result.url,
             previewUrl,
             model,
@@ -469,7 +497,17 @@ export async function POST(request: NextRequest) {
             creditsUsed: creditCost,
             taskId,
             assetId: savedAssetId ?? null,
+            clientRequestId: requestId,
+          };
+
+          console.log(`[Image Generation] Successfully generated image for task ${taskId}:`, {
+            taskId,
+            imageUrl: r2Result.url,
+            previewUrl,
+            assetId: savedAssetId,
           });
+
+          return NextResponse.json(responseData);
         }
 
         if (state === 'fail' || state === 'failed') {
@@ -478,6 +516,17 @@ export async function POST(request: NextRequest) {
             statusResponse.data.error ||
             statusResponse.data.msg ||
             'Image generation failed';
+
+          // Log detailed error information for debugging
+          console.error(`[Image Generation] Task ${taskId} failed:`, {
+            taskId,
+            state,
+            failMsg: statusResponse.data.failMsg,
+            error: statusResponse.data.error,
+            msg: statusResponse.data.msg,
+            fullResponse: JSON.stringify(statusResponse.data, null, 2),
+          });
+
           return NextResponse.json({ error: errorMsg }, { status: 500 });
         }
 
@@ -486,6 +535,23 @@ export async function POST(request: NextRequest) {
 
       // If we exit the loop without success, return timeout or current status
       if (state !== 'success' && state !== 'completed') {
+        // If we've exhausted all attempts, return timeout error
+        if (attempts >= maxAttempts) {
+          console.error(
+            `[Image Generation] Task ${taskId} timed out after ${maxAttempts} attempts`
+          );
+          return NextResponse.json(
+            {
+              error:
+                'Image generation timeout. The task is still processing. Please try again later or contact support.',
+              taskId,
+              status: state || 'processing',
+            },
+            { status: 504 } // Gateway Timeout
+          );
+        }
+
+        // Otherwise, return current status for client to poll
         return NextResponse.json({
           taskId,
           status: state || 'processing',
@@ -506,10 +572,13 @@ export async function POST(request: NextRequest) {
     // For other models, implement similar logic as needed
     return NextResponse.json({ error: 'Model not yet implemented' }, { status: 501 });
   } catch (error) {
-    console.error('Error generating image:', error);
+    console.error('[Image Generation] Unhandled error in generate-image route:', {
+      error: error instanceof Error ? error.message : String(error),
+      stack: error instanceof Error ? error.stack : undefined,
+      name: error instanceof Error ? error.name : undefined,
+    });
     const errorMessage = error instanceof Error ? error.message : 'Internal server error';
     const errorStack = error instanceof Error ? error.stack : undefined;
-    console.error('Error stack:', errorStack);
     return NextResponse.json(
       {
         error: 'Internal server error',
