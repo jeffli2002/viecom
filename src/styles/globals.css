@@ -196,6 +196,15 @@
       background-position: 100% 50%;
     }
   }
+
+  @keyframes progress-shimmer {
+    0% {
+      background-position: 0% 50%;
+    }
+    100% {
+      background-position: 200% 50%;
+    }
+  }
 }
 
 /* Base Styles */
@@ -272,6 +281,11 @@ body {
 .animate-gradient {
   background-size: 200% 200%;
   animation: gradient-shift 3s ease infinite;
+}
+
+.animate-progress-shimmer {
+  background-size: 200% 100%;
+  animation: progress-shimmer 1.8s linear infinite;
 }
 
 /* Grid Patterns */

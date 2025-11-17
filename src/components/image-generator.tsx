@@ -74,7 +74,7 @@ export default function ImageGenerator() {
   const searchParams = useSearchParams();
   const initialMode = (searchParams?.get('mode') as GenerationMode) || 'image-to-image';
 
-  const { isAuthenticated } = useAuthStore();
+  const { isAuthenticated, user } = useAuthStore();
   const { showUpgradePrompt, openUpgradePrompt, closeUpgradePrompt } = useUpgradePrompt();
   const [mode, setMode] = useState<GenerationMode>(initialMode);
   const [prompt, setPrompt] = useState('');
@@ -92,6 +92,7 @@ export default function ImageGenerator() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const shareReferenceRef = useRef<string | null>(null);
   const activeRequestIdRef = useRef<string | null>(null);
+  const [lightboxImage, setLightboxImage] = useState<{ url: string; alt: string } | null>(null);
   const {
     progressValue,
     progressMessage,
@@ -159,6 +160,21 @@ export default function ImageGenerator() {
     setShareMessage(null);
     shareReferenceRef.current = null;
   }, [imageReference]);
+
+  useEffect(() => {
+    if (!lightboxImage) {
+      return;
+    }
+    const handleKeydown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setLightboxImage(null);
+      }
+    };
+    window.addEventListener('keydown', handleKeydown);
+    return () => {
+      window.removeEventListener('keydown', handleKeydown);
+    };
+  }, [lightboxImage]);
 
   const tryRecoverResult = async (requestId: string): Promise<GenerationResult | null> => {
     try {
@@ -430,9 +446,8 @@ export default function ImageGenerator() {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 6 * 60 * 1000);
 
+      advanceProgress(15, t('progressSubmitting'));
       try {
-        advanceProgress(25, t('progressSubmitting'));
-        advanceProgress(45, t('progressWaiting'));
         response = await fetch('/api/v1/generate-image', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -440,6 +455,7 @@ export default function ImageGenerator() {
           signal: controller.signal,
         });
         clearTimeout(timeoutId);
+        advanceProgress(55, t('progressWaiting'));
       } catch (fetchError) {
         clearTimeout(timeoutId);
         console.error('Fetch error:', fetchError);
@@ -781,11 +797,22 @@ export default function ImageGenerator() {
                           key={image.dataUrl || image.name || `source-image-${idx}`}
                           className="relative w-full"
                         >
-                          <img
-                            src={image.dataUrl}
-                            alt={`Source ${idx + 1}`}
-                            className="w-full max-h-96 rounded-xl border border-gray-200 object-contain"
-                          />
+                          <button
+                            type="button"
+                            className="w-full overflow-hidden rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                            onClick={() =>
+                              setLightboxImage({
+                                url: image.dataUrl,
+                                alt: image.name || `Source image ${idx + 1}`,
+                              })
+                            }
+                          >
+                            <img
+                              src={image.dataUrl}
+                              alt={`Source ${idx + 1}`}
+                              className="w-full max-h-96 object-contain"
+                            />
+                          </button>
                           <button
                             type="button"
                             onClick={() => handleRemoveImage(idx)}
@@ -1040,7 +1067,11 @@ export default function ImageGenerator() {
                     {progressMessage || t('generatingImage')}
                   </p>
                   <div className="mt-4 w-full max-w-xs space-y-2">
-                    <Progress value={progressValue} className="h-2" />
+                    <Progress
+                      value={progressValue}
+                      className="h-2 bg-purple-200/70"
+                      indicatorClassName="bg-gradient-to-r from-purple-500 via-pink-500 to-purple-500 animate-progress-shimmer shadow-[0_0_10px_rgba(168,85,247,0.45)]"
+                    />
                     <p className="text-xs font-medium text-gray-500">
                       {Math.round(progressValue)}%
                     </p>
@@ -1053,11 +1084,22 @@ export default function ImageGenerator() {
 
               {result && !result.error && (result.previewUrl || result.imageUrl) && (
                 <div className="space-y-4">
-                  <img
-                    src={result.previewUrl ?? result.imageUrl}
-                    alt="Generated"
-                    className="w-full rounded-xl"
-                  />
+                  <button
+                    type="button"
+                    className="w-full overflow-hidden rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    onClick={() =>
+                      setLightboxImage({
+                        url: result.previewUrl ?? result.imageUrl,
+                        alt: 'Generated image preview',
+                      })
+                    }
+                  >
+                    <img
+                      src={result.previewUrl ?? result.imageUrl}
+                      alt="Generated"
+                      className="w-full rounded-xl"
+                    />
+                  </button>
                   <div className="grid grid-cols-2 gap-3">
                     <Button
                       onClick={() => {
@@ -1115,6 +1157,43 @@ export default function ImageGenerator() {
           isAuthenticated={!!user}
           limitType="daily"
         />
+      )}
+
+      {lightboxImage && (
+        <dialog
+          open
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-6"
+          onClick={() => setLightboxImage(null)}
+          onKeyDown={(e) => {
+            if (e.key === 'Escape') {
+              setLightboxImage(null);
+            }
+          }}
+        >
+          <div
+            className="relative max-h-full max-w-5xl"
+            onClick={(event) => event.stopPropagation()}
+            onKeyDown={(e) => {
+              if (e.key === 'Escape') {
+                e.stopPropagation();
+              }
+            }}
+          >
+            <button
+              type="button"
+              className="absolute right-4 top-4 rounded-full bg-black/70 p-2 text-white hover:bg-black"
+              aria-label="Close preview"
+              onClick={() => setLightboxImage(null)}
+            >
+              <X className="h-5 w-5" />
+            </button>
+            <img
+              src={lightboxImage.url}
+              alt={lightboxImage.alt}
+              className="max-h-[80vh] w-full rounded-lg object-contain"
+            />
+          </div>
+        </dialog>
       )}
     </div>
   );

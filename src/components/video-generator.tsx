@@ -310,14 +310,14 @@ export default function VideoGenerator() {
         requestBody.image = imagePreview;
       }
 
-      advanceProgress(25, t('progressSubmitting'));
-      advanceProgress(45, t('progressRendering'));
+      advanceProgress(15, t('progressSubmitting'));
 
       const response = await fetch('/api/v1/generate-video', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(requestBody),
       });
+      advanceProgress(55, t('progressRendering'));
 
       const data = await response.json();
 
@@ -839,7 +839,11 @@ export default function VideoGenerator() {
                     {progressMessage || t('generatingVideo')}
                   </p>
                   <div className="mt-4 w-full max-w-md space-y-2">
-                    <Progress value={progressValue} className="h-2" />
+                    <Progress
+                      value={progressValue}
+                      className="h-2 bg-purple-200/70"
+                      indicatorClassName="bg-gradient-to-r from-purple-500 via-pink-500 to-purple-500 animate-progress-shimmer shadow-[0_0_10px_rgba(168,85,247,0.45)]"
+                    />
                     <p className="text-xs font-medium text-gray-500">
                       {Math.round(progressValue)}%
                     </p>
