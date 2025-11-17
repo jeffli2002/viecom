@@ -24,6 +24,8 @@ import { useAuthStore } from '@/store/auth-store';
 import {
   AlertCircle,
   Download,
+  Eraser,
+  Highlighter,
   Loader2,
   Share2,
   Sparkles,
@@ -65,6 +67,8 @@ export default function VideoGenerator() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [result, setResult] = useState<GenerationResult | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const promptTextareaRef = useRef<HTMLTextAreaElement | null>(null);
+  const enhancedTextareaRef = useRef<HTMLTextAreaElement | null>(null);
   const {
     progressValue,
     progressMessage,
@@ -194,6 +198,26 @@ export default function VideoGenerator() {
       setImagePreview(reader.result as string);
     };
     reader.readAsDataURL(file);
+  };
+
+  const handleHighlightPrompt = () => {
+    if (promptTextareaRef.current) {
+      promptTextareaRef.current.focus();
+      promptTextareaRef.current.select();
+    }
+  };
+
+  const handleClearPrompt = () => {
+    setPrompt('');
+    setEnhancedPrompt('');
+    promptTextareaRef.current?.focus();
+  };
+
+  const handleHighlightEnhancedPrompt = () => {
+    if (enhancedTextareaRef.current) {
+      enhancedTextareaRef.current.focus();
+      enhancedTextareaRef.current.select();
+    }
   };
 
   const triggerFileInput = () => {
@@ -440,9 +464,33 @@ export default function VideoGenerator() {
                       </div>
                     )}
                     <div className="space-y-2">
-                      <Label className="font-light text-gray-700 text-sm">
-                        {t('videoPrompt')} <span className="text-red-500">*</span>
-                      </Label>
+                      <div className="flex items-center justify-between">
+                        <Label className="font-light text-gray-700 text-sm">
+                          {t('videoPrompt')} <span className="text-red-500">*</span>
+                        </Label>
+                        <div className="flex items-center gap-2">
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            className="h-7 text-xs text-purple-600 hover:text-purple-700"
+                            onClick={handleHighlightPrompt}
+                          >
+                            <Highlighter className="mr-1 h-3.5 w-3.5" />
+                            {t('highlightPrompt')}
+                          </Button>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            className="h-7 text-xs text-red-600 hover:text-red-700"
+                            onClick={handleClearPrompt}
+                          >
+                            <Eraser className="mr-1 h-3.5 w-3.5" />
+                            {t('clearPrompt')}
+                          </Button>
+                        </div>
+                      </div>
                       <div className="relative">
                         <Textarea
                           placeholder={textDefaultPrompt}
@@ -450,6 +498,7 @@ export default function VideoGenerator() {
                           onChange={(e) => setPrompt(e.target.value.slice(0, maxPromptLength))}
                           rows={6}
                           className="resize-none border-gray-200 pr-24 pb-12 font-light focus:border-purple-400 focus:ring-purple-400/20"
+                          ref={promptTextareaRef}
                         />
                         <Button
                           onClick={handleEnhancePrompt}
@@ -474,16 +523,28 @@ export default function VideoGenerator() {
                               <Sparkles className="h-4 w-4" />
                               {t('enhancedPrompt')}
                             </h4>
-                            <Button
-                              onClick={() => setEnhancedPrompt('')}
-                              size="sm"
-                              variant="ghost"
-                              className="h-6 w-6 p-0 text-gray-600"
-                            >
-                              <X className="h-4 w-4" />
-                            </Button>
+                            <div className="flex items-center gap-1">
+                              <Button
+                                onClick={handleHighlightEnhancedPrompt}
+                                size="sm"
+                                variant="ghost"
+                                className="h-6 px-2 text-xs text-purple-600 hover:text-purple-700"
+                              >
+                                <Highlighter className="mr-1 h-3 w-3" />
+                                {t('highlightEnhancedPrompt')}
+                              </Button>
+                              <Button
+                                onClick={() => setEnhancedPrompt('')}
+                                size="sm"
+                                variant="ghost"
+                                className="h-6 w-6 p-0 text-gray-600"
+                              >
+                                <X className="h-4 w-4" />
+                              </Button>
+                            </div>
                           </div>
                           <Textarea
+                            ref={enhancedTextareaRef}
                             value={enhancedPrompt}
                             onChange={(e) =>
                               setEnhancedPrompt(e.target.value.slice(0, maxPromptLength))
@@ -560,9 +621,33 @@ export default function VideoGenerator() {
                     </div>
 
                     <div className="space-y-2">
-                      <Label className="font-light text-gray-700 text-sm">
-                        {t('videoPrompt')} <span className="text-red-500">*</span>
-                      </Label>
+                      <div className="flex items-center justify-between">
+                        <Label className="font-light text-gray-700 text-sm">
+                          {t('videoPrompt')} <span className="text-red-500">*</span>
+                        </Label>
+                        <div className="flex items-center gap-2">
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            className="h-7 text-xs text-purple-600 hover:text-purple-700"
+                            onClick={handleHighlightPrompt}
+                          >
+                            <Highlighter className="mr-1 h-3.5 w-3.5" />
+                            {t('highlightPrompt')}
+                          </Button>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            className="h-7 text-xs text-red-600 hover:text-red-700"
+                            onClick={handleClearPrompt}
+                          >
+                            <Eraser className="mr-1 h-3.5 w-3.5" />
+                            {t('clearPrompt')}
+                          </Button>
+                        </div>
+                      </div>
                       <div className="relative">
                         <Textarea
                           placeholder={imageDefaultPrompt}
@@ -570,6 +655,7 @@ export default function VideoGenerator() {
                           onChange={(e) => setPrompt(e.target.value.slice(0, maxPromptLength))}
                           rows={4}
                           className="resize-none border-gray-200 pr-24 pb-12 font-light focus:border-purple-400 focus:ring-purple-400/20"
+                          ref={promptTextareaRef}
                         />
                         <Button
                           onClick={handleEnhancePrompt}
@@ -594,16 +680,28 @@ export default function VideoGenerator() {
                               <Sparkles className="h-4 w-4" />
                               {t('enhancedPrompt')}
                             </h4>
-                            <Button
-                              onClick={() => setEnhancedPrompt('')}
-                              size="sm"
-                              variant="ghost"
-                              className="h-6 w-6 p-0 text-gray-600"
-                            >
-                              <X className="h-4 w-4" />
-                            </Button>
+                            <div className="flex items-center gap-1">
+                              <Button
+                                onClick={handleHighlightEnhancedPrompt}
+                                size="sm"
+                                variant="ghost"
+                                className="h-6 px-2 text-xs text-purple-600 hover:text-purple-700"
+                              >
+                                <Highlighter className="mr-1 h-3 w-3" />
+                                {t('highlightEnhancedPrompt')}
+                              </Button>
+                              <Button
+                                onClick={() => setEnhancedPrompt('')}
+                                size="sm"
+                                variant="ghost"
+                                className="h-6 w-6 p-0 text-gray-600"
+                              >
+                                <X className="h-4 w-4" />
+                              </Button>
+                            </div>
                           </div>
                           <Textarea
+                            ref={enhancedTextareaRef}
                             value={enhancedPrompt}
                             onChange={(e) =>
                               setEnhancedPrompt(e.target.value.slice(0, maxPromptLength))
