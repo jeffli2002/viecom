@@ -353,7 +353,7 @@ const BillingClient = ({ plans }: BillingClientProps) => {
                 <div className="rounded-lg border p-4">
                   <p className="text-sm text-gray-500">Status</p>
                   <p className="mt-1 font-semibold text-gray-900">{currentStatusLabel}</p>
-                  {isDowngraded && (
+                  {hasScheduledChange && (
                     <p className="text-xs text-orange-600">Scheduled to cancel at period end</p>
                   )}
                 </div>

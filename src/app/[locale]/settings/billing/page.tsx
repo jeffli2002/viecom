@@ -1,7 +1,8 @@
 import BillingClient, { type BillingPlan } from '@/components/billing/BillingClient';
 import { paymentConfig } from '@/config/payment.config';
+import { Suspense } from 'react';
 
-export default function BillingPage() {
+function BillingContent() {
   const plans: BillingPlan[] = paymentConfig.plans
     .filter((plan) => plan.id === 'pro' || plan.id === 'proplus')
     .map((plan) => ({
@@ -15,4 +16,12 @@ export default function BillingPage() {
     }));
 
   return <BillingClient plans={plans} />;
+}
+
+export default function BillingPage() {
+  return (
+    <Suspense fallback={<div className="container mx-auto max-w-5xl px-4 py-10">Loading...</div>}>
+      <BillingContent />
+    </Suspense>
+  );
 }
