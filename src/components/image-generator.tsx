@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Progress } from '@/components/ui/progress';
+import { GenerationProgressBar } from '@/components/ui/generation-progress';
 import {
   Select,
   SelectContent,
@@ -1167,11 +1167,7 @@ export default function ImageGenerator() {
                     {progressMessage || t('generatingImage')}
                   </p>
                   <div className="mt-4 w-full max-w-xs space-y-2">
-                    <Progress
-                      value={progressValue}
-                      className="h-2 bg-purple-200/70"
-                      indicatorClassName="bg-gradient-to-r from-purple-500 via-pink-500 to-purple-500 animate-progress-shimmer shadow-[0_0_10px_rgba(168,85,247,0.45)]"
-                    />
+                    <GenerationProgressBar value={progressValue} />
                     <p className="text-xs font-medium text-gray-500">
                       {Math.round(progressValue)}%
                     </p>
