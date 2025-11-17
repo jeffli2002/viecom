@@ -3,9 +3,9 @@
 import UpgradePrompt from '@/components/auth/UpgradePrompt';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import { GenerationProgressBar } from '@/components/ui/generation-progress';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { GenerationProgressBar } from '@/components/ui/generation-progress';
 import {
   Select,
   SelectContent,
@@ -25,7 +25,6 @@ import {
   AlertCircle,
   Download,
   Eraser,
-  Highlighter,
   Image as ImageIcon,
   Loader2,
   Share2,
@@ -96,7 +95,6 @@ export default function ImageGenerator() {
   const activeRequestIdRef = useRef<string | null>(null);
   const [lightboxImage, setLightboxImage] = useState<{ url: string; alt: string } | null>(null);
   const promptTextareaRef = useRef<HTMLTextAreaElement | null>(null);
-  const enhancedTextareaRef = useRef<HTMLTextAreaElement | null>(null);
   const {
     progressValue,
     progressMessage,
@@ -219,24 +217,10 @@ export default function ImageGenerator() {
     }
   };
 
-  const handleHighlightPrompt = () => {
-    if (promptTextareaRef.current) {
-      promptTextareaRef.current.focus();
-      promptTextareaRef.current.select();
-    }
-  };
-
   const handleClearPrompt = () => {
     setPrompt('');
     setEnhancedPrompt('');
     promptTextareaRef.current?.focus();
-  };
-
-  const handleHighlightEnhancedPrompt = () => {
-    if (enhancedTextareaRef.current) {
-      enhancedTextareaRef.current.focus();
-      enhancedTextareaRef.current.select();
-    }
   };
 
   const addSourceImages = (files: File[]) => {
@@ -730,28 +714,16 @@ export default function ImageGenerator() {
                   <Label className="font-light text-gray-700 text-sm">
                     {t('imageDescription')}
                   </Label>
-                  <div className="flex items-center gap-2">
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      className="h-7 text-xs text-purple-600 hover:text-purple-700"
-                      onClick={handleHighlightPrompt}
-                    >
-                      <Highlighter className="mr-1 h-3.5 w-3.5" />
-                      {t('highlightPrompt')}
-                    </Button>
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      className="h-7 text-xs text-red-600 hover:text-red-700"
-                      onClick={handleClearPrompt}
-                    >
-                      <Eraser className="mr-1 h-3.5 w-3.5" />
-                      {t('clearPrompt')}
-                    </Button>
-                  </div>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className="h-7 text-xs text-purple-600 hover:text-purple-700"
+                    onClick={handleClearPrompt}
+                  >
+                    <Eraser className="mr-1 h-3.5 w-3.5" />
+                    {t('clearPrompt')}
+                  </Button>
                 </div>
                 <div className="relative">
                   <Textarea
@@ -787,28 +759,16 @@ export default function ImageGenerator() {
                         <Sparkles className="h-4 w-4" />
                         {t('enhancedPrompt')}
                       </h4>
-                      <div className="flex items-center gap-1">
-                        <Button
-                          onClick={handleHighlightEnhancedPrompt}
-                          size="sm"
-                          variant="ghost"
-                          className="h-6 px-2 text-xs text-purple-600 hover:text-purple-700"
-                        >
-                          <Highlighter className="mr-1 h-3 w-3" />
-                          {t('highlightEnhancedPrompt')}
-                        </Button>
-                        <Button
-                          onClick={() => setEnhancedPrompt('')}
-                          size="sm"
-                          variant="ghost"
-                          className="h-6 w-6 p-0 text-gray-600"
-                        >
-                          <X className="h-4 w-4" />
-                        </Button>
-                      </div>
+                      <Button
+                        onClick={() => setEnhancedPrompt('')}
+                        size="sm"
+                        variant="ghost"
+                        className="h-6 w-6 p-0 text-gray-600"
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
                     </div>
                     <Textarea
-                      ref={enhancedTextareaRef}
                       value={enhancedPrompt}
                       onChange={(e) => setEnhancedPrompt(e.target.value.slice(0, maxPromptLength))}
                       className="resize-none border border-purple-200 bg-white text-sm"
@@ -928,28 +888,16 @@ export default function ImageGenerator() {
                   <Label className="font-light text-gray-700 text-sm">
                     {t('transformationPrompt')} <span className="text-red-500">*</span>
                   </Label>
-                  <div className="flex items-center gap-2">
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      className="h-7 text-xs text-purple-600 hover:text-purple-700"
-                      onClick={handleHighlightPrompt}
-                    >
-                      <Highlighter className="mr-1 h-3.5 w-3.5" />
-                      {t('highlightPrompt')}
-                    </Button>
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      className="h-7 text-xs text-red-600 hover:text-red-700"
-                      onClick={handleClearPrompt}
-                    >
-                      <Eraser className="mr-1 h-3.5 w-3.5" />
-                      {t('clearPrompt')}
-                    </Button>
-                  </div>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className="h-7 text-xs text-purple-600 hover:text-purple-700"
+                    onClick={handleClearPrompt}
+                  >
+                    <Eraser className="mr-1 h-3.5 w-3.5" />
+                    {t('clearPrompt')}
+                  </Button>
                 </div>
                 <div className="relative">
                   <Textarea
@@ -985,28 +933,16 @@ export default function ImageGenerator() {
                         <Sparkles className="h-4 w-4" />
                         {t('enhancedPrompt')}
                       </h4>
-                      <div className="flex items-center gap-1">
-                        <Button
-                          onClick={handleHighlightEnhancedPrompt}
-                          size="sm"
-                          variant="ghost"
-                          className="h-6 px-2 text-xs text-purple-600 hover:text-purple-700"
-                        >
-                          <Highlighter className="mr-1 h-3 w-3" />
-                          {t('highlightEnhancedPrompt')}
-                        </Button>
-                        <Button
-                          onClick={() => setEnhancedPrompt('')}
-                          size="sm"
-                          variant="ghost"
-                          className="h-6 w-6 p-0 text-gray-600"
-                        >
-                          <X className="h-4 w-4" />
-                        </Button>
-                      </div>
+                      <Button
+                        onClick={() => setEnhancedPrompt('')}
+                        size="sm"
+                        variant="ghost"
+                        className="h-6 w-6 p-0 text-gray-600"
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
                     </div>
                     <Textarea
-                      ref={enhancedTextareaRef}
                       value={enhancedPrompt}
                       onChange={(e) => setEnhancedPrompt(e.target.value.slice(0, maxPromptLength))}
                       className="resize-none border border-purple-200 bg-white text-sm"
