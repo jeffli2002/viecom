@@ -779,12 +779,12 @@ export default function ImageGenerator() {
                       {sourceImages.map((image, idx) => (
                         <div
                           key={image.dataUrl || image.name || `source-image-${idx}`}
-                          className="relative"
+                          className="relative w-full"
                         >
                           <img
                             src={image.dataUrl}
                             alt={`Source ${idx + 1}`}
-                            className="h-48 w-full rounded-xl border border-gray-200 object-cover"
+                            className="w-full max-h-96 rounded-xl border border-gray-200 object-contain"
                           />
                           <button
                             type="button"
@@ -800,7 +800,7 @@ export default function ImageGenerator() {
                         <button
                           type="button"
                           onClick={triggerFileInput}
-                          className="flex h-48 w-full flex-col items-center justify-center rounded-xl border border-dashed border-gray-300 text-gray-500 transition-colors hover:border-purple-400 hover:text-purple-600"
+                          className="flex min-h-48 w-full flex-col items-center justify-center rounded-xl border border-dashed border-gray-300 text-gray-500 transition-colors hover:border-purple-400 hover:text-purple-600"
                         >
                           <Upload className="mb-2 h-8 w-8" />
                           <span className="text-sm font-medium">Add another image</span>
