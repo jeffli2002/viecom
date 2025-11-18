@@ -86,10 +86,16 @@ export function CheckinDropdown() {
           setCheckinStatus(data.data);
         }
       } else {
-        console.error('Failed to fetch checkin status:', response.status);
+        // Silently handle 401 (unauthorized) - user might not be logged in
+        if (response.status !== 401) {
+          console.error('Failed to fetch checkin status:', response.status);
+        }
       }
     } catch (error) {
-      console.error('Failed to fetch checkin status:', error);
+      // Only log unexpected errors, not network errors that might be temporary
+      if (error instanceof Error && error.name !== 'TypeError') {
+        console.error('Failed to fetch checkin status:', error);
+      }
     } finally {
       setIsLoading(false);
     }
