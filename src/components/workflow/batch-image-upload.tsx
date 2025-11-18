@@ -232,7 +232,8 @@ export function BatchImageUploadLegacy() {
             </Button>
           </div>
           <p className="text-xs text-gray-500 mt-2">
-            模板包含字段：prompt（必需）, baseImageUrl（可选，用于图生图）, model（可选）,
+            模板包含字段：prompt（必需）,
+            baseImageUrl（可选，用于图生图，支持URL、base64或Excel中直接插入图片）, model（可选）,
             productSellingPoints（可选）
           </p>
         </div>
@@ -278,7 +279,10 @@ export function BatchImageUploadLegacy() {
             <h3 className="font-medium mb-2">使用说明：</h3>
             <ul className="text-sm text-gray-600 space-y-1 list-disc list-inside">
               <li>下载模板文件，填写生成提示词（prompt）</li>
-              <li>如果选择图生图模式，需要填写 baseImageUrl 字段</li>
+              <li>
+                如果选择图生图模式，需要填写 baseImageUrl
+                字段（支持URL、base64或Excel中直接插入图片）
+              </li>
               <li>model 和 productSellingPoints 为可选字段</li>
               <li>上传填写好的文件开始批量生成</li>
               <li>生成完成后可以预览和下载结果</li>

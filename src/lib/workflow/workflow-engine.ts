@@ -626,7 +626,7 @@ export class WorkflowEngine {
   }> {
     // Parse CSV/Excel using template generator
     const { templateGenerator } = await import('./template-generator');
-    const rows = templateGenerator.parseTemplateFile(fileBuffer, fileName);
+    const rows = await templateGenerator.parseTemplateFile(fileBuffer, fileName);
 
     // Process each row
     const results: Array<{ assetId: string; publishResults?: PublishResultWithPlatform[] }> = [];

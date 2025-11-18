@@ -73,7 +73,7 @@ export async function POST(request: NextRequest) {
 
     // Parse file to get row count using template generator
     const { templateGenerator } = await import('@/lib/workflow/template-generator');
-    const rows = templateGenerator.parseTemplateFile(fileBuffer, file.name);
+    const rows = await templateGenerator.parseTemplateFile(fileBuffer, file.name);
     const totalRows = rows.length;
 
     // Create job record
@@ -135,7 +135,7 @@ async function handleTestBatchRequest({
 }) {
   const { templateGenerator } = await import('@/lib/workflow/template-generator');
   const fileBuffer = Buffer.from(await file.arrayBuffer());
-  const rows = templateGenerator.parseTemplateFile(fileBuffer, file.name || 'batch.csv');
+  const rows = await templateGenerator.parseTemplateFile(fileBuffer, file.name || 'batch.csv');
   const type = inferGenerationType(rows, generationType, mode);
   const job = createTestBatchJob({
     jobName: file.name || 'test-batch.csv',

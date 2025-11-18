@@ -73,7 +73,7 @@ export async function GET(
     const fileBuffer = Buffer.from(await getObjectResponse.Body.transformToByteArray());
 
     // Parse original file
-    const originalRows = templateGenerator.parseTemplateFile(fileBuffer, 'template.xlsx');
+    const originalRows = await templateGenerator.parseTemplateFile(fileBuffer, 'template.xlsx');
 
     // Get generated assets for this job
     const generatedAssets = await db

@@ -29,7 +29,7 @@ export async function POST(request: NextRequest) {
     const fileBuffer = Buffer.from(await file.arrayBuffer());
 
     // Parse file
-    const rows = templateGenerator.parseTemplateFile(fileBuffer, file.name);
+    const rows = await templateGenerator.parseTemplateFile(fileBuffer, file.name);
     const errors: ValidationError[] = [];
     const validatedRows: Array<Record<string, unknown>> = [];
 
