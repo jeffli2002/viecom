@@ -495,14 +495,14 @@ export default function VideoGenerator() {
                               <Sparkles className="h-4 w-4" />
                               {t('enhancedPrompt')}
                             </h4>
-                        <Button
-                          onClick={() => setEnhancedPrompt('')}
-                          size="sm"
-                          variant="ghost"
-                          className="h-6 w-6 p-0 text-gray-600"
-                        >
-                          <X className="h-4 w-4" />
-                        </Button>
+                            <Button
+                              onClick={() => setEnhancedPrompt('')}
+                              size="sm"
+                              variant="ghost"
+                              className="h-6 w-6 p-0 text-gray-600"
+                            >
+                              <X className="h-4 w-4" />
+                            </Button>
                           </div>
                           <Textarea
                             value={enhancedPrompt}

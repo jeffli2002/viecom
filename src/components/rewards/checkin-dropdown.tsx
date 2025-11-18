@@ -13,7 +13,7 @@ import { useRouter } from '@/i18n/navigation';
 import { useAuthStore } from '@/store/auth-store';
 import { Calendar, Flame, Gift, Sparkles } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { toast } from 'sonner';
 
 interface CheckinStatus {
@@ -243,7 +243,7 @@ export function CheckinDropdown() {
   const progressPercentage = (progressDays / consecutiveDaysRequired) * 100;
 
   // Generate last 7 days calendar
-  const getLast7Days = () => {
+  const last7Days = useMemo(() => {
     const days = [];
     const today = new Date();
     const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
@@ -268,13 +268,6 @@ export function CheckinDropdown() {
         isCheckedIn = true;
       }
 
-      console.log(`Day ${dateStr}:`, {
-        isToday,
-        isCheckedIn,
-        dateStr,
-        todayCheckinDate: checkinStatus?.todayCheckin?.checkinDate,
-      });
-
       days.push({
         dayName,
         date: dateStr,
@@ -284,9 +277,11 @@ export function CheckinDropdown() {
     }
 
     return days;
-  };
-
-  const last7Days = getLast7Days();
+  }, [
+    checkinStatus?.checkedInToday,
+    checkinStatus?.todayCheckin?.checkinDate,
+    checkinStatus?.recentCheckins,
+  ]);
 
   return (
     <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
@@ -351,13 +346,10 @@ export function CheckinDropdown() {
             <p className="text-xs font-medium text-gray-900 mb-2">Last 7 Days</p>
             <p className="text-xs text-gray-500 mb-3">Click today's date to check in</p>
             <div className="grid grid-cols-7 gap-1.5">
-              {last7Days.map((day, index) => {
+              {last7Days.map((day) => {
                 const isClickable = day.isToday && !day.isCheckedIn && !isCheckingIn;
                 return (
-                  <div
-                    key={day.checkinDate ?? `${day.dayName}-${index}`}
-                    className="flex flex-col items-center"
-                  >
+                  <div key={day.date} className="flex flex-col items-center">
                     <span className="text-xs text-gray-600 mb-1">{day.dayName}</span>
                     <button
                       type="button"
