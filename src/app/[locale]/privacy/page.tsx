@@ -109,8 +109,8 @@ export default function PrivacyPage() {
             <p>We do not sell your personal information. We may share your data with:</p>
             <ul className="list-disc list-inside space-y-2 ml-4">
               <li>
-                <strong>AI Service Providers:</strong> We use DeepSeek APIs to process
-                your generation requests. Your prompts are sent to these services for processing.
+                <strong>AI Service Providers:</strong> We use DeepSeek APIs to process your
+                generation requests. Your prompts are sent to these services for processing.
               </li>
               <li>
                 <strong>Payment Processors:</strong> Creem handles payment processing and may access
