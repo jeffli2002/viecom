@@ -216,8 +216,7 @@ export async function GET(request: NextRequest) {
     const todayCheckin = await db
       .select()
       .from(userDailyCheckin)
-      .where(eq(userDailyCheckin.checkinDate, today))
-      .where(eq(userDailyCheckin.userId, userId))
+      .where(and(eq(userDailyCheckin.checkinDate, today), eq(userDailyCheckin.userId, userId)))
       .limit(1);
 
     // Get last checkin for consecutive days
