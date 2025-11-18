@@ -196,6 +196,9 @@
     "shareLoginRequired": "Log in to earn credits for sharing.",
     "shareAlreadyRewarded": "Share reward already claimed for this image.",
     "generationFailed": "Generation Failed",
+    "copyAll": "Copy all",
+    "copiedToClipboard": "Copied to clipboard",
+    "copyFailed": "Failed to copy",
     "imageStyles": {
       "studio-shot": "Studio Shot",
       "lifestyle": "Lifestyle",

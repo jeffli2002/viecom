@@ -109,7 +109,7 @@ export default function PrivacyPage() {
             <p>We do not sell your personal information. We may share your data with:</p>
             <ul className="list-disc list-inside space-y-2 ml-4">
               <li>
-                <strong>AI Service Providers:</strong> We use KIE.ai and DeepSeek APIs to process
+                <strong>AI Service Providers:</strong> We use DeepSeek APIs to process
                 your generation requests. Your prompts are sent to these services for processing.
               </li>
               <li>

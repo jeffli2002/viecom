@@ -196,6 +196,9 @@
     "shareLoginRequired": "登录后才能领取分享积分。",
     "shareAlreadyRewarded": "该图片的分享奖励已领取。",
     "generationFailed": "生成失败",
+    "copyAll": "复制全部",
+    "copiedToClipboard": "已复制到剪贴板",
+    "copyFailed": "复制失败",
     "imageStyles": {
       "studio-shot": "影棚拍摄",
       "lifestyle": "生活方式",

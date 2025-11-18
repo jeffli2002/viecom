@@ -23,6 +23,7 @@ import type { BrandToneAnalysis } from '@/lib/brand/brand-tone-analyzer';
 import { useAuthStore } from '@/store/auth-store';
 import {
   AlertCircle,
+  Copy,
   Download,
   Eraser,
   Image as ImageIcon,
@@ -35,6 +36,7 @@ import {
 import { useTranslations } from 'next-intl';
 import { useSearchParams } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
+import { toast } from 'sonner';
 
 interface GenerationResult {
   imageUrl: string;
@@ -221,6 +223,17 @@ export default function ImageGenerator() {
     setPrompt('');
     setEnhancedPrompt('');
     promptTextareaRef.current?.focus();
+  };
+
+  const handleCopyEnhancedPrompt = async () => {
+    if (!enhancedPrompt) return;
+    try {
+      await navigator.clipboard.writeText(enhancedPrompt);
+      toast.success(t('copiedToClipboard') || 'Copied to clipboard');
+    } catch (error) {
+      console.error('Failed to copy:', error);
+      toast.error(t('copyFailed') || 'Failed to copy');
+    }
   };
 
   const addSourceImages = (files: File[]) => {
@@ -759,14 +772,25 @@ export default function ImageGenerator() {
                         <Sparkles className="h-4 w-4" />
                         {t('enhancedPrompt')}
                       </h4>
-                      <Button
-                        onClick={() => setEnhancedPrompt('')}
-                        size="sm"
-                        variant="ghost"
-                        className="h-6 w-6 p-0 text-gray-600"
-                      >
-                        <X className="h-4 w-4" />
-                      </Button>
+                      <div className="flex items-center gap-1">
+                        <Button
+                          onClick={handleCopyEnhancedPrompt}
+                          size="sm"
+                          variant="ghost"
+                          className="h-6 w-6 p-0 text-gray-600 hover:text-purple-700"
+                          title={t('copyAll') || 'Copy all'}
+                        >
+                          <Copy className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          onClick={() => setEnhancedPrompt('')}
+                          size="sm"
+                          variant="ghost"
+                          className="h-6 w-6 p-0 text-gray-600"
+                        >
+                          <X className="h-4 w-4" />
+                        </Button>
+                      </div>
                     </div>
                     <Textarea
                       value={enhancedPrompt}
@@ -933,14 +957,25 @@ export default function ImageGenerator() {
                         <Sparkles className="h-4 w-4" />
                         {t('enhancedPrompt')}
                       </h4>
-                      <Button
-                        onClick={() => setEnhancedPrompt('')}
-                        size="sm"
-                        variant="ghost"
-                        className="h-6 w-6 p-0 text-gray-600"
-                      >
-                        <X className="h-4 w-4" />
-                      </Button>
+                      <div className="flex items-center gap-1">
+                        <Button
+                          onClick={handleCopyEnhancedPrompt}
+                          size="sm"
+                          variant="ghost"
+                          className="h-6 w-6 p-0 text-gray-600 hover:text-purple-700"
+                          title={t('copyAll') || 'Copy all'}
+                        >
+                          <Copy className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          onClick={() => setEnhancedPrompt('')}
+                          size="sm"
+                          variant="ghost"
+                          className="h-6 w-6 p-0 text-gray-600"
+                        >
+                          <X className="h-4 w-4" />
+                        </Button>
+                      </div>
                     </div>
                     <Textarea
                       value={enhancedPrompt}
@@ -957,7 +992,7 @@ export default function ImageGenerator() {
             </TabsContent>
 
             <div className="space-y-2">
-              <Label className="font-light text-gray-700 text-sm">图片风格</Label>
+              <Label className="font-light text-gray-700 text-sm">{t('imageStyle')}</Label>
               <Select value={imageStyle} onValueChange={setImageStyle}>
                 <SelectTrigger className="border-gray-200 font-light">
                   <SelectValue />
