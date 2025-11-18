@@ -90,7 +90,7 @@ type KIEVideoTaskInput = {
   prompt: string;
   aspect_ratio: 'square' | 'portrait' | 'landscape';
   quality?: 'standard' | 'high';
-  n_frames?: '10s' | '15s';
+  n_frames?: '10' | '15';
   image_urls?: string[];
 };
 
@@ -275,11 +275,7 @@ export class KIEAPIService {
       input.quality = params.quality || 'standard';
 
       // 根据 duration 设置 n_frames
-      if (params.duration === 10) {
-        input.n_frames = '10s';
-      } else {
-        input.n_frames = '15s'; // 默认15秒
-      }
+      input.n_frames = params.duration === 10 ? '10' : '15';
     }
 
     // 添加图片URL（如果有）
