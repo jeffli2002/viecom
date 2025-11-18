@@ -229,7 +229,21 @@ export async function POST(request: NextRequest) {
 
     const taskId = generationResponse.data.taskId;
 
-    const videoResult = await kieApiService.pollTaskStatus(taskId, 'video');
+    const pollingIntervalMs = 5000;
+    const maxAttempts =
+      normalizedModel === 'sora-2-pro'
+        ? normalizedDuration === 15
+          ? 240 // up to 20 minutes
+          : 210
+        : normalizedDuration === 15
+          ? 180
+          : 150;
+    const videoResult = await kieApiService.pollTaskStatus(
+      taskId,
+      'video',
+      maxAttempts,
+      pollingIntervalMs
+    );
     if (!videoResult.videoUrl) {
       return NextResponse.json(
         { error: 'Video generation completed but no video URL found' },
