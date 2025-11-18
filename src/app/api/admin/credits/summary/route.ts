@@ -1,6 +1,6 @@
 import { requireAdmin } from '@/lib/admin/auth';
 import { db } from '@/server/db';
-import { creditTransactions, user, userCredits } from '@/server/db/schema';
+import { creditTransactions, generatedAsset, user, userCredits } from '@/server/db/schema';
 import { and, eq, gte, sql } from 'drizzle-orm';
 import { NextResponse } from 'next/server';
 
@@ -68,14 +68,29 @@ export async function GET(request: Request) {
       LIMIT 10
     `);
 
-    // Get daily credits trend (include all spend sources, not just api_call)
-    const creditsTrend = await db.execute(sql`
+    // Get completed asset counts
+    const generationCounts = await db.execute(sql`
+      SELECT 
+        asset_type,
+        COUNT(*)::int as count
+      FROM ${generatedAsset}
+      WHERE status = 'completed' AND created_at >= ${startDate}
+      GROUP BY asset_type
+    `);
+
+    const imageGenerations =
+      generationCounts.rows.find((row) => row.asset_type === 'image')?.count ?? 0;
+    const videoGenerations =
+      generationCounts.rows.find((row) => row.asset_type === 'video')?.count ?? 0;
+
+    // Get daily generation trend based on actual assets
+    const generationTrend = await db.execute(sql`
       SELECT 
         DATE(created_at) as date,
-        COALESCE(SUM(CASE WHEN type = 'spend' AND (description LIKE '%image%' OR description LIKE '%Image%') THEN ABS(amount) ELSE 0 END), 0) as "imageCredits",
-        COALESCE(SUM(CASE WHEN type = 'spend' AND (description LIKE '%video%' OR description LIKE '%Video%') THEN ABS(amount) ELSE 0 END), 0) as "videoCredits"
-      FROM ${creditTransactions}
-      WHERE created_at >= ${startDate}
+        COALESCE(SUM(CASE WHEN asset_type = 'image' THEN 1 ELSE 0 END), 0)::int as "imageCount",
+        COALESCE(SUM(CASE WHEN asset_type = 'video' THEN 1 ELSE 0 END), 0)::int as "videoCount"
+      FROM ${generatedAsset}
+      WHERE status = 'completed' AND created_at >= ${startDate}
       GROUP BY DATE(created_at)
       ORDER BY date ASC
     `);
@@ -85,9 +100,11 @@ export async function GET(request: Request) {
         totalConsumed: Number(totalConsumed[0]?.total) || 0,
         imageCredits: Number(imageCredits.rows[0]?.total) || 0,
         videoCredits: Number(videoCredits.rows[0]?.total) || 0,
+        imageGenerations,
+        videoGenerations,
       },
       top10Users: top10Users.rows,
-      trend: creditsTrend.rows,
+      trend: generationTrend.rows,
     });
 
     // Prevent caching of admin data

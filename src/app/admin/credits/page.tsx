@@ -28,6 +28,8 @@ interface CreditsSummary {
     totalConsumed: number;
     imageCredits: number;
     videoCredits: number;
+    imageGenerations: number;
+    videoGenerations: number;
   };
   top10Users: Array<{
     id: string;
@@ -40,8 +42,8 @@ interface CreditsSummary {
   }>;
   trend: Array<{
     date: string;
-    imageCredits: number;
-    videoCredits: number;
+    imageCount: number;
+    videoCount: number;
   }>;
 }
 
@@ -124,8 +126,13 @@ export default function AdminCreditsPage() {
                 <ImageIcon className="h-5 w-5 text-cyan-600" />
               </div>
               <div>
-                <p className="text-sm text-gray-500">Image Credits</p>
-                <p className="text-2xl font-bold">{data.summary.imageCredits.toLocaleString()}</p>
+                <p className="text-sm text-gray-500">Images Generated</p>
+                <p className="text-2xl font-bold">
+                  {data.summary.imageGenerations.toLocaleString()}
+                </p>
+                <p className="text-xs text-gray-500">
+                  {data.summary.imageCredits.toLocaleString()} credits used
+                </p>
               </div>
             </div>
           </CardContent>
@@ -138,8 +145,13 @@ export default function AdminCreditsPage() {
                 <Video className="h-5 w-5 text-pink-600" />
               </div>
               <div>
-                <p className="text-sm text-gray-500">Video Credits</p>
-                <p className="text-2xl font-bold">{data.summary.videoCredits.toLocaleString()}</p>
+                <p className="text-sm text-gray-500">Videos Generated</p>
+                <p className="text-2xl font-bold">
+                  {data.summary.videoGenerations.toLocaleString()}
+                </p>
+                <p className="text-xs text-gray-500">
+                  {data.summary.videoCredits.toLocaleString()} credits used
+                </p>
               </div>
             </div>
           </CardContent>
@@ -187,7 +199,7 @@ export default function AdminCreditsPage() {
         {/* Credits Trend Chart */}
         <Card>
           <CardHeader>
-            <CardTitle>Credits Consumption Trend</CardTitle>
+            <CardTitle>Generation Trend</CardTitle>
           </CardHeader>
           <CardContent>
             <div style={{ height: 400 }}>
@@ -198,8 +210,8 @@ export default function AdminCreditsPage() {
                   <YAxis />
                   <Tooltip />
                   <Legend />
-                  <Bar dataKey="imageCredits" stackId="a" fill="#06b6d4" name="Image Credits" />
-                  <Bar dataKey="videoCredits" stackId="a" fill="#ec4899" name="Video Credits" />
+                  <Bar dataKey="imageCount" stackId="a" fill="#06b6d4" name="Images" />
+                  <Bar dataKey="videoCount" stackId="a" fill="#ec4899" name="Videos" />
                 </BarChart>
               </ResponsiveContainer>
             </div>
