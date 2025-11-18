@@ -11,6 +11,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { IMAGE_STYLES } from '@/config/styles.config';
 import { Download, FileSpreadsheet, FileText, Loader2, Upload } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useEffect, useState } from 'react';
@@ -23,7 +24,7 @@ export function BatchImageUpload() {
 
 // Legacy component - keeping for backward compatibility
 export function BatchImageUploadLegacy() {
-  const _t = useTranslations('batchGeneration');
+  const t = useTranslations('batchGeneration');
   const [file, setFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
@@ -194,7 +195,7 @@ export function BatchImageUploadLegacy() {
             </div>
           </div>
           <div>
-            <Label className="text-sm font-medium mb-2 block">图片风格</Label>
+            <Label className="text-sm font-medium mb-2 block">{t('imageStyle')}</Label>
             <Select value={imageStyle} onValueChange={setImageStyle}>
               <SelectTrigger>
                 <SelectValue />
@@ -202,7 +203,7 @@ export function BatchImageUploadLegacy() {
               <SelectContent>
                 {IMAGE_STYLES.map((style) => (
                   <SelectItem key={style.id} value={style.id} title={style.description}>
-                    {style.displayName}
+                    {t(`imageStyles.${style.id}`)}
                   </SelectItem>
                 ))}
               </SelectContent>
