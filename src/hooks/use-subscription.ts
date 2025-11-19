@@ -13,6 +13,12 @@ interface SubscriptionResponse {
     status?: string;
     cancelAtPeriodEnd?: boolean;
     interval?: 'month' | 'year';
+    upcomingPlan?: {
+      planId?: 'pro' | 'proplus';
+      interval?: 'month' | 'year';
+      takesEffectAt?: string | null;
+      changeType?: 'upgrade' | 'downgrade';
+    } | null;
   } | null;
 }
 
@@ -23,6 +29,7 @@ export interface UseSubscriptionResult {
   status: string | null;
   cancelAtPeriodEnd: boolean;
   interval: 'month' | 'year' | null;
+  upcomingPlan: SubscriptionResponse['subscription']['upcomingPlan'];
 }
 
 export function useSubscription(): UseSubscriptionResult {
@@ -33,6 +40,8 @@ export function useSubscription(): UseSubscriptionResult {
   const [status, setStatus] = useState<string | null>(null);
   const [cancelAtPeriodEnd, setCancelAtPeriodEnd] = useState<boolean>(false);
   const [interval, setInterval] = useState<'month' | 'year' | null>(null);
+  const [upcomingPlan, setUpcomingPlan] =
+    useState<SubscriptionResponse['subscription']['upcomingPlan']>(null);
   const fetchedRef = useRef(false);
 
   useEffect(() => {
@@ -43,6 +52,7 @@ export function useSubscription(): UseSubscriptionResult {
       setStatus(null);
       setCancelAtPeriodEnd(false);
       setInterval(null);
+      setUpcomingPlan(null);
       setLoading(false);
       return;
     }
@@ -68,6 +78,7 @@ export function useSubscription(): UseSubscriptionResult {
           setStatus(null);
           setCancelAtPeriodEnd(false);
           setInterval(null);
+          setUpcomingPlan(null);
           return;
         }
         const apiStatus = data.subscription.status || null;
@@ -105,6 +116,13 @@ export function useSubscription(): UseSubscriptionResult {
         setStatus(apiStatus);
         setCancelAtPeriodEnd(Boolean(data.subscription.cancelAtPeriodEnd));
         setInterval((data.subscription.interval as 'month' | 'year') || null);
+        setUpcomingPlan(
+          data.subscription.upcomingPlan
+            ? {
+                ...data.subscription.upcomingPlan,
+              }
+            : null
+        );
       } catch (e) {
         setError(e instanceof Error ? e.message : 'Unknown error');
       } finally {
@@ -114,5 +132,5 @@ export function useSubscription(): UseSubscriptionResult {
     run();
   }, [isAuthenticated, authLoading]);
 
-  return { loading, error, planId, status, cancelAtPeriodEnd, interval };
+  return { loading, error, planId, status, cancelAtPeriodEnd, interval, upcomingPlan };
 }

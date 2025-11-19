@@ -81,7 +81,53 @@ async function adjustCreditsForPlanChange(
         .limit(1);
 
       if (!userCredit) {
-        console.error(`[Creem Webhook] User credit record not found for ${userId}`);
+        if (creditDifference <= 0) {
+          console.warn(
+            `[Creem Webhook] No credit account for ${userId}, skipping negative/zero adjustment (${creditDifference}).`
+          );
+          return;
+        }
+
+        const now = new Date();
+        const initialBalance = creditDifference;
+
+        await tx.insert(userCredits).values({
+          id: randomUUID(),
+          userId,
+          balance: initialBalance,
+          totalEarned: initialBalance,
+          totalSpent: 0,
+          frozenBalance: 0,
+          createdAt: now,
+          updatedAt: now,
+        });
+
+        await tx.insert(creditTransactions).values({
+          id: randomUUID(),
+          userId,
+          type: 'earn',
+          amount: initialBalance,
+          balanceAfter: initialBalance,
+          source: 'subscription',
+          description: `Plan upgrade: ${oldCreditInfo.planId} ${oldIntervalValue} → ${newCreditInfo.planId} ${newIntervalValue}`,
+          referenceId,
+          metadata: JSON.stringify({
+            oldPlanId: oldCreditInfo.planId,
+            newPlanId: newCreditInfo.planId,
+            oldPlanIdentifier,
+            newPlanIdentifier,
+            oldInterval: oldIntervalValue,
+            newInterval: newIntervalValue,
+            subscriptionId,
+            provider: 'creem',
+            creditDifference,
+            createdAccount: true,
+          }),
+        });
+
+        console.log(
+          `[Creem Webhook] Created credit account for ${userId} with initial balance ${initialBalance} (plan upgrade).`
+        );
         return;
       }
 
@@ -581,16 +627,27 @@ async function handleSubscriptionUpdate(data: CreemWebhookData) {
         actualUserId,
         targetSubscription.id
       );
+      const wasPreviouslyInactive =
+        oldStatus === 'canceled' ||
+        oldStatus === 'incomplete' ||
+        oldStatus === 'incomplete_expired';
+      const isReactivation = wasPreviouslyInactive && newStatus === 'active';
 
       if (newStatus === 'active') {
-        if (initialGrantExists) {
+        if (initialGrantExists && !isReactivation) {
           console.log(
             `[Creem Webhook] Active status detected for ${newPlanId}, but initial credits already exist. Skipping duplicate grant.`
           );
         } else {
-          console.log(
-            `[Creem Webhook] Initial credits missing for ${newPlanId} (previous status ${oldStatus}). Granting now.`
-          );
+          if (isReactivation && initialGrantExists) {
+            console.log(
+              `[Creem Webhook] Reactivation detected for ${newPlanId} (previous status ${oldStatus}). Prior credits were from an older cycle, granting fresh allocation.`
+            );
+          } else {
+            console.log(
+              `[Creem Webhook] Initial credits missing for ${newPlanId} (previous status ${oldStatus}). Granting now.`
+            );
+          }
           await grantSubscriptionCredits(
             actualUserId,
             newPlanId,

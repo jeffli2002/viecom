@@ -42,6 +42,16 @@ export interface CreatePaymentEventData {
   eventData?: string;
 }
 
+export interface PaymentEventRecord {
+  id: string;
+  paymentId: string;
+  eventType: string;
+  eventData: string | null;
+  stripeEventId?: string | null;
+  creemEventId?: string | null;
+  createdAt: Date;
+}
+
 export class PaymentRepository {
   /**
    * Create payment record
@@ -361,6 +371,22 @@ export class PaymentRepository {
     });
   }
 
+  async findLatestPlanChangeEvent(paymentId: string): Promise<PaymentEventRecord | null> {
+    const result = await db
+      .select()
+      .from(paymentEvent)
+      .where(
+        and(
+          eq(paymentEvent.paymentId, paymentId),
+          inArray(paymentEvent.eventType, ['upgraded', 'updated', 'downgraded'])
+        )
+      )
+      .orderBy(desc(paymentEvent.createdAt))
+      .limit(1);
+
+    return result[0] ? this.mapToPaymentEvent(result[0]) : null;
+  }
+
   /**
    * 映射数据库记录到 PaymentRecord
    */
@@ -383,6 +409,18 @@ export class PaymentRepository {
       createdAt: record.createdAt,
       updatedAt: record.updatedAt,
       provider: record.provider as 'stripe' | 'creem' | undefined,
+    };
+  }
+
+  private mapToPaymentEvent(event: typeof paymentEvent.$inferSelect): PaymentEventRecord {
+    return {
+      id: event.id,
+      paymentId: event.paymentId,
+      eventType: event.eventType,
+      eventData: event.eventData || null,
+      stripeEventId: event.stripeEventId || null,
+      creemEventId: event.creemEventId || null,
+      createdAt: event.createdAt || new Date(0),
     };
   }
 }

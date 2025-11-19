@@ -13,6 +13,10 @@ function BillingContent() {
       yearlyPrice: plan.yearlyPrice,
       features: plan.features,
       popular: plan.popular,
+      creditsPerInterval: {
+        month: plan.credits.monthly ?? 0,
+        year: (plan.credits.monthly ?? 0) * 12,
+      },
     }));
 
   return <BillingClient plans={plans} />;

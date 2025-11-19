@@ -67,6 +67,7 @@ export async function POST(
             action: 'downgrade_to_free_scheduled',
             scheduleAtPeriodEnd: true,
             periodEnd: paymentRecord.periodEnd?.toISOString(),
+            takesEffectAt: paymentRecord.periodEnd?.toISOString(),
           }),
         });
 
@@ -162,6 +163,7 @@ export async function POST(
           newInterval,
           scheduledAtPeriodEnd: true,
           periodEnd: paymentRecord.periodEnd?.toISOString(),
+          takesEffectAt: paymentRecord.periodEnd?.toISOString(),
         }),
       });
 

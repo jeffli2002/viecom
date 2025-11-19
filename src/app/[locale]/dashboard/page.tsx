@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { creditsConfig } from '@/config/credits.config';
+import { paymentConfig } from '@/config/payment.config';
 import { useSubscription } from '@/hooks/use-subscription';
 import { resolvePlanByIdentifier, resolvePlanByProductId } from '@/lib/creem/plan-utils';
 import { useAuthStore } from '@/store/auth-store';
@@ -27,7 +28,7 @@ import {
 import { useTranslations } from 'next-intl';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Suspense, useEffect, useState } from 'react';
+import { Suspense, useEffect, useMemo, useState } from 'react';
 
 export const dynamic = 'force-dynamic';
 
@@ -93,6 +94,17 @@ interface CreditTransaction {
   createdAt: Date;
 }
 
+const formatDateDisplay = (value?: string | null) => {
+  if (!value) return '—';
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return '—';
+  return date.toLocaleDateString(undefined, {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+  });
+};
+
 function DashboardPageContent() {
   const t = useTranslations('dashboard');
   const { isAuthenticated, user, isLoading: authLoading } = useAuthStore();
@@ -102,7 +114,29 @@ function DashboardPageContent() {
   const [transactions, setTransactions] = useState<CreditTransaction[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
-  const { planId, loading: subLoading } = useSubscription();
+  const { planId, loading: subLoading, upcomingPlan } = useSubscription();
+  const scheduledPlanDetails = useMemo(() => {
+    if (!upcomingPlan || !upcomingPlan.planId || !upcomingPlan.interval) {
+      return null;
+    }
+    const plan = paymentConfig.plans.find((p) => p.id === upcomingPlan.planId);
+    if (!plan) {
+      return null;
+    }
+    const price =
+      upcomingPlan.interval === 'year' ? (plan.yearlyPrice ?? null) : (plan.price ?? null);
+    const credits =
+      upcomingPlan.interval === 'year'
+        ? (plan.credits.monthly ?? 0) * 12
+        : (plan.credits.monthly ?? 0);
+    return {
+      planName: plan.name,
+      interval: upcomingPlan.interval,
+      price,
+      credits,
+      takesEffectAt: upcomingPlan.takesEffectAt || null,
+    };
+  }, [upcomingPlan]);
 
   useEffect(() => {
     if (!authLoading && !isAuthenticated) {
@@ -230,6 +264,26 @@ function DashboardPageContent() {
           刷新
         </Button>
       </div>
+
+      {scheduledPlanDetails && (
+        <div className="rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900">
+          <p className="font-semibold">套餐变更已排程</p>
+          <p className="mt-1">
+            自{' '}
+            <span className="font-medium">
+              {formatDateDisplay(scheduledPlanDetails.takesEffectAt)}
+            </span>{' '}
+            起，你的订阅将切换为{' '}
+            <span className="font-medium">{scheduledPlanDetails.planName}</span>（
+            {scheduledPlanDetails.interval === 'year' ? '年付' : '月付'}），费用为{' '}
+            {scheduledPlanDetails.price
+              ? `$${scheduledPlanDetails.price.toFixed(2)}`
+              : '官方标准价'}{' '}
+            ，每个周期将获赠 <span className="font-medium">{scheduledPlanDetails.credits}</span>{' '}
+            积分。当前套餐在此之前仍可继续使用。
+          </p>
+        </div>
+      )}
 
       {/* Credit Balance Cards */}
       <div className="grid gap-4 md:grid-cols-3">

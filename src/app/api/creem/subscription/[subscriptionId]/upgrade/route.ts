@@ -87,6 +87,16 @@ export async function POST(
       interval: newInterval,
     });
 
+    const scheduledAtPeriodEnd = !useProration;
+    const estimatedEffectiveDate = paymentRecord.periodEnd
+      ? new Date(paymentRecord.periodEnd)
+      : (() => {
+          const base = paymentRecord.periodStart ? new Date(paymentRecord.periodStart) : new Date();
+          const monthsToAdd = (paymentRecord.interval === 'year' ? 12 : 1) || 1;
+          base.setMonth(base.getMonth() + monthsToAdd);
+          return base;
+        })();
+
     await paymentRepository.createEvent({
       paymentId: paymentRecord.id,
       eventType: 'upgraded',
@@ -98,6 +108,11 @@ export async function POST(
         newInterval: newInterval,
         useProration,
         upgradedAt: new Date().toISOString(),
+        action: scheduledAtPeriodEnd ? 'upgrade_scheduled' : 'upgrade_immediate',
+        scheduledAtPeriodEnd,
+        takesEffectAt: scheduledAtPeriodEnd
+          ? estimatedEffectiveDate.toISOString()
+          : new Date().toISOString(),
       }),
     });
 

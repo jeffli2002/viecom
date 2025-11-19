@@ -12,6 +12,13 @@ import { paymentRepository } from '@/server/db/repositories/payment-repository';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 
+type RemoteSubscriptionResult = Awaited<ReturnType<typeof creemService.getSubscription>> & {
+  timedOut?: boolean;
+  failed?: boolean;
+};
+
+const REMOTE_SUBSCRIPTION_TIMEOUT_MS = 4000;
+
 export async function POST(request: NextRequest) {
   try {
     const session = await getSessionFromRequest(request.headers);
@@ -43,7 +50,42 @@ export async function POST(request: NextRequest) {
 
     const existing = await paymentRepository.findBySubscriptionId(subscriptionId);
 
-    const remote = await creemService.getSubscription(subscriptionId);
+    const remoteFetchPromise = creemService
+      .getSubscription(subscriptionId)
+      .then((result) => result as RemoteSubscriptionResult)
+      .catch((error: unknown) => {
+        console.warn('[Creem Sync Checkout] Remote subscription fetch failed:', {
+          subscriptionId,
+          error: error instanceof Error ? error.message : error,
+        });
+        return {
+          success: false,
+          error: error instanceof Error ? error.message : 'Unknown error',
+          failed: true,
+        } as RemoteSubscriptionResult;
+      });
+
+    const remote = await Promise.race<RemoteSubscriptionResult>([
+      remoteFetchPromise,
+      new Promise<RemoteSubscriptionResult>((resolve) =>
+        setTimeout(
+          () =>
+            resolve({
+              success: false,
+              error: 'Request timed out',
+              timedOut: true,
+            }),
+          REMOTE_SUBSCRIPTION_TIMEOUT_MS
+        )
+      ),
+    ]);
+
+    if (remote.timedOut) {
+      console.warn(
+        `[Creem Sync Checkout] Remote subscription lookup timed out for ${subscriptionId}. Using local payload fallback.`
+      );
+    }
+
     const remoteSub = remote.success ? remote.subscription : null;
 
     // Use productId as primary identifier (matching im2prompt approach where productId maps to plan)
@@ -158,7 +200,18 @@ export async function POST(request: NextRequest) {
           subscriptionId,
           normalizedInterval || undefined
         );
-        console.log('[Creem Sync Checkout] Credit grant result:', { granted, creditsPlanId });
+        console.log('[Creem Sync Checkout] Credit grant result:', {
+          granted,
+          creditsPlanId,
+          subscriptionId,
+          userId: session.user.id,
+          interval: normalizedInterval,
+        });
+        if (!granted) {
+          console.warn(
+            '[Creem Sync Checkout] Credits were NOT granted! This might indicate a duplicate grant was prevented.'
+          );
+        }
       } else {
         console.warn('[Creem Sync Checkout] Credits not granted:', {
           creditsPlanId,
@@ -185,8 +238,20 @@ export async function POST(request: NextRequest) {
       const intervalChanged = oldInterval !== newInterval;
 
       // Check if old plan is Free (no valid plan or 'free' plan)
-      const isOldPlanFree = !oldPlanResolved || oldPlanResolved.plan?.id === 'free';
+      // Also check if the existing subscription was canceled (indicating user was on Free)
+      const isOldPlanFree =
+        !oldPlanResolved || oldPlanResolved.plan?.id === 'free' || existing.status === 'canceled';
       const isNewPlanPaid = newPlanResolved && newPlanResolved.plan?.id !== 'free';
+
+      console.log('[Creem Sync Checkout] Plan upgrade check:', {
+        isOldPlanFree,
+        isNewPlanPaid,
+        oldPlanId,
+        newPlanId,
+        oldPlanResolved: oldPlanResolved ? { planId: oldPlanResolved.plan.id } : null,
+        existingStatus: existing.status,
+        existingPriceId: existing.priceId,
+      });
 
       // Calculate credit difference to determine if this is upgrade or downgrade
       // Use resolved plan IDs for accurate credit calculation
@@ -247,6 +312,8 @@ export async function POST(request: NextRequest) {
             subscriptionId,
             creditsPlanId,
             interval: normalizedInterval,
+            oldPlanId,
+            newPlanId,
           });
           const granted = await grantSubscriptionCredits(
             session.user.id,
@@ -257,7 +324,15 @@ export async function POST(request: NextRequest) {
           console.log('[Creem Sync Checkout] Credit grant result (Free->Paid):', {
             granted,
             creditsPlanId,
+            subscriptionId,
+            userId: session.user.id,
+            interval: normalizedInterval,
           });
+          if (!granted) {
+            console.warn(
+              '[Creem Sync Checkout] Credits were NOT granted for Free->Paid upgrade! This might indicate a duplicate grant was prevented.'
+            );
+          }
         } else {
           console.warn('[Creem Sync Checkout] Credits not granted (Free->Paid):', {
             creditsPlanId,

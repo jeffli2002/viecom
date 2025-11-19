@@ -14,6 +14,13 @@ import { toast } from 'sonner';
 
 type PlanId = 'pro' | 'proplus';
 
+interface ScheduledPlanChange {
+  planId: PlanId;
+  interval: 'month' | 'year';
+  takesEffectAt?: string | null;
+  changeType?: 'upgrade' | 'downgrade';
+}
+
 export interface BillingPlan {
   id: PlanId;
   name: string;
@@ -22,6 +29,10 @@ export interface BillingPlan {
   yearlyPrice?: number;
   features: string[];
   popular?: boolean;
+  creditsPerInterval: {
+    month: number;
+    year: number;
+  };
 }
 
 interface SubscriptionSummary {
@@ -34,6 +45,7 @@ interface SubscriptionSummary {
   interval: 'month' | 'year' | null;
   periodEnd?: string | null;
   cancelAtPeriodEnd?: boolean;
+  upcomingPlan?: ScheduledPlanChange | null;
 }
 
 interface BillingClientProps {
@@ -176,20 +188,84 @@ const BillingClient = ({ plans }: BillingClientProps) => {
     pathname,
   ]);
 
+  const planPriority: Record<'free' | PlanId, number> = {
+    free: 0,
+    pro: 1,
+    proplus: 2,
+  };
+  const activeStatuses = new Set(['active', 'trialing', 'past_due']);
+
   const handleUpgrade = async (planId: PlanId) => {
     if (!isAuthenticated) {
       router.push('/login');
       return;
     }
 
+    const currentPlanId = (subscription?.planId ?? 'free') as 'free' | PlanId;
+    const hasManagedSubscription =
+      !!subscription?.subscriptionId &&
+      !!subscription.planId &&
+      subscription.planId !== 'free' &&
+      subscription.status &&
+      activeStatuses.has(subscription.status);
+
     try {
       setActionLoading(true);
+
+      if (hasManagedSubscription && subscription?.subscriptionId) {
+        const currentRank = planPriority[currentPlanId];
+        const targetRank = planPriority[planId];
+        const isUpgradeFlow = targetRank >= currentRank;
+        const endpoint = isUpgradeFlow ? 'upgrade' : 'downgrade';
+        const payload = isUpgradeFlow
+          ? {
+              newPlanId: planId,
+              newInterval: interval,
+              useProration: false,
+            }
+          : {
+              newPlanId: planId === 'proplus' ? 'pro' : planId,
+              newInterval: interval,
+              scheduleAtPeriodEnd: true,
+            };
+
+        const response = await fetch(
+          `/api/creem/subscription/${subscription.subscriptionId}/${endpoint}`,
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            credentials: 'include',
+            body: JSON.stringify(payload),
+          }
+        );
+
+        const data = await response.json().catch(() => ({}));
+
+        if (!response.ok || data.success === false) {
+          throw new Error(
+            data.error ||
+              (isUpgradeFlow ? 'Failed to schedule upgrade' : 'Failed to schedule downgrade')
+          );
+        }
+
+        toast.success(
+          data.message ||
+            (isUpgradeFlow
+              ? 'Your plan will upgrade at the end of the current period'
+              : 'Your plan will downgrade at the end of the current period')
+        );
+        await fetchSubscription();
+        return;
+      }
+
       await createCheckoutSession({
         planId,
         interval,
       });
     } catch (error) {
-      const message = error instanceof Error ? error.message : 'Failed to start checkout';
+      const message = error instanceof Error ? error.message : 'Failed to update subscription';
       toast.error(message);
     } finally {
       setActionLoading(false);
@@ -293,9 +369,37 @@ const BillingClient = ({ plans }: BillingClientProps) => {
   }, [subscription]);
 
   const isCurrentPlan = (planId: PlanId) => normalizedPlanId === planId;
+  const scheduledPlanChange = subscription?.upcomingPlan ?? null;
+  const scheduledPlanDetails = useMemo(() => {
+    if (!scheduledPlanChange) {
+      return null;
+    }
+    const plan = plans.find((p) => p.id === scheduledPlanChange.planId);
+    if (!plan) {
+      return null;
+    }
+    const price =
+      scheduledPlanChange.interval === 'year' ? (plan.yearlyPrice ?? null) : (plan.price ?? null);
+    const credits =
+      scheduledPlanChange.interval === 'year'
+        ? plan.creditsPerInterval.year
+        : plan.creditsPerInterval.month;
+    const takesEffectAt = scheduledPlanChange.takesEffectAt || subscription?.periodEnd || undefined;
+    return {
+      plan,
+      price,
+      credits,
+      takesEffectAt,
+    };
+  }, [scheduledPlanChange, plans, subscription?.periodEnd]);
 
-  const hasScheduledChange = Boolean(subscription?.cancelAtPeriodEnd);
+  const hasScheduledChange = Boolean(scheduledPlanDetails);
+  const hasScheduledCancellation = Boolean(subscription?.cancelAtPeriodEnd);
   const nextRenewalDate = formatDate(subscription?.periodEnd);
+  const scheduledIntervalLabel =
+    scheduledPlanChange?.interval && intervalLabels[scheduledPlanChange.interval]
+      ? intervalLabels[scheduledPlanChange.interval]
+      : scheduledPlanChange?.interval || '';
   const currentStatusLabel = subscription?.status
     ? statusLabels[subscription.status] || subscription.status
     : 'No subscription';
@@ -353,7 +457,7 @@ const BillingClient = ({ plans }: BillingClientProps) => {
                 <div className="rounded-lg border p-4">
                   <p className="text-sm text-gray-500">Status</p>
                   <p className="mt-1 font-semibold text-gray-900">{currentStatusLabel}</p>
-                  {hasScheduledChange && (
+                  {hasScheduledCancellation && (
                     <p className="text-xs text-orange-600">Scheduled to cancel at period end</p>
                   )}
                 </div>
@@ -374,13 +478,28 @@ const BillingClient = ({ plans }: BillingClientProps) => {
                 </div>
               </div>
 
-              {hasScheduledChange && (
+              {hasScheduledChange && scheduledPlanDetails && (
                 <div className="rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900">
                   <p className="font-semibold">Plan change scheduled</p>
                   <p className="mt-1">
-                    Your current {subscription.planName || 'plan'} stays active until{' '}
-                    <span className="font-medium">{nextRenewalDate}</span>. The new subscription
-                    will take effect right after this billing period ends.
+                    Starting{' '}
+                    <span className="font-medium">
+                      {formatDate(scheduledPlanDetails.takesEffectAt || subscription?.periodEnd)}
+                    </span>
+                    , your subscription will switch to{' '}
+                    <span className="font-medium">{scheduledPlanDetails.plan.name}</span> (
+                    {scheduledIntervalLabel || 'Custom billing'}). You will be billed{' '}
+                    {scheduledPlanDetails.price
+                      ? `$${scheduledPlanDetails.price.toFixed(2)}`
+                      : 'the standard rate'}{' '}
+                    and receive <span className="font-medium">{scheduledPlanDetails.credits}</span>{' '}
+                    credits per{' '}
+                    {scheduledPlanChange?.interval === 'year'
+                      ? 'year'
+                      : scheduledPlanChange?.interval === 'month'
+                        ? 'month'
+                        : 'billing cycle'}
+                    . Your current {subscription.planName || 'plan'} remains active until then.
                   </p>
                 </div>
               )}

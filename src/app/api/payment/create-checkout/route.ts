@@ -59,51 +59,21 @@ export async function POST(request: NextRequest) {
         : 'pro';
       const currentInterval = activeSubscription.interval === 'year' ? 'year' : 'month';
 
-      if (currentPlan === planId && currentInterval === interval) {
-        console.warn('[Create Checkout] duplicate plan request', {
-          userId: session.user.id,
-          planId,
-          interval,
-        });
-        return NextResponse.json(
-          {
-            error: `You already have an active ${planId.toUpperCase()} ${interval === 'year' ? 'yearly' : 'monthly'} subscription`,
-            code: 'DUPLICATE_SUBSCRIPTION',
-          },
-          { status: 400 }
-        );
-      }
+      console.warn('[Create Checkout] Active subscription detected, blocking duplicate checkout', {
+        userId: session.user.id,
+        subscriptionId: activeSubscription.subscriptionId,
+        currentPlan,
+        currentInterval,
+      });
 
-      if (!activeSubscription.cancelAtPeriodEnd && activeSubscription.subscriptionId) {
-        try {
-          const cancelResult = await creemService.cancelSubscription(
-            activeSubscription.subscriptionId
-          );
-
-          if (cancelResult.success) {
-            await paymentRepository.update(activeSubscription.id, {
-              cancelAtPeriodEnd: true,
-            });
-
-            await paymentRepository.createEvent({
-              paymentId: activeSubscription.id,
-              eventType: 'canceled',
-              eventData: JSON.stringify({
-                subscriptionId: activeSubscription.subscriptionId,
-                canceledAt: new Date().toISOString(),
-                cancelAtPeriodEnd: true,
-                reason: 'plan_change',
-                newPlan: planId,
-                newInterval: interval,
-              }),
-            });
-          } else {
-            console.warn('[Create Checkout] Failed to auto-cancel Creem subscription');
-          }
-        } catch (error) {
-          console.error('[Create Checkout] Error canceling existing subscription', error);
-        }
-      }
+      return NextResponse.json(
+        {
+          error:
+            'You already have an active subscription. Please use the billing page to switch plans instead of creating a new checkout.',
+          code: 'ACTIVE_SUBSCRIPTION_EXISTS',
+        },
+        { status: 400 }
+      );
     }
 
     const currentPlanForCheckout: 'free' | 'pro' | 'proplus' = activeSubscription

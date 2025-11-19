@@ -1,7 +1,7 @@
+import { randomUUID } from 'node:crypto';
 import { resolve } from 'node:path';
 import { neon } from '@neondatabase/serverless';
 import { config } from 'dotenv';
-import { randomUUID } from 'node:crypto';
 
 // Load .env.local file
 config({ path: resolve(process.cwd(), '.env.local') });
@@ -92,7 +92,8 @@ async function setUserToFreeWithCredits() {
     // 5. 记录积分调整交易（如果有变化）
     if (creditDifference !== 0) {
       console.log('\n4. 记录积分调整交易...');
-      const transactionType = creditDifference > 0 ? 'earn' : creditDifference < 0 ? 'spend' : 'admin_adjust';
+      const transactionType =
+        creditDifference > 0 ? 'earn' : creditDifference < 0 ? 'spend' : 'admin_adjust';
       const referenceId = `admin_set_credits_${userId}_${Date.now()}`;
       const description = `Admin adjustment: Set credits to ${targetCredits} (downgrade from pro+ to free)`;
 
@@ -174,4 +175,3 @@ async function setUserToFreeWithCredits() {
 }
 
 setUserToFreeWithCredits();
-

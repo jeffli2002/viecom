@@ -2,7 +2,7 @@ import { randomUUID } from 'node:crypto';
 import { type BillingInterval, formatPlanName, getCreditsForPlan } from '@/lib/creem/plan-utils';
 import { db } from '@/server/db';
 import { creditTransactions, userCredits } from '@/server/db/schema';
-import { eq } from 'drizzle-orm';
+import { and, desc, eq, like, or } from 'drizzle-orm';
 
 /**
  * Grant subscription credits to user with idempotency
@@ -39,9 +39,15 @@ export async function grantSubscriptionCredits(
   const planDisplayName = formatPlanName(creditInfo.plan, normalizedPlanId);
 
   try {
+    // Simple idempotency check: only check for exact referenceId match within transaction
+    // This prevents duplicate grants from the same call, but allows grants for different plans/subscriptions
+    // For renewals, we always grant full credits (skip this check)
+
+    // For renewals, we always grant full credits (don't check existing grants)
     const referenceId = `creem_${subscriptionId}_${isRenewal ? 'renewal' : 'initial'}_${Date.now()}`;
 
     const granted = await db.transaction(async (tx) => {
+      // Double-check within transaction to prevent race conditions
       const [existingTransaction] = await tx
         .select()
         .from(creditTransactions)

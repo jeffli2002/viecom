@@ -106,6 +106,55 @@ export async function GET() {
       }
     }
 
+    const latestPlanChangeEvent = await paymentRepository.findLatestPlanChangeEvent(
+      activeSubscription.id
+    );
+    let upcomingPlan: {
+      planId: 'pro' | 'proplus';
+      interval: 'month' | 'year';
+      takesEffectAt?: string | null;
+      changeType?: 'upgrade' | 'downgrade';
+    } | null = null;
+
+    if (latestPlanChangeEvent?.eventData) {
+      try {
+        const payload = JSON.parse(latestPlanChangeEvent.eventData);
+        const scheduled =
+          payload?.scheduledAtPeriodEnd ||
+          payload?.scheduleAtPeriodEnd ||
+          (typeof payload?.action === 'string' && payload.action.includes('scheduled'));
+        const takesEffectAt =
+          payload?.takesEffectAt ||
+          payload?.periodEnd ||
+          activeSubscription.periodEnd?.toISOString() ||
+          null;
+        const takesEffectTime = takesEffectAt ? new Date(takesEffectAt).getTime() : null;
+        const isFuture = !takesEffectTime || takesEffectTime > Date.now();
+
+        if (
+          scheduled &&
+          isFuture &&
+          (payload?.newPlan === 'pro' || payload?.newPlan === 'proplus') &&
+          (payload?.newInterval === 'month' || payload?.newInterval === 'year')
+        ) {
+          upcomingPlan = {
+            planId: payload.newPlan,
+            interval: payload.newInterval,
+            takesEffectAt,
+            changeType:
+              typeof payload?.action === 'string' && payload.action.includes('downgrade')
+                ? 'downgrade'
+                : 'upgrade',
+          };
+        }
+      } catch (error) {
+        console.warn('[Subscription API] Failed to parse plan change event data', {
+          paymentId: activeSubscription.id,
+          error,
+        });
+      }
+    }
+
     return NextResponse.json({
       subscription: {
         id: activeSubscription.id,
@@ -122,6 +171,7 @@ export async function GET() {
         periodEnd: activeSubscription.periodEnd ? activeSubscription.periodEnd.toISOString() : null,
         cancelAtPeriodEnd: activeSubscription.cancelAtPeriodEnd,
         provider: activeSubscription.provider,
+        upcomingPlan,
       },
     });
   } catch (error) {
