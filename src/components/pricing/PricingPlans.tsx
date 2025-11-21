@@ -1,7 +1,7 @@
 'use client';
 
-import { PlanPurchaseButton } from '@/components/pricing/PlanPurchaseButton';
 import { CreditPackPurchaseButton } from '@/components/pricing/CreditPackPurchaseButton';
+import { PlanPurchaseButton } from '@/components/pricing/PlanPurchaseButton';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -86,9 +86,7 @@ export function PricingPlans({ plans, creditPacks }: PricingPlansProps) {
           >
             Yearly
             {resolvedPlans.some((p) => p.yearlyPrice) && (
-              <Badge className="ml-2 bg-green-500 text-white border-0 text-xs px-2">
-                Save 20%
-              </Badge>
+              <Badge className="ml-2 bg-green-500 text-white border-0 text-xs px-2">Save 20%</Badge>
             )}
           </Button>
         </div>
@@ -139,13 +137,16 @@ export function PricingPlans({ plans, creditPacks }: PricingPlansProps) {
                 <CardTitle className="text-2xl mb-2">{plan.name}</CardTitle>
                 <div className="mb-2 flex items-center justify-center gap-3">
                   {displayPrice === 0 ? (
-                    <span className="text-4xl font-bold text-gray-900">Free</span>
+                    <span className="text-4xl font-bold text-gray-900">$0</span>
                   ) : (
                     <>
                       <div className="flex flex-col items-center">
                         <div className="flex items-baseline gap-2">
                           <span className="text-4xl font-bold text-gray-900">
-                            ${billingInterval === 'year' ? (displayPrice / 12).toFixed(2) : displayPrice}
+                            $
+                            {billingInterval === 'year'
+                              ? (displayPrice / 12).toFixed(2)
+                              : displayPrice}
                           </span>
                           {billingInterval === 'year' && (
                             <span className="text-xl text-gray-400 line-through">
@@ -180,7 +181,11 @@ export function PricingPlans({ plans, creditPacks }: PricingPlansProps) {
                     let displayFeature = feature;
 
                     if (idx === 0 && feature.includes('credits')) {
-                      if (billingInterval === 'year' && plan.yearlyCredits && plan.yearlyCapacityInfo) {
+                      if (
+                        billingInterval === 'year' &&
+                        plan.yearlyCredits &&
+                        plan.yearlyCapacityInfo
+                      ) {
                         const maxImages = Math.floor(plan.yearlyCredits / 5);
                         const maxVideos = Math.floor(plan.yearlyCredits / 15);
                         displayFeature = `${plan.yearlyCredits.toLocaleString()} credits/year (up to ${maxImages} images or ${maxVideos} videos)`;
