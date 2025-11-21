@@ -18,12 +18,10 @@ export default async function PricingPage() {
     const features = [...plan.features];
 
     if (monthlyCredits > 0 && features.length > 0 && features[0].includes('credits')) {
-      const minImages = monthlyCapacity.images.flux11Ultra;
       const maxImages = monthlyCapacity.images.nanoBanana;
-      const minVideos = monthlyCapacity.videos.sora2Pro_1080p_15s;
       const maxVideos = monthlyCapacity.videos.sora2_720p_10s;
 
-      features[0] = `${monthlyCredits.toLocaleString()} credits/month (${minImages}-${maxImages} images or ${minVideos}-${maxVideos} videos)`;
+      features[0] = `${monthlyCredits.toLocaleString()} credits/month (up to ${maxImages} images or ${maxVideos} videos)`;
     }
 
     return {

@@ -47,17 +47,10 @@ export function calculateGenerationCapacity(credits: number): GenerationCapacity
 }
 
 export function formatCapacityRange(capacity: GenerationCapacity): string {
-  const minImages = capacity.images.flux11Ultra;
   const maxImages = capacity.images.nanoBanana;
-
-  const minVideos = capacity.videos.sora2Pro_1080p_15s;
   const maxVideos = capacity.videos.sora2_720p_10s;
 
-  if (minImages === maxImages) {
-    return `${maxImages} images or ${minVideos}-${maxVideos} videos`;
-  }
-
-  return `${minImages}-${maxImages} images or ${minVideos}-${maxVideos} videos`;
+  return `up to ${maxImages} images or ${maxVideos} videos`;
 }
 
 export function getYearlySavings(monthlyPrice: number, yearlyPrice: number): {
