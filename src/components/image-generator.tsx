@@ -833,9 +833,7 @@ export default function ImageGenerator() {
                       <Upload className="mx-auto mb-3 h-12 w-12 text-gray-400" />
                       <p className="mb-1 font-light text-gray-600 text-sm">{t('clickToUpload')}</p>
                       <p className="font-light text-gray-400 text-xs">{t('imageFormatDesc')}</p>
-                      <p className="mt-2 text-xs text-gray-400">
-                        Drag & drop images or click to upload (JPEG, PNG, WebP, max 10MB each)
-                      </p>
+                      <p className="mt-2 text-xs text-gray-400">{t('dragDropUpload')}</p>
                     </button>
                   ) : (
                     <div className="grid gap-4 sm:grid-cols-2">
@@ -864,7 +862,7 @@ export default function ImageGenerator() {
                             type="button"
                             onClick={() => handleRemoveImage(idx)}
                             className="absolute top-2 right-2 rounded-full bg-red-500 p-2 text-white transition-colors hover:bg-red-600"
-                            aria-label="Remove source image"
+                            aria-label={t('removeSourceImage')}
                           >
                             <X className="h-4 w-4" />
                           </button>
@@ -877,7 +875,7 @@ export default function ImageGenerator() {
                           className="flex min-h-48 w-full flex-col items-center justify-center rounded-xl border border-dashed border-gray-300 text-gray-500 transition-colors hover:border-purple-400 hover:text-purple-600"
                         >
                           <Upload className="mb-2 h-8 w-8" />
-                          <span className="text-sm font-medium">Add another image</span>
+                          <span className="text-sm font-medium">{t('addAnotherImage')}</span>
                         </button>
                       )}
                     </div>
@@ -886,14 +884,14 @@ export default function ImageGenerator() {
 
                 <div className="flex items-center justify-between text-xs text-gray-500">
                   <span>
-                    {sourceImages.length} / {MAX_SOURCE_IMAGES} images selected
+                    {t('imagesSelected', { count: sourceImages.length, max: MAX_SOURCE_IMAGES })}
                   </span>
                   <button
                     type="button"
                     onClick={triggerFileInput}
                     className="text-purple-600 font-medium hover:underline"
                   >
-                    Upload images
+                    {t('uploadImages')}
                   </button>
                 </div>
 
@@ -1030,11 +1028,11 @@ export default function ImageGenerator() {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="1:1">Square (1:1)</SelectItem>
-                    <SelectItem value="16:9">Landscape (16:9)</SelectItem>
-                    <SelectItem value="9:16">Portrait (9:16)</SelectItem>
-                    <SelectItem value="4:3">Standard (4:3)</SelectItem>
-                    <SelectItem value="3:2">Photo (3:2)</SelectItem>
+                    <SelectItem value="1:1">{t('aspectRatioSquare')}</SelectItem>
+                    <SelectItem value="16:9">{t('aspectRatioLandscape')}</SelectItem>
+                    <SelectItem value="9:16">{t('aspectRatioPortrait')}</SelectItem>
+                    <SelectItem value="4:3">{t('aspectRatioStandard')}</SelectItem>
+                    <SelectItem value="3:2">{t('aspectRatioPhoto')}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>

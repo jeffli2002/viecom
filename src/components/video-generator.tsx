@@ -92,10 +92,8 @@ export default function VideoGenerator() {
   };
 
   const videoCreditCost = getVideoCreditCost();
-  const textDefaultPrompt =
-    'A professional product video showcasing a modern smartphone rotating smoothly, highlighting its sleek design and premium features, studio lighting, clean background';
-  const imageDefaultPrompt =
-    'Create a dynamic video from this product image, smooth transitions, professional presentation';
+  const textDefaultPrompt = t('textDefaultPrompt');
+  const imageDefaultPrompt = t('imageDefaultPrompt');
 
   useEffect(() => {
     if (searchParams?.get('mode')) {
@@ -688,9 +686,9 @@ export default function VideoGenerator() {
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="sora-2">Sora 2 - {videoCreditCost} credits</SelectItem>
+                        <SelectItem value="sora-2">{t('modelSora2', { credits: videoCreditCost })}</SelectItem>
                         <SelectItem value="sora-2-pro">
-                          Sora 2 Pro - {videoCreditCost} credits
+                          {t('modelSora2Pro', { credits: videoCreditCost })}
                         </SelectItem>
                       </SelectContent>
                     </Select>
@@ -703,8 +701,8 @@ export default function VideoGenerator() {
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="16:9">Landscape (16:9)</SelectItem>
-                        <SelectItem value="9:16">Portrait (9:16)</SelectItem>
+                        <SelectItem value="16:9">{t('aspectRatioLandscape')}</SelectItem>
+                        <SelectItem value="9:16">{t('aspectRatioPortrait')}</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -724,7 +722,7 @@ export default function VideoGenerator() {
                             : 'border-gray-200 bg-white text-gray-700 hover:border-purple-300'
                         }`}
                       >
-                        <span>Standard (720P)</span>
+                        <span>{t('qualityStandard')}</span>
                         {quality === 'standard' && (
                           <svg
                             className="ml-2 h-4 w-4"
@@ -751,7 +749,7 @@ export default function VideoGenerator() {
                             : 'border-gray-200 bg-white text-gray-700 hover:border-purple-300'
                         }`}
                       >
-                        <span>High (1080P)</span>
+                        <span>{t('qualityHigh')}</span>
                         {quality === 'high' && (
                           <svg
                             className="ml-2 h-4 w-4"
@@ -785,7 +783,7 @@ export default function VideoGenerator() {
                           : 'border-gray-200 bg-white text-gray-700 hover:border-purple-300'
                       }`}
                     >
-                      <span>10 seconds</span>
+                      <span>{t('duration10')}</span>
                       {duration === 10 && (
                         <svg
                           className="ml-2 h-4 w-4"
@@ -812,7 +810,7 @@ export default function VideoGenerator() {
                           : 'border-gray-200 bg-white text-gray-700 hover:border-purple-300'
                       }`}
                     >
-                      <span>15 seconds</span>
+                      <span>{t('duration15')}</span>
                       {duration === 15 && (
                         <svg
                           className="ml-2 h-4 w-4"

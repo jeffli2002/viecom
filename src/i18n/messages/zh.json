@@ -205,7 +205,17 @@
       "minimalist": "极简主义",
       "seasonal": "季节主题",
       "infographic": "信息图表"
-    }
+    },
+    "dragDropUpload": "拖放图片或点击上传（JPEG、PNG、WebP，每个最大 10MB）",
+    "imagesSelected": "{count} / {max} 张图片已选择",
+    "uploadImages": "上传图片",
+    "addAnotherImage": "添加另一张图片",
+    "removeSourceImage": "移除源图片",
+    "aspectRatioSquare": "正方形 (1:1)",
+    "aspectRatioLandscape": "横屏 (16:9)",
+    "aspectRatioPortrait": "竖屏 (9:16)",
+    "aspectRatioStandard": "标准 (4:3)",
+    "aspectRatioPhoto": "照片 (3:2)"
   },
   "videoGeneration": {
     "title": "AI视频生成",
@@ -258,7 +268,17 @@
       "narrative-comedy": "叙事/喜剧型",
       "360-showcase": "360度展示",
       "product-demo": "产品演示"
-    }
+    },
+    "textDefaultPrompt": "专业的 product 视频，展示现代智能手机流畅旋转，突出其时尚设计和优质功能，影棚灯光，干净背景",
+    "imageDefaultPrompt": "从这张产品图片创建动态视频，流畅过渡，专业呈现",
+    "modelSora2": "Sora 2 - {credits} 积分",
+    "modelSora2Pro": "Sora 2 Pro - {credits} 积分",
+    "aspectRatioLandscape": "横屏 (16:9)",
+    "aspectRatioPortrait": "竖屏 (9:16)",
+    "duration10": "10 秒",
+    "duration15": "15 秒",
+    "qualityStandard": "标准 (720P)",
+    "qualityHigh": "高清 (1080P)"
   },
   "batchGeneration": {
     "title": "批量生成",

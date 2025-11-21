@@ -205,7 +205,17 @@
       "minimalist": "Minimalist",
       "seasonal": "Seasonal",
       "infographic": "Infographic"
-    }
+    },
+    "dragDropUpload": "Drag & drop images or click to upload (JPEG, PNG, WebP, max 10MB each)",
+    "imagesSelected": "{count} / {max} images selected",
+    "uploadImages": "Upload images",
+    "addAnotherImage": "Add another image",
+    "removeSourceImage": "Remove source image",
+    "aspectRatioSquare": "Square (1:1)",
+    "aspectRatioLandscape": "Landscape (16:9)",
+    "aspectRatioPortrait": "Portrait (9:16)",
+    "aspectRatioStandard": "Standard (4:3)",
+    "aspectRatioPhoto": "Photo (3:2)"
   },
   "videoGeneration": {
     "title": "AI Video Generation",
@@ -258,7 +268,17 @@
       "narrative-comedy": "Narrative/Comedy",
       "360-showcase": "360° Showcase",
       "product-demo": "Product Demo"
-    }
+    },
+    "textDefaultPrompt": "A professional product video showcasing a modern smartphone rotating smoothly, highlighting its sleek design and premium features, studio lighting, clean background",
+    "imageDefaultPrompt": "Create a dynamic video from this product image, smooth transitions, professional presentation",
+    "modelSora2": "Sora 2 - {credits} credits",
+    "modelSora2Pro": "Sora 2 Pro - {credits} credits",
+    "aspectRatioLandscape": "Landscape (16:9)",
+    "aspectRatioPortrait": "Portrait (9:16)",
+    "duration10": "10 seconds",
+    "duration15": "15 seconds",
+    "qualityStandard": "Standard (720P)",
+    "qualityHigh": "High (1080P)"
   },
   "batchGeneration": {
     "title": "Batch Generation",
