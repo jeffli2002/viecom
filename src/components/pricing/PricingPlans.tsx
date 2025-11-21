@@ -60,7 +60,7 @@ export function PricingPlans({ plans, creditPacks }: PricingPlansProps) {
 
   return (
     <>
-      <div className="flex justify-center mb-8">
+      <div className="flex justify-center mb-12">
         <div className="inline-flex items-center gap-3 bg-gray-100 rounded-full p-1">
           <Button
             variant={billingInterval === 'month' ? 'default' : 'ghost'}
@@ -137,23 +137,23 @@ export function PricingPlans({ plans, creditPacks }: PricingPlansProps) {
 
               <CardHeader className="text-center pb-6">
                 <CardTitle className="text-2xl mb-2">{plan.name}</CardTitle>
-                <div className="mb-2 flex items-center justify-center gap-2">
+                <div className="mb-2 flex items-center justify-center gap-3">
                   {displayPrice === 0 ? (
                     <span className="text-4xl font-bold text-gray-900">Free</span>
                   ) : (
                     <>
-                      {billingInterval === 'year' && (
-                        <span className="text-lg text-gray-400 line-through">
-                          ${(plan.price * 12).toFixed(0)}
-                        </span>
-                      )}
                       <div className="flex flex-col items-center">
-                        <div>
+                        <div className="flex items-baseline gap-2">
                           <span className="text-4xl font-bold text-gray-900">
                             ${billingInterval === 'year' ? (displayPrice / 12).toFixed(2) : displayPrice}
                           </span>
-                          <span className="text-gray-600">/mo</span>
+                          {billingInterval === 'year' && (
+                            <span className="text-xl text-gray-400 line-through">
+                              ${plan.price}
+                            </span>
+                          )}
                         </div>
+                        <span className="text-gray-600 text-sm">/mo</span>
                         {billingInterval === 'year' && (
                           <Badge className="mt-1 bg-green-500 text-white border-0 text-xs px-2">
                             Save {savings?.percentage}%
@@ -174,8 +174,8 @@ export function PricingPlans({ plans, creditPacks }: PricingPlansProps) {
                 <p className="text-sm text-gray-600 mt-2">{plan.description}</p>
               </CardHeader>
 
-              <CardContent className="space-y-6">
-                <ul className="space-y-3">
+              <CardContent className="flex flex-col h-full">
+                <ul className="space-y-3 flex-grow">
                   {plan.features.map((feature, idx) => {
                     let displayFeature = feature;
 
@@ -196,7 +196,7 @@ export function PricingPlans({ plans, creditPacks }: PricingPlansProps) {
                   })}
                 </ul>
 
-                <div className="pt-4">
+                <div className="mt-auto pt-6">
                   <PlanPurchaseButton
                     planId={plan.id as 'free' | 'pro' | 'proplus'}
                     buttonText={buttonText}
