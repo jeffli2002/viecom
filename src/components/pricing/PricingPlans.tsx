@@ -63,24 +63,24 @@ export function PricingPlans({ plans, creditPacks }: PricingPlansProps) {
       <div className="flex justify-center mb-12">
         <div className="inline-flex items-center gap-3 bg-gray-100 rounded-full p-1">
           <Button
-            variant={billingInterval === 'month' ? 'default' : 'ghost'}
+            variant="ghost"
             size="sm"
             className={`rounded-full px-6 ${
               billingInterval === 'month'
-                ? 'bg-white shadow-sm text-purple-700'
-                : 'text-gray-600 hover:text-gray-900'
+                ? 'bg-white shadow-sm text-purple-700 hover:bg-white hover:text-purple-700'
+                : 'text-gray-600 hover:text-gray-900 hover:bg-transparent'
             }`}
             onClick={() => setBillingInterval('month')}
           >
             Monthly
           </Button>
           <Button
-            variant={billingInterval === 'year' ? 'default' : 'ghost'}
+            variant="ghost"
             size="sm"
             className={`rounded-full px-6 ${
               billingInterval === 'year'
-                ? 'bg-white shadow-sm text-purple-700'
-                : 'text-gray-600 hover:text-gray-900'
+                ? 'bg-white shadow-sm text-purple-700 hover:bg-white hover:text-purple-700'
+                : 'text-gray-600 hover:text-gray-900 hover:bg-transparent'
             }`}
             onClick={() => setBillingInterval('year')}
           >
