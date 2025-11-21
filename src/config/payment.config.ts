@@ -70,6 +70,7 @@ export interface Plan {
   };
   credits: {
     monthly: number;
+    yearly?: number;
     onSignup?: number;
     onSubscribe?: number;
   };
@@ -160,6 +161,7 @@ export const paymentConfig: PaymentConfig = {
       },
       credits: {
         monthly: 500,
+        yearly: 6000,
         onSubscribe: 0,
       },
       features: [
@@ -201,6 +203,7 @@ export const paymentConfig: PaymentConfig = {
       },
       credits: {
         monthly: 900,
+        yearly: 10800,
         onSubscribe: 0,
       },
       features: [

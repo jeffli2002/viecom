@@ -1,24 +1,29 @@
 import { PricingPlans } from '@/components/pricing/PricingPlans';
 import { creditsConfig } from '@/config/credits.config';
 import { paymentConfig } from '@/config/payment.config';
+import { calculateGenerationCapacity, formatCapacityRange } from '@/lib/utils/pricing-calculator';
 import { Sparkles } from 'lucide-react';
 
 export default async function PricingPage() {
   const plans = paymentConfig.plans.map((plan) => {
     const monthlyCredits = plan.credits.monthly;
-    const creditsForCalculation = plan.credits.monthly || plan.credits.onSignup || 0;
+    const yearlyCredits = plan.credits.yearly || 0;
 
-    const imageCount = Math.floor(
-      creditsForCalculation / creditsConfig.consumption.imageGeneration['nano-banana']
-    );
-    const videoCount = Math.floor(
-      creditsForCalculation / creditsConfig.consumption.videoGeneration['sora-2-720p-10s']
-    );
+    const monthlyCapacity = calculateGenerationCapacity(monthlyCredits);
+    const yearlyCapacity = calculateGenerationCapacity(yearlyCredits);
+
+    const monthlyCapacityInfo = monthlyCredits > 0 ? formatCapacityRange(monthlyCapacity) : undefined;
+    const yearlyCapacityInfo = yearlyCredits > 0 ? formatCapacityRange(yearlyCapacity) : undefined;
 
     const features = [...plan.features];
 
-    if (monthlyCredits > 0 && features.length > 0 && features[0].includes('credits/month')) {
-      features[0] = `${monthlyCredits} credits/month (up to ${imageCount} image generation or ${videoCount} video generation)`;
+    if (monthlyCredits > 0 && features.length > 0 && features[0].includes('credits')) {
+      const minImages = monthlyCapacity.images.flux11Ultra;
+      const maxImages = monthlyCapacity.images.nanoBanana;
+      const minVideos = monthlyCapacity.videos.sora2Pro_1080p_15s;
+      const maxVideos = monthlyCapacity.videos.sora2_720p_10s;
+
+      features[0] = `${monthlyCredits.toLocaleString()} credits/month (${minImages}-${maxImages} images or ${minVideos}-${maxVideos} videos)`;
     }
 
     return {
@@ -27,16 +32,14 @@ export default async function PricingPage() {
       price: plan.price,
       yearlyPrice: plan.yearlyPrice,
       monthlyCredits,
+      yearlyCredits,
       description: plan.description,
       features,
       popular: plan.popular,
       cta: plan.id === 'free' ? 'Get Started' : `Upgrade to ${plan.name}`,
       highlighted: plan.popular,
-      savings: plan.yearlyPrice ? 'Save 20% with yearly' : undefined,
-      capacityInfo:
-        creditsForCalculation > 0
-          ? `up to ${imageCount} image generation or ${videoCount} video generation`
-          : undefined,
+      capacityInfo: monthlyCapacityInfo,
+      yearlyCapacityInfo,
       batchConcurrency: plan.limits?.batchSize,
       creemPriceIds: plan.creemPriceIds,
     };

@@ -3,11 +3,11 @@
 import { PlanPurchaseButton } from '@/components/pricing/PlanPurchaseButton';
 import { CreditPackPurchaseButton } from '@/components/pricing/CreditPackPurchaseButton';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useSubscription } from '@/hooks/use-subscription';
 import { Check } from 'lucide-react';
 import { useMemo, useState } from 'react';
-import { toast } from 'sonner';
 
 interface PricingPlan {
   id: string;
@@ -15,13 +15,14 @@ interface PricingPlan {
   price: number;
   yearlyPrice?: number;
   monthlyCredits: number;
+  yearlyCredits?: number;
   description: string;
   features: string[];
   popular: boolean;
   cta: string;
   highlighted: boolean;
-  savings?: string;
   capacityInfo?: string;
+  yearlyCapacityInfo?: string;
   batchConcurrency?: number;
   creemPriceIds?: {
     monthly?: string;
@@ -48,19 +49,75 @@ export function PricingPlans({ plans, creditPacks }: PricingPlansProps) {
   const { planId, interval, loading: loadingSubscription, cancelAtPeriodEnd } = useSubscription();
 
   const resolvedPlans = useMemo(() => plans, [plans]);
-  const [billingInterval] = useState<'month' | 'year'>('month');
+  const [billingInterval, setBillingInterval] = useState<'month' | 'year'>('year');
+
+  const calculateSavings = (monthlyPrice: number, yearlyPrice: number) => {
+    const annualMonthly = monthlyPrice * 12;
+    const savings = annualMonthly - yearlyPrice;
+    const percentage = Math.round((savings / annualMonthly) * 100);
+    return { amount: savings, percentage };
+  };
 
   return (
     <>
+      <div className="flex justify-center mb-8">
+        <div className="inline-flex items-center gap-3 bg-gray-100 rounded-full p-1">
+          <Button
+            variant={billingInterval === 'month' ? 'default' : 'ghost'}
+            size="sm"
+            className={`rounded-full px-6 ${
+              billingInterval === 'month'
+                ? 'bg-white shadow-sm text-purple-700'
+                : 'text-gray-600 hover:text-gray-900'
+            }`}
+            onClick={() => setBillingInterval('month')}
+          >
+            Monthly
+          </Button>
+          <Button
+            variant={billingInterval === 'year' ? 'default' : 'ghost'}
+            size="sm"
+            className={`rounded-full px-6 ${
+              billingInterval === 'year'
+                ? 'bg-white shadow-sm text-purple-700'
+                : 'text-gray-600 hover:text-gray-900'
+            }`}
+            onClick={() => setBillingInterval('year')}
+          >
+            Yearly
+            {resolvedPlans.some((p) => p.yearlyPrice) && (
+              <Badge className="ml-2 bg-green-500 text-white border-0 text-xs px-2">
+                Save 20%
+              </Badge>
+            )}
+          </Button>
+        </div>
+      </div>
+
       <div className="grid md:grid-cols-3 gap-6 mb-12">
         {resolvedPlans.map((plan) => {
-          // Only mark as current if BOTH plan ID AND billing interval match
-          // Pro monthly user CAN upgrade to Pro yearly (different interval)
           const isCurrent =
             !loadingSubscription &&
             planId === plan.id &&
             (interval || 'month') === billingInterval &&
             !cancelAtPeriodEnd;
+
+          const displayPrice =
+            billingInterval === 'year' && plan.yearlyPrice ? plan.yearlyPrice : plan.price;
+          const displayCredits =
+            billingInterval === 'year' && plan.yearlyCredits
+              ? plan.yearlyCredits
+              : plan.monthlyCredits;
+          const displayCapacity =
+            billingInterval === 'year' && plan.yearlyCapacityInfo
+              ? plan.yearlyCapacityInfo
+              : plan.capacityInfo;
+
+          const savings =
+            billingInterval === 'year' && plan.yearlyPrice && plan.price > 0
+              ? calculateSavings(plan.price, plan.yearlyPrice)
+              : null;
+
           const buttonText = isCurrent && !loadingSubscription ? 'Current Plan' : plan.cta;
 
           return (
@@ -81,44 +138,74 @@ export function PricingPlans({ plans, creditPacks }: PricingPlansProps) {
               <CardHeader className="text-center pb-6">
                 <CardTitle className="text-2xl mb-2">{plan.name}</CardTitle>
                 <div className="mb-2">
-                  <span className="text-4xl font-bold text-gray-900">
-                    {plan.price === 0 ? 'Free' : `$${plan.price}`}
-                  </span>
-                  {plan.price > 0 && <span className="text-gray-600">/month</span>}
+                  {displayPrice === 0 ? (
+                    <span className="text-4xl font-bold text-gray-900">Free</span>
+                  ) : (
+                    <>
+                      <span className="text-4xl font-bold text-gray-900">
+                        ${billingInterval === 'year' ? (displayPrice / 12).toFixed(2) : displayPrice}
+                      </span>
+                      <span className="text-gray-600">/month</span>
+                    </>
+                  )}
                 </div>
-                {plan.monthlyCredits > 0 && (
+
+                {billingInterval === 'year' && displayPrice > 0 && (
+                  <p className="text-sm text-gray-500">
+                    ${displayPrice}/year
+                  </p>
+                )}
+
+                {savings && (
+                  <Badge variant="outline" className="mt-2 border-green-300 text-green-700 bg-green-50">
+                    Save ${savings.amount.toFixed(0)} ({savings.percentage}%)
+                  </Badge>
+                )}
+
+                {displayCredits > 0 && (
                   <>
-                    <p className="text-sm text-purple-600 font-medium">
-                      {plan.monthlyCredits} credits/month
+                    <p className="text-sm text-purple-600 font-medium mt-2">
+                      {displayCredits.toLocaleString()} credits
+                      {billingInterval === 'year' ? '/year' : '/month'}
                     </p>
-                    {plan.capacityInfo && (
-                      <p className="text-xs text-gray-500 mt-1">{plan.capacityInfo}</p>
+                    {displayCapacity && (
+                      <p className="text-xs text-gray-500 mt-1">{displayCapacity}</p>
                     )}
                   </>
                 )}
-                {plan.savings && (
-                  <Badge variant="outline" className="mt-2 border-purple-300 text-purple-700">
-                    {plan.savings}
-                  </Badge>
-                )}
+
                 <p className="text-sm text-gray-600 mt-2">{plan.description}</p>
               </CardHeader>
 
               <CardContent className="space-y-6">
                 <ul className="space-y-3">
-                  {plan.features.map((feature) => (
-                    <li key={`${plan.id}-${feature}`} className="flex items-start gap-2">
-                      <Check className="h-5 w-5 text-green-600 flex-shrink-0 mt-0.5" />
-                      <span className="text-sm text-gray-700">{feature}</span>
-                    </li>
-                  ))}
+                  {plan.features.map((feature, idx) => {
+                    let displayFeature = feature;
+
+                    if (idx === 0 && feature.includes('credits')) {
+                      if (billingInterval === 'year' && plan.yearlyCredits) {
+                        displayFeature = feature.replace(
+                          `${plan.monthlyCredits}`,
+                          `${plan.yearlyCredits.toLocaleString()}`
+                        );
+                        displayFeature = displayFeature.replace('/month', '/year');
+                      }
+                    }
+
+                    return (
+                      <li key={`${plan.id}-${feature}-${idx}`} className="flex items-start gap-2">
+                        <Check className="h-5 w-5 text-green-600 flex-shrink-0 mt-0.5" />
+                        <span className="text-sm text-gray-700">{displayFeature}</span>
+                      </li>
+                    );
+                  })}
                 </ul>
 
                 <PlanPurchaseButton
                   planId={plan.id as 'free' | 'pro' | 'proplus'}
                   buttonText={buttonText}
                   highlighted={plan.highlighted}
-                  interval="month"
+                  interval={billingInterval}
                   isCurrentPlan={isCurrent}
                 />
               </CardContent>
@@ -159,7 +246,7 @@ export function PricingPlans({ plans, creditPacks }: PricingPlansProps) {
                 <div className="mb-2">
                   <span className="text-4xl font-bold text-gray-900">${pack.price}</span>
                 </div>
-                <p className="text-sm text-gray-600">{pack.credits} credits</p>
+                <p className="text-sm text-gray-600">{pack.credits.toLocaleString()} credits</p>
               </CardHeader>
 
               <CardContent className="space-y-4">
