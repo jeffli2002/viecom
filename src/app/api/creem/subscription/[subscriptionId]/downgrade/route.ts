@@ -59,13 +59,13 @@ export async function POST(
 
     if (newPlanId === 'free') {
       if (forceScheduleAtPeriodEnd) {
-        // Call Creem API to set cancel_at_period_end
-        console.log('[Creem Subscription Downgrade] Setting cancel_at_period_end for:', subscriptionId);
+        // Call Creem API to cancel subscription
+        console.log('[Creem Subscription Downgrade] Cancelling subscription:', subscriptionId);
         
-        const creemResult = await creemService.setCancelAtPeriodEnd(subscriptionId, true);
+        const creemResult = await creemService.cancelSubscription(subscriptionId);
         
         if (!creemResult.success) {
-          console.error('[Creem Subscription Downgrade] Failed to set cancel_at_period_end:', creemResult.error);
+          console.error('[Creem Subscription Downgrade] Failed to cancel subscription:', creemResult.error);
           return NextResponse.json(
             { 
               success: false, 
@@ -75,7 +75,7 @@ export async function POST(
           );
         }
 
-        console.log('[Creem Subscription Downgrade] Successfully set cancel_at_period_end');
+        console.log('[Creem Subscription Downgrade] Successfully cancelled subscription');
 
         // Update database: set cancelAtPeriodEnd and clear any scheduled upgrade fields
         await paymentRepository.update(paymentRecord.id, {

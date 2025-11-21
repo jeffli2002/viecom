@@ -495,45 +495,6 @@ const BillingClient = ({ plans }: BillingClientProps) => {
     }
   };
 
-  const handleDowngradeToFree = async (scheduleAtPeriodEnd = true) => {
-    if (!subscription?.subscriptionId) {
-      toast.error('No active subscription to downgrade.');
-      return;
-    }
-
-    try {
-      setActionLoading(true);
-      const response = await fetch(
-        `/api/creem/subscription/${subscription.subscriptionId}/downgrade`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          credentials: 'include',
-          body: JSON.stringify({
-            newPlanId: 'free',
-            newInterval: subscription.interval || 'month',
-            scheduleAtPeriodEnd,
-          }),
-        }
-      );
-
-      const data = await response.json().catch(() => ({}));
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Failed to update subscription');
-      }
-
-      toast.success(data.message || 'Subscription updated');
-      await fetchSubscription();
-    } catch (error) {
-      const message = error instanceof Error ? error.message : 'Failed to update subscription';
-      toast.error(message);
-    } finally {
-      setActionLoading(false);
-    }
-  };
 
   const handleReactivate = async () => {
     if (!subscription?.subscriptionId) {
@@ -843,10 +804,11 @@ const BillingClient = ({ plans }: BillingClientProps) => {
                 {!hasScheduledChange && (
                   <Button
                     variant="outline"
-                    onClick={() => handleDowngradeToFree(true)}
+                    onClick={() => router.push('/pricing')}
                     disabled={actionLoading}
                   >
-                    Schedule downgrade to Free
+                    <TrendingUp className="mr-2 h-4 w-4" />
+                    Change Plan
                   </Button>
                 )}
 
