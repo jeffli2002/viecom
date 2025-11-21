@@ -137,41 +137,38 @@ export function PricingPlans({ plans, creditPacks }: PricingPlansProps) {
 
               <CardHeader className="text-center pb-6">
                 <CardTitle className="text-2xl mb-2">{plan.name}</CardTitle>
-                <div className="mb-2">
+                <div className="mb-2 flex items-center justify-center gap-2">
                   {displayPrice === 0 ? (
                     <span className="text-4xl font-bold text-gray-900">Free</span>
                   ) : (
                     <>
-                      <span className="text-4xl font-bold text-gray-900">
-                        ${billingInterval === 'year' ? (displayPrice / 12).toFixed(2) : displayPrice}
-                      </span>
-                      <span className="text-gray-600">/month</span>
+                      {billingInterval === 'year' && (
+                        <span className="text-lg text-gray-400 line-through">
+                          ${(plan.price * 12).toFixed(0)}
+                        </span>
+                      )}
+                      <div className="flex flex-col items-center">
+                        <div>
+                          <span className="text-4xl font-bold text-gray-900">
+                            ${billingInterval === 'year' ? (displayPrice / 12).toFixed(2) : displayPrice}
+                          </span>
+                          <span className="text-gray-600">/mo</span>
+                        </div>
+                        {billingInterval === 'year' && (
+                          <Badge className="mt-1 bg-green-500 text-white border-0 text-xs px-2">
+                            Save {savings?.percentage}%
+                          </Badge>
+                        )}
+                      </div>
                     </>
                   )}
                 </div>
 
-                {billingInterval === 'year' && displayPrice > 0 && (
-                  <p className="text-sm text-gray-500">
-                    ${displayPrice}/year
-                  </p>
-                )}
-
-                {savings && (
-                  <Badge variant="outline" className="mt-2 border-green-300 text-green-700 bg-green-50">
-                    Save ${savings.amount.toFixed(0)} ({savings.percentage}%)
-                  </Badge>
-                )}
-
                 {displayCredits > 0 && (
-                  <>
-                    <p className="text-sm text-purple-600 font-medium mt-2">
-                      {displayCredits.toLocaleString()} credits
-                      {billingInterval === 'year' ? '/year' : '/month'}
-                    </p>
-                    {displayCapacity && (
-                      <p className="text-xs text-gray-500 mt-1">{displayCapacity}</p>
-                    )}
-                  </>
+                  <p className="text-sm text-purple-600 font-medium mt-2">
+                    {displayCredits.toLocaleString()} credits
+                    {billingInterval === 'year' ? '/year' : '/month'}
+                  </p>
                 )}
 
                 <p className="text-sm text-gray-600 mt-2">{plan.description}</p>
@@ -183,12 +180,10 @@ export function PricingPlans({ plans, creditPacks }: PricingPlansProps) {
                     let displayFeature = feature;
 
                     if (idx === 0 && feature.includes('credits')) {
-                      if (billingInterval === 'year' && plan.yearlyCredits) {
-                        displayFeature = feature.replace(
-                          `${plan.monthlyCredits}`,
-                          `${plan.yearlyCredits.toLocaleString()}`
-                        );
-                        displayFeature = displayFeature.replace('/month', '/year');
+                      if (billingInterval === 'year' && plan.yearlyCredits && plan.yearlyCapacityInfo) {
+                        const maxImages = Math.floor(plan.yearlyCredits / 5);
+                        const maxVideos = Math.floor(plan.yearlyCredits / 15);
+                        displayFeature = `${plan.yearlyCredits.toLocaleString()} credits/year (up to ${maxImages} images or ${maxVideos} videos)`;
                       }
                     }
 
@@ -201,13 +196,15 @@ export function PricingPlans({ plans, creditPacks }: PricingPlansProps) {
                   })}
                 </ul>
 
-                <PlanPurchaseButton
-                  planId={plan.id as 'free' | 'pro' | 'proplus'}
-                  buttonText={buttonText}
-                  highlighted={plan.highlighted}
-                  interval={billingInterval}
-                  isCurrentPlan={isCurrent}
-                />
+                <div className="pt-4">
+                  <PlanPurchaseButton
+                    planId={plan.id as 'free' | 'pro' | 'proplus'}
+                    buttonText={buttonText}
+                    highlighted={plan.highlighted}
+                    interval={billingInterval}
+                    isCurrentPlan={isCurrent}
+                  />
+                </div>
               </CardContent>
             </Card>
           );
