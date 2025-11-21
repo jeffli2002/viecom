@@ -3,6 +3,20 @@ import crypto from 'node:crypto';
 import { env } from '@/env';
 
 const getCreemTestMode = () => {
+  // Auto-detect from API key prefix
+  // Test keys: creem_test_XXXX
+  // Production keys: creem_XXXX (no additional prefix)
+  const apiKey = getCreemApiKey();
+  
+  if (apiKey.startsWith('creem_test_')) {
+    return true; // Test key → use test-api.creem.io
+  }
+  
+  if (apiKey.startsWith('creem_') && !apiKey.startsWith('creem_test_')) {
+    return false; // Production key → use api.creem.io
+  }
+  
+  // Fallback to environment variable if key format doesn't match
   const testModeEnv = env.NEXT_PUBLIC_CREEM_TEST_MODE;
   return testModeEnv === 'true';
 };
@@ -13,6 +27,14 @@ const getCreemApiKey = () => {
 
 const getCreemWebhookSecret = () => {
   return env.CREEM_WEBHOOK_SECRET || '';
+};
+
+const getCreemBaseUrl = () => {
+  // Auto-detect correct API URL based on API key type
+  // Test keys (creem_test_*) must use test-api.creem.io
+  // Production keys (creem_live_*) use api.creem.io
+  const isTestMode = getCreemTestMode();
+  return isTestMode ? 'https://test-api.creem.io' : 'https://api.creem.io';
 };
 
 export const CREEM_PRODUCTS = {
@@ -153,10 +175,112 @@ class CreemPaymentService {
       } catch (_sdkError) {
         // Fallback to direct API call if SDK not available
         console.log('[Creem] SDK not available, using direct API call');
-        const response = await fetch('https://api.creem.io/v1/checkouts', {
+        const baseUrl = getCreemBaseUrl();
+        const response = await fetch(`${baseUrl}/v1/checkouts`, {
           method: 'POST',
           headers: {
-            Authorization: `Bearer ${CREEM_API_KEY}`,
+            'x-api-key': CREEM_API_KEY,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(checkoutRequest),
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({ message: 'Unknown error' }));
+          throw new Error(errorData.message || `HTTP ${response.status}`);
+        }
+
+        const checkout = await response.json();
+        return {
+          success: true,
+          sessionId: checkout.id || checkout.checkout_id,
+          url: checkout.checkoutUrl || checkout.checkout_url,
+        };
+      }
+    } catch (error: unknown) {
+      console.error('Creem checkout session error:', error);
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Failed to create checkout session',
+      };
+    }
+  }
+
+  async createCheckoutSessionWithProductKey({
+    userId,
+    userEmail,
+    productKey,
+    successUrl,
+    cancelUrl: _cancelUrl,
+  }: {
+    userId: string;
+    userEmail: string;
+    productKey: string;
+    successUrl: string;
+    cancelUrl: string;
+  }) {
+    try {
+      const CREEM_API_KEY = getCreemApiKey();
+      const testMode = getCreemTestMode();
+
+      if (!CREEM_API_KEY) {
+        throw new Error('Creem API key not configured');
+      }
+
+      console.log('[Creem] Creating checkout with productKey:', {
+        productKey,
+        userEmail,
+        testMode,
+      });
+
+      const checkoutRequest = {
+        productId: productKey,
+        requestId: `checkout_${userId}_${Date.now()}`,
+        successUrl: successUrl,
+        metadata: {
+          userId: userId,
+          userEmail: userEmail,
+          type: 'credit_pack',
+        },
+        customer: {
+          email: userEmail,
+        },
+      };
+
+      // Use Creem SDK if available, otherwise use direct API call
+      try {
+        const { Creem } = await import('creem');
+        const creem = new Creem({
+          serverIdx: testMode ? 1 : 0,
+        });
+
+        const checkout = await creem.createCheckout({
+          xApiKey: CREEM_API_KEY,
+          createCheckoutRequest: checkoutRequest,
+        });
+
+        console.log('[Creem] Checkout created:', {
+          id: checkout.id,
+          url: checkout.checkoutUrl,
+        });
+
+        if (!checkout.checkoutUrl) {
+          throw new Error('No checkout URL in response');
+        }
+
+        return {
+          success: true,
+          sessionId: checkout.id,
+          url: checkout.checkoutUrl,
+        };
+      } catch (_sdkError) {
+        // Fallback to direct API call if SDK not available
+        console.log('[Creem] SDK not available, using direct API call');
+        const baseUrl = getCreemBaseUrl();
+        const response = await fetch(`${baseUrl}/v1/checkouts`, {
+          method: 'POST',
+          headers: {
+            'x-api-key': CREEM_API_KEY,
             'Content-Type': 'application/json',
           },
           body: JSON.stringify(checkoutRequest),
@@ -208,10 +332,11 @@ class CreemPaymentService {
         };
       } catch (_sdkError) {
         // Fallback to direct API call
-        const response = await fetch(`https://api.creem.io/v1/subscriptions/${subscriptionId}`, {
+        const baseUrl = getCreemBaseUrl();
+        const response = await fetch(`${baseUrl}/v1/subscriptions/${subscriptionId}`, {
           method: 'DELETE',
           headers: {
-            Authorization: `Bearer ${CREEM_API_KEY}`,
+            'x-api-key': CREEM_API_KEY,
           },
         });
 
@@ -278,9 +403,10 @@ class CreemPaymentService {
         };
       } catch (_sdkError) {
         // Fallback to direct API call
-        const response = await fetch(`https://api.creem.io/v1/subscriptions/${subscriptionId}`, {
+        const baseUrl = getCreemBaseUrl();
+        const response = await fetch(`${baseUrl}/v1/subscriptions/${subscriptionId}`, {
           headers: {
-            Authorization: `Bearer ${CREEM_API_KEY}`,
+            'x-api-key': CREEM_API_KEY,
           },
         });
 
@@ -348,24 +474,65 @@ class CreemPaymentService {
         };
       } catch (_sdkError) {
         // Fallback to direct API call
-        const response = await fetch(
-          `https://api.creem.io/v1/subscriptions/${subscriptionId}/upgrade`,
-          {
-            method: 'POST',
-            headers: {
-              Authorization: `Bearer ${CREEM_API_KEY}`,
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              product_id: newProductId,
-              update_behavior: useProration ? 'proration-charge' : 'proration-none',
-            }),
-          }
-        );
+        console.log('[Creem] Using direct API call for upgrade (SDK failed)');
+        const baseUrl = getCreemBaseUrl();
+        console.log('[Creem] Base URL:', baseUrl);
+        console.log('[Creem] Full URL:', `${baseUrl}/v1/subscriptions/${subscriptionId}/upgrade`);
+        
+        let response: Response;
+        try {
+          response = await fetch(
+            `${baseUrl}/v1/subscriptions/${subscriptionId}/upgrade`,
+            {
+              method: 'POST',
+              headers: {
+                'x-api-key': CREEM_API_KEY,
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                product_id: newProductId,
+                update_behavior: useProration ? 'proration-charge' : 'proration-none',
+              }),
+            }
+          );
+        } catch (fetchError) {
+          console.error('[Creem] Fetch error - network/DNS failure:', {
+            subscriptionId,
+            baseUrl,
+            error: fetchError instanceof Error ? fetchError.message : String(fetchError),
+          });
+          throw new Error(
+            `Network error: Cannot connect to Creem API at ${baseUrl}. Please check your internet connection and verify the CREEM_SANDBOX_URL environment variable. Error: ${fetchError instanceof Error ? fetchError.message : 'Unknown error'}`
+          );
+        }
 
         if (!response.ok) {
-          const errorData = await response.json().catch(() => ({ message: 'Unknown error' }));
-          throw new Error(errorData.message || `HTTP ${response.status}`);
+          const errorData = await response.json().catch(() => ({
+            message: `HTTP ${response.status}: ${response.statusText}`,
+          }));
+
+          console.error('[Creem] Upgrade API error (direct call):', {
+            status: response.status,
+            statusText: response.statusText,
+            subscriptionId,
+            newProductKey,
+            newProductId,
+            errorData,
+          });
+
+          // Provide more specific error messages
+          let errorMessage = errorData.message || `HTTP ${response.status}`;
+          if (response.status === 403) {
+            errorMessage =
+              'Forbidden: You do not have permission to upgrade this subscription. Please check your subscription status or contact support.';
+          } else if (response.status === 404) {
+            errorMessage =
+              'Subscription not found. The subscription may have been canceled or does not exist.';
+          } else if (response.status === 401) {
+            errorMessage = 'Unauthorized: Invalid API credentials. Please contact support.';
+          }
+
+          throw new Error(errorMessage);
         }
 
         const result = await response.json();
@@ -440,12 +607,13 @@ class CreemPaymentService {
           };
         } catch (_sdkError) {
           // Fallback to direct API call
+          const baseUrl = getCreemBaseUrl();
           const response = await fetch(
-            `https://api.creem.io/v1/subscriptions/${subscriptionId}/upgrade`,
+            `${baseUrl}/v1/subscriptions/${subscriptionId}/upgrade`,
             {
               method: 'POST',
               headers: {
-                Authorization: `Bearer ${CREEM_API_KEY}`,
+                'x-api-key': CREEM_API_KEY,
                 'Content-Type': 'application/json',
               },
               body: JSON.stringify({
@@ -520,10 +688,11 @@ class CreemPaymentService {
         };
       } catch (_sdkError) {
         // Fallback to direct API call
-        const response = await fetch(`https://api.creem.io/v1/subscriptions/${subscriptionId}`, {
+        const baseUrl = getCreemBaseUrl();
+        const response = await fetch(`${baseUrl}/v1/subscriptions/${subscriptionId}`, {
           method: 'PATCH',
           headers: {
-            Authorization: `Bearer ${CREEM_API_KEY}`,
+            'x-api-key': CREEM_API_KEY,
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
@@ -556,6 +725,73 @@ class CreemPaymentService {
     }
   }
 
+  async setCancelAtPeriodEnd(subscriptionId: string, cancel = true) {
+    try {
+      console.log('[Creem] Setting cancel_at_period_end:', subscriptionId, cancel);
+      const CREEM_API_KEY = getCreemApiKey();
+      if (!CREEM_API_KEY) {
+        throw new Error('Creem API key not configured');
+      }
+
+      try {
+        const { Creem } = await import('creem');
+        const creem = new Creem({
+          serverIdx: getCreemTestMode() ? 1 : 0,
+        });
+        const result = await creem.updateSubscription({
+          id: subscriptionId,
+          xApiKey: CREEM_API_KEY,
+          UpdateSubscriptionRequestEntity: {
+            cancelAtPeriodEnd: cancel,
+          },
+        });
+
+        console.log('[Creem] cancel_at_period_end updated:', subscriptionId, 'to', cancel);
+
+        return {
+          success: true,
+          subscription: result,
+        };
+      } catch (_sdkError) {
+        // Fallback to direct API call
+        const baseUrl = getCreemBaseUrl();
+        const response = await fetch(`${baseUrl}/v1/subscriptions/${subscriptionId}`, {
+          method: 'PATCH',
+          headers: {
+            'x-api-key': CREEM_API_KEY,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            cancel_at_period_end: cancel,
+          }),
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({ message: 'Unknown error' }));
+          throw new Error(errorData.message || `HTTP ${response.status}`);
+        }
+
+        const result = await response.json();
+        return {
+          success: true,
+          subscription: result,
+        };
+      }
+    } catch (error: unknown) {
+      const message = getErrorMessage(error);
+      console.error('[Creem] Set cancel_at_period_end error:', {
+        subscriptionId,
+        cancel,
+        message,
+      });
+
+      return {
+        success: false,
+        error: message || 'Failed to update subscription cancellation',
+      };
+    }
+  }
+
   async generateCustomerPortalLink(customerId: string, returnUrl: string) {
     try {
       console.log('[Creem] Generating customer portal link for:', customerId);
@@ -572,26 +808,25 @@ class CreemPaymentService {
         const result = await creem.generateCustomerLinks({
           customerId: customerId,
           xApiKey: CREEM_API_KEY,
-          returnUrl: returnUrl,
         });
 
         console.log('[Creem] Customer portal link generated');
 
         return {
           success: true,
-          url: result.url || result.portalUrl,
+          url: result.customerPortalLink,
         };
       } catch (_sdkError) {
         // Fallback to direct API call
-        const response = await fetch('https://api.creem.io/v1/customer/portal', {
+        const baseUrl = getCreemBaseUrl();
+        const response = await fetch(`${baseUrl}/v1/customers/billing`, {
           method: 'POST',
           headers: {
-            Authorization: `Bearer ${CREEM_API_KEY}`,
+            'x-api-key': CREEM_API_KEY,
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
             customer_id: customerId,
-            return_url: returnUrl,
           }),
         });
 
@@ -603,7 +838,7 @@ class CreemPaymentService {
         const result = await response.json();
         return {
           success: true,
-          url: result.url || result.portal_url,
+          url: result.customer_portal_link,
         };
       }
     } catch (error: unknown) {
@@ -742,18 +977,63 @@ class CreemPaymentService {
   private async handleCheckoutComplete(checkout: CreemCheckoutPayload) {
     const { customer, subscription, metadata, order } = checkout;
 
-    const userId = metadata?.userId || customer?.external_id;
-    const planId = metadata?.planId || this.getPlanFromProduct(order?.product);
+    // Handle customer as string or object
+    const customerId =
+      typeof customer === 'string'
+        ? customer
+        : (customer as { id?: string } | undefined)?.id || checkout.customerId;
+    const customerObj =
+      typeof customer === 'object' ? (customer as { external_id?: string }) : undefined;
 
+    // Handle subscription as string or object
     const subscriptionId =
-      subscription?.id || subscription?.subscription_id || checkout.subscription_id;
+      typeof subscription === 'string'
+        ? subscription
+        : (subscription as { id?: string } | undefined)?.id ||
+          (subscription as { subscription_id?: string } | undefined)?.subscription_id ||
+          checkout.subscription_id;
+
+    // Extract userId from metadata or customer
+    const userId =
+      (metadata as { userId?: string } | undefined)?.userId ||
+      customerObj?.external_id ||
+      (checkout as { userId?: string }).userId;
+
+    // Extract planId from metadata, order, or subscription
+    const orderProduct = (order as { product?: string | { id?: string } } | undefined)?.product;
+    const subscriptionProduct = (subscription as { product?: string | { id?: string } } | undefined)
+      ?.product;
+
+    const orderProductId = typeof orderProduct === 'string' ? orderProduct : orderProduct?.id;
+    const subscriptionProductId =
+      typeof subscriptionProduct === 'string' ? subscriptionProduct : subscriptionProduct?.id;
+
+    const planId =
+      (metadata as { planId?: string } | undefined)?.planId ||
+      (orderProductId ? this.getPlanFromProduct(orderProductId) : undefined) ||
+      (subscriptionProductId ? this.getPlanFromProduct(subscriptionProductId) : undefined);
+
+    // Extract billing interval from subscription or order
+    const subscriptionObj = typeof subscription === 'object' ? subscription : undefined;
+    const billingInterval =
+      (subscriptionObj as { billing_period?: string } | undefined)?.billing_period ||
+      (order as { billing_period?: string } | undefined)?.billing_period ||
+      (checkout as { billingInterval?: string }).billingInterval;
+
+    // Extract status from subscription
+    const status =
+      (subscriptionObj as { status?: string } | undefined)?.status ||
+      (checkout as { status?: string }).status;
 
     return {
       type: 'checkout_complete',
-      userId: userId,
-      customerId: customer?.id,
-      subscriptionId: subscriptionId,
-      planId: planId,
+      userId: userId as string | undefined,
+      customerId: customerId as string | undefined,
+      subscriptionId: subscriptionId as string | undefined,
+      planId: planId as string | undefined,
+      productId: (subscriptionProductId || orderProductId) as string | undefined,
+      billingInterval: billingInterval as string | undefined,
+      status: status as string | undefined,
     };
   }
 
@@ -766,11 +1046,21 @@ class CreemPaymentService {
       canceled_at,
       product,
       cancel_at_period_end,
+      id,
     } = subscription;
 
     const customerId = typeof customer === 'string' ? customer : customer?.id;
     const userId = metadata?.userId;
-    const planId = metadata?.planId || this.getPlanFromProduct(product?.id);
+    const productId = typeof product === 'string' ? product : product?.id;
+
+    // SIMPLIFIED: Use metadata first (like im2prompt), then product
+    // This avoids conflicts when Creem sends subscription.update immediately after upgrade
+    const planId = metadata?.planId || this.getPlanFromProduct(productId);
+
+    // Extract billing interval from product
+    const productObj = typeof product === 'object' ? product : undefined;
+    const billingPeriod = (productObj as { billing_period?: string })?.billing_period;
+    const interval = billingPeriod === 'every-year' ? 'year' : 'month';
 
     return {
       type: 'subscription_update',
@@ -778,8 +1068,11 @@ class CreemPaymentService {
       status: status,
       userId: userId,
       planId: planId,
+      productId: productId,
+      interval: interval,
       currentPeriodEnd: current_period_end_date ? new Date(current_period_end_date) : undefined,
       cancelAtPeriodEnd: cancel_at_period_end || !!canceled_at,
+      subscriptionId: id,
     };
   }
 
@@ -908,13 +1201,26 @@ class CreemPaymentService {
     };
   }
 
-  private getPlanFromProduct(productId: string): string {
-    if (!productId) return 'free';
+  private getPlanFromProduct(productId: string | undefined): string {
+    if (!productId || typeof productId !== 'string') return 'free';
 
-    if (productId.includes('proplus')) {
+    // Check product ID against CREEM_PRODUCTS to determine plan
+    if (
+      productId === CREEM_PRODUCTS.proplus_monthly ||
+      productId === CREEM_PRODUCTS.proplus_yearly
+    ) {
       return 'proplus';
     }
-    if (productId.includes('pro')) {
+    if (productId === CREEM_PRODUCTS.pro_monthly || productId === CREEM_PRODUCTS.pro_yearly) {
+      return 'pro';
+    }
+
+    // Fallback: check if product ID contains plan name
+    const productIdLower = productId.toLowerCase();
+    if (productIdLower.includes('proplus')) {
+      return 'proplus';
+    }
+    if (productIdLower.includes('pro')) {
       return 'pro';
     }
 
@@ -927,4 +1233,4 @@ class CreemPaymentService {
 }
 
 export const creemService = new CreemPaymentService();
-export { getCreemTestMode, getCreemApiKey };
+export { getCreemTestMode, getCreemApiKey, getCreemBaseUrl };

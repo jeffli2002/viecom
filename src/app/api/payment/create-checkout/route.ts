@@ -24,23 +24,53 @@ export async function POST(request: NextRequest) {
     const {
       planId,
       interval = 'month',
+      productKey,
       successUrl,
       cancelUrl,
     } = body as {
       planId?: 'pro' | 'proplus';
       interval?: 'month' | 'year';
+      productKey?: string;
       successUrl?: string;
       cancelUrl?: string;
     };
 
-    if (!planId) {
-      return NextResponse.json({ error: 'Missing planId' }, { status: 400 });
+    if (!planId && !productKey) {
+      return NextResponse.json({ error: 'Missing planId or productKey' }, { status: 400 });
     }
 
     if (!successUrl || !cancelUrl) {
       return NextResponse.json({ error: 'Missing success/cancel URLs' }, { status: 400 });
     }
 
+    // If productKey is provided (credit pack purchase), skip subscription checks
+    if (productKey) {
+      console.log('[Create Checkout] Credit pack purchase with productKey:', productKey);
+      
+      const checkout = await creemService.createCheckoutSessionWithProductKey({
+        userId: session.user.id,
+        userEmail: session.user.email,
+        productKey,
+        successUrl,
+        cancelUrl,
+      });
+
+      if (!checkout.success || !checkout.url) {
+        console.error('[Create Checkout] Creem service returned error', checkout);
+        return NextResponse.json(
+          { error: checkout.error || 'Failed to create checkout session' },
+          { status: 400 }
+        );
+      }
+
+      return NextResponse.json({
+        success: true,
+        sessionId: checkout.sessionId,
+        url: checkout.url,
+      });
+    }
+
+    // For subscriptions, check for active subscription first
     const activeSubscription = await paymentRepository.findActiveSubscriptionByUserId(
       session.user.id
     );
@@ -76,16 +106,12 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const currentPlanForCheckout: 'free' | 'pro' | 'proplus' = activeSubscription
-      ? activeSubscription.priceId.includes('proplus')
-        ? 'proplus'
-        : 'pro'
-      : 'free';
+    const currentPlanForCheckout: 'free' | 'pro' | 'proplus' = 'free';
 
     const checkout = await creemService.createCheckoutSession({
       userId: session.user.id,
       userEmail: session.user.email,
-      planId,
+      planId: planId!,
       interval,
       successUrl,
       cancelUrl,

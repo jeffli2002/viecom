@@ -23,7 +23,9 @@ export const dynamic = 'force-dynamic';
 
 /**
  * Adjust credits when changing plans (upgrade/downgrade) or intervals
+ * @deprecated This function is no longer used. Credits are now granted via grantSubscriptionCredits when scheduled upgrades take effect.
  */
+// biome-ignore lint/correctness/noUnusedVariables: Kept for reference, may be used in future
 async function adjustCreditsForPlanChange(
   userId: string,
   oldPlanIdentifier: string,
@@ -381,15 +383,39 @@ async function handleCheckoutComplete(data: CreemWebhookData) {
     status: incomingStatus,
   } = data;
 
-  if (!userId || !planId) {
-    console.error('[Creem Webhook] Missing required data for checkout complete');
+  console.log('[Creem Webhook] handleCheckoutComplete called with:', {
+    userId,
+    customerId,
+    subscriptionId,
+    planId,
+    billingInterval,
+    status: incomingStatus,
+  });
+
+  if (!userId) {
+    console.error('[Creem Webhook] Missing userId for checkout complete', { data });
+    return;
+  }
+
+  if (!planId) {
+    console.error('[Creem Webhook] Missing planId for checkout complete', { data });
     return;
   }
 
   try {
+    // Enforce single active subscription rule BEFORE processing
+    const activeCount = await paymentRepository.getActiveSubscriptionCount(userId);
+    if (activeCount > 1) {
+      console.warn(
+        `[Creem Webhook] User ${userId} has ${activeCount} active subscriptions - enforcing rule`
+      );
+      await paymentRepository.enforceSingleActiveSubscription(userId);
+    }
+
     if (subscriptionId) {
       const existingRecord = await paymentRepository.findBySubscriptionId(subscriptionId);
       if (!existingRecord) {
+        // New subscription - create record
         const normalizedStatus = normalizeCreemStatus(
           incomingStatus || (trialEnd ? 'trialing' : 'active')
         );
@@ -417,7 +443,99 @@ async function handleCheckoutComplete(data: CreemWebhookData) {
           );
         }
       } else {
-        console.log(`[Creem Webhook] Subscription ${subscriptionId} already exists`);
+        // Existing subscription - handle upgrade/downgrade
+        console.log(
+          `[Creem Webhook] Subscription ${subscriptionId} already exists, checking for plan change`
+        );
+
+        const oldPlanId = existingRecord.priceId;
+        const newPlanId = planId;
+        const oldInterval = existingRecord.interval || 'month';
+        const newInterval = billingInterval === 'year' ? 'year' : 'month';
+
+        const planChanged = oldPlanId !== newPlanId;
+        const intervalChanged = oldInterval !== newInterval;
+
+        if (planChanged || intervalChanged) {
+          console.log(
+            `[Creem Webhook] Plan/interval change detected in checkout: ${oldPlanId} ${oldInterval} → ${newPlanId} ${newInterval}`
+          );
+
+          // Check if this is an upgrade (from metadata or plan comparison)
+          const isUpgrade =
+            (oldPlanId === 'pro' && newPlanId === 'proplus') ||
+            (oldPlanId === 'free' && (newPlanId === 'pro' || newPlanId === 'proplus'));
+
+          const normalizedStatus = normalizeCreemStatus(
+            incomingStatus || (trialEnd ? 'trialing' : 'active')
+          );
+
+          // 方案2: 对于升级，应该延迟生效（在周期结束时生效）
+          // 设置 scheduled 字段，保持当前 priceId 不变
+          // 积分将在周期结束时通过 handleSubscriptionUpdate 发放
+          if (isUpgrade) {
+            // Calculate when the upgrade should take effect (current period end)
+            const currentPeriodEnd = existingRecord.periodEnd;
+            const estimatedEffectiveDate =
+              currentPeriodEnd ||
+              (() => {
+                const base = existingRecord.periodStart
+                  ? new Date(existingRecord.periodStart)
+                  : new Date();
+                const monthsToAdd = (existingRecord.interval === 'year' ? 12 : 1) || 1;
+                base.setMonth(base.getMonth() + monthsToAdd);
+                return base;
+              })();
+
+            // Calculate next period end for scheduled upgrade
+            const nextPeriodEnd = (() => {
+              const base = new Date(estimatedEffectiveDate);
+              const monthsToAdd = newInterval === 'year' ? 12 : 1;
+              base.setMonth(base.getMonth() + monthsToAdd);
+              return base;
+            })();
+
+            // Set scheduled upgrade fields - do NOT update priceId yet
+            await paymentRepository.update(existingRecord.id, {
+              status: normalizedStatus,
+              // Keep current priceId (Pro), set scheduled fields for Pro+
+              scheduledPlanId: newPlanId,
+              scheduledInterval: newInterval,
+              scheduledPeriodStart: estimatedEffectiveDate,
+              scheduledPeriodEnd: nextPeriodEnd,
+              scheduledAt: new Date(),
+            });
+
+            console.log(
+              `[Creem Webhook] Scheduled upgrade set: ${oldPlanId} → ${newPlanId} will take effect at ${estimatedEffectiveDate.toISOString()}. Credits will be granted when upgrade takes effect.`
+            );
+          } else {
+            // Downgrade or other change - update immediately
+            await paymentRepository.update(existingRecord.id, {
+              priceId: newPlanId,
+              productId: data.productId,
+              interval: newInterval,
+              status: normalizedStatus,
+              // Clear any existing scheduled upgrade
+              scheduledPlanId: null,
+              scheduledInterval: null,
+              scheduledPeriodStart: null,
+              scheduledPeriodEnd: null,
+              scheduledAt: null,
+            });
+          }
+        } else {
+          // No plan change, just update status if needed
+          const normalizedStatus = normalizeCreemStatus(
+            incomingStatus || (trialEnd ? 'trialing' : 'active')
+          );
+
+          if (existingRecord.status !== normalizedStatus) {
+            await paymentRepository.update(existingRecord.id, {
+              status: normalizedStatus,
+            });
+          }
+        }
       }
     }
 
@@ -450,6 +568,16 @@ async function handleSubscriptionCreated(data: CreemWebhookData) {
   }
 
   try {
+    // Enforce single active subscription rule BEFORE processing
+    const ownerUserId = userId || customerId;
+    const activeCount = await paymentRepository.getActiveSubscriptionCount(ownerUserId);
+    if (activeCount > 0) {
+      console.warn(
+        `[Creem Webhook] User ${ownerUserId} already has ${activeCount} active subscription(s) - enforcing rule`
+      );
+      await paymentRepository.enforceSingleActiveSubscription(ownerUserId);
+    }
+
     const existingRecord = await paymentRepository.findBySubscriptionId(subscriptionId);
 
     const normalizedStatus = normalizeCreemStatus(status);
@@ -522,6 +650,16 @@ async function handleSubscriptionUpdate(data: CreemWebhookData) {
   } = data;
 
   try {
+    console.log('[Creem Webhook] handleSubscriptionUpdate called with:', {
+      subscriptionId,
+      customerId,
+      userId,
+      planId,
+      productId: data.productId,
+      status,
+      currentPeriodEnd,
+    });
+
     let actualUserId = userId;
     let targetSubscription = null;
 
@@ -581,7 +719,18 @@ async function handleSubscriptionUpdate(data: CreemWebhookData) {
       const planChanged = oldPlanId !== newPlanId;
       const intervalChanged = oldInterval !== newInterval;
 
-      if (planChanged || intervalChanged) {
+      // Check if scheduled upgrade is already set (by upgrade API endpoint)
+      // If so, this webhook is just notification of the API call, not an actual plan change
+      const alreadyScheduled =
+        targetSubscription.scheduledPlanId && targetSubscription.scheduledPlanId === newPlanId;
+
+      if (alreadyScheduled) {
+        console.log(
+          `[Creem Webhook] Scheduled upgrade already set by API endpoint: ${oldPlanId} → ${newPlanId}. Skipping duplicate scheduling.`
+        );
+        // Don't process plan change - it's already scheduled by the upgrade API endpoint
+        // The actual upgrade will be processed when the renewal webhook arrives at period end
+      } else if (planChanged || intervalChanged) {
         console.log(
           `[Creem Webhook] Plan/interval change detected: ${oldPlanId} ${oldInterval} → ${newPlanId} ${newInterval} (from priceId: ${oldPriceId} → ${newPriceId})`
         );
@@ -591,32 +740,77 @@ async function handleSubscriptionUpdate(data: CreemWebhookData) {
         const newCreditInfo = getCreditsForPlan(newPlanId, newInterval);
         const creditDifference = newCreditInfo.amount - oldCreditInfo.amount;
 
+        // 所有付费用户升级和降级都需要等到下个订阅周期开始时生效
+        // 不立即应用积分变更，而是在周期结束时通过 scheduled 字段处理
         if (creditDifference !== 0) {
           const isDowngrade = creditDifference < 0;
+          const isUpgrade = creditDifference > 0;
 
-          if (isDowngrade) {
-            // Downgrade: Schedule for period end, don't deduct credits immediately
-            // The downgrade will be processed when the period ends (in renewal detection)
+          if (isUpgrade) {
+            // 升级：设置 scheduled 字段，延迟生效
+            const currentPeriodEnd = targetSubscription.periodEnd;
+            const estimatedEffectiveDate =
+              currentPeriodEnd ||
+              (() => {
+                const base = targetSubscription.periodStart
+                  ? new Date(targetSubscription.periodStart)
+                  : new Date();
+                const monthsToAdd = (oldInterval === 'year' ? 12 : 1) || 1;
+                base.setMonth(base.getMonth() + monthsToAdd);
+                return base;
+              })();
+
+            const nextPeriodEnd = (() => {
+              const base = new Date(estimatedEffectiveDate);
+              const monthsToAdd = newInterval === 'year' ? 12 : 1;
+              base.setMonth(base.getMonth() + monthsToAdd);
+              return base;
+            })();
+
             console.log(
-              `[Creem Webhook] Downgrade detected (${creditDifference} credits). Scheduled for period end. Credits will be adjusted at renewal.`
+              `[Creem Webhook] Upgrade detected: ${oldPlanId} → ${newPlanId}. Scheduling for period end. Credits will be granted when upgrade takes effect.`
             );
-            // Set cancelAtPeriodEnd to indicate downgrade is scheduled
+
             await paymentRepository.update(targetSubscription.id, {
-              cancelAtPeriodEnd: true,
+              scheduledPlanId: newPlanId,
+              scheduledInterval: newInterval,
+              scheduledPeriodStart: estimatedEffectiveDate,
+              scheduledPeriodEnd: nextPeriodEnd,
+              scheduledAt: new Date(),
             });
-          } else {
-            // Upgrade: Apply credit difference immediately
+          } else if (isDowngrade) {
+            // 降级：设置 scheduled 字段，延迟生效
+            const currentPeriodEnd = targetSubscription.periodEnd;
+            const estimatedEffectiveDate =
+              currentPeriodEnd ||
+              (() => {
+                const base = targetSubscription.periodStart
+                  ? new Date(targetSubscription.periodStart)
+                  : new Date();
+                const monthsToAdd = (oldInterval === 'year' ? 12 : 1) || 1;
+                base.setMonth(base.getMonth() + monthsToAdd);
+                return base;
+              })();
+
+            const nextPeriodEnd = (() => {
+              const base = new Date(estimatedEffectiveDate);
+              const monthsToAdd = newInterval === 'year' ? 12 : 1;
+              base.setMonth(base.getMonth() + monthsToAdd);
+              return base;
+            })();
+
             console.log(
-              `[Creem Webhook] Upgrade detected: ${creditDifference} credits. Applying immediately.`
+              `[Creem Webhook] Downgrade detected: ${oldPlanId} → ${newPlanId}. Scheduling for period end. Credits will be adjusted when downgrade takes effect.`
             );
-            await adjustCreditsForPlanChange(
-              actualUserId,
-              oldPlanId,
-              newPlanId,
-              targetSubscription.id,
-              oldInterval,
-              newInterval
-            );
+
+            await paymentRepository.update(targetSubscription.id, {
+              scheduledPlanId: newPlanId,
+              scheduledInterval: newInterval,
+              scheduledPeriodStart: estimatedEffectiveDate,
+              scheduledPeriodEnd: nextPeriodEnd,
+              scheduledAt: new Date(),
+              cancelAtPeriodEnd: false, // 降级不是取消
+            });
           }
         } else {
           console.log('[Creem Webhook] No credit adjustment needed (same credit amount)');
@@ -672,61 +866,172 @@ async function handleSubscriptionUpdate(data: CreemWebhookData) {
           `[Creem Webhook] Renewal detected for ${newPlanId} (period ${previousPeriodEnd?.toISOString()} → ${nextPeriodEnd.toISOString()})`
         );
 
-        // Check if this is a downgrade that was scheduled for period end
-        const wasScheduledDowngrade = targetSubscription.cancelAtPeriodEnd && planChanged;
+        // 方案2: 检查是否有 scheduled upgrade
+        const hasScheduledUpgrade =
+          targetSubscription.scheduledPlanId &&
+          targetSubscription.scheduledPeriodStart &&
+          nextPeriodEnd &&
+          new Date(targetSubscription.scheduledPeriodStart).getTime() <= nextPeriodEnd.getTime();
 
-        if (wasScheduledDowngrade) {
-          // Downgrade scheduled for period end: grant full credits for new plan
-          // This is like starting a new subscription with the new plan
+        if (hasScheduledUpgrade) {
+          // Scheduled upgrade 生效：使用 scheduled 计划信息
+          const scheduledPlanId = targetSubscription.scheduledPlanId;
+          const scheduledInterval = targetSubscription.scheduledInterval || newInterval;
+          const scheduledPeriodStart = targetSubscription.scheduledPeriodStart;
+          const scheduledPeriodEnd = targetSubscription.scheduledPeriodEnd || nextPeriodEnd;
+
           console.log(
-            `[Creem Webhook] Processing scheduled downgrade: old plan ${oldPlanId} ${oldInterval} ended, starting new plan ${newPlanId} ${newInterval}`
+            `[Creem Webhook] Processing scheduled upgrade: ${oldPlanId} ${oldInterval} → ${scheduledPlanId} ${scheduledInterval}`
           );
 
           // Grant full credits for the new plan (like a new subscription)
           await grantSubscriptionCredits(
             actualUserId,
-            newPlanId || 'free',
+            scheduledPlanId,
             targetSubscription.id,
-            newInterval,
-            false // Not a renewal, it's a new plan start
+            scheduledInterval,
+            false // Not a renewal, it's a plan upgrade
           );
 
-          // Update plan info now that period has ended
+          // Update plan info: apply scheduled upgrade
           await paymentRepository.update(targetSubscription.id, {
             status: newStatus,
-            periodEnd: nextPeriodEnd,
-            cancelAtPeriodEnd: false, // Clear the downgrade flag
-            priceId: newPlanId,
-            interval: newInterval,
+            priceId: scheduledPlanId,
+            productId: newProductId,
+            interval: scheduledInterval,
+            periodStart: scheduledPeriodStart,
+            periodEnd: scheduledPeriodEnd,
+            cancelAtPeriodEnd: cancelAtPeriodEnd,
+            // Clear scheduled upgrade fields
+            scheduledPlanId: null,
+            scheduledInterval: null,
+            scheduledPeriodStart: null,
+            scheduledPeriodEnd: null,
+            scheduledAt: null,
           });
         } else {
-          // Normal renewal: grant full credits for the new period
-          await grantSubscriptionCredits(
-            actualUserId,
-            newPlanId,
-            targetSubscription.id,
-            newInterval,
-            true
+          // 检查是否有 scheduled downgrade（通过 scheduledPlanId 检测）
+          const hasScheduledDowngrade =
+            targetSubscription.scheduledPlanId &&
+            targetSubscription.scheduledPeriodStart &&
+            nextPeriodEnd &&
+            new Date(targetSubscription.scheduledPeriodStart).getTime() <=
+              nextPeriodEnd.getTime() &&
+            (targetSubscription.scheduledPlanId === 'pro' ||
+              targetSubscription.scheduledPlanId === 'free');
+
+          if (hasScheduledDowngrade) {
+            // Scheduled downgrade 生效：使用 scheduled 计划信息
+            const scheduledPlanId = targetSubscription.scheduledPlanId;
+            const scheduledInterval = targetSubscription.scheduledInterval || newInterval;
+            const scheduledPeriodStart = targetSubscription.scheduledPeriodStart;
+            const scheduledPeriodEnd = targetSubscription.scheduledPeriodEnd || nextPeriodEnd;
+
+            console.log(
+              `[Creem Webhook] Processing scheduled downgrade: ${oldPlanId} ${oldInterval} → ${scheduledPlanId} ${scheduledInterval}`
+            );
+
+            // Grant full credits for the new plan (like a new subscription)
+            // 如果降级到 Free，不发放积分；如果降级到 Pro，发放 Pro 的完整积分
+            if (scheduledPlanId !== 'free') {
+              await grantSubscriptionCredits(
+                actualUserId,
+                scheduledPlanId,
+                targetSubscription.id,
+                scheduledInterval,
+                false // Not a renewal, it's a plan change
+              );
+            }
+
+            // Update plan info: apply scheduled downgrade
+            await paymentRepository.update(targetSubscription.id, {
+              status: newStatus,
+              priceId: scheduledPlanId,
+              productId: newProductId,
+              interval: scheduledInterval,
+              periodStart: scheduledPeriodStart,
+              periodEnd: scheduledPeriodEnd,
+              cancelAtPeriodEnd: cancelAtPeriodEnd,
+              // Clear scheduled downgrade fields
+              scheduledPlanId: null,
+              scheduledInterval: null,
+              scheduledPeriodStart: null,
+              scheduledPeriodEnd: null,
+              scheduledAt: null,
+            });
+          } else {
+            // Normal renewal: grant full credits for the new period
+            await grantSubscriptionCredits(
+              actualUserId,
+              newPlanId,
+              targetSubscription.id,
+              newInterval,
+              true
+            );
+
+            // Update subscription info
+            await paymentRepository.update(targetSubscription.id, {
+              status: newStatus,
+              periodEnd: nextPeriodEnd,
+              cancelAtPeriodEnd: cancelAtPeriodEnd,
+              priceId: newPlanId,
+              productId: newProductId,
+              interval: newInterval,
+            });
+          }
+        }
+      } else {
+        // No renewal detected, just update subscription info
+        // But check if we need to apply scheduled upgrade based on period start
+        const hasScheduledUpgrade =
+          targetSubscription.scheduledPlanId &&
+          targetSubscription.scheduledPeriodStart &&
+          nextPeriodEnd &&
+          new Date(targetSubscription.scheduledPeriodStart).getTime() <= nextPeriodEnd.getTime();
+
+        if (hasScheduledUpgrade) {
+          // Apply scheduled upgrade even if no renewal detected
+          const scheduledPlanId = targetSubscription.scheduledPlanId;
+          const scheduledInterval = targetSubscription.scheduledInterval || newInterval;
+          const scheduledPeriodStart = targetSubscription.scheduledPeriodStart;
+          const scheduledPeriodEnd = targetSubscription.scheduledPeriodEnd || nextPeriodEnd;
+
+          console.log(
+            `[Creem Webhook] Applying scheduled upgrade without renewal: ${oldPlanId} → ${scheduledPlanId}`
           );
 
-          // Update subscription info
+          await grantSubscriptionCredits(
+            actualUserId,
+            scheduledPlanId,
+            targetSubscription.id,
+            scheduledInterval,
+            false
+          );
+
+          await paymentRepository.update(targetSubscription.id, {
+            status: newStatus,
+            priceId: scheduledPlanId,
+            productId: newProductId,
+            interval: scheduledInterval,
+            periodStart: scheduledPeriodStart,
+            periodEnd: scheduledPeriodEnd,
+            cancelAtPeriodEnd: cancelAtPeriodEnd,
+            scheduledPlanId: null,
+            scheduledInterval: null,
+            scheduledPeriodStart: null,
+            scheduledPeriodEnd: null,
+            scheduledAt: null,
+          });
+        } else {
           await paymentRepository.update(targetSubscription.id, {
             status: newStatus,
             periodEnd: nextPeriodEnd,
             cancelAtPeriodEnd: cancelAtPeriodEnd,
             priceId: newPlanId,
+            productId: newProductId,
             interval: newInterval,
           });
         }
-      } else {
-        // No renewal detected, just update subscription info
-        await paymentRepository.update(targetSubscription.id, {
-          status: newStatus,
-          periodEnd: nextPeriodEnd,
-          cancelAtPeriodEnd: cancelAtPeriodEnd,
-          priceId: newPlanId,
-          interval: newInterval,
-        });
       }
 
       console.log(
@@ -736,7 +1041,14 @@ async function handleSubscriptionUpdate(data: CreemWebhookData) {
       console.warn(`[Creem Webhook] No active subscription found for user ${actualUserId}`);
     }
   } catch (error) {
-    console.error('[Creem Webhook] Error in handleSubscriptionUpdate:', error);
+    console.error('[Creem Webhook] Error in handleSubscriptionUpdate:', {
+      error,
+      subscriptionId: data.subscriptionId,
+      userId: data.userId,
+      customerId: data.customerId,
+      planId: data.planId,
+      productId: data.productId,
+    });
     throw error;
   }
 }

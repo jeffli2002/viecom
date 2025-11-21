@@ -1,12 +1,11 @@
 'use client';
 
 import { PlanPurchaseButton } from '@/components/pricing/PlanPurchaseButton';
+import { CreditPackPurchaseButton } from '@/components/pricing/CreditPackPurchaseButton';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useSubscription } from '@/hooks/use-subscription';
 import { Check } from 'lucide-react';
-import Link from 'next/link';
 import { useMemo, useState } from 'react';
 import { toast } from 'sonner';
 
@@ -41,19 +40,27 @@ interface PricingPlansProps {
     discount?: string;
     popular?: boolean;
     badge?: string;
+    creemProductKey?: string;
   }[];
 }
 
 export function PricingPlans({ plans, creditPacks }: PricingPlansProps) {
-  const { planId, loading: loadingSubscription, cancelAtPeriodEnd } = useSubscription();
+  const { planId, interval, loading: loadingSubscription, cancelAtPeriodEnd } = useSubscription();
 
   const resolvedPlans = useMemo(() => plans, [plans]);
+  const [billingInterval] = useState<'month' | 'year'>('month');
 
   return (
     <>
       <div className="grid md:grid-cols-3 gap-6 mb-12">
         {resolvedPlans.map((plan) => {
-          const isCurrent = planId === plan.id && !cancelAtPeriodEnd;
+          // Only mark as current if BOTH plan ID AND billing interval match
+          // Pro monthly user CAN upgrade to Pro yearly (different interval)
+          const isCurrent =
+            !loadingSubscription &&
+            planId === plan.id &&
+            (interval || 'month') === billingInterval &&
+            !cancelAtPeriodEnd;
           const buttonText = isCurrent && !loadingSubscription ? 'Current Plan' : plan.cta;
 
           return (
@@ -108,7 +115,7 @@ export function PricingPlans({ plans, creditPacks }: PricingPlansProps) {
                 </ul>
 
                 <PlanPurchaseButton
-                  planId={plan.id}
+                  planId={plan.id as 'free' | 'pro' | 'proplus'}
                   buttonText={buttonText}
                   highlighted={plan.highlighted}
                   interval="month"
@@ -156,18 +163,13 @@ export function PricingPlans({ plans, creditPacks }: PricingPlansProps) {
               </CardHeader>
 
               <CardContent className="space-y-4">
-                <Link href="/#pricing" className="block">
-                  <Button
-                    className={`w-full ${
-                      pack.popular
-                        ? 'bg-purple-600 hover:bg-purple-700'
-                        : 'bg-gray-800 hover:bg-gray-900'
-                    }`}
-                    size="lg"
-                  >
-                    Purchase Now
-                  </Button>
-                </Link>
+                <CreditPackPurchaseButton
+                  packId={pack.id}
+                  credits={pack.credits}
+                  price={pack.price}
+                  creemProductKey={pack.creemProductKey}
+                  popular={pack.popular}
+                />
               </CardContent>
             </Card>
           ))}

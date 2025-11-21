@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation';
 
-export default function BillingRedirectPage({
+export default async function BillingRedirectPage({
   params,
 }: {
   params: Promise<{ locale: string }>;
@@ -8,4 +8,3 @@ export default function BillingRedirectPage({
   const { locale } = await params;
   redirect(`/${locale}/settings/billing`);
 }
-

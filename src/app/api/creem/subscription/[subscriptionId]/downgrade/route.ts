@@ -51,13 +51,44 @@ export async function POST(
       );
     }
 
-    const { newPlanId, newInterval, scheduleAtPeriodEnd } = validation.data;
+    const { newPlanId, newInterval } = validation.data;
+
+    // 所有付费用户降级都需要等到下个订阅周期开始时生效
+    // 强制使用延迟生效
+    const forceScheduleAtPeriodEnd = true;
 
     if (newPlanId === 'free') {
-      if (scheduleAtPeriodEnd) {
+      if (forceScheduleAtPeriodEnd) {
+        // Call Creem API to set cancel_at_period_end
+        console.log('[Creem Subscription Downgrade] Setting cancel_at_period_end for:', subscriptionId);
+        
+        const creemResult = await creemService.setCancelAtPeriodEnd(subscriptionId, true);
+        
+        if (!creemResult.success) {
+          console.error('[Creem Subscription Downgrade] Failed to set cancel_at_period_end:', creemResult.error);
+          return NextResponse.json(
+            { 
+              success: false, 
+              error: creemResult.error || 'Failed to cancel subscription with Creem. Please try again or contact support.' 
+            },
+            { status: 500 }
+          );
+        }
+
+        console.log('[Creem Subscription Downgrade] Successfully set cancel_at_period_end');
+
+        // Update database: set cancelAtPeriodEnd and clear any scheduled upgrade fields
         await paymentRepository.update(paymentRecord.id, {
           cancelAtPeriodEnd: true,
+          // Clear scheduled upgrade fields (if Pro+ was scheduled)
+          scheduledPlanId: null,
+          scheduledInterval: null,
+          scheduledPeriodStart: null,
+          scheduledPeriodEnd: null,
+          scheduledAt: null,
         });
+
+        console.log('[Creem Subscription Downgrade] Database updated - cleared scheduled fields');
 
         await paymentRepository.createEvent({
           paymentId: paymentRecord.id,
@@ -68,58 +99,27 @@ export async function POST(
             scheduleAtPeriodEnd: true,
             periodEnd: paymentRecord.periodEnd?.toISOString(),
             takesEffectAt: paymentRecord.periodEnd?.toISOString(),
+            clearedScheduledUpgrade: !!paymentRecord.scheduledPlanId,
+            previousScheduledPlan: paymentRecord.scheduledPlanId,
           }),
         });
 
         return NextResponse.json({
           success: true,
-          message: 'Your subscription will be canceled at the end of the current billing period',
+          message: `Your subscription will be canceled at the end of the current billing period (${paymentRecord.periodEnd?.toLocaleDateString()}). You will be downgraded to the Free plan and will not be charged again.`,
           data: {
             downgraded: true,
             scheduledAtPeriodEnd: true,
+            periodEnd: paymentRecord.periodEnd?.toISOString(),
           },
         });
       }
 
-      if (!paymentRecord.subscriptionId) {
-        return NextResponse.json(
-          { success: false, error: 'Subscription is missing billing reference' },
-          { status: 400 }
-        );
-      }
-
-      const cancelResult = await creemService.cancelSubscription(paymentRecord.subscriptionId);
-
-      if (!cancelResult.success) {
-        return NextResponse.json(
-          { success: false, error: cancelResult.error || 'Failed to cancel subscription' },
-          { status: 500 }
-        );
-      }
-
-      await paymentRepository.update(paymentRecord.id, {
-        status: 'canceled',
-        cancelAtPeriodEnd: false,
-      });
-
-      await paymentRepository.createEvent({
-        paymentId: paymentRecord.id,
-        eventType: 'canceled',
-        eventData: JSON.stringify({
-          subscriptionId,
-          action: 'downgrade_to_free_immediate',
-          canceledAt: new Date().toISOString(),
-        }),
-      });
-
-      return NextResponse.json({
-        success: true,
-        message: 'Your subscription has been canceled',
-        data: {
-          downgraded: true,
-          scheduledAtPeriodEnd: false,
-        },
-      });
+      // 所有降级都需要延迟生效，不允许立即取消
+      return NextResponse.json(
+        { success: false, error: 'Downgrade to Free must be scheduled at period end' },
+        { status: 400 }
+      );
     }
 
     if (!paymentRecord.subscriptionId) {
@@ -133,10 +133,12 @@ export async function POST(
       | 'pro_monthly'
       | 'pro_yearly';
 
+    // 所有付费用户降级都需要等到下个订阅周期开始时生效
+    // 强制使用延迟生效
     const result = await creemService.downgradeSubscription(
       paymentRecord.subscriptionId,
       newProductKey,
-      scheduleAtPeriodEnd
+      true // 强制延迟生效
     );
 
     if (!result.success) {
@@ -146,59 +148,55 @@ export async function POST(
       );
     }
 
-    if (scheduleAtPeriodEnd && result.scheduledAtPeriodEnd) {
-      await paymentRepository.update(paymentRecord.id, {
-        priceId: newPlanId,
-        interval: newInterval,
-      });
+    // 计算降级生效日期（当前周期结束时间）
+    const estimatedEffectiveDate = paymentRecord.periodEnd
+      ? new Date(paymentRecord.periodEnd)
+      : (() => {
+          const base = paymentRecord.periodStart ? new Date(paymentRecord.periodStart) : new Date();
+          const monthsToAdd = (paymentRecord.interval === 'year' ? 12 : 1) || 1;
+          base.setMonth(base.getMonth() + monthsToAdd);
+          return base;
+        })();
 
-      await paymentRepository.createEvent({
-        paymentId: paymentRecord.id,
-        eventType: 'updated',
-        eventData: JSON.stringify({
-          subscriptionId,
-          oldPlan: paymentRecord.priceId,
-          oldInterval: paymentRecord.interval,
-          newPlan: newPlanId,
-          newInterval,
-          scheduledAtPeriodEnd: true,
-          periodEnd: paymentRecord.periodEnd?.toISOString(),
-          takesEffectAt: paymentRecord.periodEnd?.toISOString(),
-        }),
-      });
+    // 计算下个周期结束时间
+    const nextPeriodEnd = (() => {
+      const base = new Date(estimatedEffectiveDate);
+      const monthsToAdd = newInterval === 'year' ? 12 : 1;
+      base.setMonth(base.getMonth() + monthsToAdd);
+      return base;
+    })();
 
-      return NextResponse.json({
-        success: true,
-        message: `Your subscription will be downgraded to ${newPlanId.toUpperCase()} ${newInterval === 'year' ? 'yearly' : 'monthly'} at the end of the current period`,
-        data: {
-          downgraded: true,
-          scheduledAtPeriodEnd: true,
-        },
-      });
-    }
-
+    // 方案2: 设置 scheduled 字段，保持当前 priceId 不变
     await paymentRepository.update(paymentRecord.id, {
-      status: 'canceled',
+      scheduledPlanId: newPlanId,
+      scheduledInterval: newInterval,
+      scheduledPeriodStart: estimatedEffectiveDate,
+      scheduledPeriodEnd: nextPeriodEnd,
+      scheduledAt: new Date(),
+      cancelAtPeriodEnd: false, // 降级不是取消，只是计划变更
     });
 
     await paymentRepository.createEvent({
       paymentId: paymentRecord.id,
-      eventType: 'canceled',
+      eventType: 'updated',
       eventData: JSON.stringify({
         subscriptionId,
-        action: 'downgrade_immediate',
         oldPlan: paymentRecord.priceId,
+        oldInterval: paymentRecord.interval,
         newPlan: newPlanId,
         newInterval,
+        scheduledAtPeriodEnd: true,
+        periodEnd: paymentRecord.periodEnd?.toISOString(),
+        takesEffectAt: estimatedEffectiveDate.toISOString(),
       }),
     });
 
     return NextResponse.json({
       success: true,
-      message: 'Your subscription has been downgraded. Please complete checkout for the new plan.',
+      message: `Your subscription will be downgraded to ${newPlanId.toUpperCase()} ${newInterval === 'year' ? 'yearly' : 'monthly'} at the end of the current period`,
       data: {
         downgraded: true,
-        scheduledAtPeriodEnd: false,
+        scheduledAtPeriodEnd: true,
       },
     });
   } catch (error) {

@@ -30,16 +30,43 @@ export async function GET() {
         type: s.type,
         interval: s.interval,
         cancelAtPeriodEnd: s.cancelAtPeriodEnd,
+        provider: s.provider,
       })),
     });
 
-    const activeSubscription = await paymentRepository.findActiveSubscriptionByUserId(
+    // Find active Creem subscription
+    let activeSubscription = await paymentRepository.findActiveSubscriptionByUserId(
       session.user.id
     );
 
-    // Return null only when there is truly no active subscription
+    // Only return Creem subscriptions for this API endpoint
+    if (activeSubscription && activeSubscription.provider !== 'creem') {
+      console.warn('[Subscription API] Active subscription found but provider is not Creem:', {
+        provider: activeSubscription.provider,
+        subscriptionId: activeSubscription.id,
+      });
+      activeSubscription = null;
+    }
+
+    // If no active Creem subscription, check for any Creem subscription (even canceled)
+    // This helps with debugging and allows viewing canceled subscriptions
     if (!activeSubscription) {
-      console.log('[Subscription API] No active subscription found after filtering');
+      const creemSubscriptions = allSubscriptions.filter(
+        (s) => s.provider === 'creem' && s.type === 'subscription'
+      );
+      if (creemSubscriptions.length > 0) {
+        console.warn(
+          '[Subscription API] No active Creem subscription found. Found',
+          creemSubscriptions.length,
+          'Creem subscription(s) (may be canceled)'
+        );
+        // Don't fallback to canceled subscriptions - return null instead
+      }
+    }
+
+    // Return null if no active Creem subscription
+    if (!activeSubscription) {
+      console.log('[Subscription API] No active Creem subscription found for user');
       return NextResponse.json({ subscription: null });
     }
 
@@ -50,6 +77,7 @@ export async function GET() {
       status: activeSubscription.status,
       interval: activeSubscription.interval,
       cancelAtPeriodEnd: activeSubscription.cancelAtPeriodEnd,
+      provider: activeSubscription.provider,
     });
 
     const intervalHint = activeSubscription.interval === 'year' ? 'year' : 'month';
@@ -67,12 +95,25 @@ export async function GET() {
       status: activeSubscription.status,
     });
 
-    const resolvedPlan =
-      resolvePlanByIdentifier(activeSubscription.priceId, intervalHint) ||
-      resolvePlanByProductId(candidateProductId, intervalHint);
+    const resolvedPlanByIdentifier = resolvePlanByIdentifier(
+      activeSubscription.priceId,
+      intervalHint
+    );
+    const resolvedPlanByProduct = resolvePlanByProductId(candidateProductId, intervalHint);
+    const resolvedPlan = resolvedPlanByIdentifier || resolvedPlanByProduct;
 
-    console.log('[Subscription API] Resolved plan:', {
-      resolved: resolvedPlan
+    console.log('[Subscription API] Plan resolution:', {
+      priceId: activeSubscription.priceId,
+      productId: activeSubscription.productId,
+      candidateProductId,
+      intervalHint,
+      resolvedByIdentifier: resolvedPlanByIdentifier
+        ? { planId: resolvedPlanByIdentifier.plan.id, name: resolvedPlanByIdentifier.plan.name }
+        : null,
+      resolvedByProduct: resolvedPlanByProduct
+        ? { planId: resolvedPlanByProduct.plan.id, name: resolvedPlanByProduct.plan.name }
+        : null,
+      finalResolved: resolvedPlan
         ? { planId: resolvedPlan.plan.id, name: resolvedPlan.plan.name }
         : null,
     });
@@ -106,9 +147,7 @@ export async function GET() {
       }
     }
 
-    const latestPlanChangeEvent = await paymentRepository.findLatestPlanChangeEvent(
-      activeSubscription.id
-    );
+    // 方案2: 优先从 scheduled 字段读取即将升级的计划
     let upcomingPlan: {
       planId: 'pro' | 'proplus';
       interval: 'month' | 'year';
@@ -116,41 +155,102 @@ export async function GET() {
       changeType?: 'upgrade' | 'downgrade';
     } | null = null;
 
-    if (latestPlanChangeEvent?.eventData) {
-      try {
-        const payload = JSON.parse(latestPlanChangeEvent.eventData);
-        const scheduled =
-          payload?.scheduledAtPeriodEnd ||
-          payload?.scheduleAtPeriodEnd ||
-          (typeof payload?.action === 'string' && payload.action.includes('scheduled'));
-        const takesEffectAt =
-          payload?.takesEffectAt ||
-          payload?.periodEnd ||
-          activeSubscription.periodEnd?.toISOString() ||
-          null;
-        const takesEffectTime = takesEffectAt ? new Date(takesEffectAt).getTime() : null;
-        const isFuture = !takesEffectTime || takesEffectTime > Date.now();
+    // 方案2: 优先从 scheduled 字段读取即将升级的计划
+    // 现在 scheduled 字段已经添加到 schema，可以直接访问
+    const scheduledPlanId = activeSubscription.scheduledPlanId;
+    const scheduledInterval = activeSubscription.scheduledInterval;
+    const scheduledPeriodStart = activeSubscription.scheduledPeriodStart;
 
-        if (
-          scheduled &&
-          isFuture &&
-          (payload?.newPlan === 'pro' || payload?.newPlan === 'proplus') &&
-          (payload?.newInterval === 'month' || payload?.newInterval === 'year')
-        ) {
-          upcomingPlan = {
-            planId: payload.newPlan,
-            interval: payload.newInterval,
-            takesEffectAt,
-            changeType:
-              typeof payload?.action === 'string' && payload.action.includes('downgrade')
-                ? 'downgrade'
-                : 'upgrade',
-          };
+    console.log('[Subscription API] Checking scheduled fields:', {
+      scheduledPlanId,
+      scheduledInterval,
+      scheduledPeriodStart: scheduledPeriodStart?.toISOString(),
+    });
+
+    if (
+      scheduledPlanId &&
+      (scheduledPlanId === 'pro' || scheduledPlanId === 'proplus') &&
+      scheduledInterval &&
+      (scheduledInterval === 'month' || scheduledInterval === 'year')
+    ) {
+      // 从 scheduled 字段读取
+      const takesEffectAt = scheduledPeriodStart?.toISOString() || null;
+      const takesEffectTime = takesEffectAt ? new Date(takesEffectAt).getTime() : null;
+      const isFuture = !takesEffectTime || takesEffectTime > Date.now();
+
+      if (isFuture) {
+        // 判断是升级还是降级
+        const currentPlanId = normalizedPlanId || activeSubscription.priceId;
+        const isUpgrade =
+          (currentPlanId === 'pro' && scheduledPlanId === 'proplus') ||
+          (currentPlanId === 'free' &&
+            (scheduledPlanId === 'pro' || scheduledPlanId === 'proplus'));
+
+        upcomingPlan = {
+          planId: scheduledPlanId as 'pro' | 'proplus',
+          interval: scheduledInterval as 'month' | 'year',
+          takesEffectAt,
+          changeType: isUpgrade ? 'upgrade' : 'downgrade',
+        };
+
+        console.log(
+          '[Subscription API] Found scheduled plan change from scheduled fields:',
+          upcomingPlan
+        );
+      } else {
+        console.log('[Subscription API] Scheduled plan change is in the past, ignoring');
+      }
+    }
+
+    // Fallback: 从事件记录读取（兼容旧逻辑）
+    if (!upcomingPlan) {
+      try {
+        const latestPlanChangeEvent = await paymentRepository.findLatestPlanChangeEvent(
+          activeSubscription.id
+        );
+
+        if (latestPlanChangeEvent?.eventData) {
+          try {
+            const payload = JSON.parse(latestPlanChangeEvent.eventData);
+            const scheduled =
+              payload?.scheduledAtPeriodEnd ||
+              payload?.scheduleAtPeriodEnd ||
+              (typeof payload?.action === 'string' && payload.action.includes('scheduled'));
+            const takesEffectAt =
+              payload?.takesEffectAt ||
+              payload?.periodEnd ||
+              activeSubscription.periodEnd?.toISOString() ||
+              null;
+            const takesEffectTime = takesEffectAt ? new Date(takesEffectAt).getTime() : null;
+            const isFuture = !takesEffectTime || takesEffectTime > Date.now();
+
+            if (
+              scheduled &&
+              isFuture &&
+              (payload?.newPlan === 'pro' || payload?.newPlan === 'proplus') &&
+              (payload?.newInterval === 'month' || payload?.newInterval === 'year')
+            ) {
+              upcomingPlan = {
+                planId: payload.newPlan,
+                interval: payload.newInterval,
+                takesEffectAt,
+                changeType:
+                  typeof payload?.action === 'string' && payload.action.includes('downgrade')
+                    ? 'downgrade'
+                    : 'upgrade',
+              };
+            }
+          } catch (error) {
+            console.warn('[Subscription API] Failed to parse plan change event data', {
+              paymentId: activeSubscription.id,
+              error,
+            });
+          }
         }
       } catch (error) {
-        console.warn('[Subscription API] Failed to parse plan change event data', {
+        console.warn('[Subscription API] Failed to fetch plan change event', {
           paymentId: activeSubscription.id,
-          error,
+          error: error instanceof Error ? error.message : String(error),
         });
       }
     }
@@ -176,6 +276,14 @@ export async function GET() {
     });
   } catch (error) {
     console.error('[Creem Subscription] Error:', error);
-    return NextResponse.json({ error: 'Failed to fetch subscription' }, { status: 500 });
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error('[Creem Subscription] Error details:', {
+      message: errorMessage,
+      stack: error instanceof Error ? error.stack : undefined,
+    });
+    return NextResponse.json(
+      { error: 'Failed to fetch subscription', details: errorMessage },
+      { status: 500 }
+    );
   }
 }

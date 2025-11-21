@@ -1,5 +1,6 @@
 'use client';
 
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -7,7 +8,7 @@ import { Separator } from '@/components/ui/separator';
 import { Switch } from '@/components/ui/switch';
 import { useCreemPayment } from '@/hooks/use-creem-payment';
 import { useAuthStore } from '@/store/auth-store';
-import { Check, CreditCard, Loader2, RefreshCcw } from 'lucide-react';
+import { Calendar, Check, CreditCard, Loader2, RefreshCcw, TrendingUp } from 'lucide-react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { toast } from 'sonner';
@@ -94,28 +95,62 @@ const BillingClient = ({ plans }: BillingClientProps) => {
   const [actionLoading, setActionLoading] = useState(false);
   const [interval, setInterval] = useState<'month' | 'year'>('month');
   const [isSyncingCheckout, setIsSyncingCheckout] = useState(false);
+  const [planChangeNotice, setPlanChangeNotice] = useState<{
+    type: 'upgrade' | 'downgrade';
+    planId?: PlanId | null;
+  } | null>(null);
 
   const fetchSubscription = useCallback(async () => {
+    console.log('[Billing] Fetching subscription...');
     setLoading(true);
     try {
       const response = await fetch('/api/creem/subscription', {
         credentials: 'include',
       });
+      if (response.status === 401) {
+        if (isAuthenticated) {
+          toast.error('Session expired. Please sign in again.');
+          router.push('/login');
+        }
+        setSubscription(null);
+        return;
+      }
       const data = await response.json().catch(() => ({}));
 
       if (!response.ok) {
-        throw new Error(data.error || 'Failed to load subscription');
+        console.warn('[Billing] Failed to load subscription', data);
+        setSubscription(null);
+        return;
       }
 
       setSubscription(data.subscription || null);
+
+      // Debug: Log subscription data to help diagnose notification display issues
+      if (data.subscription) {
+        console.log('[Billing] Subscription data received:', {
+          id: data.subscription.id,
+          subscriptionId: data.subscription.subscriptionId,
+          planName: data.subscription.planName,
+          planId: data.subscription.planId,
+          status: data.subscription.status,
+          upcomingPlan: data.subscription.upcomingPlan,
+          hasUpcomingPlan: Boolean(data.subscription.upcomingPlan),
+        });
+
+        // Warn if subscriptionId is missing
+        if (!data.subscription.subscriptionId) {
+          console.warn(
+            '[Billing] WARNING: subscriptionId is missing! This will cause upgrade/downgrade to fail.'
+          );
+        }
+      }
     } catch (error) {
-      const message = error instanceof Error ? error.message : 'Failed to load subscription';
-      toast.error(message);
+      console.error('[Billing] Error fetching subscription', error);
       setSubscription(null);
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [isAuthenticated, router]);
 
   useEffect(() => {
     if (!isInitialized) {
@@ -188,6 +223,158 @@ const BillingClient = ({ plans }: BillingClientProps) => {
     pathname,
   ]);
 
+  useEffect(() => {
+    if (!isInitialized || !isAuthenticated || !subscription) {
+      return;
+    }
+
+    const planChangeParam = searchParams.get('planChange') as PlanId | null;
+    const planChangeTypeParam = searchParams.get('planChangeType');
+    const sourceParam = searchParams.get('source');
+
+    if (planChangeParam && sourceParam === 'pricing') {
+      const normalizedType: 'upgrade' | 'downgrade' =
+        planChangeTypeParam === 'downgrade' ? 'downgrade' : 'upgrade';
+
+      // Auto-trigger upgrade/downgrade when coming from pricing page
+      const currentPlanId = (subscription?.planId ?? 'free') as 'free' | PlanId;
+      const targetPlanId = planChangeParam;
+
+      // Only auto-trigger if it's a different plan
+      if (currentPlanId !== targetPlanId && subscription?.subscriptionId) {
+        // Small delay to ensure UI is ready
+        const timer = setTimeout(async () => {
+          try {
+            setActionLoading(true);
+            const currentRank = planPriority[currentPlanId];
+            const targetRank = planPriority[targetPlanId];
+            const isUpgradeFlow = targetRank >= currentRank;
+            const endpoint = isUpgradeFlow ? 'upgrade' : 'downgrade';
+            const payload = isUpgradeFlow
+              ? {
+                  newPlanId: targetPlanId,
+                  newInterval: interval,
+                  useProration: false,
+                }
+              : {
+                  newPlanId: targetPlanId === 'proplus' ? 'pro' : targetPlanId,
+                  newInterval: interval,
+                  scheduleAtPeriodEnd: true,
+                };
+
+            if (!subscription.subscriptionId) {
+              throw new Error('Subscription ID is missing');
+            }
+
+            console.log('[Billing] Sending upgrade/downgrade request:', {
+              subscriptionId: subscription.subscriptionId,
+              endpoint,
+              payload,
+            });
+
+            const response = await fetch(
+              `/api/creem/subscription/${subscription.subscriptionId}/${endpoint}`,
+              {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+                credentials: 'include',
+                body: JSON.stringify(payload),
+              }
+            );
+
+            const data = await response.json().catch(() => ({}));
+
+            if (!response.ok || data.success === false) {
+              console.error('[Billing] Upgrade/downgrade failed:', {
+                status: response.status,
+                statusText: response.statusText,
+                error: data.error,
+                data,
+              });
+
+              // Provide more specific error messages
+              let errorMessage =
+                data.error ||
+                (isUpgradeFlow ? 'Failed to schedule upgrade' : 'Failed to schedule downgrade');
+
+              if (response.status === 403) {
+                errorMessage =
+                  'Forbidden: You do not have permission to modify this subscription. Please contact support.';
+              } else if (response.status === 404) {
+                errorMessage = 'Subscription not found. Please refresh the page and try again.';
+              } else if (response.status === 401) {
+                errorMessage = 'Unauthorized: Please log in again.';
+              }
+
+              throw new Error(errorMessage);
+            }
+
+            toast.success(
+              data.message ||
+                (isUpgradeFlow
+                  ? 'Your plan will upgrade at the end of the current period'
+                  : 'Your plan will downgrade at the end of the current period')
+            );
+
+            // Set plan change notice immediately
+            setPlanChangeNotice({ type: normalizedType, planId: targetPlanId });
+
+            // Refresh subscription data to get updated scheduled fields
+            // Add a small delay to ensure database update is complete
+            setTimeout(async () => {
+              console.log('[Billing] Refreshing subscription after upgrade...');
+              await fetchSubscription();
+              console.log('[Billing] Subscription refreshed, checking for upcomingPlan...');
+            }, 1000);
+          } catch (error) {
+            console.error('[Billing] Auto-upgrade failed:', error);
+            const message =
+              error instanceof Error ? error.message : 'Failed to update subscription';
+            toast.error(message);
+            // Still show the notice even if auto-upgrade fails
+            setPlanChangeNotice({ type: normalizedType, planId: targetPlanId });
+          } finally {
+            setActionLoading(false);
+          }
+        }, 500);
+
+        // Clean up URL params
+        if (pathname) {
+          const params = new URLSearchParams(searchParams);
+          params.delete('planChange');
+          params.delete('planChangeType');
+          params.delete('source');
+          const query = params.toString();
+          router.replace(query ? `${pathname}?${query}` : pathname);
+        }
+
+        return () => clearTimeout(timer);
+      }
+      // Just show notice if already on the same plan
+      setPlanChangeNotice({ type: normalizedType, planId: targetPlanId });
+
+      if (pathname) {
+        const params = new URLSearchParams(searchParams);
+        params.delete('planChange');
+        params.delete('planChangeType');
+        params.delete('source');
+        const query = params.toString();
+        router.replace(query ? `${pathname}?${query}` : pathname);
+      }
+    }
+  }, [
+    searchParams,
+    isInitialized,
+    isAuthenticated,
+    subscription,
+    pathname,
+    router,
+    interval,
+    fetchSubscription,
+  ]);
+
   const planPriority: Record<'free' | PlanId, number> = {
     free: 0,
     pro: 1,
@@ -229,6 +416,12 @@ const BillingClient = ({ plans }: BillingClientProps) => {
               scheduleAtPeriodEnd: true,
             };
 
+        console.log('[Billing] Sending upgrade/downgrade request (manual):', {
+          subscriptionId: subscription.subscriptionId,
+          endpoint,
+          payload,
+        });
+
         const response = await fetch(
           `/api/creem/subscription/${subscription.subscriptionId}/${endpoint}`,
           {
@@ -244,10 +437,28 @@ const BillingClient = ({ plans }: BillingClientProps) => {
         const data = await response.json().catch(() => ({}));
 
         if (!response.ok || data.success === false) {
-          throw new Error(
+          console.error('[Billing] Upgrade/downgrade failed (manual):', {
+            status: response.status,
+            statusText: response.statusText,
+            error: data.error,
+            data,
+          });
+
+          // Provide more specific error messages
+          let errorMessage =
             data.error ||
-              (isUpgradeFlow ? 'Failed to schedule upgrade' : 'Failed to schedule downgrade')
-          );
+            (isUpgradeFlow ? 'Failed to schedule upgrade' : 'Failed to schedule downgrade');
+
+          if (response.status === 403) {
+            errorMessage =
+              'Forbidden: You do not have permission to modify this subscription. Please contact support.';
+          } else if (response.status === 404) {
+            errorMessage = 'Subscription not found. Please refresh the page and try again.';
+          } else if (response.status === 401) {
+            errorMessage = 'Unauthorized: Please log in again.';
+          }
+
+          throw new Error(errorMessage);
         }
 
         toast.success(
@@ -372,10 +583,13 @@ const BillingClient = ({ plans }: BillingClientProps) => {
   const scheduledPlanChange = subscription?.upcomingPlan ?? null;
   const scheduledPlanDetails = useMemo(() => {
     if (!scheduledPlanChange) {
+      console.log('[Billing] No scheduled plan change found');
       return null;
     }
+    console.log('[Billing] Scheduled plan change found:', scheduledPlanChange);
     const plan = plans.find((p) => p.id === scheduledPlanChange.planId);
     if (!plan) {
+      console.warn('[Billing] Plan not found for scheduled change:', scheduledPlanChange.planId);
       return null;
     }
     const price =
@@ -385,13 +599,56 @@ const BillingClient = ({ plans }: BillingClientProps) => {
         ? plan.creditsPerInterval.year
         : plan.creditsPerInterval.month;
     const takesEffectAt = scheduledPlanChange.takesEffectAt || subscription?.periodEnd || undefined;
-    return {
+    const details = {
       plan,
       price,
       credits,
       takesEffectAt,
+      interval: scheduledPlanChange.interval,
     };
+    console.log('[Billing] Scheduled plan details:', details);
+    return details;
   }, [scheduledPlanChange, plans, subscription?.periodEnd]);
+
+  const planChangeAlert = useMemo(() => {
+    if (!planChangeNotice) {
+      return null;
+    }
+
+    const fallbackPlan = planChangeNotice.planId
+      ? plans.find((p) => p.id === planChangeNotice.planId)
+      : null;
+    const matchesScheduled =
+      scheduledPlanChange?.planId && planChangeNotice.planId
+        ? scheduledPlanChange.planId === planChangeNotice.planId
+        : false;
+    const effectiveDate = matchesScheduled
+      ? scheduledPlanDetails?.takesEffectAt || subscription?.periodEnd || null
+      : subscription?.periodEnd || null;
+    const price = matchesScheduled
+      ? scheduledPlanDetails?.price
+      : fallbackPlan
+        ? fallbackPlan.price
+        : null;
+    const credits = matchesScheduled
+      ? scheduledPlanDetails?.credits
+      : fallbackPlan
+        ? fallbackPlan.creditsPerInterval.month
+        : null;
+    const intervalLabel = matchesScheduled
+      ? scheduledPlanDetails?.interval === 'year'
+        ? 'year'
+        : 'month'
+      : 'billing cycle';
+
+    return {
+      planName: fallbackPlan?.name || planChangeNotice.planId?.toUpperCase(),
+      price,
+      credits,
+      effectiveDate,
+      intervalLabel,
+    };
+  }, [planChangeNotice, scheduledPlanDetails, scheduledPlanChange, plans, subscription?.periodEnd]);
 
   const hasScheduledChange = Boolean(scheduledPlanDetails);
   const hasScheduledCancellation = Boolean(subscription?.cancelAtPeriodEnd);
@@ -413,6 +670,96 @@ const BillingClient = ({ plans }: BillingClientProps) => {
           View your current subscription, manage payment methods, and upgrade or downgrade plans.
         </p>
       </div>
+
+      {/* Show upgrade notice at the top if there's a scheduled plan change */}
+      {hasScheduledChange && scheduledPlanDetails && (
+        <Alert className="border-purple-300 bg-gradient-to-r from-purple-50 to-violet-50 shadow-lg">
+          <AlertTitle className="flex items-center gap-2 text-lg font-bold text-purple-900">
+            <TrendingUp className="h-5 w-5 text-purple-600" />
+            Plan Upgrade Scheduled: {scheduledPlanDetails.plan.name}
+          </AlertTitle>
+          <AlertDescription className="mt-2 text-base text-purple-800">
+            <p className="font-semibold mb-2">
+              Your subscription will upgrade to{' '}
+              <span className="font-bold text-purple-900">{scheduledPlanDetails.plan.name}</span>{' '}
+              on:
+            </p>
+            <p className="mb-3">
+              <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-md bg-purple-100 text-purple-900 font-bold text-lg">
+                <Calendar className="h-4 w-4" />
+                {formatDate(scheduledPlanDetails.takesEffectAt || subscription?.periodEnd)}
+              </span>
+            </p>
+            <div className="space-y-1 text-sm">
+              <p>
+                • Billing cycle:{' '}
+                <span className="font-medium">{scheduledIntervalLabel || 'Custom billing'}</span>
+              </p>
+              <p>
+                • Price:{' '}
+                <span className="font-medium">
+                  {scheduledPlanDetails.price
+                    ? `$${scheduledPlanDetails.price.toFixed(2)}`
+                    : 'Standard rate'}
+                </span>
+              </p>
+              <p>
+                • Credits per cycle:{' '}
+                <span className="font-medium">{scheduledPlanDetails.credits}</span>
+              </p>
+            </div>
+            <p className="mt-3 pt-3 border-t border-purple-200 text-sm">
+              Your current <span className="font-medium">{subscription?.planName || 'plan'}</span>{' '}
+              remains active until then.
+            </p>
+          </AlertDescription>
+        </Alert>
+      )}
+
+      {/* Show temporary notice if plan change was just requested */}
+      {planChangeNotice && !hasScheduledChange && (
+        <Alert className="border-purple-200 bg-purple-50 text-purple-900">
+          <AlertTitle>
+            {planChangeNotice.type === 'upgrade'
+              ? `Upgrade scheduled${planChangeAlert?.planName ? `: ${planChangeAlert.planName}` : ''}`
+              : `Downgrade scheduled${planChangeAlert?.planName ? `: ${planChangeAlert.planName}` : ''}`}
+          </AlertTitle>
+          <AlertDescription>
+            {planChangeAlert ? (
+              <>
+                {planChangeNotice.type === 'upgrade' ? 'Your upgrade to ' : 'Your downgrade to '}
+                <span className="font-medium">{planChangeAlert.planName || 'the new plan'}</span>{' '}
+                will take effect{' '}
+                {planChangeAlert.effectiveDate ? (
+                  <>
+                    on{' '}
+                    <span className="font-medium">{formatDate(planChangeAlert.effectiveDate)}</span>
+                  </>
+                ) : (
+                  'at the start of your next billing cycle'
+                )}
+                . We'll automatically charge{' '}
+                {planChangeAlert.price
+                  ? `$${planChangeAlert.price.toFixed(2)}`
+                  : 'the standard rate'}{' '}
+                and add{' '}
+                {planChangeAlert.credits ? (
+                  <span className="font-medium">{planChangeAlert.credits}</span>
+                ) : (
+                  "the plan's allotted"
+                )}{' '}
+                credits for that {planChangeAlert.intervalLabel || 'cycle'}. Your current plan stays
+                active until then.
+              </>
+            ) : (
+              <>
+                Your plan change request was received. Please refresh in a moment to see the
+                schedule.
+              </>
+            )}
+          </AlertDescription>
+        </Alert>
+      )}
 
       <Card>
         <CardHeader className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
@@ -477,32 +824,6 @@ const BillingClient = ({ plans }: BillingClientProps) => {
                   )}
                 </div>
               </div>
-
-              {hasScheduledChange && scheduledPlanDetails && (
-                <div className="rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900">
-                  <p className="font-semibold">Plan change scheduled</p>
-                  <p className="mt-1">
-                    Starting{' '}
-                    <span className="font-medium">
-                      {formatDate(scheduledPlanDetails.takesEffectAt || subscription?.periodEnd)}
-                    </span>
-                    , your subscription will switch to{' '}
-                    <span className="font-medium">{scheduledPlanDetails.plan.name}</span> (
-                    {scheduledIntervalLabel || 'Custom billing'}). You will be billed{' '}
-                    {scheduledPlanDetails.price
-                      ? `$${scheduledPlanDetails.price.toFixed(2)}`
-                      : 'the standard rate'}{' '}
-                    and receive <span className="font-medium">{scheduledPlanDetails.credits}</span>{' '}
-                    credits per{' '}
-                    {scheduledPlanChange?.interval === 'year'
-                      ? 'year'
-                      : scheduledPlanChange?.interval === 'month'
-                        ? 'month'
-                        : 'billing cycle'}
-                    . Your current {subscription.planName || 'plan'} remains active until then.
-                  </p>
-                </div>
-              )}
 
               <div className="flex flex-wrap gap-3">
                 <Button

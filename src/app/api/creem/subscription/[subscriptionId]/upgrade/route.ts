@@ -31,10 +31,56 @@ export async function POST(
     }
 
     const { subscriptionId } = await params;
+
+    // Validate subscriptionId
+    if (!subscriptionId || typeof subscriptionId !== 'string') {
+      console.error('[Creem Subscription Upgrade] Invalid subscriptionId:', subscriptionId);
+      return NextResponse.json({ error: 'Invalid subscription ID' }, { status: 400 });
+    }
+
+    console.log('[Creem Subscription Upgrade] Processing upgrade request:', {
+      subscriptionId,
+      userId: session.user.id,
+      userEmail: session.user.email,
+    });
+
     const paymentRecord = await paymentRepository.findBySubscriptionId(subscriptionId);
 
-    if (!paymentRecord || paymentRecord.userId !== session.user.id) {
+    if (!paymentRecord) {
+      console.error('[Creem Subscription Upgrade] Subscription not found:', {
+        subscriptionId,
+        userId: session.user.id,
+        userEmail: session.user.email,
+      });
       return NextResponse.json({ error: 'Subscription not found' }, { status: 404 });
+    }
+
+    console.log('[Creem Subscription Upgrade] Found payment record:', {
+      subscriptionId,
+      paymentUserId: paymentRecord.userId,
+      paymentCustomerId: paymentRecord.customerId,
+      paymentStatus: paymentRecord.status,
+      paymentPriceId: paymentRecord.priceId,
+      sessionUserId: session.user.id,
+      sessionUserEmail: session.user.email,
+    });
+
+    if (paymentRecord.userId !== session.user.id) {
+      console.error('[Creem Subscription Upgrade] User mismatch:', {
+        subscriptionId,
+        paymentUserId: paymentRecord.userId,
+        paymentUserIdType: typeof paymentRecord.userId,
+        sessionUserId: session.user.id,
+        sessionUserIdType: typeof session.user.id,
+        userEmail: session.user.email,
+      });
+      return NextResponse.json(
+        {
+          error:
+            'Forbidden: you do not have permission to upgrade this subscription. Please check your subscription status and contact support',
+        },
+        { status: 403 }
+      );
     }
 
     if (paymentRecord.status !== 'active' && paymentRecord.status !== 'trialing') {
@@ -54,7 +100,7 @@ export async function POST(
       );
     }
 
-    const { newPlanId, newInterval, useProration } = validation.data;
+    const { newPlanId, newInterval } = validation.data;
 
     const currentPlan = paymentRecord.priceId;
     const currentInterval = paymentRecord.interval;
@@ -69,10 +115,13 @@ export async function POST(
       | 'proplus_monthly'
       | 'proplus_yearly';
 
+    // 所有付费用户升级都需要等到下个订阅周期开始时生效
+    // 强制使用延迟生效（proration-none），不立即生效
+    const forceScheduledAtPeriodEnd = true;
     const result = await creemService.upgradeSubscription(
       subscriptionId,
       newProductKey,
-      useProration
+      false // 强制不使用 proration，延迟生效
     );
 
     if (!result.success) {
@@ -82,12 +131,7 @@ export async function POST(
       );
     }
 
-    await paymentRepository.update(paymentRecord.id, {
-      priceId: newPlanId,
-      interval: newInterval,
-    });
-
-    const scheduledAtPeriodEnd = !useProration;
+    const _scheduledAtPeriodEnd = forceScheduledAtPeriodEnd;
     const estimatedEffectiveDate = paymentRecord.periodEnd
       ? new Date(paymentRecord.periodEnd)
       : (() => {
@@ -96,6 +140,32 @@ export async function POST(
           base.setMonth(base.getMonth() + monthsToAdd);
           return base;
         })();
+
+    // Calculate next period end for scheduled upgrade
+    const nextPeriodEnd = (() => {
+      const base = new Date(estimatedEffectiveDate);
+      const monthsToAdd = newInterval === 'year' ? 12 : 1;
+      base.setMonth(base.getMonth() + monthsToAdd);
+      return base;
+    })();
+
+    // 所有付费用户升级都需要等到下个订阅周期开始时生效
+    // 方案2: 单条记录+字段 - 升级延迟生效，设置 scheduled 字段
+    await paymentRepository.update(paymentRecord.id, {
+      scheduledPlanId: newPlanId,
+      scheduledInterval: newInterval,
+      scheduledPeriodStart: estimatedEffectiveDate,
+      scheduledPeriodEnd: nextPeriodEnd,
+      scheduledAt: new Date(),
+      cancelAtPeriodEnd: false,
+    });
+    console.log('[Creem Subscription Upgrade] Scheduled upgrade set:', {
+      subscriptionId,
+      currentPlan: currentPlan,
+      scheduledPlan: newPlanId,
+      scheduledInterval: newInterval,
+      takesEffectAt: estimatedEffectiveDate,
+    });
 
     await paymentRepository.createEvent({
       paymentId: paymentRecord.id,
@@ -106,19 +176,15 @@ export async function POST(
         oldInterval: currentInterval,
         newPlan: newPlanId,
         newInterval: newInterval,
-        useProration,
+        useProration: false, // 强制延迟生效
         upgradedAt: new Date().toISOString(),
-        action: scheduledAtPeriodEnd ? 'upgrade_scheduled' : 'upgrade_immediate',
-        scheduledAtPeriodEnd,
-        takesEffectAt: scheduledAtPeriodEnd
-          ? estimatedEffectiveDate.toISOString()
-          : new Date().toISOString(),
+        action: 'upgrade_scheduled',
+        scheduledAtPeriodEnd: true,
+        takesEffectAt: estimatedEffectiveDate.toISOString(),
       }),
     });
 
-    const message = useProration
-      ? 'Subscription upgraded immediately with prorated charge'
-      : 'Subscription will be upgraded at the end of current period';
+    const message = 'Subscription will be upgraded at the end of current period';
 
     return NextResponse.json({
       success: true,

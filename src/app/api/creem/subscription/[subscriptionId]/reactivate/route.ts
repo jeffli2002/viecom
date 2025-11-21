@@ -42,6 +42,11 @@ export async function POST(
     await paymentRepository.update(paymentRecord.id, {
       cancelAtPeriodEnd: false,
       status: 'active',
+      scheduledPlanId: null,
+      scheduledInterval: null,
+      scheduledPeriodStart: null,
+      scheduledPeriodEnd: null,
+      scheduledAt: null,
     });
 
     await paymentRepository.createEvent({

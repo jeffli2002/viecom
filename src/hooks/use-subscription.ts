@@ -2,7 +2,7 @@
 'use client';
 
 import { useAuthStore } from '@/store/auth-store';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 export type NormalizedPlanId = 'free' | 'pro' | 'proplus';
 
@@ -33,7 +33,7 @@ export interface UseSubscriptionResult {
 }
 
 export function useSubscription(): UseSubscriptionResult {
-  const { isAuthenticated, isLoading: authLoading } = useAuthStore();
+  const { isLoading: authLoading } = useAuthStore();
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [planId, setPlanId] = useState<NormalizedPlanId>('free');
@@ -42,54 +42,42 @@ export function useSubscription(): UseSubscriptionResult {
   const [interval, setInterval] = useState<'month' | 'year' | null>(null);
   const [upcomingPlan, setUpcomingPlan] =
     useState<SubscriptionResponse['subscription']['upcomingPlan']>(null);
-  const fetchedRef = useRef(false);
-
   useEffect(() => {
     if (authLoading) return;
-    if (!isAuthenticated) {
-      // 未登录视为 free
+
+    let cancelled = false;
+
+    const resetToFree = () => {
+      if (cancelled) return;
       setPlanId('free');
       setStatus(null);
       setCancelAtPeriodEnd(false);
       setInterval(null);
       setUpcomingPlan(null);
-      setLoading(false);
-      return;
-    }
-    if (fetchedRef.current) return;
-    fetchedRef.current = true;
+    };
 
     const run = async () => {
       setLoading(true);
       setError(null);
       try {
         const res = await fetch('/api/creem/subscription', { credentials: 'include' });
+        if (res.status === 401) {
+          resetToFree();
+          return;
+        }
         if (!res.ok) {
           throw new Error('Failed to fetch subscription');
         }
         const data = (await res.json()) as SubscriptionResponse;
 
-        // Debug logging
-        console.log('[useSubscription] API Response:', data);
-
         if (!data.subscription) {
-          console.log('[useSubscription] No subscription found, setting to free');
-          setPlanId('free');
-          setStatus(null);
-          setCancelAtPeriodEnd(false);
-          setInterval(null);
-          setUpcomingPlan(null);
+          resetToFree();
           return;
         }
+
         const apiStatus = data.subscription.status || null;
         const apiPlanId = data.subscription.planId;
         const apiPlanName = (data.subscription.planName || '').toLowerCase();
-
-        console.log('[useSubscription] Raw values:', {
-          apiStatus,
-          apiPlanId,
-          apiPlanName,
-        });
 
         let normalized: NormalizedPlanId =
           apiPlanId === 'proplus'
@@ -102,15 +90,13 @@ export function useSubscription(): UseSubscriptionResult {
                   ? 'pro'
                   : 'free';
 
-        // 若订阅处于活跃/试用，但仍解析为 free，则兜底为 pro
         if ((apiStatus === 'active' || apiStatus === 'trialing') && normalized === 'free') {
-          console.log(
-            '[useSubscription] Active/trialing subscription but normalized to free, forcing to pro'
-          );
           normalized = 'pro';
         }
 
-        console.log('[useSubscription] Final normalized planId:', normalized);
+        if (cancelled) {
+          return;
+        }
 
         setPlanId(normalized);
         setStatus(apiStatus);
@@ -124,13 +110,23 @@ export function useSubscription(): UseSubscriptionResult {
             : null
         );
       } catch (e) {
-        setError(e instanceof Error ? e.message : 'Unknown error');
+        if (!cancelled) {
+          setError(e instanceof Error ? e.message : 'Unknown error');
+          resetToFree();
+        }
       } finally {
-        setLoading(false);
+        if (!cancelled) {
+          setLoading(false);
+        }
       }
     };
+
     run();
-  }, [isAuthenticated, authLoading]);
+
+    return () => {
+      cancelled = true;
+    };
+  }, [authLoading]);
 
   return { loading, error, planId, status, cancelAtPeriodEnd, interval, upcomingPlan };
 }

@@ -2,7 +2,7 @@ import { randomUUID } from 'node:crypto';
 import type { PaymentInterval, PaymentRecord, PaymentStatus, PaymentType } from '@/payment/types';
 import { db } from '@/server/db';
 import { payment, paymentEvent } from '@/server/db/schema';
-import { and, desc, eq, inArray, not } from 'drizzle-orm';
+import { and, desc, eq, inArray, not, sql } from 'drizzle-orm';
 
 export interface CreatePaymentData {
   id?: string;
@@ -24,6 +24,7 @@ export interface CreatePaymentData {
 
 export interface UpdatePaymentData {
   priceId?: string;
+  productId?: string;
   status?: PaymentStatus;
   subscriptionId?: string;
   periodStart?: Date;
@@ -32,6 +33,12 @@ export interface UpdatePaymentData {
   trialStart?: Date;
   trialEnd?: Date;
   interval?: PaymentInterval | null;
+  // Scheduled upgrade fields (方案2: 单条记录+字段)
+  scheduledPlanId?: string | null;
+  scheduledInterval?: PaymentInterval | null;
+  scheduledPeriodStart?: Date | null;
+  scheduledPeriodEnd?: Date | null;
+  scheduledAt?: Date | null;
 }
 
 export interface CreatePaymentEventData {
@@ -91,7 +98,36 @@ export class PaymentRepository {
    * Get payment record by ID
    */
   async findById(id: string): Promise<PaymentRecord | null> {
-    const result = await db.select().from(payment).where(eq(payment.id, id)).limit(1);
+    // Explicitly select columns to avoid errors if scheduled columns don't exist yet
+    const result = await db
+      .select({
+        id: payment.id,
+        provider: payment.provider,
+        priceId: payment.priceId,
+        productId: payment.productId,
+        type: payment.type,
+        interval: payment.interval,
+        userId: payment.userId,
+        customerId: payment.customerId,
+        subscriptionId: payment.subscriptionId,
+        status: payment.status,
+        periodStart: payment.periodStart,
+        periodEnd: payment.periodEnd,
+        cancelAtPeriodEnd: payment.cancelAtPeriodEnd,
+        trialStart: payment.trialStart,
+        trialEnd: payment.trialEnd,
+        createdAt: payment.createdAt,
+        updatedAt: payment.updatedAt,
+        // Scheduled fields
+        scheduledPlanId: payment.scheduledPlanId,
+        scheduledInterval: payment.scheduledInterval,
+        scheduledPeriodStart: payment.scheduledPeriodStart,
+        scheduledPeriodEnd: payment.scheduledPeriodEnd,
+        scheduledAt: payment.scheduledAt,
+      })
+      .from(payment)
+      .where(eq(payment.id, id))
+      .limit(1);
 
     return result[0] ? this.mapToPaymentRecord(result[0]) : null;
   }
@@ -100,8 +136,33 @@ export class PaymentRepository {
    * Get payment records by user ID
    */
   async findByUserId(userId: string): Promise<PaymentRecord[]> {
+    // Explicitly select columns to avoid errors if scheduled columns don't exist yet
     const results = await db
-      .select()
+      .select({
+        id: payment.id,
+        provider: payment.provider,
+        priceId: payment.priceId,
+        productId: payment.productId,
+        type: payment.type,
+        interval: payment.interval,
+        userId: payment.userId,
+        customerId: payment.customerId,
+        subscriptionId: payment.subscriptionId,
+        status: payment.status,
+        periodStart: payment.periodStart,
+        periodEnd: payment.periodEnd,
+        cancelAtPeriodEnd: payment.cancelAtPeriodEnd,
+        trialStart: payment.trialStart,
+        trialEnd: payment.trialEnd,
+        createdAt: payment.createdAt,
+        updatedAt: payment.updatedAt,
+        // Scheduled fields
+        scheduledPlanId: payment.scheduledPlanId,
+        scheduledInterval: payment.scheduledInterval,
+        scheduledPeriodStart: payment.scheduledPeriodStart,
+        scheduledPeriodEnd: payment.scheduledPeriodEnd,
+        scheduledAt: payment.scheduledAt,
+      })
       .from(payment)
       .where(eq(payment.userId, userId))
       .orderBy(desc(payment.createdAt));
@@ -126,8 +187,33 @@ export class PaymentRepository {
    * 根据客户 ID 获取支付记录
    */
   async findByCustomerId(customerId: string): Promise<PaymentRecord[]> {
+    // Explicitly select columns to avoid errors if scheduled columns don't exist yet
     const results = await db
-      .select()
+      .select({
+        id: payment.id,
+        provider: payment.provider,
+        priceId: payment.priceId,
+        productId: payment.productId,
+        type: payment.type,
+        interval: payment.interval,
+        userId: payment.userId,
+        customerId: payment.customerId,
+        subscriptionId: payment.subscriptionId,
+        status: payment.status,
+        periodStart: payment.periodStart,
+        periodEnd: payment.periodEnd,
+        cancelAtPeriodEnd: payment.cancelAtPeriodEnd,
+        trialStart: payment.trialStart,
+        trialEnd: payment.trialEnd,
+        createdAt: payment.createdAt,
+        updatedAt: payment.updatedAt,
+        // Scheduled fields
+        scheduledPlanId: payment.scheduledPlanId,
+        scheduledInterval: payment.scheduledInterval,
+        scheduledPeriodStart: payment.scheduledPeriodStart,
+        scheduledPeriodEnd: payment.scheduledPeriodEnd,
+        scheduledAt: payment.scheduledAt,
+      })
       .from(payment)
       .where(eq(payment.customerId, customerId))
       .orderBy(desc(payment.createdAt));
@@ -141,8 +227,33 @@ export class PaymentRepository {
    * as the user still has access until the period ends
    */
   async findActiveSubscriptionByUserId(userId: string): Promise<PaymentRecord | null> {
+    // Explicitly select columns to avoid errors if scheduled columns don't exist yet
     const results = await db
-      .select()
+      .select({
+        id: payment.id,
+        provider: payment.provider,
+        priceId: payment.priceId,
+        productId: payment.productId,
+        type: payment.type,
+        interval: payment.interval,
+        userId: payment.userId,
+        customerId: payment.customerId,
+        subscriptionId: payment.subscriptionId,
+        status: payment.status,
+        periodStart: payment.periodStart,
+        periodEnd: payment.periodEnd,
+        cancelAtPeriodEnd: payment.cancelAtPeriodEnd,
+        trialStart: payment.trialStart,
+        trialEnd: payment.trialEnd,
+        createdAt: payment.createdAt,
+        updatedAt: payment.updatedAt,
+        // Scheduled fields
+        scheduledPlanId: payment.scheduledPlanId,
+        scheduledInterval: payment.scheduledInterval,
+        scheduledPeriodStart: payment.scheduledPeriodStart,
+        scheduledPeriodEnd: payment.scheduledPeriodEnd,
+        scheduledAt: payment.scheduledAt,
+      })
       .from(payment)
       .where(
         and(
@@ -169,6 +280,7 @@ export class PaymentRepository {
     };
 
     if (data.priceId !== undefined) updateData.priceId = data.priceId;
+    if (data.productId !== undefined) updateData.productId = data.productId;
     if (data.status !== undefined) updateData.status = data.status;
     if (data.subscriptionId !== undefined) updateData.subscriptionId = data.subscriptionId;
     if (data.periodStart !== undefined) updateData.periodStart = data.periodStart;
@@ -177,6 +289,14 @@ export class PaymentRepository {
     if (data.trialStart !== undefined) updateData.trialStart = data.trialStart;
     if (data.trialEnd !== undefined) updateData.trialEnd = data.trialEnd;
     if (data.interval !== undefined) updateData.interval = data.interval;
+    // Scheduled upgrade fields (方案2: 单条记录+字段)
+    if (data.scheduledPlanId !== undefined) updateData.scheduledPlanId = data.scheduledPlanId;
+    if (data.scheduledInterval !== undefined) updateData.scheduledInterval = data.scheduledInterval;
+    if (data.scheduledPeriodStart !== undefined)
+      updateData.scheduledPeriodStart = data.scheduledPeriodStart;
+    if (data.scheduledPeriodEnd !== undefined)
+      updateData.scheduledPeriodEnd = data.scheduledPeriodEnd;
+    if (data.scheduledAt !== undefined) updateData.scheduledAt = data.scheduledAt;
 
     const [result] = await db.update(payment).set(updateData).where(eq(payment.id, id)).returning();
 
@@ -252,8 +372,33 @@ export class PaymentRepository {
 
   /**
    * Cancel all other active subscriptions for a user except the specified payment ID
+   * This ensures only ONE active subscription per user at any time
    */
   async cancelOtherActiveSubscriptions(userId: string, keepPaymentId: string): Promise<void> {
+    const otherSubs = await db
+      .select()
+      .from(payment)
+      .where(
+        and(
+          eq(payment.userId, userId),
+          eq(payment.type, 'subscription'),
+          not(eq(payment.id, keepPaymentId)),
+          inArray(payment.status, ['active', 'trialing', 'past_due'])
+        )
+      );
+
+    if (otherSubs.length > 0) {
+      console.log(
+        `[PaymentRepository] Canceling ${otherSubs.length} other active subscription(s) for user ${userId}`
+      );
+
+      for (const sub of otherSubs) {
+        console.log(
+          `  - Canceling ${sub.subscriptionId || sub.id} (${sub.priceId}, status: ${sub.status})`
+        );
+      }
+    }
+
     await db
       .update(payment)
       .set({
@@ -297,8 +442,9 @@ export class PaymentRepository {
    * Get subscription count by plan
    */
   async getSubscriptionCountByPlan(planId: string): Promise<number> {
+    // Only select id for counting
     const result = await db
-      .select()
+      .select({ id: payment.id })
       .from(payment)
       .where(
         and(
@@ -315,8 +461,9 @@ export class PaymentRepository {
    * Check if user has any active subscription
    */
   async hasActiveSubscription(userId: string): Promise<boolean> {
+    // Only select id for existence check
     const result = await db
-      .select()
+      .select({ id: payment.id })
       .from(payment)
       .where(
         and(
@@ -328,6 +475,76 @@ export class PaymentRepository {
       .limit(1);
 
     return result.length > 0;
+  }
+
+  /**
+   * Get count of active subscriptions for a user
+   * Should always return 0 or 1 - if > 1, there's a data integrity issue
+   */
+  async getActiveSubscriptionCount(userId: string): Promise<number> {
+    const result = await db
+      .select({ id: payment.id })
+      .from(payment)
+      .where(
+        and(
+          eq(payment.userId, userId),
+          eq(payment.type, 'subscription'),
+          inArray(payment.status, ['active', 'trialing', 'past_due'])
+        )
+      );
+
+    if (result.length > 1) {
+      console.error(
+        `[PaymentRepository] DATA INTEGRITY ISSUE: User ${userId} has ${result.length} active subscriptions!`
+      );
+    }
+
+    return result.length;
+  }
+
+  /**
+   * Enforce single active subscription rule
+   * Returns true if enforcement was needed and applied
+   */
+  async enforceSingleActiveSubscription(userId: string): Promise<boolean> {
+    const activeSubs = await db
+      .select()
+      .from(payment)
+      .where(
+        and(
+          eq(payment.userId, userId),
+          eq(payment.type, 'subscription'),
+          inArray(payment.status, ['active', 'trialing', 'past_due'])
+        )
+      )
+      .orderBy(desc(payment.createdAt));
+
+    if (activeSubs.length <= 1) {
+      return false;
+    }
+
+    console.warn(
+      `[PaymentRepository] Enforcing single subscription rule for user ${userId}: found ${activeSubs.length} active subscriptions`
+    );
+
+    const keepSub = activeSubs[0];
+    if (!keepSub) {
+      console.warn(`[PaymentRepository] No active subscription to keep for user ${userId}`);
+      return false;
+    }
+    const cancelSubs = activeSubs.slice(1);
+
+    console.log(`  - Keeping: ${keepSub.subscriptionId} (${keepSub.priceId})`);
+
+    for (const sub of cancelSubs) {
+      console.log(`  - Canceling: ${sub.subscriptionId} (${sub.priceId})`);
+      await this.update(sub.id, {
+        status: 'canceled',
+        cancelAtPeriodEnd: false,
+      });
+    }
+
+    return true;
   }
 
   /**
@@ -406,6 +623,12 @@ export class PaymentRepository {
       cancelAtPeriodEnd: record.cancelAtPeriodEnd || undefined,
       trialStart: record.trialStart || undefined,
       trialEnd: record.trialEnd || undefined,
+      // Scheduled upgrade fields (方案2: 单条记录+字段)
+      scheduledPlanId: record.scheduledPlanId || undefined,
+      scheduledInterval: (record.scheduledInterval as PaymentInterval) || undefined,
+      scheduledPeriodStart: record.scheduledPeriodStart || undefined,
+      scheduledPeriodEnd: record.scheduledPeriodEnd || undefined,
+      scheduledAt: record.scheduledAt || undefined,
       createdAt: record.createdAt,
       updatedAt: record.updatedAt,
       provider: record.provider as 'stripe' | 'creem' | undefined,

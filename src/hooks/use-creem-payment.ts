@@ -9,6 +9,7 @@ type BillingInterval = 'month' | 'year';
 interface CheckoutParams {
   planId?: PlanId;
   interval?: BillingInterval;
+  productKey?: string;
   successUrl?: string;
   cancelUrl?: string;
 }
@@ -20,6 +21,7 @@ export function useCreemPayment() {
   const createCheckoutSession = async ({
     planId,
     interval = 'month',
+    productKey,
     successUrl,
     cancelUrl,
   }: CheckoutParams) => {
@@ -38,6 +40,7 @@ export function useCreemPayment() {
         body: JSON.stringify({
           planId,
           interval,
+          productKey,
           successUrl: successUrl || `${fallbackOrigin}/settings/billing?success=true`,
           cancelUrl: cancelUrl || `${fallbackOrigin}/settings/billing?canceled=true`,
         }),
