@@ -381,24 +381,31 @@ export async function POST(request: NextRequest) {
 }
 
 async function handleCreditPackPurchase(data: CreemWebhookData) {
-  const { userId, credits, productName, checkoutId, orderId } = data;
+  const { userId, credits, productName, checkoutId, orderId, productId } = data;
 
   console.log('[Creem Webhook] handleCreditPackPurchase called with:', {
     userId,
     credits,
     productName,
+    productId,
     checkoutId,
     orderId,
+    allData: JSON.stringify(data),
   });
 
   if (!userId) {
     console.error('[Creem Webhook] Missing userId for credit pack purchase', { data });
-    return;
+    throw new Error('Missing userId for credit pack purchase');
   }
 
   if (!credits || credits <= 0) {
-    console.error('[Creem Webhook] Invalid credits amount for credit pack purchase', { data });
-    return;
+    console.error('[Creem Webhook] Invalid or missing credits amount for credit pack purchase', { 
+      credits,
+      productName,
+      productId,
+      data 
+    });
+    throw new Error(`Invalid credits amount: ${credits}`);
   }
 
   try {

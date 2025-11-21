@@ -969,7 +969,7 @@ class CreemPaymentService {
   }
 
   private async handleCheckoutComplete(checkout: CreemCheckoutPayload) {
-    const { customer, subscription, metadata, order } = checkout;
+    const { customer, subscription, metadata, order, product } = checkout;
 
     // Handle customer as string or object
     const customerId =
@@ -1000,14 +1000,26 @@ class CreemPaymentService {
 
     if (isCreditPack) {
       // Handle one-time credit pack purchase
+      // Try to get product info from checkout.product (top-level) or order.product
+      const checkoutProduct = typeof product === 'object' ? (product as { id?: string; name?: string }) : undefined;
       const orderProduct = (order as { product?: string | { id?: string; name?: string } } | undefined)?.product;
-      const productId = typeof orderProduct === 'string' ? orderProduct : orderProduct?.id;
-      const productName = typeof orderProduct === 'object' ? orderProduct?.name : undefined;
+      
+      const productId = checkoutProduct?.id || (typeof orderProduct === 'string' ? orderProduct : (orderProduct as { id?: string } | undefined)?.id);
+      const productName = checkoutProduct?.name || (typeof orderProduct === 'object' ? (orderProduct as { name?: string })?.name : undefined);
       const orderAmount = (order as { amount_paid?: number } | undefined)?.amount_paid;
       
       // Extract credit amount from product name (e.g., "1000 credits")
       const creditMatch = productName?.match(/(\d+)\s*credits/i);
       const credits = creditMatch ? Number.parseInt(creditMatch[1], 10) : undefined;
+
+      console.log('[Creem Service] Parsed credit pack purchase:', {
+        productId,
+        productName,
+        credits,
+        orderAmount,
+        checkoutId: (checkout as { id?: string }).id,
+        orderId: (order as { id?: string } | undefined)?.id,
+      });
 
       return {
         type: 'credit_pack_purchase',
