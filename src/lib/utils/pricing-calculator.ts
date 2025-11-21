@@ -30,18 +30,10 @@ export function calculateGenerationCapacity(credits: number): GenerationCapacity
     videos: {
       sora2_720p_10s: Math.floor(credits / consumption.videoGeneration['sora-2-720p-10s']),
       sora2_720p_15s: Math.floor(credits / consumption.videoGeneration['sora-2-720p-15s']),
-      sora2Pro_720p_10s: Math.floor(
-        credits / consumption.videoGeneration['sora-2-pro-720p-10s']
-      ),
-      sora2Pro_720p_15s: Math.floor(
-        credits / consumption.videoGeneration['sora-2-pro-720p-15s']
-      ),
-      sora2Pro_1080p_10s: Math.floor(
-        credits / consumption.videoGeneration['sora-2-pro-1080p-10s']
-      ),
-      sora2Pro_1080p_15s: Math.floor(
-        credits / consumption.videoGeneration['sora-2-pro-1080p-15s']
-      ),
+      sora2Pro_720p_10s: Math.floor(credits / consumption.videoGeneration['sora-2-pro-720p-10s']),
+      sora2Pro_720p_15s: Math.floor(credits / consumption.videoGeneration['sora-2-pro-720p-15s']),
+      sora2Pro_1080p_10s: Math.floor(credits / consumption.videoGeneration['sora-2-pro-1080p-10s']),
+      sora2Pro_1080p_15s: Math.floor(credits / consumption.videoGeneration['sora-2-pro-1080p-15s']),
     },
   };
 }
@@ -53,7 +45,10 @@ export function formatCapacityRange(capacity: GenerationCapacity): string {
   return `up to ${maxImages} images or ${maxVideos} videos`;
 }
 
-export function getYearlySavings(monthlyPrice: number, yearlyPrice: number): {
+export function getYearlySavings(
+  monthlyPrice: number,
+  yearlyPrice: number
+): {
   amount: number;
   percentage: number;
 } {

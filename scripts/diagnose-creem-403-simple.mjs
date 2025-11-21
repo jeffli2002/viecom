@@ -1,6 +1,6 @@
-import dotenv from 'dotenv';
-import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
+import { fileURLToPath } from 'url';
+import dotenv from 'dotenv';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -24,17 +24,14 @@ console.log('\n');
 async function test1() {
   console.log('Test 1: Retrieve subscription (GET)');
   try {
-    const getResponse = await fetch(
-      `https://api.creem.io/v1/subscriptions/${subscriptionId}`,
-      {
-        headers: {
-          Authorization: `Bearer ${CREEM_API_KEY}`,
-        },
-      }
-    );
+    const getResponse = await fetch(`https://api.creem.io/v1/subscriptions/${subscriptionId}`, {
+      headers: {
+        Authorization: `Bearer ${CREEM_API_KEY}`,
+      },
+    });
 
     console.log('Status:', getResponse.status, getResponse.statusText);
-    
+
     if (getResponse.ok) {
       const data = await getResponse.json();
       console.log('✅ SUCCESS - Can read subscription');
@@ -68,13 +65,13 @@ async function test2() {
     });
 
     console.log('Status:', listResponse.status, listResponse.statusText);
-    
+
     if (listResponse.ok) {
       const data = await listResponse.json();
       const subscriptions = data.data || data.subscriptions || [];
       console.log('✅ SUCCESS - Can list subscriptions');
       console.log('Total subscriptions:', subscriptions.length);
-      
+
       const targetSub = subscriptions.find((s) => s.id === subscriptionId);
       if (targetSub) {
         console.log('✅ Target subscription FOUND in this account');
@@ -83,8 +80,10 @@ async function test2() {
         console.log('❌ Target subscription NOT FOUND in this account');
         console.log('⚠️  This is the root cause - subscription belongs to different Creem account!');
         console.log('\nSubscriptions in this account:');
-        subscriptions.forEach(s => {
-          console.log(`  - ${s.id} (customer: ${s.customer?.id || s.customerId}, status: ${s.status})`);
+        subscriptions.forEach((s) => {
+          console.log(
+            `  - ${s.id} (customer: ${s.customer?.id || s.customerId}, status: ${s.status})`
+          );
         });
         return false;
       }
@@ -119,7 +118,7 @@ async function test3() {
     );
 
     console.log('Status:', upgradeResponse.status, upgradeResponse.statusText);
-    
+
     if (upgradeResponse.ok) {
       const data = await upgradeResponse.json();
       console.log('✅ SUCCESS - Upgrade worked!');
@@ -142,7 +141,7 @@ async function test3() {
 async function main() {
   await test1();
   const ownershipOk = await test2();
-  
+
   if (!ownershipOk) {
     console.log('\n❌ CRITICAL: Subscription not owned by this API key');
     console.log('\n📋 ACTION REQUIRED:');
@@ -154,7 +153,7 @@ async function main() {
   } else {
     await test3();
   }
-  
+
   console.log('\n=== End Diagnostic ===');
 }
 

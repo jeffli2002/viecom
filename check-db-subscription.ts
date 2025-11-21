@@ -3,10 +3,10 @@
  * Run: npx tsx check-db-subscription.ts
  */
 
-import { config } from 'dotenv';
-import { drizzle } from 'drizzle-orm/neon-http';
 import { neon } from '@neondatabase/serverless';
+import { config } from 'dotenv';
 import { eq } from 'drizzle-orm';
+import { drizzle } from 'drizzle-orm/neon-http';
 
 // Load environment variables
 config({ path: '.env.local' });
@@ -30,7 +30,7 @@ async function checkDatabase() {
   try {
     // Query 1: Find the subscription
     console.log('Query 1: Looking for subscription sub_5EM6IgULEBVjEtMx5OH0TT...\n');
-    
+
     const subscriptionResult = await sql`
       SELECT 
         id,
@@ -69,7 +69,7 @@ async function checkDatabase() {
 
     // Query 2: Count subscriptions for this user
     console.log('Query 2: Counting subscriptions for user myZwkau1DoG2GXcibytBYmmwRXX8Mw6L...\n');
-    
+
     const countResult = await sql`
       SELECT COUNT(*) as total_subscriptions
       FROM payment
@@ -80,7 +80,7 @@ async function checkDatabase() {
 
     // Query 3: Find the user
     console.log('Query 3: Looking for user myZwkau1DoG2GXcibytBYmmwRXX8Mw6L...\n');
-    
+
     const userResult = await sql`
       SELECT id, email, name 
       FROM "user" 
@@ -123,7 +123,9 @@ async function checkDatabase() {
         console.log('   This is causing the 403 Forbidden error!');
         console.log('');
         console.log('   FIX: Run this SQL command:');
-        console.log(`   UPDATE payment SET "userId" = '${user.id}' WHERE "subscriptionId" = 'sub_5EM6IgULEBVjEtMx5OH0TT';\n`);
+        console.log(
+          `   UPDATE payment SET "userId" = '${user.id}' WHERE "subscriptionId" = 'sub_5EM6IgULEBVjEtMx5OH0TT';\n`
+        );
       }
     } else if (subscriptionResult.length === 0) {
       console.log('❌ Subscription does not exist in database');
@@ -132,7 +134,6 @@ async function checkDatabase() {
       console.log('❌ User does not exist in database');
       console.log('   Check if the user ID in the webhook is correct.\n');
     }
-
   } catch (error) {
     console.error('❌ Database query failed:');
     console.error(error);

@@ -686,7 +686,9 @@ export default function VideoGenerator() {
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="sora-2">{t('modelSora2', { credits: videoCreditCost })}</SelectItem>
+                        <SelectItem value="sora-2">
+                          {t('modelSora2', { credits: videoCreditCost })}
+                        </SelectItem>
                         <SelectItem value="sora-2-pro">
                           {t('modelSora2Pro', { credits: videoCreditCost })}
                         </SelectItem>

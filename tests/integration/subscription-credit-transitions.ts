@@ -1,6 +1,6 @@
 /**
  * Subscription Credit Transition Tests
- * 
+ *
  * Tests ALL upgrade/downgrade scenarios to ensure correct credit granting
  * based on plan transitions and billing intervals.
  */
@@ -330,7 +330,9 @@ async function runCreditTransitionTests() {
 
       console.log(`   ✓ Reason: ${scenario.expectedCredits.reason}`);
     } catch (error) {
-      console.error(`   ❌ Test failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      console.error(
+        `   ❌ Test failed: ${error instanceof Error ? error.message : 'Unknown error'}`
+      );
       failedTests++;
     }
   }
@@ -340,7 +342,9 @@ async function runCreditTransitionTests() {
   console.log(`   ✅ Passed: ${passedTests}`);
   console.log(`   ❌ Failed: ${failedTests}`);
   console.log(`   📈 Total: ${passedTests + failedTests}`);
-  console.log(`   🎯 Success Rate: ${((passedTests / (passedTests + failedTests)) * 100).toFixed(1)}%`);
+  console.log(
+    `   🎯 Success Rate: ${((passedTests / (passedTests + failedTests)) * 100).toFixed(1)}%`
+  );
 
   if (failedTests === 0) {
     console.log('\n✨ All credit transition scenarios passed! ✨');

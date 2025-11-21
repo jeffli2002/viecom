@@ -2,7 +2,10 @@
 console.log('=== Runtime Environment Check ===\n');
 
 console.log('Direct process.env:');
-console.log('NEXT_PUBLIC_CREEM_TEST_MODE:', JSON.stringify(process.env.NEXT_PUBLIC_CREEM_TEST_MODE));
+console.log(
+  'NEXT_PUBLIC_CREEM_TEST_MODE:',
+  JSON.stringify(process.env.NEXT_PUBLIC_CREEM_TEST_MODE)
+);
 console.log('CREEM_API_KEY (first 15 chars):', process.env.CREEM_API_KEY?.substring(0, 15) + '...');
 
 console.log('\nNow loading through env.ts...');
@@ -21,7 +24,7 @@ try {
   console.log('\nFrom creem-service.ts:');
   console.log('getCreemTestMode():', getCreemTestMode());
   console.log('getCreemApiKey() (first 15 chars):', getCreemApiKey()?.substring(0, 15) + '...');
-  
+
   const testMode = getCreemTestMode();
   const serverIdx = testMode ? 1 : 0;
   console.log('\nServerIdx that will be used:', serverIdx, testMode ? '(sandbox)' : '(production)');

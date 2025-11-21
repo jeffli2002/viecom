@@ -244,11 +244,15 @@ interface CreemWebhookData {
   previousPlanId?: string;
   previousStatus?: string;
   checkoutId?: string;
+  orderId?: string;
   amount?: number;
   reason?: string;
   priceId?: string;
   creditsGranted?: number;
   manualAdjustment?: number;
+  credits?: number;
+  productName?: string;
+  productId?: string;
   [key: string]: unknown;
 }
 
@@ -311,6 +315,10 @@ export async function POST(request: NextRequest) {
         await handleCheckoutComplete(result);
         break;
 
+      case 'credit_pack_purchase':
+        await handleCreditPackPurchase(result);
+        break;
+
       case 'subscription_created':
         await handleSubscriptionCreated(result);
         break;
@@ -369,6 +377,118 @@ export async function POST(request: NextRequest) {
     });
 
     return NextResponse.json({ error: 'Webhook processing failed' }, { status: 500 });
+  }
+}
+
+async function handleCreditPackPurchase(data: CreemWebhookData) {
+  const { userId, credits, productName, checkoutId, orderId } = data;
+
+  console.log('[Creem Webhook] handleCreditPackPurchase called with:', {
+    userId,
+    credits,
+    productName,
+    checkoutId,
+    orderId,
+  });
+
+  if (!userId) {
+    console.error('[Creem Webhook] Missing userId for credit pack purchase', { data });
+    return;
+  }
+
+  if (!credits || credits <= 0) {
+    console.error('[Creem Webhook] Invalid credits amount for credit pack purchase', { data });
+    return;
+  }
+
+  try {
+    const referenceId = `creem_credit_pack_${orderId || checkoutId}_${Date.now()}`;
+
+    await db.transaction(async (tx) => {
+      const [userCredit] = await tx
+        .select()
+        .from(userCredits)
+        .where(eq(userCredits.userId, userId))
+        .limit(1);
+
+      if (!userCredit) {
+        // Create credit account with purchased credits
+        const now = new Date();
+        await tx.insert(userCredits).values({
+          id: randomUUID(),
+          userId,
+          balance: credits,
+          totalEarned: credits,
+          totalSpent: 0,
+          frozenBalance: 0,
+          createdAt: now,
+          updatedAt: now,
+        });
+
+        await tx.insert(creditTransactions).values({
+          id: randomUUID(),
+          userId,
+          type: 'earn',
+          amount: credits,
+          balanceAfter: credits,
+          source: 'purchase',
+          description: `Credit pack purchase: ${productName || `${credits} credits`}`,
+          referenceId,
+          metadata: JSON.stringify({
+            provider: 'creem',
+            checkoutId,
+            orderId,
+            productName,
+            credits,
+          }),
+        });
+
+        console.log(
+          `[Creem Webhook] Created credit account for ${userId} with ${credits} credits from pack purchase`
+        );
+      } else {
+        // Add credits to existing account
+        const newBalance = userCredit.balance + credits;
+
+        await tx
+          .update(userCredits)
+          .set({
+            balance: newBalance,
+            totalEarned: userCredit.totalEarned + credits,
+            updatedAt: new Date(),
+          })
+          .where(eq(userCredits.userId, userId));
+
+        await tx.insert(creditTransactions).values({
+          id: randomUUID(),
+          userId,
+          type: 'earn',
+          amount: credits,
+          balanceAfter: newBalance,
+          source: 'purchase',
+          description: `Credit pack purchase: ${productName || `${credits} credits`}`,
+          referenceId,
+          metadata: JSON.stringify({
+            provider: 'creem',
+            checkoutId,
+            orderId,
+            productName,
+            credits,
+          }),
+        });
+
+        console.log(
+          `[Creem Webhook] Granted ${credits} credits to ${userId} from pack purchase (new balance: ${newBalance})`
+        );
+      }
+    });
+
+    console.log(
+      `[Creem Webhook] Successfully processed credit pack purchase for user ${userId}: ${credits} credits`
+    );
+  } catch (error) {
+    console.error('[Creem Webhook] Error in handleCreditPackPurchase:', error);
+    throw error;
   }
 }
 

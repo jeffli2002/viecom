@@ -155,7 +155,8 @@ async function setUserToPureFree() {
 
     // 5. 检查是否还有活跃订阅
     const activeSubscriptions = finalStatus.filter(
-      (s: { status: string }) => s.status === 'active' || s.status === 'trialing' || s.status === 'past_due'
+      (s: { status: string }) =>
+        s.status === 'active' || s.status === 'trialing' || s.status === 'past_due'
     );
     const hasScheduledPlans = finalStatus.some(
       (s: { scheduled_plan_id: string | null }) => s.scheduled_plan_id !== null
@@ -183,4 +184,3 @@ async function setUserToPureFree() {
 }
 
 setUserToPureFree();
-

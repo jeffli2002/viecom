@@ -29,36 +29,136 @@ const CREDIT_CONFIG = {
 
 const SCENARIOS = [
   // FREE TO PAID
-  { id: 'free-to-pro-monthly', from: { plan: 'free', credits: 30 }, to: { plan: 'pro', interval: 'month' }, expected: { grant: 500, total: 530 } },
-  { id: 'free-to-pro-yearly', from: { plan: 'free', credits: 30 }, to: { plan: 'pro', interval: 'year' }, expected: { grant: 6000, total: 6030 } },
-  { id: 'free-to-proplus-monthly', from: { plan: 'free', credits: 30 }, to: { plan: 'proplus', interval: 'month' }, expected: { grant: 900, total: 930 } },
-  { id: 'free-to-proplus-yearly', from: { plan: 'free', credits: 30 }, to: { plan: 'proplus', interval: 'year' }, expected: { grant: 10800, total: 10830 } },
+  {
+    id: 'free-to-pro-monthly',
+    from: { plan: 'free', credits: 30 },
+    to: { plan: 'pro', interval: 'month' },
+    expected: { grant: 500, total: 530 },
+  },
+  {
+    id: 'free-to-pro-yearly',
+    from: { plan: 'free', credits: 30 },
+    to: { plan: 'pro', interval: 'year' },
+    expected: { grant: 6000, total: 6030 },
+  },
+  {
+    id: 'free-to-proplus-monthly',
+    from: { plan: 'free', credits: 30 },
+    to: { plan: 'proplus', interval: 'month' },
+    expected: { grant: 900, total: 930 },
+  },
+  {
+    id: 'free-to-proplus-yearly',
+    from: { plan: 'free', credits: 30 },
+    to: { plan: 'proplus', interval: 'year' },
+    expected: { grant: 10800, total: 10830 },
+  },
 
   // PRO MONTHLY TRANSITIONS
-  { id: 'pro-monthly-to-pro-yearly', from: { plan: 'pro', interval: 'month', credits: 200 }, to: { plan: 'pro', interval: 'year' }, expected: { grant: 6000, total: 6200 } },
-  { id: 'pro-monthly-to-proplus-monthly', from: { plan: 'pro', interval: 'month', credits: 200 }, to: { plan: 'proplus', interval: 'month' }, expected: { grant: 900, total: 1100 } },
-  { id: 'pro-monthly-to-proplus-yearly', from: { plan: 'pro', interval: 'month', credits: 200 }, to: { plan: 'proplus', interval: 'year' }, expected: { grant: 10800, total: 11000 } },
+  {
+    id: 'pro-monthly-to-pro-yearly',
+    from: { plan: 'pro', interval: 'month', credits: 200 },
+    to: { plan: 'pro', interval: 'year' },
+    expected: { grant: 6000, total: 6200 },
+  },
+  {
+    id: 'pro-monthly-to-proplus-monthly',
+    from: { plan: 'pro', interval: 'month', credits: 200 },
+    to: { plan: 'proplus', interval: 'month' },
+    expected: { grant: 900, total: 1100 },
+  },
+  {
+    id: 'pro-monthly-to-proplus-yearly',
+    from: { plan: 'pro', interval: 'month', credits: 200 },
+    to: { plan: 'proplus', interval: 'year' },
+    expected: { grant: 10800, total: 11000 },
+  },
 
   // PRO YEARLY TRANSITIONS
-  { id: 'pro-yearly-to-pro-monthly', from: { plan: 'pro', interval: 'year', credits: 3000 }, to: { plan: 'pro', interval: 'month' }, expected: { grant: 500, total: 3500 } },
-  { id: 'pro-yearly-to-proplus-monthly', from: { plan: 'pro', interval: 'year', credits: 3000 }, to: { plan: 'proplus', interval: 'month' }, expected: { grant: 900, total: 3900 } },
-  { id: 'pro-yearly-to-proplus-yearly', from: { plan: 'pro', interval: 'year', credits: 3000 }, to: { plan: 'proplus', interval: 'year' }, expected: { grant: 10800, total: 13800 } },
+  {
+    id: 'pro-yearly-to-pro-monthly',
+    from: { plan: 'pro', interval: 'year', credits: 3000 },
+    to: { plan: 'pro', interval: 'month' },
+    expected: { grant: 500, total: 3500 },
+  },
+  {
+    id: 'pro-yearly-to-proplus-monthly',
+    from: { plan: 'pro', interval: 'year', credits: 3000 },
+    to: { plan: 'proplus', interval: 'month' },
+    expected: { grant: 900, total: 3900 },
+  },
+  {
+    id: 'pro-yearly-to-proplus-yearly',
+    from: { plan: 'pro', interval: 'year', credits: 3000 },
+    to: { plan: 'proplus', interval: 'year' },
+    expected: { grant: 10800, total: 13800 },
+  },
 
   // PRO+ MONTHLY TRANSITIONS
-  { id: 'proplus-monthly-to-pro-monthly', from: { plan: 'proplus', interval: 'month', credits: 400 }, to: { plan: 'pro', interval: 'month' }, expected: { grant: 500, total: 900 } },
-  { id: 'proplus-monthly-to-pro-yearly', from: { plan: 'proplus', interval: 'month', credits: 400 }, to: { plan: 'pro', interval: 'year' }, expected: { grant: 6000, total: 6400 } },
-  { id: 'proplus-monthly-to-proplus-yearly', from: { plan: 'proplus', interval: 'month', credits: 400 }, to: { plan: 'proplus', interval: 'year' }, expected: { grant: 10800, total: 11200 } },
+  {
+    id: 'proplus-monthly-to-pro-monthly',
+    from: { plan: 'proplus', interval: 'month', credits: 400 },
+    to: { plan: 'pro', interval: 'month' },
+    expected: { grant: 500, total: 900 },
+  },
+  {
+    id: 'proplus-monthly-to-pro-yearly',
+    from: { plan: 'proplus', interval: 'month', credits: 400 },
+    to: { plan: 'pro', interval: 'year' },
+    expected: { grant: 6000, total: 6400 },
+  },
+  {
+    id: 'proplus-monthly-to-proplus-yearly',
+    from: { plan: 'proplus', interval: 'month', credits: 400 },
+    to: { plan: 'proplus', interval: 'year' },
+    expected: { grant: 10800, total: 11200 },
+  },
 
   // PRO+ YEARLY TRANSITIONS
-  { id: 'proplus-yearly-to-pro-monthly', from: { plan: 'proplus', interval: 'year', credits: 5000 }, to: { plan: 'pro', interval: 'month' }, expected: { grant: 500, total: 5500 } },
-  { id: 'proplus-yearly-to-pro-yearly', from: { plan: 'proplus', interval: 'year', credits: 5000 }, to: { plan: 'pro', interval: 'year' }, expected: { grant: 6000, total: 11000 } },
-  { id: 'proplus-yearly-to-proplus-monthly', from: { plan: 'proplus', interval: 'year', credits: 5000 }, to: { plan: 'proplus', interval: 'month' }, expected: { grant: 900, total: 5900 } },
+  {
+    id: 'proplus-yearly-to-pro-monthly',
+    from: { plan: 'proplus', interval: 'year', credits: 5000 },
+    to: { plan: 'pro', interval: 'month' },
+    expected: { grant: 500, total: 5500 },
+  },
+  {
+    id: 'proplus-yearly-to-pro-yearly',
+    from: { plan: 'proplus', interval: 'year', credits: 5000 },
+    to: { plan: 'pro', interval: 'year' },
+    expected: { grant: 6000, total: 11000 },
+  },
+  {
+    id: 'proplus-yearly-to-proplus-monthly',
+    from: { plan: 'proplus', interval: 'year', credits: 5000 },
+    to: { plan: 'proplus', interval: 'month' },
+    expected: { grant: 900, total: 5900 },
+  },
 
   // CANCELLATION TO FREE
-  { id: 'pro-monthly-to-free', from: { plan: 'pro', interval: 'month', credits: 250 }, to: { plan: 'free' }, expected: { grant: 0, total: 250 } },
-  { id: 'pro-yearly-to-free', from: { plan: 'pro', interval: 'year', credits: 2000 }, to: { plan: 'free' }, expected: { grant: 0, total: 2000 } },
-  { id: 'proplus-monthly-to-free', from: { plan: 'proplus', interval: 'month', credits: 350 }, to: { plan: 'free' }, expected: { grant: 0, total: 350 } },
-  { id: 'proplus-yearly-to-free', from: { plan: 'proplus', interval: 'year', credits: 4000 }, to: { plan: 'free' }, expected: { grant: 0, total: 4000 } },
+  {
+    id: 'pro-monthly-to-free',
+    from: { plan: 'pro', interval: 'month', credits: 250 },
+    to: { plan: 'free' },
+    expected: { grant: 0, total: 250 },
+  },
+  {
+    id: 'pro-yearly-to-free',
+    from: { plan: 'pro', interval: 'year', credits: 2000 },
+    to: { plan: 'free' },
+    expected: { grant: 0, total: 2000 },
+  },
+  {
+    id: 'proplus-monthly-to-free',
+    from: { plan: 'proplus', interval: 'month', credits: 350 },
+    to: { plan: 'free' },
+    expected: { grant: 0, total: 350 },
+  },
+  {
+    id: 'proplus-yearly-to-free',
+    from: { plan: 'proplus', interval: 'year', credits: 4000 },
+    to: { plan: 'free' },
+    expected: { grant: 0, total: 4000 },
+  },
 ];
 
 function getCreditsForTransition(from, to) {

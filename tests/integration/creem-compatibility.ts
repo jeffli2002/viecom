@@ -1,12 +1,12 @@
 /**
  * Integration Test: Creem Module Compatibility
- * 
+ *
  * This test verifies that the newly extracted @viecom/creem-subscription module
  * maintains full backward compatibility with the existing creem-service.ts
  */
 
-import { CreemApiClient } from '../../packages/creem-subscription/core/api-client';
 import crypto from 'node:crypto';
+import { CreemApiClient } from '../../packages/creem-subscription/core/api-client';
 
 console.log('🔄 Creem Module Compatibility Tests\n');
 console.log('Testing backward compatibility between:');
@@ -79,13 +79,13 @@ async function runCompatibilityTests() {
 
     // Test with same payload and signature as existing service would receive
     const payload = '{"eventType":"subscription.created","object":{"id":"sub_123"}}';
-    
+
     // Generate signature using same method as existing service
     const hmac = crypto.createHmac('sha256', TEST_WEBHOOK_SECRET);
     const signature = hmac.update(payload).digest('hex');
 
     const newModuleResult = client.verifyWebhookSignature(payload, signature);
-    
+
     // Simulate old service verification (same logic)
     const oldServiceHmac = crypto.createHmac('sha256', TEST_WEBHOOK_SECRET);
     const oldServiceDigest = oldServiceHmac.update(payload).digest('hex');
@@ -96,10 +96,7 @@ async function runCompatibilityTests() {
       'Webhook signature verification produces same result as existing service'
     );
 
-    assert(
-      newModuleResult === true,
-      'Valid signature is correctly verified (backward compatible)'
-    );
+    assert(newModuleResult === true, 'Valid signature is correctly verified (backward compatible)');
 
     // Test invalid signature
     const invalidSig = 'invalid_signature_abc123';
@@ -162,7 +159,7 @@ async function runCompatibilityTests() {
 
     // Test checkout result structure (should match existing service)
     // Existing service returns: { success: boolean, sessionId?: string, url?: string, error?: string }
-    
+
     // Mock a successful checkout response structure
     const mockCheckoutSuccess = {
       success: true,
@@ -171,9 +168,9 @@ async function runCompatibilityTests() {
     };
 
     assert(
-      'success' in mockCheckoutSuccess && 
-      'sessionId' in mockCheckoutSuccess && 
-      'url' in mockCheckoutSuccess,
+      'success' in mockCheckoutSuccess &&
+        'sessionId' in mockCheckoutSuccess &&
+        'url' in mockCheckoutSuccess,
       'Checkout success response structure matches existing service'
     );
 
@@ -184,8 +181,7 @@ async function runCompatibilityTests() {
     };
 
     assert(
-      'success' in mockCheckoutError && 
-      'error' in mockCheckoutError,
+      'success' in mockCheckoutError && 'error' in mockCheckoutError,
       'Checkout error response structure matches existing service'
     );
   } catch (error) {
@@ -219,12 +215,13 @@ async function runCompatibilityTests() {
 
     // Test unknown error (should return 'Unknown error')
     const unknownError = { random: 'object' };
-    const extracted = unknownError instanceof Error 
-      ? unknownError.message 
-      : typeof unknownError === 'string' 
-        ? unknownError 
-        : 'Unknown error';
-    
+    const extracted =
+      unknownError instanceof Error
+        ? unknownError.message
+        : typeof unknownError === 'string'
+          ? unknownError
+          : 'Unknown error';
+
     assert(
       extracted === 'Unknown error',
       'Unknown error handling compatible with existing service'
@@ -299,13 +296,13 @@ async function runCompatibilityTests() {
     // Same for other methods
     assert(
       typeof client['getSubscriptionWithSdk'] === 'function' &&
-      typeof client['getSubscriptionDirect'] === 'function',
+        typeof client['getSubscriptionDirect'] === 'function',
       'getSubscription uses SDK + fallback pattern (matches existing service)'
     );
 
     assert(
       typeof client['cancelSubscriptionWithSdk'] === 'function' &&
-      typeof client['cancelSubscriptionDirect'] === 'function',
+        typeof client['cancelSubscriptionDirect'] === 'function',
       'cancelSubscription uses SDK + fallback pattern (matches existing service)'
     );
   } catch (error) {
@@ -351,10 +348,7 @@ async function runCompatibilityTests() {
       errorThrown = true;
     }
 
-    assert(
-      errorThrown === true,
-      'Malformed JSON handling compatible with existing service'
-    );
+    assert(errorThrown === true, 'Malformed JSON handling compatible with existing service');
   } catch (error) {
     console.error('❌ Webhook parsing compatibility test failed:', error);
     failedTests++;
@@ -365,8 +359,10 @@ async function runCompatibilityTests() {
   console.log(`   ✅ Passed: ${passedTests}`);
   console.log(`   ❌ Failed: ${failedTests}`);
   console.log(`   📈 Total: ${passedTests + failedTests}`);
-  console.log(`   🎯 Compatibility Rate: ${((passedTests / (passedTests + failedTests)) * 100).toFixed(1)}%`);
-  
+  console.log(
+    `   🎯 Compatibility Rate: ${((passedTests / (passedTests + failedTests)) * 100).toFixed(1)}%`
+  );
+
   if (failedTests === 0) {
     console.log('\n✨ Full backward compatibility confirmed! ✨');
     console.log('   The new module can safely replace the existing service.\n');

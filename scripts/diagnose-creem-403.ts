@@ -1,6 +1,6 @@
 /**
  * Comprehensive Creem API Key Diagnosis Script
- * 
+ *
  * This script validates the API key format and tests various Creem API endpoints
  * to identify the root cause of 403 Forbidden errors.
  */
@@ -23,51 +23,53 @@ console.log('-----------------------------------');
 
 function validateApiKeyFormat(apiKey: string): { valid: boolean; issues: string[] } {
   const issues: string[] = [];
-  
+
   // Check for empty or undefined
   if (!apiKey) {
     issues.push('API key is empty or undefined');
     return { valid: false, issues };
   }
-  
+
   // Check for whitespace
   if (apiKey !== apiKey.trim()) {
     issues.push('API key has leading/trailing whitespace');
   }
-  
+
   // Check for line breaks
   if (apiKey.includes('\n') || apiKey.includes('\r')) {
     issues.push('API key contains line breaks');
   }
-  
+
   // Check for expected prefix
   const expectedPrefix = CREEM_TEST_MODE ? 'creem_test_' : 'creem_live_';
   if (!apiKey.startsWith(expectedPrefix)) {
-    issues.push(`API key should start with '${expectedPrefix}' but starts with '${apiKey.substring(0, 11)}'`);
+    issues.push(
+      `API key should start with '${expectedPrefix}' but starts with '${apiKey.substring(0, 11)}'`
+    );
   }
-  
+
   // Check length (typical API keys are 30-50 chars)
   if (apiKey.length < 20) {
     issues.push(`API key seems too short (${apiKey.length} characters)`);
   }
-  
+
   // Check for common copy-paste errors
   if (apiKey.includes(' ')) {
     issues.push('API key contains spaces');
   }
-  
+
   // Display key info
   console.log(`Key prefix: ${apiKey.substring(0, 11)}...`);
   console.log(`Key length: ${apiKey.length} characters`);
   console.log(`Test mode: ${CREEM_TEST_MODE}`);
   console.log(`Expected prefix: ${expectedPrefix}`);
-  
+
   if (issues.length === 0) {
     console.log('✅ API key format looks valid\n');
     return { valid: true, issues: [] };
   } else {
     console.log('❌ API key format issues detected:');
-    issues.forEach(issue => console.log(`   - ${issue}`));
+    issues.forEach((issue) => console.log(`   - ${issue}`));
     console.log('');
     return { valid: false, issues };
   }
@@ -83,11 +85,11 @@ function checkEnvironmentMismatch(apiKey: string, subscriptionId: string): void 
   const isTestKey = apiKey.startsWith('creem_test_');
   const isLiveKey = apiKey.startsWith('creem_live_');
   const hasTestPrefix = subscriptionId.includes('test_');
-  
+
   console.log(`API Key type: ${isTestKey ? 'TEST' : isLiveKey ? 'LIVE' : 'UNKNOWN'}`);
   console.log(`Subscription ID: ${subscriptionId}`);
   console.log(`Subscription has test prefix: ${hasTestPrefix ? 'YES' : 'NO'}`);
-  
+
   if (isTestKey && !hasTestPrefix) {
     console.log('⚠️  WARNING: Test API key but production subscription ID');
     console.log('   This is the likely cause of 403 Forbidden!');
@@ -116,40 +118,34 @@ interface TestResult {
   body?: unknown;
 }
 
-async function testEndpoint(
-  endpoint: string,
-  method: string = 'GET',
-  body?: unknown
-): Promise<TestResult> {
-  const baseUrl = CREEM_TEST_MODE 
-    ? 'https://sandbox.creem.io/v1'
-    : 'https://api.creem.io/v1';
-  
+async function testEndpoint(endpoint: string, method = 'GET', body?: unknown): Promise<TestResult> {
+  const baseUrl = CREEM_TEST_MODE ? 'https://sandbox.creem.io/v1' : 'https://api.creem.io/v1';
+
   const url = `${baseUrl}${endpoint}`;
-  
+
   try {
     const options: RequestInit = {
       method,
       headers: {
-        'Authorization': `Bearer ${CREEM_API_KEY}`,
+        Authorization: `Bearer ${CREEM_API_KEY}`,
         'Content-Type': 'application/json',
       },
     };
-    
+
     if (body && method !== 'GET') {
       options.body = JSON.stringify(body);
     }
-    
+
     const response = await fetch(url, options);
     const responseText = await response.text();
-    
+
     let responseBody: unknown;
     try {
       responseBody = JSON.parse(responseText);
     } catch {
       responseBody = responseText;
     }
-    
+
     return {
       endpoint,
       method,
@@ -174,19 +170,19 @@ async function runApiTests(): Promise<void> {
   const tests: Promise<TestResult>[] = [
     // Test 1: List products (should work for any valid key)
     testEndpoint('/products', 'GET'),
-    
+
     // Test 2: Get specific subscription (the problematic one)
     testEndpoint(`/subscriptions/${TEST_SUBSCRIPTION_ID}`, 'GET'),
-    
+
     // Test 3: List all subscriptions
     testEndpoint('/subscriptions', 'GET'),
-    
+
     // Test 4: List customers
     testEndpoint('/customers', 'GET'),
-    
+
     // Test 5: Get specific customer
     testEndpoint(`/customers/${TEST_CUSTOMER_ID}`, 'GET'),
-    
+
     // Test 6: Try to create a test checkout (write operation)
     testEndpoint('/checkouts', 'POST', {
       productId: 'test_product',
@@ -195,32 +191,32 @@ async function runApiTests(): Promise<void> {
       successUrl: 'https://example.com/success',
     }),
   ];
-  
+
   const results = await Promise.all(tests);
-  
+
   console.log('Test Results:');
   console.log('-------------');
-  
+
   results.forEach((result, index) => {
     console.log(`\nTest ${index + 1}: ${result.method} ${result.endpoint}`);
     console.log(`Status: ${result.status} ${result.success ? '✅' : '❌'}`);
-    
+
     if (result.error) {
       console.log(`Error: ${result.error}`);
     }
-    
+
     if (result.body && typeof result.body === 'object') {
       console.log('Response:', JSON.stringify(result.body, null, 2));
     }
   });
-  
+
   // Analysis
   console.log('\n=== Analysis ===');
-  const allFailed = results.every(r => !r.success);
-  const allForbidden = results.every(r => r.status === 403);
-  const someFailed = results.some(r => !r.success);
-  const someSucceeded = results.some(r => r.success);
-  
+  const allFailed = results.every((r) => !r.success);
+  const allForbidden = results.every((r) => r.status === 403);
+  const someFailed = results.some((r) => !r.success);
+  const someSucceeded = results.some((r) => r.success);
+
   if (allFailed && allForbidden) {
     console.log('❌ ALL requests returned 403 Forbidden');
     console.log('   Possible causes:');
@@ -233,13 +229,17 @@ async function runApiTests(): Promise<void> {
     console.log('⚠️  MIXED results - some succeeded, some failed');
     console.log('   This suggests selective permissions or resource visibility issues');
     console.log('   \nSucceeded:');
-    results.filter(r => r.success).forEach(r => {
-      console.log(`   ✅ ${r.method} ${r.endpoint}`);
-    });
+    results
+      .filter((r) => r.success)
+      .forEach((r) => {
+        console.log(`   ✅ ${r.method} ${r.endpoint}`);
+      });
     console.log('   \nFailed:');
-    results.filter(r => !r.success).forEach(r => {
-      console.log(`   ❌ ${r.method} ${r.endpoint} (${r.status})`);
-    });
+    results
+      .filter((r) => !r.success)
+      .forEach((r) => {
+        console.log(`   ❌ ${r.method} ${r.endpoint} (${r.status})`);
+      });
   } else if (someSucceeded) {
     console.log('✅ Some requests succeeded');
     console.log('   API key has at least partial access');
@@ -253,19 +253,21 @@ console.log('-------------------------------');
 async function testCreemSdk(): Promise<void> {
   try {
     const { Creem } = await import('creem');
-    
+
     // Test both server indices
     for (const serverIdx of [0, 1]) {
-      console.log(`\nTesting with serverIdx: ${serverIdx} (${serverIdx === 0 ? 'production' : 'sandbox'})`);
-      
+      console.log(
+        `\nTesting with serverIdx: ${serverIdx} (${serverIdx === 0 ? 'production' : 'sandbox'})`
+      );
+
       const creem = new Creem({ serverIdx });
-      
+
       try {
         const result = await creem.retrieveSubscription({
           subscriptionId: TEST_SUBSCRIPTION_ID,
           xApiKey: CREEM_API_KEY,
         });
-        
+
         console.log(`✅ SUCCESS with serverIdx ${serverIdx}`);
         console.log('Subscription:', JSON.stringify(result, null, 2));
       } catch (error) {
@@ -284,10 +286,10 @@ async function runDiagnostics(): Promise<void> {
   if (!keyValidation.valid) {
     console.log('⚠️  API key format issues detected. Fix these first before continuing.\n');
   }
-  
+
   await runApiTests();
   await testCreemSdk();
-  
+
   console.log('\n=== Recommendations ===');
   console.log('Based on the test results:');
   console.log('1. If ALL requests fail with 403:');

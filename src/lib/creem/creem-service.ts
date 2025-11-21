@@ -993,6 +993,36 @@ class CreemPaymentService {
       customerObj?.external_id ||
       (checkout as { userId?: string }).userId;
 
+    // Check if this is a one-time credit pack purchase
+    const metadataType = (metadata as { type?: string } | undefined)?.type;
+    const orderType = (order as { type?: string } | undefined)?.type;
+    const isCreditPack = metadataType === 'credit_pack' || orderType === 'onetime';
+
+    if (isCreditPack) {
+      // Handle one-time credit pack purchase
+      const orderProduct = (order as { product?: string | { id?: string; name?: string } } | undefined)?.product;
+      const productId = typeof orderProduct === 'string' ? orderProduct : orderProduct?.id;
+      const productName = typeof orderProduct === 'object' ? orderProduct?.name : undefined;
+      const orderAmount = (order as { amount_paid?: number } | undefined)?.amount_paid;
+      
+      // Extract credit amount from product name (e.g., "1000 credits")
+      const creditMatch = productName?.match(/(\d+)\s*credits/i);
+      const credits = creditMatch ? Number.parseInt(creditMatch[1], 10) : undefined;
+
+      return {
+        type: 'credit_pack_purchase',
+        userId: userId as string | undefined,
+        customerId: customerId as string | undefined,
+        productId: productId as string | undefined,
+        productName: productName as string | undefined,
+        credits: credits,
+        amount: orderAmount as number | undefined,
+        checkoutId: (checkout as { id?: string }).id as string | undefined,
+        orderId: (order as { id?: string } | undefined)?.id as string | undefined,
+      };
+    }
+
+    // Handle subscription checkout
     // Extract planId from metadata, order, or subscription
     const orderProduct = (order as { product?: string | { id?: string } } | undefined)?.product;
     const subscriptionProduct = (subscription as { product?: string | { id?: string } } | undefined)

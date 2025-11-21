@@ -12,7 +12,8 @@ export default async function PricingPage() {
     const monthlyCapacity = calculateGenerationCapacity(monthlyCredits);
     const yearlyCapacity = calculateGenerationCapacity(yearlyCredits);
 
-    const monthlyCapacityInfo = monthlyCredits > 0 ? formatCapacityRange(monthlyCapacity) : undefined;
+    const monthlyCapacityInfo =
+      monthlyCredits > 0 ? formatCapacityRange(monthlyCapacity) : undefined;
     const yearlyCapacityInfo = yearlyCredits > 0 ? formatCapacityRange(yearlyCapacity) : undefined;
 
     const features = [...plan.features];

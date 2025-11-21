@@ -2,20 +2,20 @@
 
 /**
  * Comprehensive Creem API Capability Test
- * 
+ *
  * This script tests what operations the API key can and cannot perform:
  * 1. List products
  * 2. List customers
  * 3. Retrieve specific subscription
  * 4. List all subscriptions
  * 5. Create a test checkout
- * 
+ *
  * Usage: node scripts/test-creem-api-capabilities.mjs
  */
 
-import dotenv from 'dotenv';
-import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
+import { fileURLToPath } from 'url';
+import dotenv from 'dotenv';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -54,7 +54,7 @@ async function makeApiCall(endpoint, method = 'GET', body = null) {
   const options = {
     method,
     headers: {
-      'Authorization': `Bearer ${CREEM_API_KEY}`,
+      Authorization: `Bearer ${CREEM_API_KEY}`,
       'Content-Type': 'application/json',
     },
   };
@@ -64,12 +64,12 @@ async function makeApiCall(endpoint, method = 'GET', body = null) {
   }
 
   console.log(`\n📡 ${method} ${url}`);
-  
+
   try {
     const response = await fetch(url, options);
     const statusEmoji = response.ok ? '✅' : '❌';
     console.log(`${statusEmoji} Status: ${response.status} ${response.statusText}`);
-    
+
     let data;
     const contentType = response.headers.get('content-type');
     if (contentType && contentType.includes('application/json')) {
@@ -78,7 +78,7 @@ async function makeApiCall(endpoint, method = 'GET', body = null) {
       const text = await response.text();
       data = { _raw: text };
     }
-    
+
     return {
       ok: response.ok,
       status: response.status,
@@ -104,9 +104,9 @@ async function testListProducts() {
   console.log('TEST 1: List Products');
   console.log('='.repeat(80));
   console.log('This tests if the API key has read access to products in the account.');
-  
+
   const result = await makeApiCall('/products');
-  
+
   if (result.ok) {
     console.log('✅ SUCCESS: Can list products');
     if (Array.isArray(result.data)) {
@@ -126,7 +126,7 @@ async function testListProducts() {
     console.log(`❌ FAILED: Cannot list products (${result.status})`);
     console.log('Response:', JSON.stringify(result.data, null, 2));
   }
-  
+
   return result;
 }
 
@@ -138,9 +138,9 @@ async function testListCustomers() {
   console.log('TEST 2: List Customers');
   console.log('='.repeat(80));
   console.log('This tests if the API key has read access to customers in the account.');
-  
+
   const result = await makeApiCall('/customers');
-  
+
   if (result.ok) {
     console.log('✅ SUCCESS: Can list customers');
     if (Array.isArray(result.data)) {
@@ -160,7 +160,7 @@ async function testListCustomers() {
     console.log(`❌ FAILED: Cannot list customers (${result.status})`);
     console.log('Response:', JSON.stringify(result.data, null, 2));
   }
-  
+
   return result;
 }
 
@@ -172,9 +172,9 @@ async function testListSubscriptions() {
   console.log('TEST 3: List All Subscriptions');
   console.log('='.repeat(80));
   console.log('This tests if the API key has read access to subscriptions in the account.');
-  
+
   const result = await makeApiCall('/subscriptions');
-  
+
   if (result.ok) {
     console.log('✅ SUCCESS: Can list subscriptions');
     if (Array.isArray(result.data)) {
@@ -193,7 +193,7 @@ async function testListSubscriptions() {
   } else {
     console.log(`❌ FAILED: Cannot list subscriptions (${result.status})`);
     console.log('Response:', JSON.stringify(result.data, null, 2));
-    
+
     if (result.status === 403) {
       console.log('\n⚠️  403 FORBIDDEN ERROR DETECTED');
       console.log('This means the API key does NOT have permission to list subscriptions.');
@@ -203,7 +203,7 @@ async function testListSubscriptions() {
       console.log('  3. API key permissions were restricted when regenerated');
     }
   }
-  
+
   return result;
 }
 
@@ -215,16 +215,16 @@ async function testRetrieveSubscription() {
   console.log('TEST 4: Retrieve Specific Subscription');
   console.log('='.repeat(80));
   console.log(`This tests if the API key can retrieve subscription: ${SUBSCRIPTION_ID}`);
-  
+
   const result = await makeApiCall(`/subscriptions/${SUBSCRIPTION_ID}`);
-  
+
   if (result.ok) {
     console.log('✅ SUCCESS: Can retrieve this subscription');
     console.log('📄 Subscription details:', JSON.stringify(result.data, null, 2));
   } else {
     console.log(`❌ FAILED: Cannot retrieve this subscription (${result.status})`);
     console.log('Response:', JSON.stringify(result.data, null, 2));
-    
+
     if (result.status === 404) {
       console.log('\n⚠️  404 NOT FOUND ERROR DETECTED');
       console.log('This means one of the following:');
@@ -232,7 +232,7 @@ async function testRetrieveSubscription() {
       console.log('  2. The subscription exists in a different environment (test vs production)');
       console.log('  3. The subscription exists in a different Creem project/account');
       console.log('  4. The subscription was deleted');
-      
+
       // Check if subscription ID format suggests test vs production
       if (SUBSCRIPTION_ID.includes('test_')) {
         console.log('\n💡 The subscription ID contains "test_" - it\'s a test mode subscription');
@@ -249,7 +249,7 @@ async function testRetrieveSubscription() {
       }
     }
   }
-  
+
   return result;
 }
 
@@ -261,14 +261,14 @@ async function testCreateCheckout() {
   console.log('TEST 5: Create Test Checkout');
   console.log('='.repeat(80));
   console.log('This tests if the API key has write permissions (create checkouts).');
-  
+
   const PRO_MONTHLY_PRODUCT = process.env.CREEM_PRO_PLAN_PRODUCT_KEY_MONTHLY;
-  
+
   if (!PRO_MONTHLY_PRODUCT) {
     console.log('⚠️  SKIPPED: CREEM_PRO_PLAN_PRODUCT_KEY_MONTHLY not configured');
     return { ok: false, skipped: true };
   }
-  
+
   const testCheckoutRequest = {
     productId: PRO_MONTHLY_PRODUCT,
     requestId: `test_checkout_${Date.now()}`,
@@ -280,20 +280,22 @@ async function testCreateCheckout() {
       email: 'test@example.com',
     },
   };
-  
+
   console.log('Checkout request:', JSON.stringify(testCheckoutRequest, null, 2));
-  
+
   const result = await makeApiCall('/checkouts', 'POST', testCheckoutRequest);
-  
+
   if (result.ok) {
     console.log('✅ SUCCESS: Can create checkouts');
     console.log('🎟️  Checkout created:', JSON.stringify(result.data, null, 2));
-    console.log('\n⚠️  NOTE: This is a real checkout. You may want to delete it from the Creem dashboard.');
+    console.log(
+      '\n⚠️  NOTE: This is a real checkout. You may want to delete it from the Creem dashboard.'
+    );
   } else {
     console.log(`❌ FAILED: Cannot create checkouts (${result.status})`);
     console.log('Response:', JSON.stringify(result.data, null, 2));
   }
-  
+
   return result;
 }
 
@@ -308,23 +310,25 @@ async function runAllTests() {
     specificSubscription: await testRetrieveSubscription(),
     createCheckout: await testCreateCheckout(),
   };
-  
+
   // Summary
   console.log('\n' + '='.repeat(80));
   console.log('SUMMARY');
   console.log('='.repeat(80));
-  
+
   console.log('\nAPI Key Capabilities:');
   console.log(`  List Products:           ${results.products.ok ? '✅ YES' : '❌ NO'}`);
   console.log(`  List Customers:          ${results.customers.ok ? '✅ YES' : '❌ NO'}`);
   console.log(`  List Subscriptions:      ${results.subscriptions.ok ? '✅ YES' : '❌ NO'}`);
   console.log(`  Retrieve Subscription:   ${results.specificSubscription.ok ? '✅ YES' : '❌ NO'}`);
-  console.log(`  Create Checkout:         ${results.createCheckout.skipped ? '⚠️  SKIPPED' : results.createCheckout.ok ? '✅ YES' : '❌ NO'}`);
-  
+  console.log(
+    `  Create Checkout:         ${results.createCheckout.skipped ? '⚠️  SKIPPED' : results.createCheckout.ok ? '✅ YES' : '❌ NO'}`
+  );
+
   console.log('\n' + '='.repeat(80));
   console.log('DIAGNOSIS');
   console.log('='.repeat(80));
-  
+
   // Analyze results
   if (!results.subscriptions.ok && results.subscriptions.status === 403) {
     console.log('\n🔴 CRITICAL ISSUE: 403 Forbidden when listing subscriptions');
@@ -340,7 +344,7 @@ async function runAllTests() {
     console.log('  4. Try creating a NEW API key with full permissions');
     console.log('  5. Contact Creem support to verify API key scope');
   }
-  
+
   if (!results.specificSubscription.ok && results.specificSubscription.status === 404) {
     console.log('\n🔴 CRITICAL ISSUE: 404 Not Found for specific subscription');
     console.log('\nPossible Root Causes:');
@@ -353,13 +357,13 @@ async function runAllTests() {
     console.log('  3. Verify test mode setting matches subscription environment');
     console.log('  4. Try listing all subscriptions from the Creem dashboard');
   }
-  
+
   if (results.products.ok && results.customers.ok && !results.subscriptions.ok) {
     console.log('\n⚠️  PARTIAL ACCESS DETECTED');
     console.log('The API key can access some resources but not subscriptions.');
     console.log('This strongly suggests the API key has SCOPED permissions.');
   }
-  
+
   if (!results.products.ok && !results.customers.ok && !results.subscriptions.ok) {
     console.log('\n🔴 CRITICAL ISSUE: API key has NO read access to any resources');
     console.log('The API key might be invalid, revoked, or from wrong environment.');
@@ -368,22 +372,24 @@ async function runAllTests() {
     console.log('  2. Check if the API key was revoked in Creem dashboard');
     console.log('  3. Regenerate a new API key with full permissions');
   }
-  
+
   console.log('\n' + '='.repeat(80));
   console.log('Environment Configuration Check:');
   console.log('='.repeat(80));
   console.log(`CREEM_API_KEY: ${CREEM_API_KEY ? '✅ Set' : '❌ Not Set'}`);
   console.log(`NEXT_PUBLIC_CREEM_TEST_MODE: ${process.env.NEXT_PUBLIC_CREEM_TEST_MODE || 'false'}`);
   console.log(`Detected Mode: ${CREEM_TEST_MODE ? 'TEST' : 'PRODUCTION'}`);
-  console.log(`API Key Type: ${CREEM_API_KEY.startsWith('creem_test_') ? 'TEST' : CREEM_API_KEY.startsWith('creem_live_') ? 'PRODUCTION' : 'UNKNOWN'}`);
-  
+  console.log(
+    `API Key Type: ${CREEM_API_KEY.startsWith('creem_test_') ? 'TEST' : CREEM_API_KEY.startsWith('creem_live_') ? 'PRODUCTION' : 'UNKNOWN'}`
+  );
+
   if (CREEM_TEST_MODE && !CREEM_API_KEY.startsWith('creem_test_')) {
     console.log('\n⚠️  WARNING: Test mode is enabled but API key does not start with "creem_test_"');
   }
   if (!CREEM_TEST_MODE && !CREEM_API_KEY.startsWith('creem_live_')) {
     console.log('\n⚠️  WARNING: Production mode but API key does not start with "creem_live_"');
   }
-  
+
   console.log('\n' + '='.repeat(80));
 }
 

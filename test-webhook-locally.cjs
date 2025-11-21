@@ -11,31 +11,31 @@ const WEBHOOK_URL = 'http://localhost:3000/api/webhooks/creem';
 const WEBHOOK_SECRET = 'whsec_1Fjrs44z8YRXHr0DKiA9z3';
 
 const payload = {
-  "id": "evt_RNsRiA7qspe9crHl7IuMj",
-  "eventType": "subscription.update",
-  "created_at": 1763689492658,
-  "object": {
-    "id": "sub_5EM6IgULEBVjEtMx5OH0TT",
-    "object": "subscription",
-    "product": {
-      "id": "prod_kUzMsZPgszRro3jOiUrfd",
-      "object": "product",
-      "name": "monthly Pro"
+  id: 'evt_RNsRiA7qspe9crHl7IuMj',
+  eventType: 'subscription.update',
+  created_at: 1763689492658,
+  object: {
+    id: 'sub_5EM6IgULEBVjEtMx5OH0TT',
+    object: 'subscription',
+    product: {
+      id: 'prod_kUzMsZPgszRro3jOiUrfd',
+      object: 'product',
+      name: 'monthly Pro',
     },
-    "customer": {
-      "id": "cust_7ECJrW5ALvuCieDX4W3mOQ",
-      "email": "jefflee2002@gmail.com"
+    customer: {
+      id: 'cust_7ECJrW5ALvuCieDX4W3mOQ',
+      email: 'jefflee2002@gmail.com',
     },
-    "status": "active",
-    "current_period_start_date": "2025-11-19T01:11:55.000Z",
-    "current_period_end_date": "2025-12-19T01:11:55.000Z",
-    "metadata": {
-      "planId": "proplus",
-      "userId": "myZwkau1DoG2GXcibytBYmmwRXX8Mw6L",
-      "userEmail": "jefflee2002@gmail.com",
-      "currentPlan": "pro"
-    }
-  }
+    status: 'active',
+    current_period_start_date: '2025-11-19T01:11:55.000Z',
+    current_period_end_date: '2025-12-19T01:11:55.000Z',
+    metadata: {
+      planId: 'proplus',
+      userId: 'myZwkau1DoG2GXcibytBYmmwRXX8Mw6L',
+      userEmail: 'jefflee2002@gmail.com',
+      currentPlan: 'pro',
+    },
+  },
 };
 
 const payloadString = JSON.stringify(payload);
@@ -53,15 +53,15 @@ fetch(WEBHOOK_URL, {
   method: 'POST',
   headers: {
     'Content-Type': 'application/json',
-    'x-creem-signature': signature
+    'x-creem-signature': signature,
   },
-  body: payloadString
+  body: payloadString,
 })
   .then(async (response) => {
     console.log('Response status:', response.status, response.statusText);
     const text = await response.text();
     console.log('Response body:', text || '(empty)');
-    
+
     if (response.status === 500) {
       console.log('\n❌ 500 ERROR - Check your terminal running "pnpm dev" for error stack trace');
     } else if (response.status === 200) {

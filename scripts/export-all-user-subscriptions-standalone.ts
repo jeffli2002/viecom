@@ -1,9 +1,9 @@
-import { config } from 'dotenv';
 import { resolve } from 'path';
-import { drizzle } from 'drizzle-orm/neon-http';
 import { neon } from '@neondatabase/serverless';
-import { user, payment } from '../src/server/db/schema';
+import { config } from 'dotenv';
 import { eq } from 'drizzle-orm';
+import { drizzle } from 'drizzle-orm/neon-http';
+import { payment, user } from '../src/server/db/schema';
 
 config({ path: resolve(process.cwd(), '.env.local') });
 
@@ -46,10 +46,7 @@ async function exportAllUserSubscriptions() {
     const results: UserSubscriptionInfo[] = [];
 
     for (const u of users) {
-      const subscriptions = await db
-        .select()
-        .from(payment)
-        .where(eq(payment.userId, u.id));
+      const subscriptions = await db.select().from(payment).where(eq(payment.userId, u.id));
 
       const activeSubscription = subscriptions.find(
         (s) => s.status === 'active' || s.status === 'trialing'
@@ -99,7 +96,9 @@ async function exportAllUserSubscriptions() {
         console.log(`Subscription ID: ${user.subscriptionId}`);
         console.log(`Current Plan: ${user.currentPlan}`);
         console.log(`Status: ${user.status}`);
-        console.log(`Period: ${user.periodStart?.toISOString()} → ${user.periodEnd?.toISOString()}`);
+        console.log(
+          `Period: ${user.periodStart?.toISOString()} → ${user.periodEnd?.toISOString()}`
+        );
         console.log(`Cancel at Period End: ${user.cancelAtPeriodEnd ? 'YES' : 'NO'}`);
 
         if (user.scheduledPlanId) {
@@ -132,7 +131,9 @@ async function exportAllUserSubscriptions() {
     console.log('CSV EXPORT');
     console.log('═══════════════════════════════════════════════════════════════\n');
 
-    console.log('email,name,userId,hasSubscription,currentPlan,status,periodEnd,cancelAtPeriodEnd,scheduledPlanId,scheduledPeriodStart');
+    console.log(
+      'email,name,userId,hasSubscription,currentPlan,status,periodEnd,cancelAtPeriodEnd,scheduledPlanId,scheduledPeriodStart'
+    );
     for (const user of results) {
       console.log(
         [

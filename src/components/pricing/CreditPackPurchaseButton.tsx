@@ -1,10 +1,10 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
-import { useAuthStore } from '@/store/auth-store';
 import { useCreemPayment } from '@/hooks/use-creem-payment';
+import { useAuthStore } from '@/store/auth-store';
 import { Loader2 } from 'lucide-react';
-import { useRouter, usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { toast } from 'sonner';
 
@@ -69,9 +69,7 @@ export function CreditPackPurchaseButton({
       onClick={handlePurchase}
       disabled={isProcessing}
       className={`w-full ${
-        popular
-          ? 'bg-purple-600 hover:bg-purple-700'
-          : 'bg-gray-800 hover:bg-gray-900'
+        popular ? 'bg-purple-600 hover:bg-purple-700' : 'bg-gray-800 hover:bg-gray-900'
       }`}
       size="lg"
     >
