@@ -1,13 +1,8 @@
-import type {
-  CreemApiConfig,
-  CheckoutRequest,
-  CheckoutResult,
-  ApiResult,
-} from '../types/config';
 import type { Logger } from '../types/adapters';
 import { ConsoleLogger } from '../types/adapters';
+import type { ApiResult, CheckoutRequest, CheckoutResult, CreemApiConfig } from '../types/config';
 import { verifyWebhookSignature } from '../utils/crypto';
-import { getErrorMessage, CreemApiError } from '../utils/error';
+import { CreemApiError, getErrorMessage } from '../utils/error';
 
 export class CreemApiClient {
   private readonly config: Required<CreemApiConfig>;
@@ -324,7 +319,10 @@ export class CreemApiClient {
   /**
    * Generate customer portal link
    */
-  async generateCustomerPortalLink(customerId: string, returnUrl: string): Promise<ApiResult<{ url: string }>> {
+  async generateCustomerPortalLink(
+    customerId: string,
+    returnUrl: string
+  ): Promise<ApiResult<{ url: string }>> {
     try {
       this.logger.info('Generating customer portal link', { customerId });
 
@@ -386,7 +384,7 @@ export class CreemApiClient {
    */
   private async fetch(path: string, options: RequestInit = {}): Promise<Response> {
     const url = `${this.config.baseUrl}${path}`;
-    
+
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), this.config.timeout);
 

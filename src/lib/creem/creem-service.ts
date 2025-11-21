@@ -7,15 +7,15 @@ const getCreemTestMode = () => {
   // Test keys: creem_test_XXXX
   // Production keys: creem_XXXX (no additional prefix)
   const apiKey = getCreemApiKey();
-  
+
   if (apiKey.startsWith('creem_test_')) {
     return true; // Test key → use test-api.creem.io
   }
-  
+
   if (apiKey.startsWith('creem_') && !apiKey.startsWith('creem_test_')) {
     return false; // Production key → use api.creem.io
   }
-  
+
   // Fallback to environment variable if key format doesn't match
   const testModeEnv = env.NEXT_PUBLIC_CREEM_TEST_MODE;
   return testModeEnv === 'true';
@@ -478,23 +478,20 @@ class CreemPaymentService {
         const baseUrl = getCreemBaseUrl();
         console.log('[Creem] Base URL:', baseUrl);
         console.log('[Creem] Full URL:', `${baseUrl}/v1/subscriptions/${subscriptionId}/upgrade`);
-        
+
         let response: Response;
         try {
-          response = await fetch(
-            `${baseUrl}/v1/subscriptions/${subscriptionId}/upgrade`,
-            {
-              method: 'POST',
-              headers: {
-                'x-api-key': CREEM_API_KEY,
-                'Content-Type': 'application/json',
-              },
-              body: JSON.stringify({
-                product_id: newProductId,
-                update_behavior: useProration ? 'proration-charge' : 'proration-none',
-              }),
-            }
-          );
+          response = await fetch(`${baseUrl}/v1/subscriptions/${subscriptionId}/upgrade`, {
+            method: 'POST',
+            headers: {
+              'x-api-key': CREEM_API_KEY,
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              product_id: newProductId,
+              update_behavior: useProration ? 'proration-charge' : 'proration-none',
+            }),
+          });
         } catch (fetchError) {
           console.error('[Creem] Fetch error - network/DNS failure:', {
             subscriptionId,
@@ -608,20 +605,17 @@ class CreemPaymentService {
         } catch (_sdkError) {
           // Fallback to direct API call
           const baseUrl = getCreemBaseUrl();
-          const response = await fetch(
-            `${baseUrl}/v1/subscriptions/${subscriptionId}/upgrade`,
-            {
-              method: 'POST',
-              headers: {
-                'x-api-key': CREEM_API_KEY,
-                'Content-Type': 'application/json',
-              },
-              body: JSON.stringify({
-                product_id: newProductId,
-                update_behavior: 'proration-none',
-              }),
-            }
-          );
+          const response = await fetch(`${baseUrl}/v1/subscriptions/${subscriptionId}/upgrade`, {
+            method: 'POST',
+            headers: {
+              'x-api-key': CREEM_API_KEY,
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              product_id: newProductId,
+              update_behavior: 'proration-none',
+            }),
+          });
 
           if (!response.ok) {
             throw new Error(`HTTP ${response.status}`);

@@ -22,24 +22,14 @@
       "require": "./dist/adapters/auth/better-auth-adapter.js"
     }
   },
-  "files": [
-    "dist",
-    "migrations",
-    "README.md"
-  ],
+  "files": ["dist", "migrations", "README.md"],
   "scripts": {
     "build": "tsup",
     "dev": "tsup --watch",
     "typecheck": "tsc --noEmit",
     "test": "vitest"
   },
-  "keywords": [
-    "creem",
-    "subscription",
-    "payment",
-    "saas",
-    "billing"
-  ],
+  "keywords": ["creem", "subscription", "payment", "saas", "billing"],
   "author": "Viecom",
   "license": "MIT",
   "peerDependencies": {

@@ -46,7 +46,7 @@ export async function POST(request: NextRequest) {
     // If productKey is provided (credit pack purchase), skip subscription checks
     if (productKey) {
       console.log('[Create Checkout] Credit pack purchase with productKey:', productKey);
-      
+
       const checkout = await creemService.createCheckoutSessionWithProductKey({
         userId: session.user.id,
         userEmail: session.user.email,

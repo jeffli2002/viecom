@@ -495,7 +495,6 @@ const BillingClient = ({ plans }: BillingClientProps) => {
     }
   };
 
-
   const handleReactivate = async () => {
     if (!subscription?.subscriptionId) {
       toast.error('No subscription to reactivate.');

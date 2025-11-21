@@ -61,15 +61,20 @@ export async function POST(
       if (forceScheduleAtPeriodEnd) {
         // Call Creem API to cancel subscription
         console.log('[Creem Subscription Downgrade] Cancelling subscription:', subscriptionId);
-        
+
         const creemResult = await creemService.cancelSubscription(subscriptionId);
-        
+
         if (!creemResult.success) {
-          console.error('[Creem Subscription Downgrade] Failed to cancel subscription:', creemResult.error);
+          console.error(
+            '[Creem Subscription Downgrade] Failed to cancel subscription:',
+            creemResult.error
+          );
           return NextResponse.json(
-            { 
-              success: false, 
-              error: creemResult.error || 'Failed to cancel subscription with Creem. Please try again or contact support.' 
+            {
+              success: false,
+              error:
+                creemResult.error ||
+                'Failed to cancel subscription with Creem. Please try again or contact support.',
             },
             { status: 500 }
           );
