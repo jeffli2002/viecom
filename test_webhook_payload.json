@@ -1,0 +1,26 @@
+{
+  "id": "evt_6my8qGjMgBkoTePYTdh5K3",
+  "eventType": "subscription.update",
+  "created_at": 1763687079690,
+  "object": {
+    "id": "sub_5EM6IgULEBVjEtMx5OH0TT",
+    "object": "subscription",
+    "product": {
+      "id": "prod_kUzMsZPgszRro3jOiUrfd",
+      "name": "monthly Pro"
+    },
+    "customer": {
+      "id": "cust_7ECJrW5ALvuCieDX4W3mOQ",
+      "email": "jefflee2002@gmail.com"
+    },
+    "status": "active",
+    "current_period_start_date": "2025-11-19T01:11:55.000Z",
+    "current_period_end_date": "2025-12-19T01:11:55.000Z",
+    "metadata": {
+      "planId": "proplus",
+      "userId": "myZwkau1DoG2GXcibytBYmmwRXX8Mw6L",
+      "userEmail": "jefflee2002@gmail.com",
+      "currentPlan": "pro"
+    }
+  }
+}

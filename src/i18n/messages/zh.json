@@ -300,6 +300,7 @@
     "enhanceAllPrompts": "一键增强所有 Prompt",
     "selectAll": "全选",
     "deselectAll": "取消全选",
+    "selected": "已选择",
     "generating": "批量生成中...",
     "startBatchGeneration": "开始批量生成",
     "rowsSelected": "行",

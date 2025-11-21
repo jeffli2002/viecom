@@ -31,7 +31,9 @@
     "analyze": "ANALYZE=true pnpm build",
     "analyze:server": "BUNDLE_ANALYZE=server pnpm build",
     "analyze:browser": "BUNDLE_ANALYZE=browser pnpm build",
-    "size-check": "bundlesize"
+    "size-check": "bundlesize",
+    "diagnose:creem": "tsx scripts/diagnose-creem-403.ts",
+    "diagnose:creem-create": "tsx scripts/test-creem-create.ts"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.842.0",

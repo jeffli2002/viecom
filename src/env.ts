@@ -39,6 +39,9 @@ export const env = createEnv({
     // Creem Payment
     CREEM_API_KEY: z.string().optional(),
     CREEM_WEBHOOK_SECRET: z.string().optional(),
+    // Note: CREEM_API_URL is auto-detected from API key type (test vs production)
+    // but can be overridden via env var if needed
+    CREEM_API_URL: z.string().url().optional().default('https://api.creem.io'),
     CREEM_PRO_PLAN_PRODUCT_KEY_MONTHLY: z.string().optional(),
     CREEM_PROPLUS_PLAN_PRODUCT_KEY_MONTHLY: z.string().optional(),
     CREEM_PRO_PLAN_PRODUCT_KEY_YEARLY: z.string().optional(),
@@ -54,6 +57,11 @@ export const env = createEnv({
     NEXT_PUBLIC_APP_URL: z.string().url(),
     NEXT_PUBLIC_DISABLE_AUTH: z.string().optional().default('false'),
     NEXT_PUBLIC_CREEM_TEST_MODE: z.string().optional().default('false'),
+    // Creem Credit Packs (One-time purchases)
+    NEXT_PUBLIC_CREEM_PRICE_PACK_1000: z.string().optional(),
+    NEXT_PUBLIC_CREEM_PRICE_PACK_2000: z.string().optional(),
+    NEXT_PUBLIC_CREEM_PRICE_PACK_5000: z.string().optional(),
+    NEXT_PUBLIC_CREEM_PRICE_PACK_10000: z.string().optional(),
   },
 
   /**
@@ -87,11 +95,16 @@ export const env = createEnv({
     REDIS_URL: process.env.REDIS_URL,
     CREEM_API_KEY: process.env.CREEM_API_KEY,
     CREEM_WEBHOOK_SECRET: process.env.CREEM_WEBHOOK_SECRET,
+    CREEM_API_URL: process.env.CREEM_API_URL,
     CREEM_PRO_PLAN_PRODUCT_KEY_MONTHLY: process.env.CREEM_PRO_PLAN_PRODUCT_KEY_MONTHLY,
     CREEM_PROPLUS_PLAN_PRODUCT_KEY_MONTHLY: process.env.CREEM_PROPLUS_PLAN_PRODUCT_KEY_MONTHLY,
     CREEM_PRO_PLAN_PRODUCT_KEY_YEARLY: process.env.CREEM_PRO_PLAN_PRODUCT_KEY_YEARLY,
     CREEM_PROPLUS_PLAN_PRODUCT_KEY_YEARLY: process.env.CREEM_PROPLUS_PLAN_PRODUCT_KEY_YEARLY,
     NEXT_PUBLIC_CREEM_TEST_MODE: process.env.NEXT_PUBLIC_CREEM_TEST_MODE,
+    NEXT_PUBLIC_CREEM_PRICE_PACK_1000: process.env.NEXT_PUBLIC_CREEM_PRICE_PACK_1000,
+    NEXT_PUBLIC_CREEM_PRICE_PACK_2000: process.env.NEXT_PUBLIC_CREEM_PRICE_PACK_2000,
+    NEXT_PUBLIC_CREEM_PRICE_PACK_5000: process.env.NEXT_PUBLIC_CREEM_PRICE_PACK_5000,
+    NEXT_PUBLIC_CREEM_PRICE_PACK_10000: process.env.NEXT_PUBLIC_CREEM_PRICE_PACK_10000,
   },
   /**
    * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation. This is especially

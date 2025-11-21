@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Import Creem Subscriptions</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            padding: 40px;
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+        
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+        
+        .instructions {
+            background: #f0f9ff;
+            border-left: 4px solid #3b82f6;
+            padding: 20px;
+            margin-bottom: 30px;
+            border-radius: 4px;
+        }
+        
+        .instructions h3 {
+            color: #1e40af;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+        
+        .instructions ol {
+            margin-left: 20px;
+            color: #334155;
+            line-height: 1.8;
+        }
+        
+        .instructions code {
+            background: #e0f2fe;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 13px;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .form-group {
+            background: #f8fafc;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border: 2px solid #e2e8f0;
+        }
+        
+        .form-group.active {
+            border-color: #667eea;
+            background: #faf5ff;
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .form-field {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .form-field.full-width {
+            grid-column: 1 / -1;
+        }
+        
+        label {
+            font-weight: 600;
+            color: #475569;
+            margin-bottom: 6px;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        input, select {
+            padding: 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+        
+        input:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 14px;
+        }
+        
+        .btn-add {
+            background: #10b981;
+            color: white;
+            flex: 1;
+        }
+        
+        .btn-add:hover {
+            background: #059669;
+            transform: translateY(-1px);
+        }
+        
+        .btn-clear {
+            background: #ef4444;
+            color: white;
+        }
+        
+        .btn-clear:hover {
+            background: #dc2626;
+        }
+        
+        .btn-export {
+            background: #667eea;
+            color: white;
+            width: 100%;
+            padding: 16px;
+            font-size: 16px;
+            margin-top: 20px;
+        }
+        
+        .btn-export:hover {
+            background: #5a67d8;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+        
+        .btn-export:disabled {
+            background: #cbd5e1;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .subscription-list {
+            margin-top: 30px;
+        }
+        
+        .subscription-item {
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 6px;
+            padding: 15px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .subscription-info {
+            flex: 1;
+        }
+        
+        .subscription-id {
+            font-weight: 700;
+            color: #667eea;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+        }
+        
+        .subscription-details {
+            color: #64748b;
+            font-size: 13px;
+            margin-top: 4px;
+        }
+        
+        .btn-remove {
+            background: #fee2e2;
+            color: #991b1b;
+            padding: 8px 16px;
+            font-size: 12px;
+        }
+        
+        .btn-remove:hover {
+            background: #fecaca;
+        }
+        
+        .count-badge {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+        
+        .success-message {
+            background: #d1fae5;
+            border: 2px solid #10b981;
+            color: #065f46;
+            padding: 15px;
+            border-radius: 6px;
+            margin-top: 20px;
+            display: none;
+        }
+        
+        .success-message.show {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📥 Import Creem Subscriptions</h1>
+        <p class="subtitle">Easy data entry form - no coding required!</p>
+        
+        <div class="instructions">
+            <h3>📋 How to use:</h3>
+            <ol>
+                <li>Open your <strong>Creem dashboard</strong> in another tab</li>
+                <li>For each subscription, copy the <strong>Subscription ID</strong> from the list (looks like <code>sub_xxxxx</code>)</li>
+                <li>Fill in the details below and click <strong>"Add Subscription"</strong></li>
+                <li>Repeat for all 14 subscriptions</li>
+                <li>Click <strong>"Generate CSV File"</strong> when done</li>
+                <li>Save the file as <code>creem-subscriptions.csv</code> in your project folder</li>
+                <li>Run: <code>pnpm tsx scripts/import-from-csv.ts</code></li>
+            </ol>
+        </div>
+        
+        <form id="subscriptionForm">
+            <div class="form-group active">
+                <div class="form-row">
+                    <div class="form-field">
+                        <label for="subId">Subscription ID *</label>
+                        <input type="text" id="subId" placeholder="sub_xxxxxxxxxxxxx" required>
+                    </div>
+                    
+                    <div class="form-field">
+                        <label for="customerId">Customer ID</label>
+                        <input type="text" id="customerId" placeholder="cus_xxxxxxxxxxxxx (optional)">
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-field">
+                        <label for="priceId">Plan *</label>
+                        <select id="priceId" required>
+                            <option value="">Select plan...</option>
+                            <option value="pro">Pro</option>
+                            <option value="proplus">Pro+</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-field">
+                        <label for="status">Status *</label>
+                        <select id="status" required>
+                            <option value="active">Active</option>
+                            <option value="trialing">Trialing</option>
+                            <option value="canceled">Canceled</option>
+                            <option value="past_due">Past Due</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-field">
+                        <label for="interval">Billing Interval *</label>
+                        <select id="interval" required>
+                            <option value="month">Monthly</option>
+                            <option value="year">Yearly</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-field">
+                        <label for="periodStart">Period Start</label>
+                        <input type="date" id="periodStart">
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-field">
+                        <label for="periodEnd">Period End</label>
+                        <input type="date" id="periodEnd">
+                    </div>
+                </div>
+                
+                <div class="btn-group">
+                    <button type="submit" class="btn-add">✅ Add Subscription</button>
+                    <button type="button" class="btn-clear" onclick="clearForm()">🗑️ Clear</button>
+                </div>
+            </div>
+        </form>
+        
+        <div class="subscription-list">
+            <h2>Added Subscriptions <span class="count-badge" id="count">0</span></h2>
+            <div id="subscriptionsList"></div>
+        </div>
+        
+        <button class="btn-export" id="exportBtn" onclick="exportCSV()" disabled>
+            💾 Generate CSV File
+        </button>
+        
+        <div class="success-message" id="successMsg">
+            ✅ CSV file downloaded! Save it as <strong>creem-subscriptions.csv</strong> in your project root, then run: <code>pnpm tsx scripts/import-from-csv.ts</code>
+        </div>
+    </div>
+    
+    <script>
+        const subscriptions = [];
+        
+        document.getElementById('subscriptionForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            addSubscription();
+        });
+        
+        function addSubscription() {
+            const sub = {
+                subscriptionId: document.getElementById('subId').value.trim(),
+                customerId: document.getElementById('customerId').value.trim() || 'auto',
+                priceId: document.getElementById('priceId').value,
+                status: document.getElementById('status').value,
+                interval: document.getElementById('interval').value,
+                periodStart: document.getElementById('periodStart').value || '',
+                periodEnd: document.getElementById('periodEnd').value || ''
+            };
+            
+            if (!sub.subscriptionId) {
+                alert('Please enter a Subscription ID');
+                return;
+            }
+            
+            // Check for duplicates
+            if (subscriptions.some(s => s.subscriptionId === sub.subscriptionId)) {
+                alert('This subscription ID already exists!');
+                return;
+            }
+            
+            subscriptions.push(sub);
+            updateList();
+            clearForm();
+            document.getElementById('subId').focus();
+        }
+        
+        function removeSubscription(index) {
+            subscriptions.splice(index, 1);
+            updateList();
+        }
+        
+        function updateList() {
+            const list = document.getElementById('subscriptionsList');
+            const count = document.getElementById('count');
+            const exportBtn = document.getElementById('exportBtn');
+            
+            count.textContent = subscriptions.length;
+            exportBtn.disabled = subscriptions.length === 0;
+            
+            if (subscriptions.length === 0) {
+                list.innerHTML = '<p style="color: #94a3b8; text-align: center; padding: 40px;">No subscriptions added yet</p>';
+                return;
+            }
+            
+            list.innerHTML = subscriptions.map((sub, index) => `
+                <div class="subscription-item">
+                    <div class="subscription-info">
+                        <div class="subscription-id">${sub.subscriptionId}</div>
+                        <div class="subscription-details">
+                            ${sub.priceId.toUpperCase()} • ${sub.status} • ${sub.interval}ly
+                            ${sub.periodEnd ? ` • Ends: ${sub.periodEnd}` : ''}
+                        </div>
+                    </div>
+                    <button class="btn-remove" onclick="removeSubscription(${index})">Remove</button>
+                </div>
+            `).join('');
+        }
+        
+        function clearForm() {
+            document.getElementById('subscriptionForm').reset();
+            document.getElementById('customerId').value = '';
+            document.getElementById('periodStart').value = '';
+            document.getElementById('periodEnd').value = '';
+        }
+        
+        function exportCSV() {
+            if (subscriptions.length === 0) {
+                alert('Please add at least one subscription first!');
+                return;
+            }
+            
+            // Create CSV content
+            let csv = 'subscriptionId,customerId,priceId,status,interval,periodStart,periodEnd\n';
+            
+            subscriptions.forEach(sub => {
+                csv += `${sub.subscriptionId},${sub.customerId},${sub.priceId},${sub.status},${sub.interval},${sub.periodStart},${sub.periodEnd}\n`;
+            });
+            
+            // Download file
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'creem-subscriptions.csv';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+            
+            // Show success message
+            document.getElementById('successMsg').classList.add('show');
+            
+            setTimeout(() => {
+                document.getElementById('successMsg').classList.remove('show');
+            }, 10000);
+        }
+        
+        // Set default date to today
+        document.getElementById('periodStart').valueAsDate = new Date();
+        const endDate = new Date();
+        endDate.setMonth(endDate.getMonth() + 1);
+        document.getElementById('periodEnd').valueAsDate = endDate;
+    </script>
+</body>
+</html>

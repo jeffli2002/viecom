@@ -1,6 +1,7 @@
 // @ts-nocheck
 'use client';
 
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -25,7 +26,7 @@ import {
   TrendingUp,
   Video,
 } from 'lucide-react';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Suspense, useEffect, useMemo, useState } from 'react';
@@ -107,6 +108,7 @@ const formatDateDisplay = (value?: string | null) => {
 
 function DashboardPageContent() {
   const t = useTranslations('dashboard');
+  const locale = useLocale();
   const { isAuthenticated, user, isLoading: authLoading } = useAuthStore();
   const router = useRouter();
   const [creditBalance, setCreditBalance] = useState<CreditBalance | null>(null);
@@ -266,23 +268,60 @@ function DashboardPageContent() {
       </div>
 
       {scheduledPlanDetails && (
-        <div className="rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900">
-          <p className="font-semibold">套餐变更已排程</p>
-          <p className="mt-1">
-            自{' '}
-            <span className="font-medium">
-              {formatDateDisplay(scheduledPlanDetails.takesEffectAt)}
-            </span>{' '}
-            起，你的订阅将切换为{' '}
-            <span className="font-medium">{scheduledPlanDetails.planName}</span>（
-            {scheduledPlanDetails.interval === 'year' ? '年付' : '月付'}），费用为{' '}
-            {scheduledPlanDetails.price
-              ? `$${scheduledPlanDetails.price.toFixed(2)}`
-              : '官方标准价'}{' '}
-            ，每个周期将获赠 <span className="font-medium">{scheduledPlanDetails.credits}</span>{' '}
-            积分。当前套餐在此之前仍可继续使用。
-          </p>
-        </div>
+        <Alert className="border-purple-300 bg-gradient-to-r from-purple-50 to-violet-50 shadow-lg">
+          <AlertTitle className="flex items-center gap-2 text-lg font-bold text-purple-900">
+            <TrendingUp className="h-5 w-5 text-purple-600" />
+            {locale === 'zh'
+              ? `套餐升级已排程：${scheduledPlanDetails.planName}`
+              : `Plan Upgrade Scheduled: ${scheduledPlanDetails.planName}`}
+          </AlertTitle>
+          <AlertDescription className="mt-2 text-base text-purple-800">
+            <p className="font-semibold mb-2">
+              {locale === 'zh'
+                ? `您的订阅将在以下日期升级为 ${scheduledPlanDetails.planName}：`
+                : `Your subscription will upgrade to ${scheduledPlanDetails.planName} on:`}
+            </p>
+            <p className="mb-3">
+              <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-md bg-purple-100 text-purple-900 font-bold text-lg">
+                <Calendar className="h-4 w-4" />
+                {formatDateDisplay(scheduledPlanDetails.takesEffectAt)}
+              </span>
+            </p>
+            <div className="space-y-1 text-sm">
+              <p>
+                {locale === 'zh' ? '• 计费周期：' : '• Billing cycle: '}
+                <span className="font-medium">
+                  {scheduledPlanDetails.interval === 'year'
+                    ? locale === 'zh'
+                      ? '年付'
+                      : 'Yearly'
+                    : locale === 'zh'
+                      ? '月付'
+                      : 'Monthly'}
+                </span>
+              </p>
+              <p>
+                {locale === 'zh' ? '• 费用：' : '• Price: '}
+                <span className="font-medium">
+                  {scheduledPlanDetails.price
+                    ? `$${scheduledPlanDetails.price.toFixed(2)}`
+                    : locale === 'zh'
+                      ? '官方标准价'
+                      : 'Standard rate'}
+                </span>
+              </p>
+              <p>
+                {locale === 'zh' ? '• 每月积分：' : '• Credits per cycle: '}
+                <span className="font-medium">{scheduledPlanDetails.credits}</span>
+              </p>
+            </div>
+            <p className="mt-3 pt-3 border-t border-purple-200 text-sm">
+              {locale === 'zh'
+                ? `当前 ${planId === 'proplus' ? 'Pro+' : planId === 'pro' ? 'Pro' : 'Free'} 套餐将在此日期之前保持有效。`
+                : `Your current ${planId === 'proplus' ? 'Pro+' : planId === 'pro' ? 'Pro' : 'Free'} plan remains active until then.`}
+            </p>
+          </AlertDescription>
+        </Alert>
       )}
 
       {/* Credit Balance Cards */}

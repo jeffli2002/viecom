@@ -348,6 +348,45 @@ export const useAuthStore = create<AuthState>()(
             }
           } catch (error) {
             console.error('Initialize error:', error);
+            // If it's a network error, retry once after a short delay
+            if (error instanceof TypeError && error.message.includes('fetch')) {
+              console.log('[Auth] Network error detected, retrying in 1 second...');
+              setTimeout(async () => {
+                try {
+                  const retrySession = await authClient.getSession();
+                  if (retrySession.data) {
+                    const user = retrySession.data.user;
+                    set({
+                      user,
+                      isAuthenticated: true,
+                      isLoading: false,
+                      isInitialized: true,
+                      lastUpdated: Date.now(),
+                    });
+                    return;
+                  }
+                } catch (retryError) {
+                  console.error('[Auth] Retry failed:', retryError);
+                }
+                // If retry also fails, fall through to normal error handling
+                if (!get().isCacheValid()) {
+                  set({
+                    user: null,
+                    isAuthenticated: false,
+                    isLoading: false,
+                    isInitialized: true,
+                    lastUpdated: Date.now(),
+                  });
+                } else {
+                  set({
+                    isLoading: false,
+                    isInitialized: true,
+                  });
+                }
+              }, 1000);
+              return;
+            }
+            // Normal error handling for non-network errors
             if (!get().isCacheValid()) {
               set({
                 user: null,

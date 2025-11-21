@@ -143,6 +143,12 @@ export const payment = pgTable('payment', {
   cancelAtPeriodEnd: boolean('cancel_at_period_end'),
   trialStart: timestamp('trial_start'),
   trialEnd: timestamp('trial_end'),
+  // Scheduled upgrade fields (方案2: 单条记录+字段)
+  scheduledPlanId: text('scheduled_plan_id'),
+  scheduledInterval: text('scheduled_interval'),
+  scheduledPeriodStart: timestamp('scheduled_period_start'),
+  scheduledPeriodEnd: timestamp('scheduled_period_end'),
+  scheduledAt: timestamp('scheduled_at'),
   createdAt: timestamp('created_at')
     .$defaultFn(() => new Date())
     .notNull(),

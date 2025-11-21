@@ -25,7 +25,7 @@ export default async function LocaleLayout({
   const messages = await getMessages();
 
   return (
-    <NextIntlClientProvider messages={messages} locale={locale}>
+    <NextIntlClientProvider messages={messages as Record<string, unknown>} locale={locale}>
       <MainLayout>{children}</MainLayout>
       <Toaster />
     </NextIntlClientProvider>
