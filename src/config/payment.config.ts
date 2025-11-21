@@ -209,10 +209,9 @@ export const paymentConfig: PaymentConfig = {
       features: [
         '900 credits/month',
         'Everything in Pro',
-        'Advanced AI models (Sora 2 Pro)',
+        'Advanced AI models First Try',
         'Priority queue processing (10 concurrent)',
         '30 days asset display',
-        '4K quality exports',
         'Dedicated account manager',
         '24/7 priority support',
       ],
