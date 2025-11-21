@@ -209,7 +209,7 @@ export const paymentConfig: PaymentConfig = {
       features: [
         '900 credits/month',
         'Everything in Pro',
-        'Advanced AI models First Try',
+        'Advanced AI models first try',
         'Priority queue processing (10 concurrent)',
         '30 days asset display',
         'Dedicated account manager',
