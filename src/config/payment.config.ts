@@ -212,7 +212,7 @@ export const paymentConfig: PaymentConfig = {
         'Advanced AI models first try',
         'Batch generation (10 concurrent)',
         'Priority queue processing',
-        '30 days asset display',
+        '90 days asset display',
         'Dedicated account manager',
         '24/7 priority support',
       ],
