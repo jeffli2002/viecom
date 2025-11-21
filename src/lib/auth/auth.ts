@@ -20,7 +20,10 @@ const createTrustedOrigins = (): string[] => {
       hostname.endsWith('.local') ||
       hostname.endsWith('.localhost');
 
-    if (!isLocalhost) {
+    // Trust Vercel preview deployments
+    const isVercelPreview = hostname.endsWith('.vercel.app');
+
+    if (!isLocalhost && !isVercelPreview) {
       const portSuffix = baseUrl.port ? `:${baseUrl.port}` : '';
 
       if (hostname.startsWith('www.')) {
@@ -29,6 +32,11 @@ const createTrustedOrigins = (): string[] => {
       } else {
         origins.add(`${baseUrl.protocol}//www.${hostname}${portSuffix}`);
       }
+    }
+
+    // For Vercel previews, explicitly trust the exact URL
+    if (isVercelPreview) {
+      origins.add(baseOrigin);
     }
   } catch (error) {
     console.warn('[auth] Invalid NEXT_PUBLIC_APP_URL, cannot derive trusted origins:', error);
