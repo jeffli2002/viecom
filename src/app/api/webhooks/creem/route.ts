@@ -411,84 +411,97 @@ async function handleCreditPackPurchase(data: CreemWebhookData) {
   try {
     const referenceId = `creem_credit_pack_${orderId || checkoutId}_${Date.now()}`;
 
-    await db.transaction(async (tx) => {
-      const [userCredit] = await tx
-        .select()
-        .from(userCredits)
-        .where(eq(userCredits.userId, userId))
-        .limit(1);
+    // Check for existing transaction to prevent duplicates
+    const [existingTransaction] = await db
+      .select()
+      .from(creditTransactions)
+      .where(eq(creditTransactions.referenceId, referenceId))
+      .limit(1);
 
-      if (!userCredit) {
-        // Create credit account with purchased credits
-        const now = new Date();
-        await tx.insert(userCredits).values({
-          id: randomUUID(),
-          userId,
-          balance: credits,
-          totalEarned: credits,
-          totalSpent: 0,
-          frozenBalance: 0,
-          createdAt: now,
-          updatedAt: now,
-        });
+    if (existingTransaction) {
+      console.log(
+        `[Creem Webhook] Credit pack purchase already processed for reference ${referenceId}`
+      );
+      return;
+    }
 
-        await tx.insert(creditTransactions).values({
-          id: randomUUID(),
-          userId,
-          type: 'earn',
-          amount: credits,
-          balanceAfter: credits,
-          source: 'purchase',
-          description: `Credit pack purchase: ${productName || `${credits} credits`}`,
-          referenceId,
-          metadata: JSON.stringify({
-            provider: 'creem',
-            checkoutId,
-            orderId,
-            productName,
-            credits,
-          }),
-        });
+    // Get or create user credit account
+    const [userCredit] = await db
+      .select()
+      .from(userCredits)
+      .where(eq(userCredits.userId, userId))
+      .limit(1);
 
-        console.log(
-          `[Creem Webhook] Created credit account for ${userId} with ${credits} credits from pack purchase`
-        );
-      } else {
-        // Add credits to existing account
-        const newBalance = userCredit.balance + credits;
+    if (!userCredit) {
+      // Create credit account with purchased credits
+      const now = new Date();
+      await db.insert(userCredits).values({
+        id: randomUUID(),
+        userId,
+        balance: credits,
+        totalEarned: credits,
+        totalSpent: 0,
+        frozenBalance: 0,
+        createdAt: now,
+        updatedAt: now,
+      });
 
-        await tx
-          .update(userCredits)
-          .set({
-            balance: newBalance,
-            totalEarned: userCredit.totalEarned + credits,
-            updatedAt: new Date(),
-          })
-          .where(eq(userCredits.userId, userId));
+      await db.insert(creditTransactions).values({
+        id: randomUUID(),
+        userId,
+        type: 'earn',
+        amount: credits,
+        balanceAfter: credits,
+        source: 'purchase',
+        description: `Credit pack purchase: ${productName || `${credits} credits`}`,
+        referenceId,
+        metadata: JSON.stringify({
+          provider: 'creem',
+          checkoutId,
+          orderId,
+          productName,
+          credits,
+        }),
+      });
 
-        await tx.insert(creditTransactions).values({
-          id: randomUUID(),
-          userId,
-          type: 'earn',
-          amount: credits,
-          balanceAfter: newBalance,
-          source: 'purchase',
-          description: `Credit pack purchase: ${productName || `${credits} credits`}`,
-          referenceId,
-          metadata: JSON.stringify({
-            provider: 'creem',
-            checkoutId,
-            orderId,
-            productName,
-            credits,
-          }),
-        });
+      console.log(
+        `[Creem Webhook] Created credit account for ${userId} with ${credits} credits from pack purchase`
+      );
+    } else {
+      // Add credits to existing account
+      const newBalance = userCredit.balance + credits;
 
-        console.log(
-          `[Creem Webhook] Granted ${credits} credits to ${userId} from pack purchase (new balance: ${newBalance})`
-        );
-      }
-    });
+      await db
+        .update(userCredits)
+        .set({
+          balance: newBalance,
+          totalEarned: userCredit.totalEarned + credits,
+          updatedAt: new Date(),
+        })
+        .where(eq(userCredits.userId, userId));
+
+      await db.insert(creditTransactions).values({
+        id: randomUUID(),
+        userId,
+        type: 'earn',
+        amount: credits,
+        balanceAfter: newBalance,
+        source: 'purchase',
+        description: `Credit pack purchase: ${productName || `${credits} credits`}`,
+        referenceId,
+        metadata: JSON.stringify({
+          provider: 'creem',
+          checkoutId,
+          orderId,
+          productName,
+          credits,
+        }),
+      });
+
+      console.log(
+        `[Creem Webhook] Granted ${credits} credits to ${userId} from pack purchase (new balance: ${newBalance})`
+      );
+    }
 
     console.log(
       `[Creem Webhook] Successfully processed credit pack purchase for user ${userId}: ${credits} credits`

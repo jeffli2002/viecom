@@ -39,83 +39,81 @@ export async function grantSubscriptionCredits(
   const planDisplayName = formatPlanName(creditInfo.plan, normalizedPlanId);
 
   try {
-    // Simple idempotency check: only check for exact referenceId match within transaction
+    // Simple idempotency check: only check for exact referenceId match
     // This prevents duplicate grants from the same call, but allows grants for different plans/subscriptions
     // For renewals, we always grant full credits (skip this check)
 
     // For renewals, we always grant full credits (don't check existing grants)
     const referenceId = `creem_${subscriptionId}_${isRenewal ? 'renewal' : 'initial'}_${Date.now()}`;
 
-    const granted = await db.transaction(async (tx) => {
-      // Double-check within transaction to prevent race conditions
-      const [existingTransaction] = await tx
-        .select()
-        .from(creditTransactions)
-        .where(eq(creditTransactions.referenceId, referenceId))
-        .limit(1);
+    // Check for existing transaction to prevent duplicates
+    // Note: neon-http driver doesn't support db.transaction(), so we do manual idempotency checks
+    const [existingTransaction] = await db
+      .select()
+      .from(creditTransactions)
+      .where(eq(creditTransactions.referenceId, referenceId))
+      .limit(1);
 
-      if (existingTransaction) {
-        console.log(`[Creem Credits] Credits already granted for reference ${referenceId}`);
-        return false;
-      }
-
-      const [userCredit] = await tx
-        .select()
-        .from(userCredits)
-        .where(eq(userCredits.userId, userId))
-        .limit(1);
-
-      const newBalance = (userCredit?.balance || 0) + creditsToGrant;
-
-      if (userCredit) {
-        await tx
-          .update(userCredits)
-          .set({
-            balance: newBalance,
-            totalEarned: userCredit.totalEarned + creditsToGrant,
-            updatedAt: new Date(),
-          })
-          .where(eq(userCredits.userId, userId));
-      } else {
-        await tx.insert(userCredits).values({
-          id: randomUUID(),
-          userId,
-          balance: creditsToGrant,
-          totalEarned: creditsToGrant,
-          totalSpent: 0,
-          frozenBalance: 0,
-        });
-      }
-
-      await tx.insert(creditTransactions).values({
-        id: randomUUID(),
-        userId,
-        type: 'earn',
-        amount: creditsToGrant,
-        balanceAfter: newBalance,
-        source: 'subscription',
-        description: `${planDisplayName} subscription ${isRenewal ? 'renewal' : 'credits'} (Creem)`,
-        referenceId,
-        metadata: JSON.stringify({
-          planId: normalizedPlanId,
-          planIdentifier,
-          isYearly,
-          subscriptionId,
-          provider: 'creem',
-          isRenewal,
-        }),
-      });
-
-      return true;
-    });
-
-    if (granted) {
-      console.log(
-        `[Creem Credits] Granted ${creditsToGrant} credits to user ${userId} for ${normalizedPlanId} ${isRenewal ? 'renewal' : 'subscription'}`
-      );
+    if (existingTransaction) {
+      console.log(`[Creem Credits] Credits already granted for reference ${referenceId}`);
+      return false;
     }
 
-    return granted;
+    // Get user credit account
+    const [userCredit] = await db
+      .select()
+      .from(userCredits)
+      .where(eq(userCredits.userId, userId))
+      .limit(1);
+
+    const newBalance = (userCredit?.balance || 0) + creditsToGrant;
+
+    // Update or create user credit account
+    if (userCredit) {
+      await db
+        .update(userCredits)
+        .set({
+          balance: newBalance,
+          totalEarned: userCredit.totalEarned + creditsToGrant,
+          updatedAt: new Date(),
+        })
+        .where(eq(userCredits.userId, userId));
+    } else {
+      await db.insert(userCredits).values({
+        id: randomUUID(),
+        userId,
+        balance: creditsToGrant,
+        totalEarned: creditsToGrant,
+        totalSpent: 0,
+        frozenBalance: 0,
+      });
+    }
+
+    // Insert credit transaction
+    await db.insert(creditTransactions).values({
+      id: randomUUID(),
+      userId,
+      type: 'earn',
+      amount: creditsToGrant,
+      balanceAfter: newBalance,
+      source: 'subscription',
+      description: `${planDisplayName} subscription ${isRenewal ? 'renewal' : 'credits'} (Creem)`,
+      referenceId,
+      metadata: JSON.stringify({
+        planId: normalizedPlanId,
+        planIdentifier,
+        isYearly,
+        subscriptionId,
+        provider: 'creem',
+        isRenewal,
+      }),
+    });
+
+    console.log(
+      `[Creem Credits] Granted ${creditsToGrant} credits to user ${userId} for ${normalizedPlanId} ${isRenewal ? 'renewal' : 'subscription'}`
+    );
+
+    return true;
   } catch (error) {
     console.error('[Creem Credits] Error granting subscription credits:', error);
     return false;
