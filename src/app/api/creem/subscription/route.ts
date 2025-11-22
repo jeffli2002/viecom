@@ -1,5 +1,6 @@
 import { auth } from '@/lib/auth/auth';
 import { resolvePlanByIdentifier, resolvePlanByProductId } from '@/lib/creem/plan-utils';
+import { resyncActiveCreemSubscription } from '@/lib/creem/resync-active-subscription';
 import { isCreemConfigured } from '@/payment/creem/client';
 import { paymentRepository } from '@/server/db/repositories/payment-repository';
 import { headers } from 'next/headers';
@@ -61,6 +62,18 @@ export async function GET() {
           'Creem subscription(s) (may be canceled)'
         );
         // Don't fallback to canceled subscriptions - return null instead
+      }
+
+      const recovered = await resyncActiveCreemSubscription(session.user.id);
+      if (recovered) {
+        console.log('[Subscription API] Recovered active subscription from Creem sync', {
+          id: recovered.id,
+          subscriptionId: recovered.subscriptionId,
+          status: recovered.status,
+          interval: recovered.interval,
+          cancelAtPeriodEnd: recovered.cancelAtPeriodEnd,
+        });
+        activeSubscription = recovered;
       }
     }
 
