@@ -25,7 +25,7 @@ export const dynamic = 'force-dynamic';
 /**
  * Adjust credits when changing plans (upgrade/downgrade) or intervals
  * @deprecated This function is no longer used. Credits are now granted via grantSubscriptionCredits when scheduled upgrades take effect.
- * 
+ *
  * REMOVED: This function used db.transaction() which is not supported by neon-http driver.
  * All credit adjustments now happen via grantSubscriptionCredits() which uses manual idempotency checks.
  */
@@ -104,6 +104,24 @@ interface CreemWebhookData {
 }
 
 type CreemWebhookResult = CreemWebhookData & { type: string };
+
+function normalizeIntervalValue(value?: string | null): BillingInterval | undefined {
+  if (!value) return undefined;
+  const lower = value.toLowerCase();
+  if (lower.includes('year')) {
+    return 'year';
+  }
+  if (lower.includes('month')) {
+    return 'month';
+  }
+  if (lower === 'annual' || lower === 'annually') {
+    return 'year';
+  }
+  if (lower === 'monthly') {
+    return 'month';
+  }
+  return undefined;
+}
 
 export async function POST(request: NextRequest) {
   const requestId = randomUUID();
@@ -238,10 +256,10 @@ export async function POST(request: NextRequest) {
     });
 
     return NextResponse.json(
-      { 
+      {
         error: 'Webhook processing failed',
-        message: error instanceof Error ? error.message : 'Unknown error'
-      }, 
+        message: error instanceof Error ? error.message : 'Unknown error',
+      },
       { status: 500 }
     );
   }
@@ -303,13 +321,13 @@ async function handleCreditPackPurchase(data: CreemWebhookData) {
     // This handles cases where referenceId might have been different
     const orderIdPattern = orderId ? `%"orderId":"${orderId}"%` : null;
     const checkoutIdPattern = checkoutId ? `%"checkoutId":"${checkoutId}"%` : null;
-    
+
     if (orderIdPattern || checkoutIdPattern) {
       const conditions = [
         eq(creditTransactions.userId, userId),
         eq(creditTransactions.source, 'purchase'),
       ];
-      
+
       const metadataConditions = [];
       if (orderIdPattern) {
         metadataConditions.push(sql`${creditTransactions.metadata} LIKE ${orderIdPattern}`);
@@ -317,10 +335,12 @@ async function handleCreditPackPurchase(data: CreemWebhookData) {
       if (checkoutIdPattern) {
         metadataConditions.push(sql`${creditTransactions.metadata} LIKE ${checkoutIdPattern}`);
       }
-      
+
       if (metadataConditions.length > 0) {
-        conditions.push(metadataConditions.length === 1 ? metadataConditions[0]! : or(...metadataConditions)!);
-        
+        conditions.push(
+          metadataConditions.length === 1 ? metadataConditions[0]! : or(...metadataConditions)!
+        );
+
         const existingByMetadata = await db
           .select()
           .from(creditTransactions)
@@ -489,6 +509,11 @@ async function handleCheckoutComplete(data: CreemWebhookData) {
           incomingStatus || (trialEnd ? 'trialing' : 'active')
         );
 
+        const resolvedInterval =
+          normalizeIntervalValue(interval) ||
+          normalizeIntervalValue(billingInterval) ||
+          'month';
+
         await paymentRepository.create({
           id: subscriptionId,
           provider: 'creem',
@@ -498,14 +523,14 @@ async function handleCheckoutComplete(data: CreemWebhookData) {
           customerId: customerId || '',
           subscriptionId,
           status: normalizedStatus,
-          interval: billingInterval === 'year' ? 'year' : 'month',
+          interval: resolvedInterval,
           trialEnd: trialEnd ? new Date(trialEnd) : undefined,
         });
         await enforceSingleCreemSubscription(userId, subscriptionId);
 
         // Grant credits immediately for non-trial subscriptions
         if (normalizedStatus !== 'trialing') {
-          await grantSubscriptionCredits(userId, planId, subscriptionId, data.interval, false);
+          await grantSubscriptionCredits(userId, planId, subscriptionId, resolvedInterval, false);
         } else {
           console.log(
             '[Creem Webhook] Trial subscription - credits will be granted after trial ends'
@@ -520,7 +545,11 @@ async function handleCheckoutComplete(data: CreemWebhookData) {
         const oldPlanId = existingRecord.priceId;
         const newPlanId = planId;
         const oldInterval = existingRecord.interval || 'month';
-        const newInterval = billingInterval === 'year' ? 'year' : 'month';
+        const newInterval =
+          normalizeIntervalValue(interval) ||
+          normalizeIntervalValue(billingInterval) ||
+          existingRecord.interval ||
+          'month';
 
         const planChanged = oldPlanId !== newPlanId;
         const intervalChanged = oldInterval !== newInterval;
@@ -652,7 +681,7 @@ async function handleSubscriptionCreated(data: CreemWebhookData) {
     const normalizedStatus = normalizeCreemStatus(status);
 
     if (!existingRecord) {
-      const ownerUserId = userId || customerId;
+      const resolvedInterval = normalizeIntervalValue(interval) || 'month';
       await paymentRepository.create({
         id: subscriptionId,
         provider: 'creem',
@@ -662,7 +691,7 @@ async function handleSubscriptionCreated(data: CreemWebhookData) {
         customerId,
         subscriptionId,
         status: normalizedStatus,
-        interval: interval === 'year' ? 'year' : 'month',
+        interval: resolvedInterval,
         periodStart: currentPeriodStart ? new Date(currentPeriodStart) : undefined,
         periodEnd: currentPeriodEnd ? new Date(currentPeriodEnd) : undefined,
         trialStart: trialStart ? new Date(trialStart) : undefined,
@@ -672,7 +701,7 @@ async function handleSubscriptionCreated(data: CreemWebhookData) {
 
       // Only grant credits if not in trial or if trial just ended
       if (planId && userId && normalizedStatus !== 'trialing') {
-        await grantSubscriptionCredits(userId, planId, subscriptionId, data.interval, false);
+        await grantSubscriptionCredits(userId, planId, subscriptionId, resolvedInterval, false);
       } else if (normalizedStatus === 'trialing') {
         console.log(
           '[Creem Webhook] Trial subscription created - credits will be granted after trial ends'

@@ -1,6 +1,6 @@
 import { creemService } from '@/lib/creem/creem-service';
-import { paymentRepository } from '@/server/db/repositories/payment-repository';
 import type { PaymentRecord, PaymentStatus } from '@/payment/types';
+import { paymentRepository } from '@/server/db/repositories/payment-repository';
 
 const ACTIVE_SUBSCRIPTION_STATUSES: PaymentStatus[] = ['active', 'trialing', 'past_due'];
 
@@ -25,9 +25,7 @@ export async function enforceSingleCreemSubscription(
     return 0;
   }
 
-  const sortedSubs = [...activeSubs].sort(
-    (a, b) => b.createdAt.getTime() - a.createdAt.getTime()
-  );
+  const sortedSubs = [...activeSubs].sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
 
   let keepSub: PaymentRecord | undefined;
   if (keepSubscriptionId) {

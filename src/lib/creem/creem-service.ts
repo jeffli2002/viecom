@@ -141,6 +141,7 @@ class CreemPaymentService {
           userEmail: userEmail,
           planId: planId,
           currentPlan: currentPlan,
+          interval: interval,
         },
         customer: {
           email: userEmail,
@@ -951,6 +952,18 @@ class CreemPaymentService {
     }
 
     const planId = metadata?.planId || this.getPlanFromProduct(subscription.product?.id);
+    const subscriptionProductId =
+      typeof subscription.product === 'string'
+        ? subscription.product
+        : (subscription.product as { id?: string } | undefined)?.id;
+    const productObj =
+      typeof subscription.product === 'object' ? (subscription.product as { billing_period?: string }) : undefined;
+    const normalizedInterval =
+      this.normalizeInterval(
+        (subscription as { billing_period?: string } | undefined)?.billing_period
+      ) ||
+      this.normalizeInterval(productObj?.billing_period) ||
+      this.getIntervalFromProduct(subscriptionProductId);
 
     return {
       type: 'subscription_created',
@@ -966,6 +979,7 @@ class CreemPaymentService {
         ? new Date(current_period_start_date)
         : undefined,
       currentPeriodEnd: current_period_end_date ? new Date(current_period_end_date) : undefined,
+      interval: normalizedInterval as string | undefined,
     };
   }
 
@@ -1084,6 +1098,13 @@ class CreemPaymentService {
       (subscriptionObj as { billing_period?: string } | undefined)?.billing_period ||
       (order as { billing_period?: string } | undefined)?.billing_period ||
       (checkout as { billingInterval?: string }).billingInterval;
+    const metadataInterval = (metadata as { interval?: string } | undefined)?.interval;
+    const normalizedInterval =
+      this.normalizeInterval(billingInterval) ||
+      this.normalizeInterval(metadataInterval) ||
+      this.getIntervalFromProduct(
+        ((orderProductId || subscriptionProductId) as string | undefined) || undefined
+      );
 
     // Extract status from subscription
     const status =
@@ -1098,6 +1119,7 @@ class CreemPaymentService {
       planId: planId as string | undefined,
       productId: (subscriptionProductId || orderProductId) as string | undefined,
       billingInterval: billingInterval as string | undefined,
+      interval: normalizedInterval as string | undefined,
       status: status as string | undefined,
     };
   }
@@ -1290,6 +1312,38 @@ class CreemPaymentService {
     }
 
     return 'free';
+  }
+
+  private normalizeInterval(interval?: string | null): 'month' | 'year' | undefined {
+    if (!interval) return undefined;
+    const lower = interval.toLowerCase();
+    if (lower.includes('year') || lower === 'annual' || lower === 'annually') {
+      return 'year';
+    }
+    if (lower.includes('month') || lower === 'monthly') {
+      return 'month';
+    }
+    return undefined;
+  }
+
+  private getIntervalFromProduct(productId?: string | null): 'month' | 'year' | undefined {
+    if (!productId) return undefined;
+    const lowered = productId.toLowerCase();
+    if (
+      productId === CREEM_PRODUCTS.pro_yearly ||
+      productId === CREEM_PRODUCTS.proplus_yearly ||
+      lowered.includes('year')
+    ) {
+      return 'year';
+    }
+    if (
+      productId === CREEM_PRODUCTS.pro_monthly ||
+      productId === CREEM_PRODUCTS.proplus_monthly ||
+      lowered.includes('month')
+    ) {
+      return 'month';
+    }
+    return undefined;
   }
 
   isTestMode(): boolean {
