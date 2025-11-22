@@ -324,8 +324,45 @@ function DashboardPageContent() {
         </Alert>
       )}
 
-      {/* Credit Balance Cards */}
-      <div className="grid gap-4 md:grid-cols-3">
+      {/* Credit Balance Cards + Subscription */}
+      <div className="grid gap-4 md:grid-cols-4">
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <div>
+              <CardTitle className="font-medium text-sm">{t('subscriptionPlan')}</CardTitle>
+              <CardDescription className="text-xs text-muted-foreground">
+                {planId === 'free' ? t('free') : t('paid')}
+              </CardDescription>
+            </div>
+            <div className="rounded-full bg-primary/10 p-2">
+              <CreditCard className="h-4 w-4 text-primary" />
+            </div>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <div className="flex items-center gap-2">
+              <p className="text-2xl font-bold capitalize">
+                {planId === 'proplus' ? 'Pro Plus' : planId === 'pro' ? 'Pro' : 'Free'}
+              </p>
+              <Badge variant={planId === 'free' ? 'secondary' : 'default'}>
+                {planId === 'free' ? t('free') : t('paid')}
+              </Badge>
+            </div>
+            <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+              <Button variant="ghost" className="w-full" asChild>
+                <Link href="/settings/billing">{t('manageSubscription')}</Link>
+              </Button>
+              <Button variant="outline" className="w-full" asChild>
+                <Link href="/pricing">{t('upgradeNow', { defaultValue: 'Upgrade Plan' })}</Link>
+              </Button>
+              <Button variant="secondary" className="w-full sm:col-span-2" asChild>
+                <Link href="/pricing#credit-packs">
+                  {t('buyCredits', { defaultValue: 'Buy Credits' })}
+                </Link>
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="font-medium text-sm">可用积分</CardTitle>
@@ -520,43 +557,7 @@ function DashboardPageContent() {
       </Card>
 
       {/* Quick Actions */}
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
-        <Card className="p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-muted-foreground mb-1">{t('subscriptionPlan')}</p>
-              <div className="flex items-center gap-2">
-                <p className="text-2xl font-bold capitalize">
-                  {planId === 'proplus' ? 'Pro Plus' : planId === 'pro' ? 'Pro' : 'Free'}
-                </p>
-                <Badge variant={planId === 'free' ? 'secondary' : 'default'}>
-                  {planId === 'free' ? t('free') : t('paid')}
-                </Badge>
-              </div>
-            </div>
-            <div className="rounded-full bg-primary/10 p-3">
-              <CreditCard className="h-6 w-6 text-primary" />
-            </div>
-          </div>
-          <div className="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-2">
-            <Button variant="ghost" className="w-full" asChild>
-              <Link href="/settings/billing">{t('manageSubscription')}</Link>
-            </Button>
-            <Button variant="outline" className="w-full" asChild>
-              <Link href="/pricing">
-                {planId === 'free'
-                  ? t('upgradeNow', { defaultValue: 'Upgrade Plan' })
-                  : t('upgradeNow', { defaultValue: 'Upgrade Plan' })}
-              </Link>
-            </Button>
-            <Button variant="secondary" className="w-full sm:col-span-2" asChild>
-              <Link href="/pricing#credit-packs">
-                {t('buyCredits', { defaultValue: 'Buy Credits' })}
-              </Link>
-            </Button>
-          </div>
-        </Card>
-
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
         <Card className="p-6">
           <div className="flex items-center justify-between">
             <div>
