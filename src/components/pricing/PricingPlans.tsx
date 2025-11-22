@@ -224,13 +224,13 @@ export function PricingPlans({ plans, creditPacks }: PricingPlansProps) {
           </p>
         </div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-5">
           {creditPacks.map((pack) => (
             <Card
               key={pack.id}
               className={`relative ${
                 pack.popular ? 'border-2 border-purple-500 shadow-lg' : 'border border-gray-200'
-              }`}
+              } lg:flex-1`}
             >
               {pack.badge && (
                 <Badge className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-gradient-to-r from-purple-600 to-pink-600 text-white border-0">
