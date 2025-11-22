@@ -1,13 +1,14 @@
 /**
  * Database migration script
  * Loads environment variables and runs Drizzle migrations
+ * Uses pg (node-postgres) driver for transaction support
  */
 
 import { resolve } from 'node:path';
-import { neon } from '@neondatabase/serverless';
 import { config } from 'dotenv';
-import { drizzle } from 'drizzle-orm/neon-http';
-import { migrate } from 'drizzle-orm/postgres-js/migrator';
+import { Pool } from 'pg';
+import { drizzle } from 'drizzle-orm/node-postgres';
+import { migrate } from 'drizzle-orm/node-postgres/migrator';
 import { env } from '../src/env';
 
 // Load .env.local file
@@ -17,10 +18,14 @@ async function runMigrations() {
   console.log('🔄 Starting database migration...');
   console.log(`📊 Database URL: ${env.DATABASE_URL.replace(/:[^:@]+@/, ':****@')}`);
 
-  try {
-    const sql = neon(env.DATABASE_URL);
-    const db = drizzle(sql);
+  // Use pg (node-postgres) Pool for transaction support (required for migrations)
+  const pool = new Pool({
+    connectionString: env.DATABASE_URL,
+    max: 1, // Use single connection for migrations
+  });
+  const db = drizzle(pool);
 
+  try {
     // Run migrations from drizzle directory
     await migrate(db, { migrationsFolder: './drizzle' });
 
@@ -28,7 +33,13 @@ async function runMigrations() {
     process.exit(0);
   } catch (error) {
     console.error('❌ Migration failed:', error);
+    console.error('Error details:', error instanceof Error ? error.message : String(error));
+    if (error instanceof Error && error.stack) {
+      console.error('Stack trace:', error.stack);
+    }
     process.exit(1);
+  } finally {
+    await pool.end();
   }
 }
 

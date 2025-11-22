@@ -96,6 +96,7 @@ export const creditTransactions = pgTable(
     source: text('source', {
       enum: [
         'subscription',
+        'purchase',
         'api_call',
         'admin',
         'storage',
