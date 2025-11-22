@@ -14,13 +14,26 @@ import { existsSync } from 'fs';
 import { resolve } from 'path';
 import { config } from 'dotenv';
 
-// Load environment variables from .env.local or .env file
+// Load environment variables from .env.local or .env file FIRST
 const envLocal = resolve(process.cwd(), '.env.local');
 const envDefault = resolve(process.cwd(), '.env');
 const envPath = existsSync(envLocal) ? envLocal : envDefault;
 
 console.log(`Loading environment from: ${envPath}`);
 config({ path: envPath });
+
+// Set SKIP_ENV_VALIDATION BEFORE importing any modules that use env.ts
+// This prevents env.ts from validating environment variables during import
+process.env.SKIP_ENV_VALIDATION = 'true';
+
+// Verify CREEM_API_KEY is loaded before importing modules
+const apiKeyFromEnv = process.env.CREEM_API_KEY;
+if (!apiKeyFromEnv) {
+  console.error('❌ CREEM_API_KEY not found in .env.local');
+  console.error('   Please ensure CREEM_API_KEY is set in .env.local');
+  process.exit(1);
+}
+console.log(`✅ CREEM_API_KEY loaded from process.env: ${apiKeyFromEnv.substring(0, 15)}...\n`);
 
 import { creemService } from '@/lib/creem/creem-service';
 import { normalizeCreemStatus } from '@/lib/creem/status-utils';

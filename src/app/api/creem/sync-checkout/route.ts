@@ -1,5 +1,6 @@
 import { getSessionFromRequest } from '@/lib/auth/auth-utils';
 import { creemService } from '@/lib/creem/creem-service';
+import { enforceSingleCreemSubscription } from '@/lib/creem/enforce-single-subscription';
 import {
   getCreditsForPlan,
   resolvePlanByIdentifier,
@@ -175,7 +176,7 @@ export async function POST(request: NextRequest) {
         trialStart,
         trialEnd,
       });
-      await paymentRepository.cancelOtherActiveSubscriptions(session.user.id, subscriptionId);
+      await enforceSingleCreemSubscription(session.user.id, subscriptionId);
 
       // Grant full credits for new subscription
       console.log('[Creem Sync Checkout] New subscription created:', {

@@ -22,7 +22,8 @@ const getCreemTestMode = () => {
 };
 
 const getCreemApiKey = () => {
-  return env.CREEM_API_KEY || '';
+  // Fallback to process.env if env.CREEM_API_KEY is not set (e.g., in scripts)
+  return env.CREEM_API_KEY || process.env.CREEM_API_KEY || '';
 };
 
 const getCreemWebhookSecret = () => {

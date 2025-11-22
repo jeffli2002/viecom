@@ -3,6 +3,7 @@ import { randomUUID } from 'node:crypto';
 import { paymentConfig } from '@/config/payment.config';
 import { env } from '@/env';
 import { creemService } from '@/lib/creem/creem-service';
+import { enforceSingleCreemSubscription } from '@/lib/creem/enforce-single-subscription';
 import {
   type BillingInterval,
   formatPlanName,
@@ -477,7 +478,7 @@ async function handleCheckoutComplete(data: CreemWebhookData) {
       console.warn(
         `[Creem Webhook] User ${userId} has ${activeCount} active subscriptions - enforcing rule`
       );
-      await paymentRepository.enforceSingleActiveSubscription(userId);
+      await enforceSingleCreemSubscription(userId);
     }
 
     if (subscriptionId) {
@@ -500,7 +501,7 @@ async function handleCheckoutComplete(data: CreemWebhookData) {
           interval: billingInterval === 'year' ? 'year' : 'month',
           trialEnd: trialEnd ? new Date(trialEnd) : undefined,
         });
-        await paymentRepository.cancelOtherActiveSubscriptions(userId, subscriptionId);
+        await enforceSingleCreemSubscription(userId, subscriptionId);
 
         // Grant credits immediately for non-trial subscriptions
         if (normalizedStatus !== 'trialing') {
@@ -643,7 +644,7 @@ async function handleSubscriptionCreated(data: CreemWebhookData) {
       console.warn(
         `[Creem Webhook] User ${ownerUserId} already has ${activeCount} active subscription(s) - enforcing rule`
       );
-      await paymentRepository.enforceSingleActiveSubscription(ownerUserId);
+      await enforceSingleCreemSubscription(ownerUserId);
     }
 
     const existingRecord = await paymentRepository.findBySubscriptionId(subscriptionId);
@@ -667,7 +668,7 @@ async function handleSubscriptionCreated(data: CreemWebhookData) {
         trialStart: trialStart ? new Date(trialStart) : undefined,
         trialEnd: trialEnd ? new Date(trialEnd) : undefined,
       });
-      await paymentRepository.cancelOtherActiveSubscriptions(ownerUserId, subscriptionId);
+      await enforceSingleCreemSubscription(ownerUserId, subscriptionId);
 
       // Only grant credits if not in trial or if trial just ended
       if (planId && userId && normalizedStatus !== 'trialing') {
