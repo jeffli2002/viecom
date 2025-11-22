@@ -15,7 +15,7 @@ import { grantSubscriptionCredits } from '@/lib/creem/subscription-credits';
 import { db } from '@/server/db';
 import { paymentRepository } from '@/server/db/repositories/payment-repository';
 import { creditTransactions, userCredits } from '@/server/db/schema';
-import { and, desc, eq } from 'drizzle-orm';
+import { and, desc, eq, or, sql } from 'drizzle-orm';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 
@@ -263,20 +263,64 @@ async function handleCreditPackPurchase(data: CreemWebhookData) {
   }
 
   try {
-    const referenceId = `creem_credit_pack_${orderId || checkoutId}_${Date.now()}`;
+    // Generate referenceId without timestamp to ensure idempotency
+    // Use orderId first (more stable), fallback to checkoutId
+    const stableId = orderId || checkoutId;
+    if (!stableId) {
+      throw new Error('Missing orderId and checkoutId for credit pack purchase');
+    }
+    const referenceId = `creem_credit_pack_${stableId}`;
 
     // Check for existing transaction to prevent duplicates
-    const [existingTransaction] = await db
+    // Check by referenceId first (most reliable)
+    const [existingByReference] = await db
       .select()
       .from(creditTransactions)
       .where(eq(creditTransactions.referenceId, referenceId))
       .limit(1);
 
-    if (existingTransaction) {
+    if (existingByReference) {
       console.log(
         `[Creem Webhook] Credit pack purchase already processed for reference ${referenceId}`
       );
       return;
+    }
+
+    // Also check by orderId or checkoutId in metadata (fallback check)
+    // This handles cases where referenceId might have been different
+    const orderIdPattern = orderId ? `%"orderId":"${orderId}"%` : null;
+    const checkoutIdPattern = checkoutId ? `%"checkoutId":"${checkoutId}"%` : null;
+    
+    if (orderIdPattern || checkoutIdPattern) {
+      const conditions = [
+        eq(creditTransactions.userId, userId),
+        eq(creditTransactions.source, 'purchase'),
+      ];
+      
+      const metadataConditions = [];
+      if (orderIdPattern) {
+        metadataConditions.push(sql`${creditTransactions.metadata}::text LIKE ${orderIdPattern}`);
+      }
+      if (checkoutIdPattern) {
+        metadataConditions.push(sql`${creditTransactions.metadata}::text LIKE ${checkoutIdPattern}`);
+      }
+      
+      if (metadataConditions.length > 0) {
+        conditions.push(metadataConditions.length === 1 ? metadataConditions[0]! : or(...metadataConditions)!);
+        
+        const existingByMetadata = await db
+          .select()
+          .from(creditTransactions)
+          .where(and(...conditions))
+          .limit(1);
+
+        if (existingByMetadata.length > 0) {
+          console.log(
+            `[Creem Webhook] Credit pack purchase already processed (found by metadata): orderId=${orderId}, checkoutId=${checkoutId}`
+          );
+          return;
+        }
+      }
     }
 
     // Get or create user credit account
