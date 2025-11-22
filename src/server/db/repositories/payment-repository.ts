@@ -341,15 +341,34 @@ export class PaymentRepository {
 
   /**
    * 检查 Creem 事件是否已处理
+   * Checks both payment_event table (for subscriptions) and credit_transactions table (for credit packs)
    */
   async isCreemEventProcessed(creemEventId: string): Promise<boolean> {
-    const result = await db
+    // Check payment_event table (for subscription events)
+    const paymentEventResult = await db
       .select()
       .from(paymentEvent)
       .where(eq(paymentEvent.creemEventId, creemEventId))
       .limit(1);
 
-    return result.length > 0;
+    if (paymentEventResult.length > 0) {
+      return true;
+    }
+
+    // Check credit_transactions table (for credit pack purchases)
+    // Credit pack purchases store creemEventId in metadata JSON
+    const { creditTransactions } = await import('@/server/db/schema');
+    
+    const searchPattern = `%"creemEventId":"${creemEventId}"%`;
+    const creditTransactionResult = await db
+      .select()
+      .from(creditTransactions)
+      .where(
+        sql`${creditTransactions.metadata}::text LIKE ${searchPattern}`
+      )
+      .limit(1);
+
+    return creditTransactionResult.length > 0;
   }
 
   /**

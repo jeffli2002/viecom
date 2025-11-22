@@ -315,6 +315,7 @@ async function handleCreditPackPurchase(data: CreemWebhookData) {
           orderId,
           productName,
           credits,
+          creemEventId: data.eventId,
         }),
       });
 
@@ -349,6 +350,7 @@ async function handleCreditPackPurchase(data: CreemWebhookData) {
           orderId,
           productName,
           credits,
+          creemEventId: data.eventId,
         }),
       });
 
@@ -361,13 +363,13 @@ async function handleCreditPackPurchase(data: CreemWebhookData) {
       `[Creem Webhook] Successfully processed credit pack purchase for user ${userId}: ${credits} credits`
     );
 
-    // Mark event as processed
-    await paymentRepository.createEvent({
-      paymentId: orderId || checkoutId || randomUUID(),
-      eventType: 'credit_pack.purchased',
-      creemEventId: data.eventId || randomUUID(),
-      eventData: JSON.stringify(data),
-    });
+    // Note: We don't call createEvent for credit pack purchases because:
+    // 1. payment_event table requires paymentId to exist in payment table
+    // 2. Credit pack purchases don't create payment records
+    // 3. Duplicate prevention is handled by:
+    //    - Main webhook handler checks isCreemEventProcessed (now checks credit_transactions too)
+    //    - This handler checks referenceId in credit_transactions
+    // 4. Event tracking is done via credit_transactions.metadata which includes creemEventId
   } catch (error) {
     console.error('[Creem Webhook] Error in handleCreditPackPurchase:', {
       error,
