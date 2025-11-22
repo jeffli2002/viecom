@@ -344,31 +344,56 @@ export class PaymentRepository {
    * Checks both payment_event table (for subscriptions) and credit_transactions table (for credit packs)
    */
   async isCreemEventProcessed(creemEventId: string): Promise<boolean> {
-    // Check payment_event table (for subscription events)
-    const paymentEventResult = await db
-      .select()
-      .from(paymentEvent)
-      .where(eq(paymentEvent.creemEventId, creemEventId))
-      .limit(1);
+    try {
+      // Check payment_event table (for subscription events)
+      const paymentEventResult = await db
+        .select()
+        .from(paymentEvent)
+        .where(eq(paymentEvent.creemEventId, creemEventId))
+        .limit(1);
 
-    if (paymentEventResult.length > 0) {
-      return true;
+      if (paymentEventResult.length > 0) {
+        return true;
+      }
+
+      // Check credit_transactions table (for credit pack purchases)
+      // Credit pack purchases store creemEventId in metadata JSON
+      // metadata is stored as text (JSON string), so we can search directly
+      const { creditTransactions } = await import('@/server/db/schema');
+      
+      // Escape special characters in creemEventId for LIKE pattern
+      const escapedEventId = creemEventId.replace(/[%_\\]/g, '\\$&');
+      const searchPattern = `%"creemEventId":"${escapedEventId}"%`;
+      
+      try {
+        const creditTransactionResult = await db
+          .select()
+          .from(creditTransactions)
+          .where(
+            sql`${creditTransactions.metadata} LIKE ${searchPattern}`
+          )
+          .limit(1);
+
+        return creditTransactionResult.length > 0;
+      } catch (queryError) {
+        // If query fails, log but don't throw - allow webhook to proceed
+        console.error('[PaymentRepository] Error querying credit_transactions for creemEventId:', {
+          creemEventId,
+          error: queryError instanceof Error ? queryError.message : String(queryError),
+        });
+        return false;
+      }
+    } catch (error) {
+      // If there's an error checking credit_transactions, log it but don't fail
+      // This allows the webhook to proceed even if the check fails
+      console.error('[PaymentRepository] Error checking isCreemEventProcessed:', {
+        creemEventId,
+        error: error instanceof Error ? error.message : String(error),
+      });
+      // Return false to allow processing (fail open for credit pack purchases)
+      // The duplicate check in handleCreditPackPurchase will catch duplicates
+      return false;
     }
-
-    // Check credit_transactions table (for credit pack purchases)
-    // Credit pack purchases store creemEventId in metadata JSON
-    const { creditTransactions } = await import('@/server/db/schema');
-    
-    const searchPattern = `%"creemEventId":"${creemEventId}"%`;
-    const creditTransactionResult = await db
-      .select()
-      .from(creditTransactions)
-      .where(
-        sql`${creditTransactions.metadata}::text LIKE ${searchPattern}`
-      )
-      .limit(1);
-
-    return creditTransactionResult.length > 0;
   }
 
   /**

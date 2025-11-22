@@ -140,7 +140,19 @@ export async function POST(request: NextRequest) {
     const eventId = event.id;
     const eventType = event.eventType || event.type;
 
-    const isProcessed = await paymentRepository.isCreemEventProcessed(eventId);
+    // Check if event already processed (with error handling)
+    let isProcessed = false;
+    try {
+      isProcessed = await paymentRepository.isCreemEventProcessed(eventId);
+    } catch (checkError) {
+      console.error('[Creem Webhook] Error checking if event processed:', {
+        eventId,
+        error: checkError instanceof Error ? checkError.message : String(checkError),
+        requestId,
+      });
+      // Continue processing if check fails (fail open)
+    }
+
     if (isProcessed) {
       console.log('[Creem Webhook] Event already processed', { eventType, eventId, requestId });
       return NextResponse.json({ received: true });
@@ -299,10 +311,10 @@ async function handleCreditPackPurchase(data: CreemWebhookData) {
       
       const metadataConditions = [];
       if (orderIdPattern) {
-        metadataConditions.push(sql`${creditTransactions.metadata}::text LIKE ${orderIdPattern}`);
+        metadataConditions.push(sql`${creditTransactions.metadata} LIKE ${orderIdPattern}`);
       }
       if (checkoutIdPattern) {
-        metadataConditions.push(sql`${creditTransactions.metadata}::text LIKE ${checkoutIdPattern}`);
+        metadataConditions.push(sql`${creditTransactions.metadata} LIKE ${checkoutIdPattern}`);
       }
       
       if (metadataConditions.length > 0) {
