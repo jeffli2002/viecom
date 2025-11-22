@@ -527,6 +527,7 @@ async function handleCheckoutComplete(data: CreemWebhookData) {
           status: normalizedStatus,
           interval: resolvedInterval,
           trialEnd: trialEnd ? new Date(trialEnd) : undefined,
+          cancelAtPeriodEnd: false,
         });
         await enforceSingleCreemSubscription(userId, subscriptionId);
 
@@ -698,6 +699,7 @@ async function handleSubscriptionCreated(data: CreemWebhookData) {
         periodEnd: currentPeriodEnd ? new Date(currentPeriodEnd) : undefined,
         trialStart: trialStart ? new Date(trialStart) : undefined,
         trialEnd: trialEnd ? new Date(trialEnd) : undefined,
+        cancelAtPeriodEnd: false,
       });
       await enforceSingleCreemSubscription(ownerUserId, subscriptionId);
 
