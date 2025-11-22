@@ -1001,13 +1001,22 @@ class CreemPaymentService {
     if (isCreditPack) {
       // Handle one-time credit pack purchase
       // Try to get product info from checkout.product (top-level) or order.product
-      const checkoutProduct = typeof product === 'object' ? (product as { id?: string; name?: string }) : undefined;
-      const orderProduct = (order as { product?: string | { id?: string; name?: string } } | undefined)?.product;
-      
-      const productId = checkoutProduct?.id || (typeof orderProduct === 'string' ? orderProduct : (orderProduct as { id?: string } | undefined)?.id);
-      const productName = checkoutProduct?.name || (typeof orderProduct === 'object' ? (orderProduct as { name?: string })?.name : undefined);
+      const checkoutProduct =
+        typeof product === 'object' ? (product as { id?: string; name?: string }) : undefined;
+      const orderProduct = (
+        order as { product?: string | { id?: string; name?: string } } | undefined
+      )?.product;
+
+      const productId =
+        checkoutProduct?.id ||
+        (typeof orderProduct === 'string'
+          ? orderProduct
+          : (orderProduct as { id?: string } | undefined)?.id);
+      const productName =
+        checkoutProduct?.name ||
+        (typeof orderProduct === 'object' ? (orderProduct as { name?: string })?.name : undefined);
       const orderAmount = (order as { amount_paid?: number } | undefined)?.amount_paid;
-      
+
       // Extract credit amount from product name (e.g., "1000 credits")
       const creditMatch = productName?.match(/(\d+)\s*credits/i);
       const credits = creditMatch ? Number.parseInt(creditMatch[1], 10) : undefined;
@@ -1019,7 +1028,26 @@ class CreemPaymentService {
         orderAmount,
         checkoutId: (checkout as { id?: string }).id,
         orderId: (order as { id?: string } | undefined)?.id,
+        userId,
+        customerId,
       });
+
+      if (!credits || credits <= 0) {
+        console.error('[Creem Service] Failed to parse credits from product name:', {
+          productName,
+          productId,
+          orderType,
+          metadataType,
+        });
+      }
+
+      if (!userId) {
+        console.error('[Creem Service] Missing userId for credit pack purchase:', {
+          metadata,
+          customer,
+          checkout,
+        });
+      }
 
       return {
         type: 'credit_pack_purchase',

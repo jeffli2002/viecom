@@ -308,7 +308,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ received: true });
     }
 
-    const result = rawResult as CreemWebhookResult;
+    const result = { ...rawResult, eventId } as CreemWebhookResult;
 
     switch (result.type) {
       case 'checkout_complete':
@@ -399,11 +399,11 @@ async function handleCreditPackPurchase(data: CreemWebhookData) {
   }
 
   if (!credits || credits <= 0) {
-    console.error('[Creem Webhook] Invalid or missing credits amount for credit pack purchase', { 
+    console.error('[Creem Webhook] Invalid or missing credits amount for credit pack purchase', {
       credits,
       productName,
       productId,
-      data 
+      data,
     });
     throw new Error(`Invalid credits amount: ${credits}`);
   }
@@ -493,6 +493,14 @@ async function handleCreditPackPurchase(data: CreemWebhookData) {
     console.log(
       `[Creem Webhook] Successfully processed credit pack purchase for user ${userId}: ${credits} credits`
     );
+
+    // Mark event as processed
+    await paymentRepository.createEvent({
+      paymentId: orderId || checkoutId || randomUUID(),
+      eventType: 'credit_pack.purchased',
+      creemEventId: data.eventId || randomUUID(),
+      eventData: JSON.stringify(data),
+    });
   } catch (error) {
     console.error('[Creem Webhook] Error in handleCreditPackPurchase:', error);
     throw error;
