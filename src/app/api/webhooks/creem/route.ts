@@ -218,11 +218,19 @@ export async function POST(request: NextRequest) {
     const processingTime = Date.now() - startTime;
     console.error('[Creem Webhook] Error processing webhook', {
       error,
+      errorMessage: error instanceof Error ? error.message : String(error),
+      errorStack: error instanceof Error ? error.stack : undefined,
       requestId,
       processingTime,
     });
 
-    return NextResponse.json({ error: 'Webhook processing failed' }, { status: 500 });
+    return NextResponse.json(
+      { 
+        error: 'Webhook processing failed',
+        message: error instanceof Error ? error.message : 'Unknown error'
+      }, 
+      { status: 500 }
+    );
   }
 }
 
@@ -361,7 +369,15 @@ async function handleCreditPackPurchase(data: CreemWebhookData) {
       eventData: JSON.stringify(data),
     });
   } catch (error) {
-    console.error('[Creem Webhook] Error in handleCreditPackPurchase:', error);
+    console.error('[Creem Webhook] Error in handleCreditPackPurchase:', {
+      error,
+      errorMessage: error instanceof Error ? error.message : String(error),
+      errorStack: error instanceof Error ? error.stack : undefined,
+      userId,
+      credits,
+      orderId,
+      checkoutId,
+    });
     throw error;
   }
 }
