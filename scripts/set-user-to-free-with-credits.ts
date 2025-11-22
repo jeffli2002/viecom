@@ -179,7 +179,8 @@ async function setUserToFreeWithCredits(email: string, credits: number) {
 
     // Record credit transaction so dashboard history stays accurate
     if (delta !== 0) {
-      const adjustmentType = delta > 0 ? 'earn' : 'admin_adjust';
+      const isIncrease = delta > 0;
+      const adjustmentType = isIncrease ? 'earn' : 'admin_adjust';
       const adjustmentAmount = Math.abs(delta);
 
       await sql`
@@ -199,7 +200,7 @@ async function setUserToFreeWithCredits(email: string, credits: number) {
           ${randomUUID()},
           ${userId},
           ${adjustmentType},
-          ${adjustmentAmount},
+          ${isIncrease ? adjustmentAmount : -adjustmentAmount},
           ${credits},
           'admin',
           'Manual credit adjustment (set-user-to-free-with-credits)',
