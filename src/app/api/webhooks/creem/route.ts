@@ -469,6 +469,7 @@ async function handleCheckoutComplete(data: CreemWebhookData) {
     planId,
     trialEnd,
     billingInterval,
+    interval,
     status: incomingStatus,
   } = data;
 
@@ -478,6 +479,7 @@ async function handleCheckoutComplete(data: CreemWebhookData) {
     subscriptionId,
     planId,
     billingInterval,
+    interval,
     status: incomingStatus,
   });
 
