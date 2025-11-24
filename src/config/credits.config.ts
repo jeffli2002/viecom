@@ -13,6 +13,7 @@ export interface CreditsConfig {
     };
     imageGeneration: {
       'nano-banana': number;
+      'nano-banana-pro': number;
       'flux-1.1': number;
       'flux-1.1-pro': number;
       'flux-1.1-ultra': number;
@@ -94,6 +95,7 @@ export const creditsConfig: CreditsConfig = {
     },
     imageGeneration: {
       'nano-banana': 5,
+      'nano-banana-pro': 30,
       'flux-1.1': 5,
       'flux-1.1-pro': 5,
       'flux-1.1-ultra': 8,

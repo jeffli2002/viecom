@@ -115,7 +115,7 @@ export async function POST(request: NextRequest) {
     const dailyPeriod = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
     const monthlyPeriod = new Date().toISOString().substring(0, 7); // YYYY-MM
 
-    const isNanoBanana = model === 'nano-banana';
+    const isNanoBanana = model === 'nano-banana' || model === 'nano-banana-pro';
     if (isNanoBanana) {
       // Use KIE API for nano-banana image generation
       let kieApiService: KieApiService | undefined;
@@ -295,12 +295,15 @@ export async function POST(request: NextRequest) {
       // Create image generation task
       let taskResponse: Awaited<ReturnType<KieApiService['generateImage']>> | undefined;
       try {
+        // Pass the model name to KIE API service
+        // For nano-banana-pro, pass 'nano-banana-pro' as preferred model
+        const preferredModel = model === 'nano-banana-pro' ? 'nano-banana-pro' : undefined;
         taskResponse = await kieApiService.generateImage({
           prompt,
           imageUrls: imageUrlsForKie.length > 0 ? imageUrlsForKie : undefined,
           imageSize: kieImageSize,
           outputFormat: kieOutputFormat,
-        });
+        }, preferredModel);
       } catch (error) {
         console.error('[Image Generation] KIE API generateImage error:', {
           error: error instanceof Error ? error.message : String(error),

@@ -1017,6 +1017,10 @@ export default function ImageGenerator() {
                       Nano Banana - {creditsConfig.consumption.imageGeneration['nano-banana']}{' '}
                       credits
                     </SelectItem>
+                    <SelectItem value="nano-banana-pro">
+                      Nano Banana Pro - {creditsConfig.consumption.imageGeneration['nano-banana-pro']}{' '}
+                      credits
+                    </SelectItem>
                   </SelectContent>
                 </Select>
               </div>

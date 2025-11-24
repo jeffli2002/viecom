@@ -10,11 +10,13 @@ const buildModelPriorityList = (...models: Array<string | undefined>): string[] 
 const IMAGE_MODEL_PRIORITY = {
   t2i: buildModelPriorityList(
     env.KIE_IMAGE_T2I_MODEL,
-    'google/nano-banana' // Text-to-image model
+    'google/nano-banana', // Text-to-image model
+    'nano-banana-pro' // Nano Banana Pro model
   ),
   i2i: buildModelPriorityList(
     env.KIE_IMAGE_I2I_MODEL,
-    'google/nano-banana-edit' // Image-to-image model
+    'google/nano-banana-edit', // Image-to-image model
+    'nano-banana-pro' // Nano Banana Pro model (supports both T2I and I2I)
   ),
 };
 
@@ -112,10 +114,23 @@ export class KIEAPIService {
   /**
    * Generate image using nano banana model
    */
-  async generateImage(params: KIEImageGenerationParams): Promise<KIETaskResponse> {
+  async generateImage(params: KIEImageGenerationParams, preferredModel?: string): Promise<KIETaskResponse> {
     // Determine if this is I2I or T2I based on imageUrl
-    const isI2I = !!params.imageUrl;
-    const priorityList = isI2I ? this.imageModelPriority.i2i : this.imageModelPriority.t2i;
+    const isI2I = !!params.imageUrl || (params.imageUrls && params.imageUrls.length > 0);
+    let priorityList = isI2I ? this.imageModelPriority.i2i : this.imageModelPriority.t2i;
+    
+    // If a preferred model is specified, prioritize it
+    // Map 'nano-banana-pro' to 'nano-banana-pro' (same name in KIE API)
+    if (preferredModel) {
+      // Check if preferred model exists in priority list (exact match or mapped name)
+      const modelInList = priorityList.find(m => m === preferredModel || m.includes(preferredModel));
+      if (modelInList) {
+        priorityList = [modelInList, ...priorityList.filter(m => m !== modelInList)];
+      } else if (preferredModel === 'nano-banana-pro') {
+        // If nano-banana-pro is requested but not in list, add it to the front
+        priorityList = [preferredModel, ...priorityList];
+      }
+    }
 
     if (priorityList.length === 0) {
       throw new Error(
@@ -131,13 +146,13 @@ export class KIEAPIService {
     let lastError: Error | null = null;
     const attemptedModels: string[] = [];
 
-    for (const model of priorityList) {
-      attemptedModels.push(model);
+    for (const modelName of priorityList) {
+      attemptedModels.push(modelName);
       try {
         console.log(
-          `Attempting to create ${isI2I ? 'image-to-image' : 'text-to-image'} task with model: ${model}`
+          `Attempting to create ${isI2I ? 'image-to-image' : 'text-to-image'} task with model: ${modelName}`
         );
-        return await this.createImageTask(model, params);
+        return await this.createImageTask(modelName, params);
       } catch (error) {
         lastError = error instanceof Error ? error : new Error(String(error));
         console.warn(`Model ${model} failed:`, lastError.message);
@@ -166,6 +181,18 @@ export class KIEAPIService {
     model: string,
     params: KIEImageGenerationParams
   ): Promise<KIETaskResponse> {
+    // Map model name to KIE API model name
+    // KIE API uses 'nano-banana-pro' for the pro model
+    // For other models, use as-is (e.g., 'google/nano-banana', 'google/nano-banana-edit')
+    let kieModelName: string;
+    if (model === 'nano-banana-pro') {
+      kieModelName = 'nano-banana-pro';
+    } else if (model === 'google/nano-banana' || model === 'google/nano-banana-edit') {
+      kieModelName = model; // Use full model name for standard nano-banana
+    } else {
+      kieModelName = model; // Fallback to original model name
+    }
+    
     // KIE API format according to documentation
     const input: KIEImageTaskInput = {
       prompt: params.prompt,
@@ -189,7 +216,7 @@ export class KIEAPIService {
 
     // Build request body
     const requestBody: KIEImageTaskRequest = {
-      model,
+      model: kieModelName,
       input,
     };
 
