@@ -40,12 +40,12 @@ async function runCompatibilityTests() {
     });
 
     assert(
-      testClient['config'].testMode === true,
+      testClient.config.testMode === true,
       'Test mode detection matches existing service (creem_test_*)'
     );
 
     assert(
-      testClient['config'].baseUrl === 'https://test-api.creem.io',
+      testClient.config.baseUrl === 'https://test-api.creem.io',
       'Test API URL matches existing service implementation'
     );
 
@@ -56,12 +56,12 @@ async function runCompatibilityTests() {
     });
 
     assert(
-      prodClient['config'].testMode === false,
+      prodClient.config.testMode === false,
       'Production mode detection matches existing service (creem_*)'
     );
 
     assert(
-      prodClient['config'].baseUrl === 'https://api.creem.io',
+      prodClient.config.baseUrl === 'https://api.creem.io',
       'Production API URL matches existing service implementation'
     );
   } catch (error) {
@@ -127,10 +127,7 @@ async function runCompatibilityTests() {
       webhookSecret: TEST_WEBHOOK_SECRET,
     });
 
-    assert(
-      client['config'].timeout === 30000,
-      'Default timeout matches typical fetch timeout (30s)'
-    );
+    assert(client.config.timeout === 30000, 'Default timeout matches typical fetch timeout (30s)');
 
     // Test custom timeout
     const customClient = new CreemApiClient({
@@ -140,7 +137,7 @@ async function runCompatibilityTests() {
     });
 
     assert(
-      customClient['config'].timeout === 60000,
+      customClient.config.timeout === 60000,
       'Custom timeout configuration works (new feature, no breaking change)'
     );
   } catch (error) {
@@ -152,7 +149,7 @@ async function runCompatibilityTests() {
 
   try {
     // Verify that API result structure matches existing service return types
-    const client = new CreemApiClient({
+    const _client = new CreemApiClient({
       apiKey: TEST_API_KEY,
       webhookSecret: TEST_WEBHOOK_SECRET,
     });
@@ -192,7 +189,7 @@ async function runCompatibilityTests() {
   console.log('\n📋 Test Suite: Error Handling Compatibility\n');
 
   try {
-    const client = new CreemApiClient({
+    const _client = new CreemApiClient({
       apiKey: TEST_API_KEY,
       webhookSecret: TEST_WEBHOOK_SECRET,
     });
@@ -242,7 +239,7 @@ async function runCompatibilityTests() {
     });
 
     assert(
-      clientNoLogger['logger'] !== undefined,
+      clientNoLogger.logger !== undefined,
       'Default logger provided (no breaking change, backward compatible)'
     );
 
@@ -264,7 +261,7 @@ async function runCompatibilityTests() {
     );
 
     assert(
-      clientWithLogger['logger'] === customLogger,
+      clientWithLogger.logger === customLogger,
       'Custom logger injection works (new feature, backward compatible)'
     );
   } catch (error) {
@@ -284,25 +281,25 @@ async function runCompatibilityTests() {
 
     // Verify that both createCheckout methods exist internally
     assert(
-      typeof client['createCheckoutWithSdk'] === 'function',
+      typeof client.createCheckoutWithSdk === 'function',
       'SDK method exists (matches existing service pattern)'
     );
 
     assert(
-      typeof client['createCheckoutDirect'] === 'function',
+      typeof client.createCheckoutDirect === 'function',
       'Direct API fallback method exists (matches existing service pattern)'
     );
 
     // Same for other methods
     assert(
-      typeof client['getSubscriptionWithSdk'] === 'function' &&
-        typeof client['getSubscriptionDirect'] === 'function',
+      typeof client.getSubscriptionWithSdk === 'function' &&
+        typeof client.getSubscriptionDirect === 'function',
       'getSubscription uses SDK + fallback pattern (matches existing service)'
     );
 
     assert(
-      typeof client['cancelSubscriptionWithSdk'] === 'function' &&
-        typeof client['cancelSubscriptionDirect'] === 'function',
+      typeof client.cancelSubscriptionWithSdk === 'function' &&
+        typeof client.cancelSubscriptionDirect === 'function',
       'cancelSubscription uses SDK + fallback pattern (matches existing service)'
     );
   } catch (error) {
@@ -344,7 +341,7 @@ async function runCompatibilityTests() {
     let errorThrown = false;
     try {
       client.parseWebhookEvent('{invalid json}');
-    } catch (error) {
+    } catch (_error) {
       errorThrown = true;
     }
 
@@ -354,7 +351,7 @@ async function runCompatibilityTests() {
     failedTests++;
   }
 
-  console.log('\n' + '='.repeat(60));
+  console.log(`\n${'='.repeat(60)}`);
   console.log('\n📊 Compatibility Test Results:');
   console.log(`   ✅ Passed: ${passedTests}`);
   console.log(`   ❌ Failed: ${failedTests}`);

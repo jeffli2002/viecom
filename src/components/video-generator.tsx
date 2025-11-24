@@ -537,7 +537,9 @@ export default function VideoGenerator() {
                     </div>
 
                     <div className="space-y-2">
-                      <Label className="font-light text-slate-700 dark:text-slate-300 text-sm">{t('sourceImage')}</Label>
+                      <Label className="font-light text-slate-700 dark:text-slate-300 text-sm">
+                        {t('sourceImage')}
+                      </Label>
 
                       {!imagePreview ? (
                         <button
@@ -552,7 +554,9 @@ export default function VideoGenerator() {
                           <p className="mb-1 font-light text-slate-600 dark:text-slate-400 text-sm">
                             {t('clickToUpload')}
                           </p>
-                          <p className="font-light text-slate-400 dark:text-slate-500 text-xs">{t('imageFormatDesc')}</p>
+                          <p className="font-light text-slate-400 dark:text-slate-500 text-xs">
+                            {t('imageFormatDesc')}
+                          </p>
                         </button>
                       ) : (
                         <div className="relative">
@@ -656,7 +660,9 @@ export default function VideoGenerator() {
 
                 {/* Video Style Selection */}
                 <div className="space-y-2">
-                  <Label className="font-light text-slate-700 dark:text-slate-300 text-sm">{t('videoStyle')}</Label>
+                  <Label className="font-light text-slate-700 dark:text-slate-300 text-sm">
+                    {t('videoStyle')}
+                  </Label>
                   <Select value={videoStyle} onValueChange={setVideoStyle}>
                     <SelectTrigger className="border-slate-200 dark:border-slate-700 font-light">
                       <SelectValue />
@@ -673,7 +679,9 @@ export default function VideoGenerator() {
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label className="font-light text-slate-700 dark:text-slate-300 text-sm">{t('model')}</Label>
+                    <Label className="font-light text-slate-700 dark:text-slate-300 text-sm">
+                      {t('model')}
+                    </Label>
                     <Select
                       value={model}
                       onValueChange={(value) => {
@@ -699,7 +707,9 @@ export default function VideoGenerator() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label className="font-light text-slate-700 dark:text-slate-300 text-sm">{t('aspectRatio')}</Label>
+                    <Label className="font-light text-slate-700 dark:text-slate-300 text-sm">
+                      {t('aspectRatio')}
+                    </Label>
                     <Select value={aspectRatio} onValueChange={setAspectRatio}>
                       <SelectTrigger className="border-slate-200 dark:border-slate-700 font-light">
                         <SelectValue />
@@ -715,7 +725,9 @@ export default function VideoGenerator() {
                 {/* Quality Selector - Only show for Sora 2 Pro */}
                 {model === 'sora-2-pro' && (
                   <div className="space-y-2">
-                    <Label className="font-light text-slate-700 dark:text-slate-300 text-sm">{t('quality')}</Label>
+                    <Label className="font-light text-slate-700 dark:text-slate-300 text-sm">
+                      {t('quality')}
+                    </Label>
                     <div className="grid grid-cols-2 gap-3">
                       <button
                         type="button"
@@ -776,7 +788,9 @@ export default function VideoGenerator() {
                 )}
 
                 <div className="space-y-2">
-                  <Label className="font-light text-slate-700 dark:text-slate-300 text-sm">{t('videoDuration')}</Label>
+                  <Label className="font-light text-slate-700 dark:text-slate-300 text-sm">
+                    {t('videoDuration')}
+                  </Label>
                   <div className="grid grid-cols-2 gap-3">
                     <button
                       type="button"
@@ -863,7 +877,9 @@ export default function VideoGenerator() {
                 <div className="flex aspect-video items-center justify-center rounded-xl bg-slate-100 dark:bg-slate-800">
                   <div className="space-y-3 text-center">
                     <VideoIcon className="mx-auto h-16 w-16 text-slate-400 dark:text-slate-500" />
-                    <p className="font-light text-slate-500 dark:text-slate-400 text-sm">{t('videoWillAppearHere')}</p>
+                    <p className="font-light text-slate-500 dark:text-slate-400 text-sm">
+                      {t('videoWillAppearHere')}
+                    </p>
                   </div>
                 </div>
               )}

@@ -175,14 +175,17 @@ export default function ImageToVideoAIPage() {
     <div className="min-h-screen bg-white dark:bg-slate-950">
       <script
         type="application/ld+json"
+        // biome-ignore lint/security/noDangerouslySetInnerHtml: JSON-LD schema is safe
         dangerouslySetInnerHTML={{ __html: JSON.stringify(howItWorksSchema) }}
       />
       <script
         type="application/ld+json"
+        // biome-ignore lint/security/noDangerouslySetInnerHtml: JSON-LD schema is safe
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
       />
       <script
         type="application/ld+json"
+        // biome-ignore lint/security/noDangerouslySetInnerHtml: JSON-LD schema is safe
         dangerouslySetInnerHTML={{ __html: JSON.stringify(softwareSchema) }}
       />
 
@@ -286,9 +289,9 @@ export default function ImageToVideoAIPage() {
             Perfect For
           </h2>
           <div className="grid md:grid-cols-3 gap-8">
-            {useCases.map((useCase, index) => (
+            {useCases.map((useCase) => (
               <div
-                key={index}
+                key={useCase.title}
                 className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl p-6 hover:shadow-lg transition-shadow"
               >
                 <useCase.icon className="h-12 w-12 text-purple-500 mb-4" />
@@ -306,8 +309,8 @@ export default function ImageToVideoAIPage() {
             Features
           </h2>
           <div className="grid md:grid-cols-2 gap-4">
-            {features.map((feature, index) => (
-              <div key={index} className="flex items-start gap-3">
+            {features.map((feature) => (
+              <div key={feature} className="flex items-start gap-3">
                 <Check className="h-6 w-6 text-green-500 flex-shrink-0 mt-0.5" />
                 <span className="text-lg text-slate-700 dark:text-slate-300">{feature}</span>
               </div>
@@ -323,9 +326,9 @@ export default function ImageToVideoAIPage() {
             Choose the plan that fits your needs. Upgrade or downgrade anytime.
           </p>
           <div className="grid md:grid-cols-3 gap-8">
-            {pricingComparison.map((plan, index) => (
+            {pricingComparison.map((plan) => (
               <div
-                key={index}
+                key={plan.plan}
                 className={`bg-white dark:bg-slate-900 border-2 rounded-xl p-8 ${
                   plan.popular
                     ? 'border-purple-500 shadow-xl scale-105'
@@ -351,9 +354,9 @@ export default function ImageToVideoAIPage() {
                 <p className="text-sm text-slate-600 dark:text-slate-400 mb-2">{plan.credits}</p>
                 <p className="text-sm text-slate-600 dark:text-slate-400 mb-6">{plan.videos}</p>
                 <ul className="space-y-3 mb-8">
-                  {plan.features.map((feature, idx) => (
+                  {plan.features.map((feature) => (
                     <li
-                      key={idx}
+                      key={feature}
                       className="flex items-center gap-2 text-slate-700 dark:text-slate-300"
                     >
                       <Check className="h-5 w-5 text-green-500 flex-shrink-0" />

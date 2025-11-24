@@ -512,9 +512,7 @@ async function handleCheckoutComplete(data: CreemWebhookData) {
         );
 
         const resolvedInterval =
-          normalizeIntervalValue(interval) ||
-          normalizeIntervalValue(billingInterval) ||
-          'month';
+          normalizeIntervalValue(interval) || normalizeIntervalValue(billingInterval) || 'month';
 
         await paymentRepository.create({
           id: subscriptionId,

@@ -145,7 +145,11 @@ export default function UpgradePrompt({
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4" role="dialog" aria-modal="true">
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4"
+      role="dialog"
+      aria-modal="true"
+    >
       <Card className="w-full max-w-md max-h-[90vh] bg-white dark:bg-slate-900 shadow-2xl border-0 flex flex-col overflow-hidden">
         <CardHeader className="bg-white dark:bg-slate-900 flex-shrink-0">
           <div className="flex items-center justify-between">
@@ -170,7 +174,10 @@ export default function UpgradePrompt({
           )}
           {isAuthenticated && (
             <div className="mt-2 text-center">
-              <Badge variant="outline" className="text-xs border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 bg-slate-50 dark:bg-slate-800">
+              <Badge
+                variant="outline"
+                className="text-xs border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 bg-slate-50 dark:bg-slate-800"
+              >
                 Current balance: {creditsUsed} credits
               </Badge>
             </div>
@@ -179,7 +186,9 @@ export default function UpgradePrompt({
         <CardContent className="flex flex-col bg-white dark:bg-slate-900 flex-1 min-h-0 p-6 space-y-0">
           {/* Upgrade to Pro section - Always visible */}
           <div className="rounded-lg bg-gradient-to-r from-teal-50 to-blue-50 dark:from-teal-900/20 dark:to-blue-900/20 py-4 text-center border border-teal-100 dark:border-teal-800 mb-6 flex-shrink-0">
-            <h3 className="mb-2 font-bold text-2xl text-slate-900 dark:text-white">Upgrade to {targetPlanName}</h3>
+            <h3 className="mb-2 font-bold text-2xl text-slate-900 dark:text-white">
+              Upgrade to {targetPlanName}
+            </h3>
             <div className="flex items-center justify-center gap-2">
               <span className="font-bold text-3xl text-teal-500">${targetPlanPrice}/mo</span>
             </div>
@@ -196,7 +205,9 @@ export default function UpgradePrompt({
                   <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-teal-100 dark:bg-teal-900/30">
                     <feature.icon className="h-4 w-4 text-teal-500" />
                   </div>
-                  <span className="text-slate-800 dark:text-slate-200 font-medium">{feature.text}</span>
+                  <span className="text-slate-800 dark:text-slate-200 font-medium">
+                    {feature.text}
+                  </span>
                 </div>
               ))}
             </div>

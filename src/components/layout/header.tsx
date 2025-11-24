@@ -94,7 +94,7 @@ export function Header() {
       ],
     },
     {
-      title: 'Features',
+      title: 'Learn',
       items: [
         {
           title: 'Image to Video AI',

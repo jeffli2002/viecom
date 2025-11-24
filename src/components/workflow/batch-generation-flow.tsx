@@ -1482,7 +1482,9 @@ export function BatchGenerationFlow({ generationType }: BatchGenerationFlowProps
               {isGenerating && generationProgress.total > 0 && (
                 <div className="space-y-2 pt-2 border-t">
                   <div className="flex items-center justify-between text-sm">
-                    <span className="text-slate-600 dark:text-slate-400">{t('overallProgress')}</span>
+                    <span className="text-slate-600 dark:text-slate-400">
+                      {t('overallProgress')}
+                    </span>
                     <span className="font-medium">
                       {generationProgress.current} / {generationProgress.total}
                     </span>
@@ -1502,7 +1504,9 @@ export function BatchGenerationFlow({ generationType }: BatchGenerationFlowProps
               {totalRows > 0 && (
                 <div className="pt-2 border-t">
                   <div className="flex items-center justify-between text-sm mb-2">
-                    <span className="text-slate-600 dark:text-slate-400">{t('completionRate')}</span>
+                    <span className="text-slate-600 dark:text-slate-400">
+                      {t('completionRate')}
+                    </span>
                     <span className="font-medium">
                       {Math.round((completedCount / totalRows) * 100)}%
                     </span>
@@ -1513,7 +1517,9 @@ export function BatchGenerationFlow({ generationType }: BatchGenerationFlowProps
 
               {/* Status Breakdown */}
               <div className="pt-2 border-t space-y-2">
-                <h4 className="text-sm font-medium text-slate-700 dark:text-slate-300">{t('statusDistribution')}</h4>
+                <h4 className="text-sm font-medium text-slate-700 dark:text-slate-300">
+                  {t('statusDistribution')}
+                </h4>
                 <div className="space-y-1.5">
                   {completedCount > 0 && (
                     <div className="flex items-center justify-between text-xs">
@@ -1528,7 +1534,9 @@ export function BatchGenerationFlow({ generationType }: BatchGenerationFlowProps
                     <div className="flex items-center justify-between text-xs">
                       <div className="flex items-center gap-2">
                         <Loader2 className="w-3 h-3 text-blue-500 animate-spin" />
-                        <span className="text-slate-600 dark:text-slate-400">{t('generatingStatus')}</span>
+                        <span className="text-slate-600 dark:text-slate-400">
+                          {t('generatingStatus')}
+                        </span>
                       </div>
                       <span className="font-medium">{generatingCount}</span>
                     </div>
@@ -1701,7 +1709,9 @@ export function BatchGenerationFlow({ generationType }: BatchGenerationFlowProps
                           <div className="flex-1 space-y-3">
                             {row.productName && (
                               <div>
-                                <Label className="text-xs text-slate-500 dark:text-slate-400">{t('productName')}</Label>
+                                <Label className="text-xs text-slate-500 dark:text-slate-400">
+                                  {t('productName')}
+                                </Label>
                                 <p className="text-sm font-medium">{row.productName}</p>
                               </div>
                             )}

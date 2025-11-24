@@ -44,7 +44,9 @@ export default function RefundPolicyPage() {
 
         <Card>
           <CardContent className="pt-6 space-y-4">
-            <p className="text-sm text-gray-500 dark:text-slate-400">Last updated: November 12, 2024</p>
+            <p className="text-sm text-gray-500 dark:text-slate-400">
+              Last updated: November 12, 2024
+            </p>
 
             <p>
               This Refund Policy outlines our policies and procedures regarding refunds for Viecom's
@@ -56,7 +58,9 @@ export default function RefundPolicyPage() {
 
         <Card>
           <CardContent className="pt-6 space-y-4">
-            <h2 className="text-2xl font-semibold text-gray-900 dark:text-white">1. General Policy</h2>
+            <h2 className="text-2xl font-semibold text-gray-900 dark:text-white">
+              1. General Policy
+            </h2>
 
             <p>
               Due to the nature of digital services and AI-generated content,{' '}
@@ -75,7 +79,9 @@ export default function RefundPolicyPage() {
 
         <Card>
           <CardContent className="pt-6 space-y-4">
-            <h2 className="text-2xl font-semibold text-gray-900 dark:text-white">2. Why No Refunds?</h2>
+            <h2 className="text-2xl font-semibold text-gray-900 dark:text-white">
+              2. Why No Refunds?
+            </h2>
 
             <p>
               Our digital services involve the immediate consumption of computational resources and
@@ -97,7 +103,9 @@ export default function RefundPolicyPage() {
 
         <Card>
           <CardContent className="pt-6 space-y-4">
-            <h2 className="text-2xl font-semibold text-gray-900 dark:text-white">3. Subscription Cancellation</h2>
+            <h2 className="text-2xl font-semibold text-gray-900 dark:text-white">
+              3. Subscription Cancellation
+            </h2>
 
             <p>While we do not offer refunds, you can cancel your subscription at any time:</p>
             <ul className="list-disc list-inside space-y-2 ml-4">
@@ -164,7 +172,9 @@ export default function RefundPolicyPage() {
 
         <Card>
           <CardContent className="pt-6 space-y-4">
-            <h2 className="text-2xl font-semibold text-gray-900 dark:text-white">5. Free Trial and Testing</h2>
+            <h2 className="text-2xl font-semibold text-gray-900 dark:text-white">
+              5. Free Trial and Testing
+            </h2>
 
             <p>
               We encourage you to utilize our free tier to test our services before making a
@@ -213,7 +223,9 @@ export default function RefundPolicyPage() {
 
         <Card>
           <CardContent className="pt-6 space-y-4">
-            <h2 className="text-2xl font-semibold text-gray-900 dark:text-white">7. Pricing Changes</h2>
+            <h2 className="text-2xl font-semibold text-gray-900 dark:text-white">
+              7. Pricing Changes
+            </h2>
 
             <p>We reserve the right to modify our pricing at any time. However:</p>
             <ul className="list-disc list-inside space-y-2 ml-4">
@@ -259,7 +271,9 @@ export default function RefundPolicyPage() {
 
         <Card>
           <CardContent className="pt-6 space-y-4">
-            <h2 className="text-2xl font-semibold text-gray-900 dark:text-white">9. Policy Updates</h2>
+            <h2 className="text-2xl font-semibold text-gray-900 dark:text-white">
+              9. Policy Updates
+            </h2>
 
             <p>
               We may update this Refund Policy from time to time. Any changes will be posted on this

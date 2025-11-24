@@ -20,7 +20,7 @@
     const scripts = document.querySelectorAll('script');
     for (const script of scripts) {
       const content = script.textContent;
-      if (content && content.includes('subscription')) {
+      if (content?.includes('subscription')) {
         try {
           // Try to extract JSON data
           const matches = content.match(/(\{[^{}]*"subscription[^{}]*\})/g);
@@ -28,7 +28,7 @@
             console.log('Found potential subscription data in script tags');
             return matches;
           }
-        } catch (e) {}
+        } catch (_e) {}
       }
     }
     return null;
@@ -123,7 +123,7 @@ console.log('✅ Interceptor installed! Now refresh the page (F5)');
             return value;
           }
         }
-      } catch (e) {}
+      } catch (_e) {}
     }
     return null;
   }

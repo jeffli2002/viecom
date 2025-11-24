@@ -37,7 +37,7 @@ async function checkUserSubscription(email: string) {
     }
 
     const user = userResult[0];
-    console.log(`\n👤 User Information:`);
+    console.log('\n👤 User Information:');
     console.log(`   ID: ${user.id}`);
     console.log(`   Email: ${user.email}`);
     console.log(`   Name: ${user.name || 'N/A'}`);
@@ -55,11 +55,11 @@ async function checkUserSubscription(email: string) {
 
     if (creditResult.length > 0) {
       const credits = creditResult[0];
-      console.log(`\n💰 Credit Balance:`);
+      console.log('\n💰 Credit Balance:');
       console.log(`   Balance: ${credits.balance}`);
       console.log(`   Last Updated: ${new Date(credits.updated_at).toISOString()}`);
     } else {
-      console.log(`\n💰 Credit Balance: 0 (no record found)`);
+      console.log('\n💰 Credit Balance: 0 (no record found)');
     }
 
     // Get all subscriptions
@@ -134,14 +134,18 @@ async function checkUserSubscription(email: string) {
           console.log(`   Period End: ${new Date(sub.period_end).toISOString()}`);
         }
         if (sub.scheduled_plan_id) {
-          console.log(`   ⚠️  Scheduled Plan Change:`);
+          console.log('   ⚠️  Scheduled Plan Change:');
           console.log(`      Scheduled Plan: ${sub.scheduled_plan_id}`);
           console.log(`      Scheduled Interval: ${sub.scheduled_interval || 'N/A'}`);
           if (sub.scheduled_period_start) {
-            console.log(`      Scheduled Period Start: ${new Date(sub.scheduled_period_start).toISOString()}`);
+            console.log(
+              `      Scheduled Period Start: ${new Date(sub.scheduled_period_start).toISOString()}`
+            );
           }
           if (sub.scheduled_period_end) {
-            console.log(`      Scheduled Period End: ${new Date(sub.scheduled_period_end).toISOString()}`);
+            console.log(
+              `      Scheduled Period End: ${new Date(sub.scheduled_period_end).toISOString()}`
+            );
           }
           if (sub.scheduled_at) {
             console.log(`      Scheduled At: ${new Date(sub.scheduled_at).toISOString()}`);
@@ -159,7 +163,10 @@ async function checkUserSubscription(email: string) {
       if (activeSub) {
         let currentPlanName = 'Unknown';
         if (activeSub.product_id) {
-          if (activeSub.product_id.includes('proplus') || activeSub.product_id.includes('pro_plus')) {
+          if (
+            activeSub.product_id.includes('proplus') ||
+            activeSub.product_id.includes('pro_plus')
+          ) {
             currentPlanName = 'Pro+';
           } else if (activeSub.product_id.includes('pro')) {
             currentPlanName = 'Pro';
@@ -181,15 +188,17 @@ async function checkUserSubscription(email: string) {
         if (activeSub.scheduled_plan_id) {
           console.log(`   ⚠️  Scheduled to change to: ${activeSub.scheduled_plan_id}`);
           if (activeSub.scheduled_period_start) {
-            console.log(`   Effective from: ${new Date(activeSub.scheduled_period_start).toISOString()}`);
+            console.log(
+              `   Effective from: ${new Date(activeSub.scheduled_period_start).toISOString()}`
+            );
           }
         }
       } else {
-        console.log(`\n📌 Current Status: FREE PLAN (no active subscription)`);
+        console.log('\n📌 Current Status: FREE PLAN (no active subscription)');
       }
     }
 
-    console.log('\n' + '='.repeat(80));
+    console.log(`\n${'='.repeat(80)}`);
   } catch (error) {
     console.error('❌ Error checking subscription:', error);
     process.exit(1);
@@ -203,4 +212,3 @@ checkUserSubscription(email)
     console.error('Fatal error:', error);
     process.exit(1);
   });
-

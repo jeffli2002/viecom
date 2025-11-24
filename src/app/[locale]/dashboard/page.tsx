@@ -29,7 +29,7 @@ import {
 import { useLocale, useTranslations } from 'next-intl';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Suspense, useEffect, useMemo, useState } from 'react';
+import { Suspense, useCallback, useEffect, useMemo, useState } from 'react';
 
 export const dynamic = 'force-dynamic';
 
@@ -140,7 +140,7 @@ function DashboardPageContent() {
     };
   }, [upcomingPlan]);
 
-  const fetchDashboardData = async () => {
+  const fetchDashboardData = useCallback(async () => {
     try {
       // Fetch credit balance
       const balanceResponse = await fetch('/api/credits/balance', {
@@ -181,7 +181,7 @@ function DashboardPageContent() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     if (!authLoading && !isAuthenticated) {
@@ -192,8 +192,7 @@ function DashboardPageContent() {
     if (isAuthenticated) {
       fetchDashboardData();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isAuthenticated, authLoading]);
+  }, [isAuthenticated, authLoading, router, fetchDashboardData]);
 
   const handleRefresh = async () => {
     setIsRefreshing(true);

@@ -309,7 +309,9 @@ export function CheckinDropdown() {
                 <Calendar className="h-5 w-5 text-teal-500" />
                 <h3 className="text-lg font-bold text-slate-900 dark:text-white">Daily Check-In</h3>
               </div>
-              <p className="text-xs text-slate-500 dark:text-slate-400">Check in daily to earn credits</p>
+              <p className="text-xs text-slate-500 dark:text-slate-400">
+                Check in daily to earn credits
+              </p>
             </div>
             {creditBalance && (
               <Badge className="bg-gradient-to-r from-teal-500 to-blue-500 text-white border-0 px-3 py-1">
@@ -324,7 +326,9 @@ export function CheckinDropdown() {
             <Flame className="h-8 w-8 text-orange-500 flex-shrink-0" />
             <div className="flex-1">
               <p className="text-xs text-slate-600 dark:text-slate-400 mb-0.5">Current Streak</p>
-              <p className="text-2xl font-bold text-slate-900 dark:text-white">{consecutiveDays} Days</p>
+              <p className="text-2xl font-bold text-slate-900 dark:text-white">
+                {consecutiveDays} Days
+              </p>
             </div>
           </div>
 
@@ -333,7 +337,9 @@ export function CheckinDropdown() {
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center gap-1.5">
                 <Gift className="h-3.5 w-3.5 text-teal-500" />
-                <span className="text-xs font-medium text-slate-900 dark:text-white">7-Day Bonus</span>
+                <span className="text-xs font-medium text-slate-900 dark:text-white">
+                  7-Day Bonus
+                </span>
               </div>
               <span className="text-xs text-slate-500 dark:text-slate-400">
                 {progressDays}/{consecutiveDaysRequired} days
@@ -350,13 +356,17 @@ export function CheckinDropdown() {
           {/* Last 7 Days Calendar */}
           <div>
             <p className="text-xs font-medium text-slate-900 dark:text-white mb-2">Last 7 Days</p>
-            <p className="text-xs text-slate-500 dark:text-slate-400 mb-3">Click today's date to check in</p>
+            <p className="text-xs text-slate-500 dark:text-slate-400 mb-3">
+              Click today's date to check in
+            </p>
             <div className="grid grid-cols-7 gap-1.5">
               {last7Days.map((day) => {
                 const isClickable = day.isToday && !day.isCheckedIn && !isCheckingIn;
                 return (
                   <div key={day.date} className="flex flex-col items-center">
-                    <span className="text-xs text-slate-600 dark:text-slate-400 mb-1">{day.dayName}</span>
+                    <span className="text-xs text-slate-600 dark:text-slate-400 mb-1">
+                      {day.dayName}
+                    </span>
                     <button
                       type="button"
                       onClick={() => handleDateClick(day)}
@@ -391,16 +401,22 @@ export function CheckinDropdown() {
             <div className="bg-teal-50 dark:bg-teal-900/20 rounded-lg p-2 border border-teal-100 dark:border-teal-800">
               <div className="flex items-center gap-1 mb-1">
                 <Sparkles className="h-3 w-3 text-teal-500" />
-                <span className="text-xs font-medium text-slate-700 dark:text-slate-300">Daily</span>
+                <span className="text-xs font-medium text-slate-700 dark:text-slate-300">
+                  Daily
+                </span>
               </div>
               <p className="text-lg font-bold text-slate-900 dark:text-white">+{dailyCredits}</p>
             </div>
             <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-2 border border-blue-100 dark:border-blue-800">
               <div className="flex items-center gap-1 mb-1">
                 <Gift className="h-3 w-3 text-blue-500" />
-                <span className="text-xs font-medium text-slate-700 dark:text-slate-300">7-Day</span>
+                <span className="text-xs font-medium text-slate-700 dark:text-slate-300">
+                  7-Day
+                </span>
               </div>
-              <p className="text-lg font-bold text-slate-900 dark:text-white">+{weeklyBonusCredits}</p>
+              <p className="text-lg font-bold text-slate-900 dark:text-white">
+                +{weeklyBonusCredits}
+              </p>
             </div>
           </div>
         </div>

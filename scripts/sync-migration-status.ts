@@ -36,8 +36,8 @@ async function syncMigrationStatus() {
     const journal = JSON.parse(fs.readFileSync('./drizzle/meta/_journal.json', 'utf-8'));
 
     console.log('📋 Migration files in journal:');
-    const migrations = journal.entries || [];
-    migrations.forEach((entry: any, index: number) => {
+    const migrations = (journal.entries as Array<{ tag?: string }>) || [];
+    migrations.forEach((entry, index: number) => {
       const tag = entry.tag || `migration_${index}`;
       console.log(`   ${index + 1}. ${tag}`);
     });

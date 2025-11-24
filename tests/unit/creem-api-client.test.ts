@@ -19,8 +19,8 @@ describe('CreemApiClient', () => {
         webhookSecret: 'test_secret',
       });
 
-      expect(client['config'].testMode).toBe(true);
-      expect(client['config'].baseUrl).toBe('https://test-api.creem.io');
+      expect(client.config.testMode).toBe(true);
+      expect(client.config.baseUrl).toBe('https://test-api.creem.io');
     });
 
     it('should auto-detect production mode from API key without test prefix', () => {
@@ -29,8 +29,8 @@ describe('CreemApiClient', () => {
         webhookSecret: 'prod_secret',
       });
 
-      expect(client['config'].testMode).toBe(false);
-      expect(client['config'].baseUrl).toBe('https://api.creem.io');
+      expect(client.config.testMode).toBe(false);
+      expect(client.config.baseUrl).toBe('https://api.creem.io');
     });
 
     it('should use custom base URL when provided', () => {
@@ -41,7 +41,7 @@ describe('CreemApiClient', () => {
         baseUrl: customUrl,
       });
 
-      expect(client['config'].baseUrl).toBe(customUrl);
+      expect(client.config.baseUrl).toBe(customUrl);
     });
 
     it('should use default timeout of 30000ms', () => {
@@ -50,7 +50,7 @@ describe('CreemApiClient', () => {
         webhookSecret: 'secret',
       });
 
-      expect(client['config'].timeout).toBe(30000);
+      expect(client.config.timeout).toBe(30000);
     });
 
     it('should use custom timeout when provided', () => {
@@ -60,7 +60,7 @@ describe('CreemApiClient', () => {
         timeout: 60000,
       });
 
-      expect(client['config'].timeout).toBe(60000);
+      expect(client.config.timeout).toBe(60000);
     });
 
     it('should throw error if API key is missing', () => {
@@ -88,7 +88,7 @@ describe('CreemApiClient', () => {
         mockLogger
       );
 
-      expect(client['logger']).toBe(mockLogger);
+      expect(client.logger).toBe(mockLogger);
     });
   });
 

@@ -43,7 +43,7 @@ export function Footer() {
             </div>
           </div>
 
-          {/* Product */}
+          {/* Tools */}
           <div>
             <h4 className="font-bold text-slate-900 dark:text-white mb-6">
               {t('footerProduct') || '产品'}
@@ -57,11 +57,6 @@ export function Footer() {
               <li>
                 <Link href="/video-generation" className="hover:text-teal-500 transition-colors">
                   {t('videoGeneration')}
-                </Link>
-              </li>
-              <li>
-                <Link href="/image-to-video-ai" className="hover:text-teal-500 transition-colors">
-                  Image to Video AI
                 </Link>
               </li>
               <li>
@@ -83,15 +78,15 @@ export function Footer() {
             </ul>
           </div>
 
-          {/* Resources */}
+          {/* Learn */}
           <div>
             <h4 className="font-bold text-slate-900 dark:text-white mb-6">
-              {t('footerResources') || '资源'}
+              Learn
             </h4>
             <ul className="space-y-4 text-sm text-slate-600 dark:text-slate-400">
               <li>
-                <Link href="/assets" className="hover:text-teal-500 transition-colors">
-                  {t('assets')}
+                <Link href="/image-to-video-ai" className="hover:text-teal-500 transition-colors">
+                  Image to Video AI
                 </Link>
               </li>
               <li>
@@ -102,6 +97,11 @@ export function Footer() {
               <li>
                 <Link href="/video-enhancer-ai" className="hover:text-teal-500 transition-colors">
                   Video Enhancer
+                </Link>
+              </li>
+              <li>
+                <Link href="/assets" className="hover:text-teal-500 transition-colors">
+                  {t('assets')}
                 </Link>
               </li>
               <li>

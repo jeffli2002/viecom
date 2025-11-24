@@ -97,7 +97,9 @@ export default function AdminSubscriptionsPage() {
     <div className="p-6 space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold text-slate-900 dark:text-white">Subscriptions Management</h1>
+        <h1 className="text-3xl font-bold text-slate-900 dark:text-white">
+          Subscriptions Management
+        </h1>
         <div className="flex items-center gap-3">
           <Select value={range} onValueChange={setRange}>
             <SelectTrigger className="w-[180px]">
@@ -185,7 +187,9 @@ export default function AdminSubscriptionsPage() {
         <Card>
           <CardContent className="pt-6">
             <p className="text-sm text-gray-500">Expired</p>
-            <p className="text-3xl font-bold text-slate-600 dark:text-slate-400">{data.statusCounts.expired}</p>
+            <p className="text-3xl font-bold text-slate-600 dark:text-slate-400">
+              {data.statusCounts.expired}
+            </p>
           </CardContent>
         </Card>
       </div>

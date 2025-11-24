@@ -5,7 +5,7 @@
  * Run: node test-webhook-locally.js
  */
 
-const crypto = require('crypto');
+const crypto = require('node:crypto');
 
 const WEBHOOK_URL = 'http://localhost:3000/api/webhooks/creem';
 const WEBHOOK_SECRET = 'whsec_1Fjrs44z8YRXHr0DKiA9z3';
@@ -45,7 +45,7 @@ const hmac = crypto.createHmac('sha256', WEBHOOK_SECRET);
 const signature = hmac.update(payloadString).digest('hex');
 
 console.log('Testing webhook locally...\n');
-console.log('Payload:', payloadString.substring(0, 100) + '...');
+console.log('Payload:', `${payloadString.substring(0, 100)}...`);
 console.log('Signature:', signature, '\n');
 
 // Send webhook

@@ -208,7 +208,9 @@ export function DailyCheckin({ className }: DailyCheckinProps) {
         </div>
         <div className="flex-1">
           <p className="text-sm text-slate-600 dark:text-slate-400 mb-1">Current Streak</p>
-          <p className="text-3xl font-bold text-slate-900 dark:text-white">{consecutiveDays} Days</p>
+          <p className="text-3xl font-bold text-slate-900 dark:text-white">
+            {consecutiveDays} Days
+          </p>
         </div>
       </div>
 
@@ -217,7 +219,9 @@ export function DailyCheckin({ className }: DailyCheckinProps) {
         <div className="flex items-center justify-between mb-2">
           <div className="flex items-center gap-2">
             <Gift className="h-4 w-4 text-teal-500" />
-            <span className="text-sm font-medium text-slate-900 dark:text-white">7-Day Bonus Progress</span>
+            <span className="text-sm font-medium text-slate-900 dark:text-white">
+              7-Day Bonus Progress
+            </span>
           </div>
           <span className="text-sm text-slate-500 dark:text-slate-400">
             {progressDays}/{consecutiveDaysRequired} days
@@ -276,16 +280,24 @@ export function DailyCheckin({ className }: DailyCheckinProps) {
         <div className="bg-teal-50 dark:bg-teal-900/20 rounded-xl p-4 border border-teal-100 dark:border-teal-800">
           <div className="flex items-center gap-2 mb-2">
             <Sparkles className="h-4 w-4 text-teal-500" />
-            <span className="text-sm font-medium text-slate-700 dark:text-slate-300">Daily Reward</span>
+            <span className="text-sm font-medium text-slate-700 dark:text-slate-300">
+              Daily Reward
+            </span>
           </div>
-          <p className="text-2xl font-bold text-slate-900 dark:text-white">+{dailyCredits} Credits</p>
+          <p className="text-2xl font-bold text-slate-900 dark:text-white">
+            +{dailyCredits} Credits
+          </p>
         </div>
         <div className="bg-pink-50 rounded-xl p-4 border border-pink-100">
           <div className="flex items-center gap-2 mb-2">
             <Gift className="h-4 w-4 text-teal-500" />
-            <span className="text-sm font-medium text-slate-700 dark:text-slate-300">7-Day Bonus</span>
+            <span className="text-sm font-medium text-slate-700 dark:text-slate-300">
+              7-Day Bonus
+            </span>
           </div>
-          <p className="text-2xl font-bold text-slate-900 dark:text-white">+{weeklyBonusCredits} Credits</p>
+          <p className="text-2xl font-bold text-slate-900 dark:text-white">
+            +{weeklyBonusCredits} Credits
+          </p>
         </div>
       </div>
     </Card>

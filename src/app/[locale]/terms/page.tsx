@@ -17,7 +17,9 @@ export default function TermsPage() {
       <div className="space-y-6 text-gray-700 dark:text-slate-300">
         <Card>
           <CardContent className="pt-6 space-y-4">
-            <p className="text-sm text-gray-500 dark:text-slate-400">Last updated: November 10, 2024</p>
+            <p className="text-sm text-gray-500 dark:text-slate-400">
+              Last updated: November 10, 2024
+            </p>
 
             <p>
               Welcome to Viecom. By accessing or using our AI-powered e-commerce content generation
@@ -28,7 +30,9 @@ export default function TermsPage() {
 
         <Card>
           <CardContent className="pt-6 space-y-4">
-            <h2 className="text-2xl font-semibold text-gray-900 dark:text-white">1. Acceptance of Terms</h2>
+            <h2 className="text-2xl font-semibold text-gray-900 dark:text-white">
+              1. Acceptance of Terms
+            </h2>
 
             <p>
               By creating an account or using Viecom's services, you agree to these Terms of Service
@@ -39,7 +43,9 @@ export default function TermsPage() {
 
         <Card>
           <CardContent className="pt-6 space-y-4">
-            <h2 className="text-2xl font-semibold text-gray-900 dark:text-white">2. Service Description</h2>
+            <h2 className="text-2xl font-semibold text-gray-900 dark:text-white">
+              2. Service Description
+            </h2>
 
             <p>
               Viecom provides AI-powered image and video generation services for e-commerce
@@ -58,7 +64,9 @@ export default function TermsPage() {
 
         <Card>
           <CardContent className="pt-6 space-y-4">
-            <h2 className="text-2xl font-semibold text-gray-900 dark:text-white">3. Account Registration</h2>
+            <h2 className="text-2xl font-semibold text-gray-900 dark:text-white">
+              3. Account Registration
+            </h2>
 
             <p>To use our services, you must:</p>
             <ul className="list-disc list-inside space-y-2 ml-4">
@@ -76,22 +84,30 @@ export default function TermsPage() {
 
         <Card>
           <CardContent className="pt-6 space-y-4">
-            <h2 className="text-2xl font-semibold text-gray-900 dark:text-white">4. Subscription and Payment</h2>
+            <h2 className="text-2xl font-semibold text-gray-900 dark:text-white">
+              4. Subscription and Payment
+            </h2>
 
-            <h3 className="text-lg font-semibold text-gray-800 dark:text-slate-200">4.1 Plans and Pricing</h3>
+            <h3 className="text-lg font-semibold text-gray-800 dark:text-slate-200">
+              4.1 Plans and Pricing
+            </h3>
             <p>
               We offer various subscription plans with different features and credit allocations.
               Pricing and features are subject to change with 30 days notice.
             </p>
 
-            <h3 className="text-lg font-semibold text-gray-800 dark:text-slate-200 mt-4">4.2 Billing</h3>
+            <h3 className="text-lg font-semibold text-gray-800 dark:text-slate-200 mt-4">
+              4.2 Billing
+            </h3>
             <p>
               Subscriptions are billed monthly or yearly in advance. Payment is processed through
               our payment partner Creem. All fees are non-refundable except as required by law or as
               explicitly stated in your subscription agreement.
             </p>
 
-            <h3 className="text-lg font-semibold text-gray-800 dark:text-slate-200 mt-4">4.3 Credits System</h3>
+            <h3 className="text-lg font-semibold text-gray-800 dark:text-slate-200 mt-4">
+              4.3 Credits System
+            </h3>
             <p>
               Our platform uses a credit-based system. Credits are consumed when generating images
               or videos:
@@ -114,7 +130,9 @@ export default function TermsPage() {
               referrals, sharing) remain active as long as your account is in good standing.
             </p>
 
-            <h3 className="text-lg font-semibold text-gray-800 dark:text-slate-200 mt-4">4.4 Cancellation</h3>
+            <h3 className="text-lg font-semibold text-gray-800 dark:text-slate-200 mt-4">
+              4.4 Cancellation
+            </h3>
             <p>
               You may cancel your subscription at any time through your account settings. Your
               access will continue until the end of your current billing period.
@@ -124,7 +142,9 @@ export default function TermsPage() {
 
         <Card>
           <CardContent className="pt-6 space-y-4">
-            <h2 className="text-2xl font-semibold text-gray-900 dark:text-white">5. Acceptable Use</h2>
+            <h2 className="text-2xl font-semibold text-gray-900 dark:text-white">
+              5. Acceptable Use
+            </h2>
 
             <p>You agree NOT to:</p>
             <ul className="list-disc list-inside space-y-2 ml-4">
@@ -150,21 +170,27 @@ export default function TermsPage() {
               6. Intellectual Property Rights
             </h2>
 
-            <h3 className="text-lg font-semibold text-gray-800 dark:text-slate-200">6.1 Your Content</h3>
+            <h3 className="text-lg font-semibold text-gray-800 dark:text-slate-200">
+              6.1 Your Content
+            </h3>
             <p>
               You retain all rights to the prompts, images, and other content you create using our
               platform. By using our service, you grant us a limited license to process and store
               your content solely for the purpose of providing our services.
             </p>
 
-            <h3 className="text-lg font-semibold text-gray-800 dark:text-slate-200 mt-4">6.2 Generated Content</h3>
+            <h3 className="text-lg font-semibold text-gray-800 dark:text-slate-200 mt-4">
+              6.2 Generated Content
+            </h3>
             <p>
               Subject to your subscription plan, you own the rights to images and videos generated
               using our platform, including commercial use rights. However, you are responsible for
               ensuring your use of generated content does not infringe on third-party rights.
             </p>
 
-            <h3 className="text-lg font-semibold text-gray-800 dark:text-slate-200 mt-4">6.3 Platform Content</h3>
+            <h3 className="text-lg font-semibold text-gray-800 dark:text-slate-200 mt-4">
+              6.3 Platform Content
+            </h3>
             <p>
               All content on our platform (excluding user-generated content), including software,
               text, graphics, logos, and trademarks, is the property of Viecom or its licensors and
@@ -175,7 +201,9 @@ export default function TermsPage() {
 
         <Card>
           <CardContent className="pt-6 space-y-4">
-            <h2 className="text-2xl font-semibold text-gray-900 dark:text-white">7. Service Limitations</h2>
+            <h2 className="text-2xl font-semibold text-gray-900 dark:text-white">
+              7. Service Limitations
+            </h2>
 
             <p>
               Our services are provided "as is" without warranties of any kind. We do not guarantee:
@@ -196,7 +224,9 @@ export default function TermsPage() {
 
         <Card>
           <CardContent className="pt-6 space-y-4">
-            <h2 className="text-2xl font-semibold text-gray-900 dark:text-white">8. Limitation of Liability</h2>
+            <h2 className="text-2xl font-semibold text-gray-900 dark:text-white">
+              8. Limitation of Liability
+            </h2>
 
             <p>To the maximum extent permitted by law, Viecom shall not be liable for:</p>
             <ul className="list-disc list-inside space-y-2 ml-4">
@@ -215,7 +245,9 @@ export default function TermsPage() {
 
         <Card>
           <CardContent className="pt-6 space-y-4">
-            <h2 className="text-2xl font-semibold text-gray-900 dark:text-white">9. Indemnification</h2>
+            <h2 className="text-2xl font-semibold text-gray-900 dark:text-white">
+              9. Indemnification
+            </h2>
 
             <p>
               You agree to indemnify and hold harmless Viecom, its officers, directors, employees,
@@ -232,7 +264,9 @@ export default function TermsPage() {
 
         <Card>
           <CardContent className="pt-6 space-y-4">
-            <h2 className="text-2xl font-semibold text-gray-900 dark:text-white">10. Termination</h2>
+            <h2 className="text-2xl font-semibold text-gray-900 dark:text-white">
+              10. Termination
+            </h2>
 
             <p>We may suspend or terminate your account at any time for:</p>
             <ul className="list-disc list-inside space-y-2 ml-4">
@@ -251,7 +285,9 @@ export default function TermsPage() {
 
         <Card>
           <CardContent className="pt-6 space-y-4">
-            <h2 className="text-2xl font-semibold text-gray-900 dark:text-white">11. Dispute Resolution</h2>
+            <h2 className="text-2xl font-semibold text-gray-900 dark:text-white">
+              11. Dispute Resolution
+            </h2>
 
             <p>
               Any disputes arising from these Terms shall be resolved through binding arbitration in
@@ -263,7 +299,9 @@ export default function TermsPage() {
 
         <Card>
           <CardContent className="pt-6 space-y-4">
-            <h2 className="text-2xl font-semibold text-gray-900 dark:text-white">12. Governing Law</h2>
+            <h2 className="text-2xl font-semibold text-gray-900 dark:text-white">
+              12. Governing Law
+            </h2>
 
             <p>
               These Terms shall be governed by and construed in accordance with the laws of the
@@ -274,7 +312,9 @@ export default function TermsPage() {
 
         <Card>
           <CardContent className="pt-6 space-y-4">
-            <h2 className="text-2xl font-semibold text-gray-900 dark:text-white">13. Changes to Terms</h2>
+            <h2 className="text-2xl font-semibold text-gray-900 dark:text-white">
+              13. Changes to Terms
+            </h2>
 
             <p>
               We reserve the right to modify these Terms at any time. We will provide notice of
@@ -286,7 +326,9 @@ export default function TermsPage() {
 
         <Card>
           <CardContent className="pt-6 space-y-4">
-            <h2 className="text-2xl font-semibold text-gray-900 dark:text-white">14. Contact Information</h2>
+            <h2 className="text-2xl font-semibold text-gray-900 dark:text-white">
+              14. Contact Information
+            </h2>
 
             <div className="space-y-2">
               <p>For questions about these Terms of Service, contact us at:</p>

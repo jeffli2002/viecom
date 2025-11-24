@@ -167,10 +167,12 @@ export default function VideoEnhancerAIPage() {
     <div className="min-h-screen bg-white dark:bg-slate-950">
       <script
         type="application/ld+json"
+        // biome-ignore lint/security/noDangerouslySetInnerHtml: JSON-LD schema is safe
         dangerouslySetInnerHTML={{ __html: JSON.stringify(softwareSchema) }}
       />
       <script
         type="application/ld+json"
+        // biome-ignore lint/security/noDangerouslySetInnerHtml: JSON-LD schema is safe
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
       />
 
@@ -266,9 +268,9 @@ export default function VideoEnhancerAIPage() {
             AI Enhancement Features
           </h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {features.map((feature, index) => (
+            {features.map((feature) => (
               <div
-                key={index}
+                key={feature.title}
                 className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl p-6 hover:shadow-lg transition-shadow"
               >
                 <feature.icon className="h-10 w-10 text-blue-500 mb-4" />
@@ -286,8 +288,8 @@ export default function VideoEnhancerAIPage() {
             Perfect For
           </h2>
           <div className="grid md:grid-cols-2 gap-4">
-            {useCases.map((useCase, index) => (
-              <div key={index} className="flex items-start gap-3">
+            {useCases.map((useCase) => (
+              <div key={useCase} className="flex items-start gap-3">
                 <Check className="h-6 w-6 text-green-500 flex-shrink-0 mt-0.5" />
                 <span className="text-lg text-slate-700 dark:text-slate-300">{useCase}</span>
               </div>
@@ -303,9 +305,9 @@ export default function VideoEnhancerAIPage() {
             Try free, upgrade for unlimited enhancements
           </p>
           <div className="grid md:grid-cols-3 gap-8">
-            {pricingTiers.map((tier, index) => (
+            {pricingTiers.map((tier) => (
               <div
-                key={index}
+                key={tier.name}
                 className={`bg-white dark:bg-slate-900 border-2 rounded-xl p-8 ${
                   tier.popular
                     ? 'border-blue-500 shadow-xl scale-105'
@@ -331,9 +333,9 @@ export default function VideoEnhancerAIPage() {
                 <p className="text-sm text-slate-600 dark:text-slate-400 mb-2">{tier.credits}</p>
                 <p className="text-sm text-slate-600 dark:text-slate-400 mb-6">{tier.videos}</p>
                 <ul className="space-y-3 mb-8">
-                  {tier.features.map((feature, idx) => (
+                  {tier.features.map((feature) => (
                     <li
-                      key={idx}
+                      key={feature}
                       className="flex items-center gap-2 text-slate-700 dark:text-slate-300"
                     >
                       <Check className="h-5 w-5 text-green-500 flex-shrink-0" />

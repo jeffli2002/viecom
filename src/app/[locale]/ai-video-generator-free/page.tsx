@@ -140,10 +140,12 @@ export default function FreeAIVideoGeneratorPage() {
     <div className="min-h-screen bg-white dark:bg-slate-950">
       <script
         type="application/ld+json"
+        // biome-ignore lint/security/noDangerouslySetInnerHtml: JSON-LD schema is safe
         dangerouslySetInnerHTML={{ __html: JSON.stringify(softwareSchema) }}
       />
       <script
         type="application/ld+json"
+        // biome-ignore lint/security/noDangerouslySetInnerHtml: JSON-LD schema is safe
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
       />
 
@@ -213,8 +215,8 @@ export default function FreeAIVideoGeneratorPage() {
               What's Included for Free
             </h2>
             <div className="grid md:grid-cols-2 gap-4">
-              {freeFeatures.map((feature, index) => (
-                <div key={index} className="flex items-start gap-3">
+              {freeFeatures.map((feature) => (
+                <div key={feature} className="flex items-start gap-3">
                   <Check className="h-6 w-6 text-green-500 flex-shrink-0 mt-0.5" />
                   <span className="text-lg text-slate-700 dark:text-slate-300">{feature}</span>
                 </div>
@@ -231,9 +233,9 @@ export default function FreeAIVideoGeneratorPage() {
             Keep creating videos for free by earning credits every day
           </p>
           <div className="grid md:grid-cols-3 gap-8">
-            {earnMoreCredits.map((method, index) => (
+            {earnMoreCredits.map((method) => (
               <div
-                key={index}
+                key={method.title}
                 className="bg-white dark:bg-slate-900 border-2 border-slate-200 dark:border-slate-700 rounded-xl p-8 hover:border-green-500 dark:hover:border-green-500 transition-colors"
               >
                 <method.icon className="h-12 w-12 text-green-500 mb-4" />
@@ -276,8 +278,8 @@ export default function FreeAIVideoGeneratorPage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-200 dark:divide-slate-700">
-                  {comparisonTable.map((row, index) => (
-                    <tr key={index} className="hover:bg-slate-50 dark:hover:bg-slate-800/50">
+                  {comparisonTable.map((row) => (
+                    <tr key={row.feature} className="hover:bg-slate-50 dark:hover:bg-slate-800/50">
                       <td className="px-6 py-4 text-sm text-slate-900 dark:text-white font-medium">
                         {row.feature}
                       </td>

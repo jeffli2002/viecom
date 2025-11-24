@@ -7,7 +7,19 @@ import { NextResponse } from 'next/server';
 const intlMiddleware = createMiddleware(routing);
 
 export default async function middleware(request: NextRequest) {
-  const { pathname } = request.nextUrl;
+  const { pathname, hostname } = request.nextUrl;
+
+  // Redirect non-www to www (canonical domain)
+  // Only apply in production to avoid breaking localhost
+  if (
+    process.env.NODE_ENV === 'production' &&
+    hostname === 'viecom.pro' &&
+    !hostname.startsWith('www.')
+  ) {
+    const url = request.nextUrl.clone();
+    url.hostname = 'www.viecom.pro';
+    return NextResponse.redirect(url, 301);
+  }
 
   // Handle admin routes (no i18n needed)
   if (pathname.startsWith('/admin')) {

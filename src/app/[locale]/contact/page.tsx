@@ -131,7 +131,9 @@ export default function ContactPage() {
           </div>
 
           <div>
-            <h3 className="font-semibold text-gray-900 dark:text-white mb-2">How do I cancel my subscription?</h3>
+            <h3 className="font-semibold text-gray-900 dark:text-white mb-2">
+              How do I cancel my subscription?
+            </h3>
             <p className="text-gray-700 dark:text-slate-300 text-sm">
               You can cancel anytime through your account settings. Your access continues until the
               end of your billing period. No refunds for partial months.
@@ -139,7 +141,9 @@ export default function ContactPage() {
           </div>
 
           <div>
-            <h3 className="font-semibold text-gray-900 dark:text-white mb-2">Do you offer refunds?</h3>
+            <h3 className="font-semibold text-gray-900 dark:text-white mb-2">
+              Do you offer refunds?
+            </h3>
             <p className="text-gray-700 dark:text-slate-300 text-sm">
               We offer a 7-day satisfaction guarantee for new subscriptions. If you're not satisfied
               within the first 7 days, contact us for a full refund. After 7 days, all fees are
@@ -192,7 +196,9 @@ export default function ContactPage() {
 
       {/* CTA */}
       <div className="mt-12 bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 rounded-lg p-8 text-center">
-        <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Ready to Get Started?</h3>
+        <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
+          Ready to Get Started?
+        </h3>
         <p className="text-gray-700 dark:text-slate-300 mb-6">
           Create your free account and start generating stunning product visuals today
         </p>

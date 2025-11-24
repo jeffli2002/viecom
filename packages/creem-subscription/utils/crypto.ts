@@ -9,7 +9,7 @@ export function verifyWebhookSignature(
     const hmac = crypto.createHmac('sha256', secret);
     const digest = hmac.update(payload).digest('hex');
     return crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(digest));
-  } catch (error) {
+  } catch (_error) {
     return false;
   }
 }

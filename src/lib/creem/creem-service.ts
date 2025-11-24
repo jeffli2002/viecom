@@ -788,7 +788,7 @@ class CreemPaymentService {
     }
   }
 
-  async generateCustomerPortalLink(customerId: string, returnUrl: string) {
+  async generateCustomerPortalLink(customerId: string, _returnUrl: string) {
     try {
       console.log('[Creem] Generating customer portal link for:', customerId);
       const CREEM_API_KEY = getCreemApiKey();
@@ -957,7 +957,9 @@ class CreemPaymentService {
         ? subscription.product
         : (subscription.product as { id?: string } | undefined)?.id;
     const productObj =
-      typeof subscription.product === 'object' ? (subscription.product as { billing_period?: string }) : undefined;
+      typeof subscription.product === 'object'
+        ? (subscription.product as { billing_period?: string })
+        : undefined;
     const normalizedInterval =
       this.normalizeInterval(
         (subscription as { billing_period?: string } | undefined)?.billing_period

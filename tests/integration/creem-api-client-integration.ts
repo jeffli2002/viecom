@@ -29,17 +29,14 @@ async function runTests() {
       webhookSecret: TEST_WEBHOOK_SECRET,
     });
 
-    assert(
-      testClient['config'].testMode === true,
-      'Test mode auto-detected from creem_test_ prefix'
-    );
+    assert(testClient.config.testMode === true, 'Test mode auto-detected from creem_test_ prefix');
 
     assert(
-      testClient['config'].baseUrl === 'https://test-api.creem.io',
+      testClient.config.baseUrl === 'https://test-api.creem.io',
       'Test API URL configured correctly'
     );
 
-    assert(testClient['config'].timeout === 30000, 'Default timeout is 30000ms');
+    assert(testClient.config.timeout === 30000, 'Default timeout is 30000ms');
   } catch (error) {
     console.error('❌ Configuration test failed:', error);
     failedTests++;
@@ -54,12 +51,12 @@ async function runTests() {
     });
 
     assert(
-      prodClient['config'].testMode === false,
+      prodClient.config.testMode === false,
       'Production mode detected from creem_live_ prefix'
     );
 
     assert(
-      prodClient['config'].baseUrl === 'https://api.creem.io',
+      prodClient.config.baseUrl === 'https://api.creem.io',
       'Production API URL configured correctly'
     );
   } catch (error) {
@@ -77,12 +74,9 @@ async function runTests() {
       timeout: 60000,
     });
 
-    assert(
-      customClient['config'].baseUrl === 'https://custom.creem.io',
-      'Custom base URL configured'
-    );
+    assert(customClient.config.baseUrl === 'https://custom.creem.io', 'Custom base URL configured');
 
-    assert(customClient['config'].timeout === 60000, 'Custom timeout configured');
+    assert(customClient.config.timeout === 60000, 'Custom timeout configured');
   } catch (error) {
     console.error('❌ Custom configuration test failed:', error);
     failedTests++;
@@ -190,14 +184,14 @@ async function runTests() {
       customLogger
     );
 
-    assert(client['logger'] === customLogger, 'Custom logger configured correctly');
+    assert(client.logger === customLogger, 'Custom logger configured correctly');
   } catch (error) {
     console.error('❌ Custom logger test failed:', error);
     failedTests++;
   }
 
-  console.log('\n' + '='.repeat(60));
-  console.log(`\n📊 Test Results Summary:`);
+  console.log(`\n${'='.repeat(60)}`);
+  console.log('\n📊 Test Results Summary:');
   console.log(`   ✅ Passed: ${passedTests}`);
   console.log(`   ❌ Failed: ${failedTests}`);
   console.log(`   📈 Total: ${passedTests + failedTests}`);

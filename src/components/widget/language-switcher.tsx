@@ -30,8 +30,12 @@ export function LanguageSwitcher() {
         <SelectValue />
       </SelectTrigger>
       <SelectContent className="language-switcher-content">
-        <SelectItem value="en" className="language-switcher-item">English</SelectItem>
-        <SelectItem value="zh" className="language-switcher-item">中文</SelectItem>
+        <SelectItem value="en" className="language-switcher-item">
+          English
+        </SelectItem>
+        <SelectItem value="zh" className="language-switcher-item">
+          中文
+        </SelectItem>
       </SelectContent>
     </Select>
   );

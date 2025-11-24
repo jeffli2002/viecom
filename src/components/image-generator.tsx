@@ -1018,8 +1018,8 @@ export default function ImageGenerator() {
                       credits
                     </SelectItem>
                     <SelectItem value="nano-banana-pro">
-                      Nano Banana Pro - {creditsConfig.consumption.imageGeneration['nano-banana-pro']}{' '}
-                      credits
+                      Nano Banana Pro -{' '}
+                      {creditsConfig.consumption.imageGeneration['nano-banana-pro']} credits
                     </SelectItem>
                   </SelectContent>
                 </Select>
@@ -1128,7 +1128,9 @@ export default function ImageGenerator() {
                 <div className="flex aspect-square items-center justify-center rounded-xl bg-slate-100 dark:bg-slate-800">
                   <div className="space-y-3 text-center">
                     <ImageIcon className="mx-auto h-16 w-16 text-slate-400 dark:text-slate-500" />
-                    <p className="font-light text-slate-500 dark:text-slate-400 text-sm">{t('imageWillAppearHere')}</p>
+                    <p className="font-light text-slate-500 dark:text-slate-400 text-sm">
+                      {t('imageWillAppearHere')}
+                    </p>
                   </div>
                 </div>
               )}

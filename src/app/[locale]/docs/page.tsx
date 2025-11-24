@@ -75,7 +75,9 @@ export default function DocsPage() {
                 1
               </div>
               <div className="flex-1">
-                <h3 className="font-semibold text-gray-900 dark:text-white mb-2">Sign Up and Get Free Credits</h3>
+                <h3 className="font-semibold text-gray-900 dark:text-white mb-2">
+                  Sign Up and Get Free Credits
+                </h3>
                 <p className="text-gray-700 dark:text-slate-300 text-sm mb-2">
                   Create your free account at{' '}
                   <Link href="/signup" className="text-teal-500 hover:underline">
@@ -96,7 +98,9 @@ export default function DocsPage() {
                 2
               </div>
               <div className="flex-1">
-                <h3 className="font-semibold text-gray-900 dark:text-white mb-2">Choose Your Generation Type</h3>
+                <h3 className="font-semibold text-gray-900 dark:text-white mb-2">
+                  Choose Your Generation Type
+                </h3>
                 <ul className="space-y-2 text-sm text-gray-700 dark:text-slate-300">
                   <li className="flex items-start gap-2">
                     <CheckCircle2 className="h-4 w-4 text-green-600 mt-0.5 flex-shrink-0" />
@@ -135,7 +139,9 @@ export default function DocsPage() {
                 3
               </div>
               <div className="flex-1">
-                <h3 className="font-semibold text-gray-900 dark:text-white mb-2">Generate and Download</h3>
+                <h3 className="font-semibold text-gray-900 dark:text-white mb-2">
+                  Generate and Download
+                </h3>
                 <p className="text-gray-700 dark:text-slate-300 text-sm mb-2">
                   Enter your prompt (or use AI enhancement), select your preferences (aspect ratio,
                   style, quality), and click Generate. Your content will be ready in 30 seconds to
@@ -190,7 +196,9 @@ export default function DocsPage() {
                   <li>Choose aspect ratio (1:1 for square, 16:9 for landscape, etc.)</li>
                   <li>Select image style (Studio Shot, Lifestyle, Minimalist, etc.)</li>
                   <li>
-                    Choose AI model: <strong>Nano Banana</strong> ({nanoBananaCost} credits) for standard quality, or <strong>Nano Banana Pro</strong> ({nanoBananaProCost} credits) for premium quality with enhanced detail and realism
+                    Choose AI model: <strong>Nano Banana</strong> ({nanoBananaCost} credits) for
+                    standard quality, or <strong>Nano Banana Pro</strong> ({nanoBananaProCost}{' '}
+                    credits) for premium quality with enhanced detail and realism
                   </li>
                   <li>
                     Choose output format: <strong>PNG</strong> (lossless) or <strong>JPEG</strong>{' '}
@@ -203,7 +211,9 @@ export default function DocsPage() {
                   <li>Download the result or share directly</li>
                 </ol>
                 <p className="text-xs text-gray-600 dark:text-slate-400 mt-2">
-                  ⚡ Cost: {nanoBananaCost}-{nanoBananaProCost} credits per image depending on model (Nano Banana {nanoBananaCost} credits, Nano Banana Pro {nanoBananaProCost} credits)
+                  ⚡ Cost: {nanoBananaCost}-{nanoBananaProCost} credits per image depending on model
+                  (Nano Banana {nanoBananaCost} credits, Nano Banana Pro {nanoBananaProCost}{' '}
+                  credits)
                 </p>
               </div>
 
@@ -233,7 +243,9 @@ export default function DocsPage() {
                     colors")
                   </li>
                   <li>
-                    Choose AI model: <strong>Nano Banana</strong> ({nanoBananaCost} credits) for standard quality, or <strong>Nano Banana Pro</strong> ({nanoBananaProCost} credits) for premium quality
+                    Choose AI model: <strong>Nano Banana</strong> ({nanoBananaCost} credits) for
+                    standard quality, or <strong>Nano Banana Pro</strong> ({nanoBananaProCost}{' '}
+                    credits) for premium quality
                   </li>
                   <li>Select aspect ratio and output format</li>
                   <li>
@@ -471,10 +483,7 @@ export default function DocsPage() {
                 <ol className="space-y-2 text-sm text-gray-700 dark:text-slate-300 ml-6 list-decimal">
                   <li>
                     Go to{' '}
-                    <Link
-                      href="/batch-image-generation"
-                      className="text-teal-500 hover:underline"
-                    >
+                    <Link href="/batch-image-generation" className="text-teal-500 hover:underline">
                       Batch Image Generation
                     </Link>{' '}
                     page
@@ -507,10 +516,7 @@ export default function DocsPage() {
                 <ol className="space-y-2 text-sm text-gray-700 dark:text-slate-300 ml-6 list-decimal">
                   <li>
                     Visit{' '}
-                    <Link
-                      href="/batch-video-generation"
-                      className="text-teal-500 hover:underline"
-                    >
+                    <Link href="/batch-video-generation" className="text-teal-500 hover:underline">
                       Batch Video Generation
                     </Link>{' '}
                     page
@@ -529,7 +535,9 @@ export default function DocsPage() {
               </div>
 
               <div className="bg-gray-50 dark:bg-slate-800/50 rounded-lg p-4 border border-gray-200 dark:border-slate-700">
-                <h4 className="font-semibold text-gray-900 dark:text-white mb-2 text-sm">Template File Format:</h4>
+                <h4 className="font-semibold text-gray-900 dark:text-white mb-2 text-sm">
+                  Template File Format:
+                </h4>
                 <div className="text-xs text-gray-700 dark:text-slate-300 space-y-1">
                   <p>
                     <strong>Required columns:</strong> prompt (or productName + productDescription)
@@ -559,20 +567,28 @@ export default function DocsPage() {
         <CardContent className="pt-6">
           <div className="space-y-6">
             <div>
-              <h3 className="font-semibold text-gray-900 dark:text-white mb-3">How Do Credits Work?</h3>
+              <h3 className="font-semibold text-gray-900 dark:text-white mb-3">
+                How Do Credits Work?
+              </h3>
               <p className="text-sm text-gray-700 dark:text-slate-300 mb-3">
                 Viecom uses a credit-based system. Each generation consumes credits based on the AI
                 model and settings used.
               </p>
               <div className="grid md:grid-cols-2 gap-4">
                 <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-3 border border-blue-200 dark:border-blue-800">
-                  <h4 className="font-semibold text-blue-900 dark:text-blue-200 text-sm mb-2">Image Generation</h4>
+                  <h4 className="font-semibold text-blue-900 dark:text-blue-200 text-sm mb-2">
+                    Image Generation
+                  </h4>
                   <p className="text-xs text-blue-800 dark:text-blue-200">
-                    {nanoBananaCost}-{nanoBananaProCost} credits per image (Nano Banana {nanoBananaCost} credits, Nano Banana Pro {nanoBananaProCost} credits, Flux models 5-10 credits)
+                    {nanoBananaCost}-{nanoBananaProCost} credits per image (Nano Banana{' '}
+                    {nanoBananaCost} credits, Nano Banana Pro {nanoBananaProCost} credits, Flux
+                    models 5-10 credits)
                   </p>
                 </div>
                 <div className="bg-teal-50 dark:bg-teal-900/20 rounded-lg p-3 border border-teal-200 dark:border-teal-800">
-                  <h4 className="font-semibold text-purple-900 dark:text-purple-200 text-sm mb-2">Video Generation</h4>
+                  <h4 className="font-semibold text-purple-900 dark:text-purple-200 text-sm mb-2">
+                    Video Generation
+                  </h4>
                   <p className="text-xs text-purple-800 dark:text-purple-200">
                     {videoCostMin}-{videoCostMax} credits per video (varies by model, quality,
                     duration)
@@ -582,20 +598,30 @@ export default function DocsPage() {
             </div>
 
             <div className="border-t border-gray-200 pt-6">
-              <h3 className="font-semibold text-gray-900 dark:text-white mb-3">How to Earn Free Credits?</h3>
+              <h3 className="font-semibold text-gray-900 dark:text-white mb-3">
+                How to Earn Free Credits?
+              </h3>
               <div className="grid md:grid-cols-3 gap-3">
                 <div className="bg-green-50 dark:bg-green-900/20 rounded-lg p-3 border border-green-200 dark:border-green-800">
-                  <div className="font-semibold text-green-900 dark:text-green-200 text-sm mb-1">Daily Check-in</div>
-                  <div className="text-xs text-green-800 dark:text-green-200">+{dailyCheckin} credits/day</div>
+                  <div className="font-semibold text-green-900 dark:text-green-200 text-sm mb-1">
+                    Daily Check-in
+                  </div>
+                  <div className="text-xs text-green-800 dark:text-green-200">
+                    +{dailyCheckin} credits/day
+                  </div>
                 </div>
                 <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-3 border border-blue-200 dark:border-blue-800">
-                  <div className="font-semibold text-blue-900 dark:text-blue-200 text-sm mb-1">Referral Program</div>
+                  <div className="font-semibold text-blue-900 dark:text-blue-200 text-sm mb-1">
+                    Referral Program
+                  </div>
                   <div className="text-xs text-blue-800 dark:text-blue-200">
                     +{referralReward} credits per referral
                   </div>
                 </div>
                 <div className="bg-teal-50 dark:bg-teal-900/20 rounded-lg p-3 border border-teal-200 dark:border-teal-800">
-                  <div className="font-semibold text-purple-900 dark:text-purple-200 text-sm mb-1">Social Sharing</div>
+                  <div className="font-semibold text-purple-900 dark:text-purple-200 text-sm mb-1">
+                    Social Sharing
+                  </div>
                   <div className="text-xs text-purple-800 dark:text-purple-200">
                     +{creditsConfig.rewards.socialShare.creditsPerShare} credits per share
                   </div>
@@ -604,7 +630,9 @@ export default function DocsPage() {
             </div>
 
             <div className="border-t border-gray-200 pt-6">
-              <h3 className="font-semibold text-gray-900 dark:text-white mb-3">How to Choose the Right Plan?</h3>
+              <h3 className="font-semibold text-gray-900 dark:text-white mb-3">
+                How to Choose the Right Plan?
+              </h3>
               <div className="space-y-3">
                 <div className="flex items-start gap-3">
                   <div className="bg-gray-100 dark:bg-slate-700 rounded px-2 py-1 text-xs font-bold text-gray-700 dark:text-slate-200">
@@ -639,7 +667,9 @@ export default function DocsPage() {
       {/* FAQ Section */}
       <Card className="mt-8">
         <CardHeader>
-          <CardTitle className="text-2xl text-gray-900 dark:text-white">Frequently Asked Questions</CardTitle>
+          <CardTitle className="text-2xl text-gray-900 dark:text-white">
+            Frequently Asked Questions
+          </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-6">
@@ -693,7 +723,9 @@ export default function DocsPage() {
             </div>
 
             <div>
-              <h3 className="font-semibold text-gray-900 dark:text-white mb-2">How to maximize my free credits?</h3>
+              <h3 className="font-semibold text-gray-900 dark:text-white mb-2">
+                How to maximize my free credits?
+              </h3>
               <p className="text-sm text-gray-700 dark:text-slate-300">
                 Combine all reward methods: {freePlan?.credits.onSignup} credits sign-up bonus +
                 daily check-in ({dailyCheckin} credits/day) + refer friends ({referralReward}{' '}

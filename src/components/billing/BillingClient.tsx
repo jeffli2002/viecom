@@ -641,7 +641,9 @@ const BillingClient = ({ plans }: BillingClientProps) => {
           <AlertDescription className="mt-2 text-base text-purple-800">
             <p className="font-semibold mb-2">
               Your subscription will upgrade to{' '}
-              <span className="font-bold text-slate-900 dark:text-white">{scheduledPlanDetails.plan.name}</span>{' '}
+              <span className="font-bold text-slate-900 dark:text-white">
+                {scheduledPlanDetails.plan.name}
+              </span>{' '}
               on:
             </p>
             <p className="mb-3">
@@ -763,7 +765,9 @@ const BillingClient = ({ plans }: BillingClientProps) => {
                 </div>
                 <div className="rounded-lg border p-4">
                   <p className="text-sm text-slate-500 dark:text-slate-400">Status</p>
-                  <p className="mt-1 font-semibold text-slate-900 dark:text-white">{currentStatusLabel}</p>
+                  <p className="mt-1 font-semibold text-slate-900 dark:text-white">
+                    {currentStatusLabel}
+                  </p>
                   {hasScheduledCancellation && (
                     <p className="text-xs text-orange-600">Scheduled to cancel at period end</p>
                   )}
@@ -772,7 +776,9 @@ const BillingClient = ({ plans }: BillingClientProps) => {
                   <p className="text-sm text-slate-500 dark:text-slate-400">Next renewal</p>
                   {subscription.periodEnd ? (
                     <>
-                      <p className="mt-1 font-semibold text-slate-900 dark:text-white">{nextRenewalDate}</p>
+                      <p className="mt-1 font-semibold text-slate-900 dark:text-white">
+                        {nextRenewalDate}
+                      </p>
                       {subscription.interval && (
                         <p className="text-xs text-slate-500 dark:text-slate-400">
                           {intervalLabels[subscription.interval] || subscription.interval}
@@ -780,7 +786,9 @@ const BillingClient = ({ plans }: BillingClientProps) => {
                       )}
                     </>
                   ) : (
-                    <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">Not applicable</p>
+                    <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+                      Not applicable
+                    </p>
                   )}
                 </div>
               </div>
@@ -856,21 +864,27 @@ const BillingClient = ({ plans }: BillingClientProps) => {
                 <div
                   key={plan.id}
                   className={`rounded-2xl border p-6 ${
-                    plan.popular ? 'border-teal-500 shadow-lg' : 'border-slate-200 dark:border-slate-700'
+                    plan.popular
+                      ? 'border-teal-500 shadow-lg'
+                      : 'border-slate-200 dark:border-slate-700'
                   }`}
                 >
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-sm font-semibold uppercase text-slate-500 dark:text-slate-400">{plan.name}</p>
-                      <p className="text-xl font-bold text-slate-900 dark:text-white">{plan.description}</p>
+                      <p className="text-sm font-semibold uppercase text-slate-500 dark:text-slate-400">
+                        {plan.name}
+                      </p>
+                      <p className="text-xl font-bold text-slate-900 dark:text-white">
+                        {plan.description}
+                      </p>
                     </div>
-                    {plan.popular && (
-                      <Badge className="bg-teal-500 text-white">Most Popular</Badge>
-                    )}
+                    {plan.popular && <Badge className="bg-teal-500 text-white">Most Popular</Badge>}
                   </div>
 
                   <div className="mt-4 flex items-baseline gap-2">
-                    <span className="text-4xl font-bold text-slate-900 dark:text-white">{priceLabel}</span>
+                    <span className="text-4xl font-bold text-slate-900 dark:text-white">
+                      {priceLabel}
+                    </span>
                     {displayPrice && displayPrice > 0 && (
                       <span className="text-sm text-slate-500 dark:text-slate-400">
                         /{interval === 'year' ? 'year' : 'month'}

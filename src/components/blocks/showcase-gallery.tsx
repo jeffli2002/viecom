@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { ChevronLeft, ChevronRight, Loader2, Play } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { ChevronLeft, ChevronRight, Play, Loader2 } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
 
 // 展示项类型
 type GalleryItem = {
@@ -16,16 +16,22 @@ type GalleryItem = {
 
 // 默认展示项（作为后备）
 const DEFAULT_ITEMS: GalleryItem[] = [
-  { id: 'default-1', type: 'image', category: 'Showcase', url: '/showcase/changemode_output.png', title: 'Showcase Item' },
+  {
+    id: 'default-1',
+    type: 'image',
+    category: 'Showcase',
+    url: '/showcase/changemode_output.png',
+    title: 'Showcase Item',
+  },
 ];
 
 // 视频项组件，用于处理缩略图截取
-function VideoGalleryItem({ 
-  item, 
-  thumbnail, 
-  onThumbnailCapture 
-}: { 
-  item: GalleryItem; 
+function VideoGalleryItem({
+  item,
+  thumbnail,
+  onThumbnailCapture,
+}: {
+  item: GalleryItem;
   thumbnail?: string;
   onThumbnailCapture: (itemId: string, thumbnailUrl: string) => void;
 }) {
@@ -38,16 +44,16 @@ function VideoGalleryItem({
       // 确保视频设置为静音（浏览器要求）
       video.muted = true;
       video.setAttribute('playsinline', 'true');
-      
+
       // 如果视频已经加载，尝试播放
       if (video.readyState >= 2) {
-        video.play().catch(error => {
+        video.play().catch((error) => {
           console.warn(`Video autoplay failed for ${item.url}:`, error);
         });
       } else {
         // 等待视频可以播放
         const handleCanPlayOnce = () => {
-          video.play().catch(error => {
+          video.play().catch((error) => {
             console.warn(`Video autoplay failed for ${item.url}:`, error);
           });
           video.removeEventListener('canplay', handleCanPlayOnce);
@@ -60,24 +66,24 @@ function VideoGalleryItem({
   const handleLoadedMetadata = () => {
     if (videoRef.current && !thumbnail) {
       const video = videoRef.current;
-      
+
       // 确保视频在第一帧
       video.currentTime = 0;
-      
+
       // 尝试播放
-      video.play().catch(error => {
+      video.play().catch((error) => {
         console.warn(`Video play failed for ${item.url}:`, error);
       });
-      
+
       // 截取缩略图（用于 poster）
       const captureThumbnail = () => {
         const canvas = document.createElement('canvas');
         const ctx = canvas.getContext('2d');
-        
+
         if (ctx && video.videoWidth && video.videoHeight) {
           canvas.width = video.videoWidth;
           canvas.height = video.videoHeight;
-          
+
           try {
             ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
             const thumbnailUrl = canvas.toDataURL('image/jpeg', 0.8);
@@ -87,7 +93,7 @@ function VideoGalleryItem({
           }
         }
       };
-      
+
       // 等待视频可以绘制
       if (video.readyState >= 2) {
         requestAnimationFrame(() => {
@@ -110,7 +116,7 @@ function VideoGalleryItem({
     if (video) {
       // 确保视频正在播放
       if (video.paused) {
-        video.play().catch(error => {
+        video.play().catch((error) => {
           console.warn(`Video play failed on canplay for ${item.url}:`, error);
         });
       }
@@ -123,13 +129,13 @@ function VideoGalleryItem({
 
   return (
     <div className="w-[220px] md:w-[280px] flex-none aspect-[3/4] relative group/card rounded-xl overflow-hidden cursor-pointer snap-center border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-xl transition-all duration-300 bg-slate-100 dark:bg-slate-800">
-      <video 
+      <video
         ref={videoRef}
-        src={item.url} 
+        src={item.url}
         poster={thumbnail} // 使用缩略图作为 poster，但不替换视频
-        className="w-full h-full object-cover transition-transform duration-700 group-hover/card:scale-110 bg-black" 
-        muted 
-        loop 
+        className="w-full h-full object-cover transition-transform duration-700 group-hover/card:scale-110 bg-black"
+        muted
+        loop
         playsInline
         autoPlay
         preload="auto"
@@ -138,8 +144,12 @@ function VideoGalleryItem({
         onError={handleError}
       />
       <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover/card:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-4">
-        <span className="text-white font-bold text-base transform translate-y-4 group-hover/card:translate-y-0 transition-transform duration-300">{item.title}</span>
-        <span className="text-xs text-white/80 transform translate-y-4 group-hover/card:translate-y-0 transition-transform duration-300 delay-75">{item.category}</span>
+        <span className="text-white font-bold text-base transform translate-y-4 group-hover/card:translate-y-0 transition-transform duration-300">
+          {item.title}
+        </span>
+        <span className="text-xs text-white/80 transform translate-y-4 group-hover/card:translate-y-0 transition-transform duration-300 delay-75">
+          {item.category}
+        </span>
         <div className="absolute top-3 right-3 w-6 h-6 bg-white/20 backdrop-blur rounded-full flex items-center justify-center">
           <Play className="w-3 h-3 text-white fill-current" />
         </div>
@@ -165,7 +175,7 @@ export function ShowcaseGallery() {
         setIsLoading(true);
         const response = await fetch('/api/v1/showcase');
         const data = await response.json();
-        
+
         if (data.success && data.items && data.items.length > 0) {
           setGalleryItems(data.items);
         } else {
@@ -195,31 +205,31 @@ export function ShowcaseGallery() {
       }
     }
   };
-  
+
   const handleScroll = () => {
-      handleManualScroll(); // 手动滚动时暂停自动滚动
-      if (scrollRef.current) {
-          const { scrollLeft } = scrollRef.current;
-          const cardWidth = typeof window !== 'undefined' && window.innerWidth >= 768 ? 300 : 240;
-          const newIndex = Math.round(scrollLeft / cardWidth);
-          setActiveIndex(newIndex);
-      }
+    handleManualScroll(); // 手动滚动时暂停自动滚动
+    if (scrollRef.current) {
+      const { scrollLeft } = scrollRef.current;
+      const cardWidth = typeof window !== 'undefined' && window.innerWidth >= 768 ? 300 : 240;
+      const newIndex = Math.round(scrollLeft / cardWidth);
+      setActiveIndex(newIndex);
+    }
   };
-  
+
   const scrollToItem = (index: number) => {
-      setIsPaused(true);
-      if(scrollRef.current && typeof window !== 'undefined') {
-          const cardWidth = window.innerWidth >= 768 ? 300 : 240;
-           scrollRef.current.scrollTo({ left: index * cardWidth, behavior: 'smooth' });
-      }
-      // 3秒后恢复自动滚动
-      setTimeout(() => {
-          setIsPaused(false);
-      }, 3000);
+    setIsPaused(true);
+    if (scrollRef.current && typeof window !== 'undefined') {
+      const cardWidth = window.innerWidth >= 768 ? 300 : 240;
+      scrollRef.current.scrollTo({ left: index * cardWidth, behavior: 'smooth' });
+    }
+    // 3秒后恢复自动滚动
+    setTimeout(() => {
+      setIsPaused(false);
+    }, 3000);
   };
 
   const handleThumbnailCapture = (itemId: string, thumbnailUrl: string) => {
-    setVideoThumbnails(prev => ({ ...prev, [itemId]: thumbnailUrl }));
+    setVideoThumbnails((prev) => ({ ...prev, [itemId]: thumbnailUrl }));
   };
 
   // 自动滚动功能
@@ -243,7 +253,7 @@ export function ShowcaseGallery() {
           const container = scrollRef.current;
           const scrollAmount = 1; // 每次滚动1px，实现平滑滚动
           const maxScroll = container.scrollWidth - container.clientWidth;
-          
+
           if (container.scrollLeft >= maxScroll - 1) {
             // 滚动到末尾，重置到开头
             container.scrollTo({ left: 0, behavior: 'auto' });
@@ -287,98 +297,108 @@ export function ShowcaseGallery() {
 
   return (
     <section className="section-base bg-alt relative group">
-       <div className="container-base">
-          <div className="flex justify-between items-end mb-8">
-            <div>
-                <h2 className="h2-section">
-                {t('title')} <span className="text-teal-500">{t('titleHighlight')}</span>
-                </h2>
-                <p className="text-sm text-body">
-                {t('description')}
-                </p>
-            </div>
+      <div className="container-base">
+        <div className="flex justify-between items-end mb-8">
+          <div>
+            <h2 className="h2-section">
+              {t('title')} <span className="text-teal-500">{t('titleHighlight')}</span>
+            </h2>
+            <p className="text-sm text-body">{t('description')}</p>
           </div>
-          
-          <div 
-            className="relative px-4 md:px-12"
-            onMouseEnter={handleMouseEnter}
-            onMouseLeave={handleMouseLeave}
-          >
-            <button 
-                onClick={() => {
-                  setIsPaused(true);
-                  scroll('left');
-                  setTimeout(() => setIsPaused(false), 3000);
-                }} 
-                className="absolute left-0 top-1/2 -translate-y-1/2 z-20 p-3 rounded-full bg-white dark:bg-slate-800 shadow-xl border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white transition-all duration-300 hover:scale-110 hover:border-teal-500 hover:text-teal-500 hidden md:flex items-center justify-center"
-                aria-label="Scroll left"
-            >
-                <ChevronLeft className="w-6 h-6" />
-            </button>
-            <button 
-                onClick={() => {
-                  setIsPaused(true);
-                  scroll('right');
-                  setTimeout(() => setIsPaused(false), 3000);
-                }} 
-                className="absolute right-0 top-1/2 -translate-y-1/2 z-20 p-3 rounded-full bg-white dark:bg-slate-800 shadow-xl border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white transition-all duration-300 hover:scale-110 hover:border-teal-500 hover:text-teal-500 hidden md:flex items-center justify-center"
-                aria-label="Scroll right"
-            >
-                <ChevronRight className="w-6 h-6" />
-            </button>
+        </div>
 
-            {isLoading ? (
-                <div className="flex items-center justify-center py-16">
-                    <Loader2 className="w-8 h-8 animate-spin text-teal-500" />
-                </div>
-            ) : (
-                <>
-                    <div 
-                        ref={scrollRef}
-                        onScroll={handleScroll}
-                        className="flex gap-5 overflow-x-auto scrollbar-hide pb-8 -mx-4 px-4 snap-x"
-                        style={{ scrollBehavior: 'auto' }} // 自动滚动时使用 auto，手动滚动时使用 smooth
+        <div
+          className="relative px-4 md:px-12"
+          onMouseEnter={handleMouseEnter}
+          onMouseLeave={handleMouseLeave}
+        >
+          <button
+            onClick={() => {
+              setIsPaused(true);
+              scroll('left');
+              setTimeout(() => setIsPaused(false), 3000);
+            }}
+            className="absolute left-0 top-1/2 -translate-y-1/2 z-20 p-3 rounded-full bg-white dark:bg-slate-800 shadow-xl border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white transition-all duration-300 hover:scale-110 hover:border-teal-500 hover:text-teal-500 hidden md:flex items-center justify-center"
+            aria-label="Scroll left"
+          >
+            <ChevronLeft className="w-6 h-6" />
+          </button>
+          <button
+            onClick={() => {
+              setIsPaused(true);
+              scroll('right');
+              setTimeout(() => setIsPaused(false), 3000);
+            }}
+            className="absolute right-0 top-1/2 -translate-y-1/2 z-20 p-3 rounded-full bg-white dark:bg-slate-800 shadow-xl border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white transition-all duration-300 hover:scale-110 hover:border-teal-500 hover:text-teal-500 hidden md:flex items-center justify-center"
+            aria-label="Scroll right"
+          >
+            <ChevronRight className="w-6 h-6" />
+          </button>
+
+          {isLoading ? (
+            <div className="flex items-center justify-center py-16">
+              <Loader2 className="w-8 h-8 animate-spin text-teal-500" />
+            </div>
+          ) : (
+            <>
+              <div
+                ref={scrollRef}
+                onScroll={handleScroll}
+                className="flex gap-5 overflow-x-auto scrollbar-hide pb-8 -mx-4 px-4 snap-x"
+                style={{ scrollBehavior: 'auto' }} // 自动滚动时使用 auto，手动滚动时使用 smooth
+              >
+                {galleryItems.map((item) =>
+                  item.type === 'video' ? (
+                    <VideoGalleryItem
+                      key={item.id}
+                      item={item}
+                      thumbnail={videoThumbnails[item.id]}
+                      onThumbnailCapture={handleThumbnailCapture}
+                    />
+                  ) : (
+                    <div
+                      key={item.id}
+                      className="w-[220px] md:w-[280px] flex-none aspect-[3/4] relative group/card rounded-xl overflow-hidden cursor-pointer snap-center border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-xl transition-all duration-300 bg-slate-100 dark:bg-slate-800"
                     >
-                        {galleryItems.map((item) => (
-                            item.type === 'video' ? (
-                                <VideoGalleryItem
-                                    key={item.id}
-                                    item={item}
-                                    thumbnail={videoThumbnails[item.id]}
-                                    onThumbnailCapture={handleThumbnailCapture}
-                                />
-                            ) : (
-                                <div key={item.id} className="w-[220px] md:w-[280px] flex-none aspect-[3/4] relative group/card rounded-xl overflow-hidden cursor-pointer snap-center border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-xl transition-all duration-300 bg-slate-100 dark:bg-slate-800">
-                                    <img loading="lazy" src={item.url} alt={item.title} className="w-full h-full object-cover transition-transform duration-700 group-hover/card:scale-110" />
-                                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover/card:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-4">
-                                        <span className="text-white font-bold text-base transform translate-y-4 group-hover/card:translate-y-0 transition-transform duration-300">{item.title}</span>
-                                        <span className="text-xs text-white/80 transform translate-y-4 group-hover/card:translate-y-0 transition-transform duration-300 delay-75">{item.category}</span>
-                                    </div>
-                                </div>
-                            )
-                        ))}
+                      <img
+                        loading="lazy"
+                        src={item.url}
+                        alt={item.title}
+                        className="w-full h-full object-cover transition-transform duration-700 group-hover/card:scale-110"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover/card:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-4">
+                        <span className="text-white font-bold text-base transform translate-y-4 group-hover/card:translate-y-0 transition-transform duration-300">
+                          {item.title}
+                        </span>
+                        <span className="text-xs text-white/80 transform translate-y-4 group-hover/card:translate-y-0 transition-transform duration-300 delay-75">
+                          {item.category}
+                        </span>
+                      </div>
                     </div>
-                    
-                    {galleryItems.length > 0 && (
-                        <div className="flex justify-center gap-2 mt-4">
-                            {galleryItems.map((_, idx) => (
-                                <button
-                                    key={idx}
-                                    onClick={() => scrollToItem(idx)}
-                                    className={`transition-all duration-300 rounded-full ${
-                                        activeIndex === idx 
-                                        ? 'w-8 h-2 bg-teal-500' 
-                                        : 'w-2 h-2 bg-slate-300 dark:bg-slate-700 hover:bg-teal-500/50'
-                                    }`}
-                                    aria-label={`Go to item ${idx + 1}`}
-                                />
-                            ))}
-                        </div>
-                    )}
-                </>
-            )}
-          </div>
-       </div>
+                  )
+                )}
+              </div>
+
+              {galleryItems.length > 0 && (
+                <div className="flex justify-center gap-2 mt-4">
+                  {galleryItems.map((_, idx) => (
+                    <button
+                      key={idx}
+                      onClick={() => scrollToItem(idx)}
+                      className={`transition-all duration-300 rounded-full ${
+                        activeIndex === idx
+                          ? 'w-8 h-2 bg-teal-500'
+                          : 'w-2 h-2 bg-slate-300 dark:bg-slate-700 hover:bg-teal-500/50'
+                      }`}
+                      aria-label={`Go to item ${idx + 1}`}
+                    />
+                  ))}
+                </div>
+              )}
+            </>
+          )}
+        </div>
+      </div>
     </section>
   );
 }

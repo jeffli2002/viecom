@@ -22,8 +22,8 @@ if (!apiKeyFromEnv) {
 }
 console.log(`✅ CREEM_API_KEY loaded: ${apiKeyFromEnv.substring(0, 15)}...\n`);
 
-import { neon } from '@neondatabase/serverless';
 import { creemService } from '@/lib/creem/creem-service';
+import { neon } from '@neondatabase/serverless';
 
 const databaseUrl = process.env.DATABASE_URL;
 
@@ -89,12 +89,14 @@ async function setUserToFree(email: string) {
           console.log(`   Canceling: ${subId}...`);
           const result = await creemService.cancelSubscription(subId);
           if (result.success || result.alreadyCancelled) {
-            console.log(`   ✅ Canceled in Creem`);
+            console.log('   ✅ Canceled in Creem');
           } else {
             console.log(`   ⚠️  Failed to cancel in Creem: ${result.error}`);
           }
         } catch (error) {
-          console.log(`   ⚠️  Error canceling in Creem: ${error instanceof Error ? error.message : String(error)}`);
+          console.log(
+            `   ⚠️  Error canceling in Creem: ${error instanceof Error ? error.message : String(error)}`
+          );
         }
       }
       console.log();
@@ -141,7 +143,7 @@ async function setUserToFree(email: string) {
     });
 
     // Step 5: Verify final state
-    console.log('\n' + '='.repeat(80));
+    console.log(`\n${'='.repeat(80)}`);
     console.log('📊 Verification:\n');
 
     const finalCheck = await sql`
@@ -166,7 +168,7 @@ async function setUserToFree(email: string) {
       console.log(`   - Scheduled plan changes: ${scheduledCount}`);
     }
 
-    console.log('\n' + '='.repeat(80));
+    console.log(`\n${'='.repeat(80)}`);
     console.log('✅ Process completed!\n');
   } catch (error) {
     console.error('❌ Error setting user to Free:', error);
@@ -187,5 +189,3 @@ setUserToFree(email)
     console.error('Fatal error:', error);
     process.exit(1);
   });
-
-

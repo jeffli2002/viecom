@@ -55,7 +55,7 @@ export class CreemApiClient {
         if (result.success) {
           return result;
         }
-      } catch (sdkError) {
+      } catch (_sdkError) {
         this.logger.debug('SDK not available, falling back to direct API call');
       }
 
@@ -140,7 +140,7 @@ export class CreemApiClient {
         if (result.success) {
           return result;
         }
-      } catch (sdkError) {
+      } catch (_sdkError) {
         this.logger.debug('SDK not available, using direct API');
       }
 
@@ -207,7 +207,7 @@ export class CreemApiClient {
         if (result.success) {
           return result;
         }
-      } catch (sdkError) {
+      } catch (_sdkError) {
         this.logger.debug('SDK not available, using direct API');
       }
 
@@ -374,7 +374,7 @@ export class CreemApiClient {
   parseWebhookEvent(rawEvent: string): Record<string, unknown> {
     try {
       return JSON.parse(rawEvent);
-    } catch (error) {
+    } catch (_error) {
       throw new Error('Invalid webhook event payload');
     }
   }

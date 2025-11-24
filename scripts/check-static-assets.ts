@@ -23,18 +23,20 @@ const staticAssets = [
   '/imagesgen/candles.jpg',
   '/imagesgen/christmas.jpg',
   '/imagesgen/christmas_output.png',
-  
+
   // 批量图片
   '/batch/shoes.jpg',
   '/batch/skincare.jpg',
   '/batch/sweater.png',
   '/batch/lotionmodel.png',
-  
+
   // 视频
   '/video/lipstick.mp4',
 ];
 
-async function checkAsset(url: string): Promise<{ success: boolean; status?: number; error?: string }> {
+async function checkAsset(
+  url: string
+): Promise<{ success: boolean; status?: number; error?: string }> {
   try {
     const response = await fetch(url, { method: 'HEAD' });
     return {
@@ -51,7 +53,7 @@ async function checkAsset(url: string): Promise<{ success: boolean; status?: num
 
 async function main() {
   console.log(`\n🔍 检查静态资源访问: ${productionUrl}\n`);
-  
+
   const results = await Promise.all(
     staticAssets.map(async (path) => {
       const url = `${productionUrl}${path}`;
@@ -59,20 +61,20 @@ async function main() {
       return { path, url, ...result };
     })
   );
-  
-  const successCount = results.filter(r => r.success).length;
+
+  const successCount = results.filter((r) => r.success).length;
   const failCount = results.length - successCount;
-  
+
   console.log('📊 检查结果:\n');
-  
+
   results.forEach(({ path, success, status, error }) => {
     const icon = success ? '✅' : '❌';
     const statusText = success ? `Status: ${status}` : `Error: ${error || status}`;
     console.log(`${icon} ${path} - ${statusText}`);
   });
-  
+
   console.log(`\n📈 总计: ${successCount}/${results.length} 成功, ${failCount} 失败\n`);
-  
+
   if (failCount > 0) {
     console.log('⚠️  部分资源无法访问，建议：');
     console.log('   1. 检查 public 文件夹是否被正确复制到构建输出');
@@ -85,4 +87,3 @@ async function main() {
 }
 
 main().catch(console.error);
-

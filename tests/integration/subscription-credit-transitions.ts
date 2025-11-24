@@ -337,7 +337,7 @@ async function runCreditTransitionTests() {
     }
   }
 
-  console.log('\n' + '='.repeat(70));
+  console.log(`\n${'='.repeat(70)}`);
   console.log('\n📊 Credit Transition Test Results:');
   console.log(`   ✅ Passed: ${passedTests}`);
   console.log(`   ❌ Failed: ${failedTests}`);

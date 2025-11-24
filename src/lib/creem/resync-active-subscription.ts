@@ -1,5 +1,5 @@
-import { normalizeCreemStatus } from '@/lib/creem/status-utils';
 import { creemService } from '@/lib/creem/creem-service';
+import { normalizeCreemStatus } from '@/lib/creem/status-utils';
 import { paymentRepository } from '@/server/db/repositories/payment-repository';
 
 const ACTIVE_STATUSES = new Set(['active', 'trialing', 'past_due']);

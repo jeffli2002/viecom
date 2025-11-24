@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import '@/styles/globals.css';
-import { DEFAULT_SEO_KEYWORDS, getMetadataBase } from '@/lib/seo/metadata';
 import { GoogleAnalytics } from '@/components/analytics/google-analytics';
+import { DEFAULT_SEO_KEYWORDS, getMetadataBase } from '@/lib/seo/metadata';
 
 export const metadata: Metadata = {
   metadataBase: getMetadataBase(),

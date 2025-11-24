@@ -106,12 +106,16 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    if (!planId) {
+      return NextResponse.json({ error: 'Plan ID is required' }, { status: 400 });
+    }
+
     const currentPlanForCheckout: 'free' | 'pro' | 'proplus' = 'free';
 
     const checkout = await creemService.createCheckoutSession({
       userId: session.user.id,
       userEmail: session.user.email,
-      planId: planId!,
+      planId,
       interval,
       successUrl,
       cancelUrl,

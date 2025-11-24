@@ -159,16 +159,16 @@
     --popover-foreground: oklch(0.985 0 0);
     --primary: oklch(0.985 0 0);
     --primary-foreground: oklch(0.205 0 0);
-    --secondary: oklch(0.30 0.02 250);
+    --secondary: oklch(0.3 0.02 250);
     --secondary-foreground: oklch(0.985 0 0);
-    --muted: oklch(0.30 0.02 250);
+    --muted: oklch(0.3 0.02 250);
     --muted-foreground: oklch(0.708 0 0);
-    --accent: oklch(0.30 0.02 250);
+    --accent: oklch(0.3 0.02 250);
     --accent-foreground: oklch(0.985 0 0);
     --destructive: oklch(0.396 0.141 25.723);
     --destructive-foreground: oklch(0.637 0.237 25.331);
-    --border: oklch(0.30 0.02 250);
-    --input: oklch(0.30 0.02 250);
+    --border: oklch(0.3 0.02 250);
+    --input: oklch(0.3 0.02 250);
     --ring: oklch(0.439 0 0);
     --chart-1: oklch(0.488 0.243 264.376);
     --chart-2: oklch(0.696 0.17 162.48);
@@ -179,9 +179,9 @@
     --sidebar-foreground: oklch(0.985 0 0);
     --sidebar-primary: oklch(0.488 0.243 264.376);
     --sidebar-primary-foreground: oklch(0.985 0 0);
-    --sidebar-accent: oklch(0.30 0.02 250);
+    --sidebar-accent: oklch(0.3 0.02 250);
     --sidebar-accent-foreground: oklch(0.985 0 0);
-    --sidebar-border: oklch(0.30 0.02 250);
+    --sidebar-border: oklch(0.3 0.02 250);
     --sidebar-ring: oklch(0.439 0 0);
   }
 }
@@ -776,7 +776,7 @@ header [class*="bg-primary"][class*="Avatar"] {
   .section-base {
     @apply py-24 transition-colors duration-300 border-b border-slate-200 dark:border-white/5;
   }
-  
+
   /* Alternating Backgrounds System */
   .bg-main {
     @apply bg-white dark:bg-slate-900;
@@ -803,7 +803,7 @@ header [class*="bg-primary"][class*="Avatar"] {
   .h2-section {
     @apply text-3xl md:text-5xl font-semibold text-slate-900 dark:text-white mb-6;
   }
-  
+
   /* Component System */
   .btn-primary {
     @apply px-8 py-4 bg-teal-500 hover:bg-teal-600 text-white font-bold rounded-xl transition-all hover:scale-105 shadow-[0_0_20px_rgba(20,184,166,0.3)] flex items-center justify-center gap-2;
@@ -816,7 +816,7 @@ header [class*="bg-primary"][class*="Avatar"] {
     @apply bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border border-slate-200 dark:border-white/10;
   }
   .tag-pill {
-     @apply inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider;
+    @apply inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider;
   }
   .text-gradient {
     @apply bg-gradient-to-r from-teal-500 to-blue-500 bg-clip-text text-transparent;

@@ -1,6 +1,6 @@
+import { createHash } from 'node:crypto';
 import { readdir } from 'node:fs/promises';
 import { join } from 'node:path';
-import { createHash } from 'node:crypto';
 import { NextResponse } from 'next/server';
 
 export const dynamic = 'force-dynamic';
@@ -84,7 +84,7 @@ function inferCategory(filename: string): string {
 
 // 根据分类获取随机提示词
 function getPromptForCategory(category: string): string {
-  const templates = PROMPT_TEMPLATES[category] || PROMPT_TEMPLATES['Apparel'];
+  const templates = PROMPT_TEMPLATES[category] || PROMPT_TEMPLATES.Apparel;
   return templates[Math.floor(Math.random() * templates.length)] || templates[0] || '';
 }
 
@@ -127,15 +127,15 @@ export async function GET() {
 
     // 为每个视频生成演示项（按文件名排序以确保一致性）
     const sortedVideoFiles = [...videoFiles].sort();
-    
+
     const videos = sortedVideoFiles.map((filename, index) => {
       const category = inferCategory(filename);
       const videoPath = `/video/${filename}`;
       const videoId = generateVideoId(filename);
-      
+
       // 生成一个占位输入图片 URL（可以后续改进为实际图片）
       // 使用 hash 的一部分来生成不同的图片 ID
-      const hashNum = parseInt(videoId.substring(0, 8), 16);
+      const hashNum = Number.parseInt(videoId.substring(0, 8), 16);
       const inputImageUrl = `https://images.unsplash.com/photo-${1500000000000 + (hashNum % 1000)}?auto=format&fit=crop&q=80&w=800`;
 
       return {
@@ -157,7 +157,7 @@ export async function GET() {
     });
   } catch (error) {
     console.error('Failed to read video directory:', error);
-    
+
     // 如果读取失败，返回空数组而不是错误
     return NextResponse.json(
       {
@@ -169,4 +169,3 @@ export async function GET() {
     );
   }
 }
-

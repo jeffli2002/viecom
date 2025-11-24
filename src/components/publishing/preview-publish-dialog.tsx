@@ -196,7 +196,9 @@ export function PreviewPublishDialog({
               <button
                 type="button"
                 className={`border rounded-lg p-3 cursor-pointer transition-colors text-left ${
-                  publishMode === 'media-only' ? 'border-primary bg-primary/5' : 'hover:bg-slate-50 dark:bg-slate-900'
+                  publishMode === 'media-only'
+                    ? 'border-primary bg-primary/5'
+                    : 'hover:bg-slate-50 dark:bg-slate-900'
                 }`}
                 onClick={() => setPublishMode('media-only')}
                 aria-pressed={publishMode === 'media-only'}
@@ -204,7 +206,9 @@ export function PreviewPublishDialog({
                 <div className="flex items-center gap-2">
                   <div
                     className={`w-4 h-4 rounded-full border-2 ${
-                      publishMode === 'media-only' ? 'border-primary bg-primary' : 'border-slate-300 dark:border-slate-700'
+                      publishMode === 'media-only'
+                        ? 'border-primary bg-primary'
+                        : 'border-slate-300 dark:border-slate-700'
                     }`}
                   >
                     {publishMode === 'media-only' && (
@@ -213,14 +217,18 @@ export function PreviewPublishDialog({
                   </div>
                   <div>
                     <div className="font-medium text-sm">{t('mediaOnly')}</div>
-                    <div className="text-xs text-slate-500 dark:text-slate-400">{t('mediaOnlyDesc')}</div>
+                    <div className="text-xs text-slate-500 dark:text-slate-400">
+                      {t('mediaOnlyDesc')}
+                    </div>
                   </div>
                 </div>
               </button>
               <button
                 type="button"
                 className={`border rounded-lg p-3 cursor-pointer transition-colors text-left ${
-                  publishMode === 'product' ? 'border-primary bg-primary/5' : 'hover:bg-slate-50 dark:bg-slate-900'
+                  publishMode === 'product'
+                    ? 'border-primary bg-primary/5'
+                    : 'hover:bg-slate-50 dark:bg-slate-900'
                 }`}
                 onClick={() => setPublishMode('product')}
                 aria-pressed={publishMode === 'product'}
@@ -228,7 +236,9 @@ export function PreviewPublishDialog({
                 <div className="flex items-center gap-2">
                   <div
                     className={`w-4 h-4 rounded-full border-2 ${
-                      publishMode === 'product' ? 'border-primary bg-primary' : 'border-slate-300 dark:border-slate-700'
+                      publishMode === 'product'
+                        ? 'border-primary bg-primary'
+                        : 'border-slate-300 dark:border-slate-700'
                     }`}
                   >
                     {publishMode === 'product' && (
@@ -237,7 +247,9 @@ export function PreviewPublishDialog({
                   </div>
                   <div>
                     <div className="font-medium text-sm">{t('fullProduct')}</div>
-                    <div className="text-xs text-slate-500 dark:text-slate-400">{t('fullProductDesc')}</div>
+                    <div className="text-xs text-slate-500 dark:text-slate-400">
+                      {t('fullProductDesc')}
+                    </div>
                   </div>
                 </div>
               </button>
@@ -280,7 +292,10 @@ export function PreviewPublishDialog({
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor="product-title" className="text-xs text-slate-500 dark:text-slate-400">
+                  <Label
+                    htmlFor="product-title"
+                    className="text-xs text-slate-500 dark:text-slate-400"
+                  >
                     {t('productTitle')}
                   </Label>
                   <Input
@@ -293,7 +308,10 @@ export function PreviewPublishDialog({
                   />
                 </div>
                 <div>
-                  <Label htmlFor="product-category" className="text-xs text-slate-500 dark:text-slate-400">
+                  <Label
+                    htmlFor="product-category"
+                    className="text-xs text-slate-500 dark:text-slate-400"
+                  >
                     分类
                   </Label>
                   <Input
@@ -307,7 +325,10 @@ export function PreviewPublishDialog({
               </div>
 
               <div>
-                <Label htmlFor="product-description" className="text-xs text-slate-500 dark:text-slate-400">
+                <Label
+                  htmlFor="product-description"
+                  className="text-xs text-slate-500 dark:text-slate-400"
+                >
                   描述
                 </Label>
                 <Textarea
@@ -322,7 +343,10 @@ export function PreviewPublishDialog({
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor="product-brand" className="text-xs text-slate-500 dark:text-slate-400">
+                  <Label
+                    htmlFor="product-brand"
+                    className="text-xs text-slate-500 dark:text-slate-400"
+                  >
                     品牌
                   </Label>
                   <Input
@@ -334,7 +358,10 @@ export function PreviewPublishDialog({
                   />
                 </div>
                 <div>
-                  <Label htmlFor="product-sku" className="text-xs text-slate-500 dark:text-slate-400">
+                  <Label
+                    htmlFor="product-sku"
+                    className="text-xs text-slate-500 dark:text-slate-400"
+                  >
                     SKU
                   </Label>
                   <Input
@@ -351,7 +378,10 @@ export function PreviewPublishDialog({
               {(selectedPlatforms.includes('amazon') || selectedPlatforms.length === 0) && (
                 <div className="grid grid-cols-2 gap-4 border-t pt-4">
                   <div>
-                    <Label htmlFor="product-upc" className="text-xs text-slate-500 dark:text-slate-400">
+                    <Label
+                      htmlFor="product-upc"
+                      className="text-xs text-slate-500 dark:text-slate-400"
+                    >
                       UPC/EAN (Amazon必需)
                     </Label>
                     <Input
@@ -363,7 +393,10 @@ export function PreviewPublishDialog({
                     />
                   </div>
                   <div>
-                    <Label htmlFor="product-coo" className="text-xs text-slate-500 dark:text-slate-400">
+                    <Label
+                      htmlFor="product-coo"
+                      className="text-xs text-slate-500 dark:text-slate-400"
+                    >
                       原产国 (Amazon必需)
                     </Label>
                     <Input
@@ -382,7 +415,10 @@ export function PreviewPublishDialog({
                 <Label className="text-sm font-medium mb-3 block">价格信息</Label>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <Label htmlFor="standard-price" className="text-xs text-slate-500 dark:text-slate-400">
+                    <Label
+                      htmlFor="standard-price"
+                      className="text-xs text-slate-500 dark:text-slate-400"
+                    >
                       标准售价 *
                     </Label>
                     <Input
@@ -397,7 +433,10 @@ export function PreviewPublishDialog({
                     />
                   </div>
                   <div>
-                    <Label htmlFor="sale-price" className="text-xs text-slate-500 dark:text-slate-400">
+                    <Label
+                      htmlFor="sale-price"
+                      className="text-xs text-slate-500 dark:text-slate-400"
+                    >
                       促销价 (TikTok需要)
                     </Label>
                     <Input
@@ -417,7 +456,10 @@ export function PreviewPublishDialog({
               <div className="border-t pt-4">
                 <Label className="text-sm font-medium mb-3 block">库存信息</Label>
                 <div>
-                  <Label htmlFor="inventory-quantity" className="text-xs text-slate-500 dark:text-slate-400">
+                  <Label
+                    htmlFor="inventory-quantity"
+                    className="text-xs text-slate-500 dark:text-slate-400"
+                  >
                     库存数量
                   </Label>
                   <Input
@@ -432,7 +474,10 @@ export function PreviewPublishDialog({
               </div>
 
               <div>
-                <Label htmlFor="product-tags" className="text-xs text-slate-500 dark:text-slate-400">
+                <Label
+                  htmlFor="product-tags"
+                  className="text-xs text-slate-500 dark:text-slate-400"
+                >
                   标签（用逗号分隔）
                 </Label>
                 <Input

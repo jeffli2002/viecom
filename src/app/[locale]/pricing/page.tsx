@@ -109,6 +109,7 @@ export default async function PricingPage() {
     <div className="container-base py-24">
       <script
         type="application/ld+json"
+        // biome-ignore lint/security/noDangerouslySetInnerHtml: JSON-LD schema is safe
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
       />
       <div className="mb-12 text-center">

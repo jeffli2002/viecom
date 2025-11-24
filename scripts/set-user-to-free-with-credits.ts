@@ -23,8 +23,8 @@ if (!apiKeyFromEnv) {
 }
 console.log(`✅ CREEM_API_KEY loaded: ${apiKeyFromEnv.substring(0, 15)}...\n`);
 
-import { neon } from '@neondatabase/serverless';
 import { creemService } from '@/lib/creem/creem-service';
+import { neon } from '@neondatabase/serverless';
 
 const databaseUrl = process.env.DATABASE_URL;
 
@@ -90,12 +90,14 @@ async function setUserToFreeWithCredits(email: string, credits: number) {
           console.log(`   Canceling: ${subId}...`);
           const result = await creemService.cancelSubscription(subId);
           if (result.success || result.alreadyCancelled) {
-            console.log(`   ✅ Canceled in Creem`);
+            console.log('   ✅ Canceled in Creem');
           } else {
             console.log(`   ⚠️  Failed to cancel in Creem: ${result.error}`);
           }
         } catch (error) {
-          console.log(`   ⚠️  Error canceling in Creem: ${error instanceof Error ? error.message : String(error)}`);
+          console.log(
+            `   ⚠️  Error canceling in Creem: ${error instanceof Error ? error.message : String(error)}`
+          );
         }
       }
       console.log();
@@ -163,7 +165,7 @@ async function setUserToFreeWithCredits(email: string, credits: number) {
     const now = new Date();
     const referenceId = `admin_manual_adjust_${Date.now()}`;
     const delta = credits - currentBalance;
-    
+
     const creditUpdate = await sql`
       INSERT INTO user_credits (id, user_id, balance, total_earned, total_spent, created_at, updated_at)
       VALUES (${creditId}, ${userId}, ${credits}, ${credits}, 0, ${now.toISOString()}, ${now.toISOString()})
@@ -222,7 +224,7 @@ async function setUserToFreeWithCredits(email: string, credits: number) {
     }
 
     // Step 6: Verify final state
-    console.log('\n' + '='.repeat(80));
+    console.log(`\n${'='.repeat(80)}`);
     console.log('📊 Verification:\n');
 
     const finalCheck = await sql`
@@ -258,7 +260,7 @@ async function setUserToFreeWithCredits(email: string, credits: number) {
       console.log(`   - Credit balance: ${finalBalance} (expected: ${credits})`);
     }
 
-    console.log('\n' + '='.repeat(80));
+    console.log(`\n${'='.repeat(80)}`);
     console.log('✅ Process completed!\n');
   } catch (error) {
     console.error('❌ Error setting user to Free:', error);
@@ -273,9 +275,9 @@ async function setUserToFreeWithCredits(email: string, credits: number) {
 }
 
 const email = process.argv[2] || 'jefflee2002@gmail.com';
-const credits = process.argv[3] ? parseInt(process.argv[3], 10) : 100;
+const credits = process.argv[3] ? Number.parseInt(process.argv[3], 10) : 100;
 
-if (isNaN(credits)) {
+if (Number.isNaN(credits)) {
   console.error('❌ Invalid credits amount. Please provide a number.');
   process.exit(1);
 }
@@ -286,4 +288,3 @@ setUserToFreeWithCredits(email, credits)
     console.error('Fatal error:', error);
     process.exit(1);
   });
-

@@ -202,7 +202,7 @@ for (const scenario of SCENARIOS) {
   );
 }
 
-console.log('\n' + '='.repeat(60));
+console.log(`\n${'='.repeat(60)}`);
 console.log(`\n📊 Results: ${passedTests} passed, ${failedTests} failed`);
 console.log(`🎯 Success Rate: ${((passedTests / (passedTests + failedTests)) * 100).toFixed(1)}%`);
 

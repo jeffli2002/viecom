@@ -298,12 +298,15 @@ export async function POST(request: NextRequest) {
         // Pass the model name to KIE API service
         // For nano-banana-pro, pass 'nano-banana-pro' as preferred model
         const preferredModel = model === 'nano-banana-pro' ? 'nano-banana-pro' : undefined;
-        taskResponse = await kieApiService.generateImage({
-          prompt,
-          imageUrls: imageUrlsForKie.length > 0 ? imageUrlsForKie : undefined,
-          imageSize: kieImageSize,
-          outputFormat: kieOutputFormat,
-        }, preferredModel);
+        taskResponse = await kieApiService.generateImage(
+          {
+            prompt,
+            imageUrls: imageUrlsForKie.length > 0 ? imageUrlsForKie : undefined,
+            imageSize: kieImageSize,
+            outputFormat: kieOutputFormat,
+          },
+          preferredModel
+        );
       } catch (error) {
         console.error('[Image Generation] KIE API generateImage error:', {
           error: error instanceof Error ? error.message : String(error),

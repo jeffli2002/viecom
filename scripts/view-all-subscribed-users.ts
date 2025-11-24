@@ -14,6 +14,22 @@ if (!databaseUrl) {
 
 const sql = neon(databaseUrl);
 
+interface SubscriptionRow {
+  user_id: string;
+  email: string;
+  user_name: string | null;
+  price_id: string | null;
+  subscription_status: string;
+  provider: string | null;
+  billing_interval: string | null;
+  period_start: string | null;
+  period_end: string | null;
+  days_until_period_end: number | null;
+  cancel_at_period_end: boolean | null;
+  current_credits: number | null;
+  subscription_status_category: string | null;
+}
+
 async function viewAllSubscribedUsers() {
   try {
     console.log('📊 Fetching all subscribed users...\n');
@@ -94,7 +110,7 @@ async function viewAllSubscribedUsers() {
     console.log('ALL SUBSCRIBED USERS');
     console.log('='.repeat(120));
     console.table(
-      results.map((row: any) => ({
+      (results as SubscriptionRow[]).map((row) => ({
         Email: row.email,
         'User Name': row.user_name || 'N/A',
         Plan: row.price_id || 'N/A',
@@ -115,14 +131,15 @@ async function viewAllSubscribedUsers() {
     console.log('SUMMARY STATISTICS');
     console.log('='.repeat(120));
 
-    const activeCount = results.filter(
-      (r: any) => r.subscription_status === 'active' || r.subscription_status === 'trialing'
+    const typedResults = results as SubscriptionRow[];
+    const activeCount = typedResults.filter(
+      (r) => r.subscription_status === 'active' || r.subscription_status === 'trialing'
     ).length;
-    const canceledCount = results.filter((r: any) => r.subscription_status === 'canceled').length;
-    const uniqueUsers = new Set(results.map((r: any) => r.user_id)).size;
+    const canceledCount = typedResults.filter((r) => r.subscription_status === 'canceled').length;
+    const uniqueUsers = new Set(typedResults.map((r) => r.user_id)).size;
 
     const planCounts: Record<string, number> = {};
-    results.forEach((row: any) => {
+    typedResults.forEach((row) => {
       const plan = row.price_id || 'unknown';
       planCounts[plan] = (planCounts[plan] || 0) + 1;
     });
@@ -141,7 +158,7 @@ async function viewAllSubscribedUsers() {
     console.log('DETAILED INFORMATION');
     console.log('='.repeat(120));
 
-    results.forEach((row: any, index: number) => {
+    typedResults.forEach((row, index: number) => {
       console.log(`\n[${index + 1}] ${row.email || 'N/A'}`);
       console.log(`  User ID: ${row.user_id}`);
       console.log(`  Name: ${row.user_name || 'N/A'}`);

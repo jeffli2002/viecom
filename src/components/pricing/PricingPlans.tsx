@@ -106,7 +106,7 @@ export function PricingPlans({ plans, creditPacks }: PricingPlansProps) {
             billingInterval === 'year' && plan.yearlyCredits
               ? plan.yearlyCredits
               : plan.monthlyCredits;
-          const displayCapacity =
+          const _displayCapacity =
             billingInterval === 'year' && plan.yearlyCapacityInfo
               ? plan.yearlyCapacityInfo
               : plan.capacityInfo;
@@ -218,7 +218,9 @@ export function PricingPlans({ plans, creditPacks }: PricingPlansProps) {
 
       <div className="mb-12">
         <div className="text-center mb-8">
-          <h2 className="text-3xl font-bold text-slate-900 dark:text-white mb-2">One-Time Credit Packs</h2>
+          <h2 className="text-3xl font-bold text-slate-900 dark:text-white mb-2">
+            One-Time Credit Packs
+          </h2>
           <p className="text-slate-600 dark:text-slate-400">
             Need extra credits? Purchase credit packs without a subscription
           </p>
@@ -229,7 +231,9 @@ export function PricingPlans({ plans, creditPacks }: PricingPlansProps) {
             <Card
               key={pack.id}
               className={`relative ${
-                pack.popular ? 'border-2 border-teal-500 shadow-lg' : 'border border-slate-200 dark:border-slate-700'
+                pack.popular
+                  ? 'border-2 border-teal-500 shadow-lg'
+                  : 'border border-slate-200 dark:border-slate-700'
               } lg:flex-1`}
             >
               {pack.badge && (
@@ -246,9 +250,13 @@ export function PricingPlans({ plans, creditPacks }: PricingPlansProps) {
 
               <CardHeader className="text-center">
                 <div className="mb-2">
-                  <span className="text-4xl font-bold text-slate-900 dark:text-white">${pack.price}</span>
+                  <span className="text-4xl font-bold text-slate-900 dark:text-white">
+                    ${pack.price}
+                  </span>
                 </div>
-                <p className="text-sm text-slate-600 dark:text-slate-400">{pack.credits.toLocaleString()} credits</p>
+                <p className="text-sm text-slate-600 dark:text-slate-400">
+                  {pack.credits.toLocaleString()} credits
+                </p>
               </CardHeader>
 
               <CardContent className="space-y-4">

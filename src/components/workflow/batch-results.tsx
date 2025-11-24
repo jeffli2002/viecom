@@ -265,7 +265,9 @@ export function BatchResults({ jobId, assets: initialAssets }: BatchResultsProps
         {/* Download Updated Template */}
         <div className="border rounded-lg p-4 bg-slate-50 dark:bg-slate-900">
           <Label className="text-sm font-medium mb-2 block">{t('downloadUpdatedTemplate')}</Label>
-          <p className="text-xs text-slate-600 dark:text-slate-400 mb-3">{t('downloadUpdatedTemplateDesc')}</p>
+          <p className="text-xs text-slate-600 dark:text-slate-400 mb-3">
+            {t('downloadUpdatedTemplateDesc')}
+          </p>
           <div className="flex gap-2">
             <Button
               variant="outline"
@@ -358,11 +360,15 @@ export function BatchResults({ jobId, assets: initialAssets }: BatchResultsProps
 
                 {/* Prompt Info */}
                 <div className="space-y-1">
-                  <div className="text-xs text-slate-500 dark:text-slate-400">{t('originalPrompt')}</div>
+                  <div className="text-xs text-slate-500 dark:text-slate-400">
+                    {t('originalPrompt')}
+                  </div>
                   <div className="text-sm line-clamp-2">{asset.prompt}</div>
                   {asset.enhancedPrompt && asset.enhancedPrompt !== asset.prompt && (
                     <>
-                      <div className="text-xs text-slate-500 dark:text-slate-400 mt-2">{t('enhancedPrompt')}</div>
+                      <div className="text-xs text-slate-500 dark:text-slate-400 mt-2">
+                        {t('enhancedPrompt')}
+                      </div>
                       <div className="text-sm line-clamp-2 text-primary">
                         {asset.enhancedPrompt}
                       </div>

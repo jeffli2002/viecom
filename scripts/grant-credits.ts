@@ -20,11 +20,11 @@ if (!databaseUrl) {
   process.exit(1);
 }
 
-import { neon } from '@neondatabase/serverless';
-import { drizzle } from 'drizzle-orm/neon-http';
-import { user, userCredits, creditTransactions } from '@/server/db/schema';
-import { eq } from 'drizzle-orm';
 import { randomUUID } from 'node:crypto';
+import { creditTransactions, user, userCredits } from '@/server/db/schema';
+import { neon } from '@neondatabase/serverless';
+import { eq } from 'drizzle-orm';
+import { drizzle } from 'drizzle-orm/neon-http';
 
 const sql = neon(databaseUrl);
 const db = drizzle(sql);
@@ -110,8 +110,8 @@ async function grantCredits(email: string, amount: number) {
     console.log('✅ Credits granted successfully!');
     console.log(`   Transaction ID: ${transactionId}`);
     console.log(`   New balance: ${newBalance}`);
-    console.log(`   Transaction type: earn`);
-    console.log(`   Source: admin`);
+    console.log('   Transaction type: earn');
+    console.log('   Source: admin');
 
     // Step 5: Verify final balance
     const [finalCredits] = await db
@@ -121,7 +121,7 @@ async function grantCredits(email: string, amount: number) {
       .limit(1);
 
     const finalBalance = finalCredits?.balance || 0;
-    console.log(`\n📊 Verification:`);
+    console.log('\n📊 Verification:');
     console.log(`   Final balance: ${finalBalance}`);
 
     if (finalBalance === newBalance) {
@@ -130,7 +130,7 @@ async function grantCredits(email: string, amount: number) {
       console.log(`   ⚠️  Warning: Balance mismatch (expected: ${newBalance})`);
     }
 
-    console.log('\n' + '='.repeat(80));
+    console.log(`\n${'='.repeat(80)}`);
     console.log('✅ Process completed!\n');
   } catch (error) {
     console.error('❌ Error granting credits:', error);
@@ -162,9 +162,9 @@ if (!amountArg) {
   process.exit(1);
 }
 
-const amount = parseInt(amountArg, 10);
+const amount = Number.parseInt(amountArg, 10);
 
-if (isNaN(amount) || amount <= 0) {
+if (Number.isNaN(amount) || amount <= 0) {
   console.error('❌ Invalid amount. Please provide a positive number.');
   process.exit(1);
 }
@@ -175,4 +175,3 @@ grantCredits(email, amount)
     console.error('Fatal error:', error);
     process.exit(1);
   });
-
