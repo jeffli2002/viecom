@@ -13,6 +13,8 @@ import { type NextRequest, NextResponse } from 'next/server';
 
 export const dynamic = 'force-dynamic';
 export const fetchCache = 'force-no-store';
+// Allow long-running polling (large models can take a few minutes)
+export const maxDuration = 300;
 
 // Map aspect ratio to KIE format
 function mapAspectRatio(ratio: string): 'square' | 'portrait' | 'landscape' {

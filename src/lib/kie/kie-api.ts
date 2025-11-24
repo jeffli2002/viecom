@@ -89,7 +89,7 @@ type KIEImageTaskRequest = {
 type KIEVideoTaskInput = {
   prompt: string;
   aspect_ratio: 'square' | 'portrait' | 'landscape';
-  quality?: 'standard' | 'high';
+  size?: 'standard' | 'high';
   n_frames?: '10' | '15';
   image_urls?: string[];
 };
@@ -265,15 +265,15 @@ export class KIEAPIService {
     }
 
     // 构建输入参数
+    const requestedSize = params.quality === 'high' ? 'high' : 'standard';
     const input: KIEVideoTaskInput = {
       prompt: params.prompt,
       aspect_ratio: params.aspectRatio || 'landscape',
+      size: requestedSize,
     };
 
     // Sora 2 Pro 支持 quality 和 n_frames 参数
     if (useProModel) {
-      input.quality = params.quality || 'standard';
-
       // 根据 duration 设置 n_frames
       input.n_frames = params.duration === 10 ? '10' : '15';
     }
