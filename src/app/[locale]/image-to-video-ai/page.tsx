@@ -191,16 +191,16 @@ export default function ImageToVideoAIPage() {
 
       <div className="container-base py-16 md:py-24">
         <div className="text-center max-w-4xl mx-auto mb-16">
-          <div className="inline-flex items-center gap-2 bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-900/20 dark:to-blue-900/20 px-4 py-2 rounded-full border border-purple-200 dark:border-purple-800 mb-6">
-            <Sparkles className="h-4 w-4 text-purple-500" />
-            <span className="text-sm font-medium text-purple-900 dark:text-purple-100">
+          <div className="inline-flex items-center gap-2 bg-gradient-to-r from-teal-50 to-blue-50 dark:from-teal-900/20 dark:to-blue-900/20 px-4 py-2 rounded-full border border-teal-200 dark:border-teal-800 mb-6">
+            <Sparkles className="h-4 w-4 text-teal-500" />
+            <span className="text-sm font-medium text-teal-900 dark:text-teal-100">
               #1 Image to Video AI for E-commerce
             </span>
           </div>
 
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-slate-900 dark:text-white mb-6">
+          <h1 className="h1-hero text-center mb-6">
             Transform Product Photos into{' '}
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-blue-600">
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-teal-600 to-blue-600">
               Engaging Videos
             </span>{' '}
             in 60 Seconds
@@ -213,7 +213,7 @@ export default function ImageToVideoAIPage() {
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
             <Link href="/video-generation">
-              <Button size="lg" className="text-lg px-8 py-6 group">
+              <Button size="lg" className="btn-primary text-lg px-8 py-6 group">
                 Try Free - No Credit Card
                 <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
               </Button>
@@ -243,12 +243,12 @@ export default function ImageToVideoAIPage() {
 
         <div className="max-w-5xl mx-auto mb-20">
           <div className="bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 rounded-2xl p-8 md:p-12 border border-slate-200 dark:border-slate-700">
-            <h2 className="text-3xl font-bold text-center mb-12 text-slate-900 dark:text-white">
+            <h2 className="h2-section text-center mb-12">
               How It Works
             </h2>
             <div className="grid md:grid-cols-3 gap-8">
               <div className="text-center">
-                <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-blue-500 rounded-full flex items-center justify-center mx-auto mb-4 text-white text-2xl font-bold">
+                <div className="w-16 h-16 bg-gradient-to-br from-teal-500 to-blue-500 rounded-full flex items-center justify-center mx-auto mb-4 text-white text-2xl font-bold">
                   1
                 </div>
                 <h3 className="text-xl font-semibold mb-3 text-slate-900 dark:text-white">
@@ -259,7 +259,7 @@ export default function ImageToVideoAIPage() {
                 </p>
               </div>
               <div className="text-center">
-                <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-blue-500 rounded-full flex items-center justify-center mx-auto mb-4 text-white text-2xl font-bold">
+                <div className="w-16 h-16 bg-gradient-to-br from-teal-500 to-blue-500 rounded-full flex items-center justify-center mx-auto mb-4 text-white text-2xl font-bold">
                   2
                 </div>
                 <h3 className="text-xl font-semibold mb-3 text-slate-900 dark:text-white">
@@ -270,7 +270,7 @@ export default function ImageToVideoAIPage() {
                 </p>
               </div>
               <div className="text-center">
-                <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-blue-500 rounded-full flex items-center justify-center mx-auto mb-4 text-white text-2xl font-bold">
+                <div className="w-16 h-16 bg-gradient-to-br from-teal-500 to-blue-500 rounded-full flex items-center justify-center mx-auto mb-4 text-white text-2xl font-bold">
                   3
                 </div>
                 <h3 className="text-xl font-semibold mb-3 text-slate-900 dark:text-white">
@@ -285,7 +285,7 @@ export default function ImageToVideoAIPage() {
         </div>
 
         <div className="max-w-6xl mx-auto mb-20">
-          <h2 className="text-3xl font-bold text-center mb-12 text-slate-900 dark:text-white">
+          <h2 className="h2-section text-center mb-12">
             Perfect For
           </h2>
           <div className="grid md:grid-cols-3 gap-8">
@@ -294,7 +294,7 @@ export default function ImageToVideoAIPage() {
                 key={useCase.title}
                 className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl p-6 hover:shadow-lg transition-shadow"
               >
-                <useCase.icon className="h-12 w-12 text-purple-500 mb-4" />
+                <useCase.icon className="h-12 w-12 text-teal-500 mb-4" />
                 <h3 className="text-xl font-semibold mb-3 text-slate-900 dark:text-white">
                   {useCase.title}
                 </h3>
@@ -305,7 +305,7 @@ export default function ImageToVideoAIPage() {
         </div>
 
         <div className="max-w-4xl mx-auto mb-20">
-          <h2 className="text-3xl font-bold text-center mb-12 text-slate-900 dark:text-white">
+          <h2 className="h2-section text-center mb-12">
             Features
           </h2>
           <div className="grid md:grid-cols-2 gap-4">
@@ -319,7 +319,7 @@ export default function ImageToVideoAIPage() {
         </div>
 
         <div className="max-w-6xl mx-auto mb-20">
-          <h2 className="text-3xl font-bold text-center mb-4 text-slate-900 dark:text-white">
+          <h2 className="h2-section text-center mb-4">
             Simple, Transparent Pricing
           </h2>
           <p className="text-center text-slate-600 dark:text-slate-400 mb-12">
@@ -331,12 +331,12 @@ export default function ImageToVideoAIPage() {
                 key={plan.plan}
                 className={`bg-white dark:bg-slate-900 border-2 rounded-xl p-8 ${
                   plan.popular
-                    ? 'border-purple-500 shadow-xl scale-105'
+                    ? 'border-teal-500 shadow-xl scale-105'
                     : 'border-slate-200 dark:border-slate-700'
                 }`}
               >
                 {plan.popular && (
-                  <div className="bg-gradient-to-r from-purple-500 to-blue-500 text-white text-sm font-semibold px-4 py-1 rounded-full inline-block mb-4">
+                  <div className="bg-gradient-to-r from-teal-500 to-blue-500 text-white text-sm font-semibold px-4 py-1 rounded-full inline-block mb-4">
                     Most Popular
                   </div>
                 )}
@@ -366,7 +366,7 @@ export default function ImageToVideoAIPage() {
                 </ul>
                 <Link href={plan.plan === 'Free' ? '/video-generation' : '/pricing'}>
                   <Button
-                    className="w-full"
+                    className={plan.popular ? 'btn-primary w-full' : 'w-full'}
                     variant={plan.popular ? 'default' : 'outline'}
                     size="lg"
                   >
@@ -379,7 +379,7 @@ export default function ImageToVideoAIPage() {
         </div>
 
         <div className="max-w-3xl mx-auto mb-20">
-          <h2 className="text-3xl font-bold text-center mb-12 text-slate-900 dark:text-white">
+          <h2 className="h2-section text-center mb-12">
             Frequently Asked Questions
           </h2>
           <div className="space-y-8">
@@ -432,7 +432,7 @@ export default function ImageToVideoAIPage() {
         </div>
 
         <div className="max-w-4xl mx-auto text-center">
-          <div className="bg-gradient-to-r from-purple-600 to-blue-600 rounded-2xl p-12 text-white">
+          <div className="bg-gradient-to-r from-teal-600 to-blue-600 rounded-2xl p-12 text-white">
             <h2 className="text-3xl font-bold mb-4">Ready to Transform Your Product Images?</h2>
             <p className="text-xl mb-8 opacity-90">
               Start creating professional videos today. No credit card required.

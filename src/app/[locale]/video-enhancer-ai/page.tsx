@@ -178,16 +178,16 @@ export default function VideoEnhancerAIPage() {
 
       <div className="container-base py-16 md:py-24">
         <div className="text-center max-w-4xl mx-auto mb-16">
-          <div className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 px-4 py-2 rounded-full border border-blue-200 dark:border-blue-800 mb-6">
+          <div className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-50 to-teal-50 dark:from-blue-900/20 dark:to-teal-900/20 px-4 py-2 rounded-full border border-blue-200 dark:border-blue-800 mb-6">
             <Sparkles className="h-4 w-4 text-blue-500" />
             <span className="text-sm font-medium text-blue-900 dark:text-blue-100">
               Powered by Nano Banana Pro AI
             </span>
           </div>
 
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-slate-900 dark:text-white mb-6">
+          <h1 className="h1-hero text-center mb-6">
             Enhance Product Videos to{' '}
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-teal-600">
               4K Quality
             </span>{' '}
             with AI
@@ -201,7 +201,7 @@ export default function VideoEnhancerAIPage() {
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
             <Link href="/video-generation">
-              <Button size="lg" className="text-lg px-8 py-6 group">
+              <Button size="lg" className="btn-primary text-lg px-8 py-6 group">
                 Try Video Enhancer Free
                 <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
               </Button>
@@ -230,7 +230,7 @@ export default function VideoEnhancerAIPage() {
         </div>
 
         <div className="max-w-6xl mx-auto mb-20">
-          <h2 className="text-3xl font-bold text-center mb-12 text-slate-900 dark:text-white">
+          <h2 className="h2-section text-center mb-12">
             Before & After Examples
           </h2>
           <div className="bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 rounded-2xl p-8 md:p-12 border border-slate-200 dark:border-slate-700">
@@ -246,7 +246,7 @@ export default function VideoEnhancerAIPage() {
                 </p>
               </div>
               <div>
-                <div className="bg-gradient-to-br from-blue-100 to-purple-100 dark:from-blue-900/30 dark:to-purple-900/30 rounded-lg aspect-video flex items-center justify-center mb-3 border-2 border-blue-500">
+                <div className="bg-gradient-to-br from-blue-100 to-teal-100 dark:from-blue-900/30 dark:to-teal-900/30 rounded-lg aspect-video flex items-center justify-center mb-3 border-2 border-blue-500">
                   <span className="text-blue-600 dark:text-blue-400 font-medium">
                     1080p Enhanced
                   </span>
@@ -264,7 +264,7 @@ export default function VideoEnhancerAIPage() {
         </div>
 
         <div className="max-w-6xl mx-auto mb-20">
-          <h2 className="text-3xl font-bold text-center mb-12 text-slate-900 dark:text-white">
+          <h2 className="h2-section text-center mb-12">
             AI Enhancement Features
           </h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
@@ -284,7 +284,7 @@ export default function VideoEnhancerAIPage() {
         </div>
 
         <div className="max-w-4xl mx-auto mb-20">
-          <h2 className="text-3xl font-bold text-center mb-12 text-slate-900 dark:text-white">
+          <h2 className="h2-section text-center mb-12">
             Perfect For
           </h2>
           <div className="grid md:grid-cols-2 gap-4">
@@ -298,7 +298,7 @@ export default function VideoEnhancerAIPage() {
         </div>
 
         <div className="max-w-6xl mx-auto mb-20">
-          <h2 className="text-3xl font-bold text-center mb-4 text-slate-900 dark:text-white">
+          <h2 className="h2-section text-center mb-4">
             Enhancement Pricing
           </h2>
           <p className="text-center text-slate-600 dark:text-slate-400 mb-12">
@@ -315,7 +315,7 @@ export default function VideoEnhancerAIPage() {
                 }`}
               >
                 {tier.popular && (
-                  <div className="bg-gradient-to-r from-blue-500 to-purple-500 text-white text-sm font-semibold px-4 py-1 rounded-full inline-block mb-4">
+                  <div className="bg-gradient-to-r from-blue-500 to-teal-500 text-white text-sm font-semibold px-4 py-1 rounded-full inline-block mb-4">
                     Most Popular
                   </div>
                 )}
@@ -345,7 +345,7 @@ export default function VideoEnhancerAIPage() {
                 </ul>
                 <Link href={tier.name === 'Free Trial' ? '/video-generation' : '/pricing'}>
                   <Button
-                    className="w-full"
+                    className={tier.popular ? 'btn-primary w-full' : 'w-full'}
                     variant={tier.popular ? 'default' : 'outline'}
                     size="lg"
                   >
@@ -358,7 +358,7 @@ export default function VideoEnhancerAIPage() {
         </div>
 
         <div className="max-w-3xl mx-auto mb-20">
-          <h2 className="text-3xl font-bold text-center mb-12 text-slate-900 dark:text-white">
+          <h2 className="h2-section text-center mb-12">
             Frequently Asked Questions
           </h2>
           <div className="space-y-8">
@@ -413,7 +413,7 @@ export default function VideoEnhancerAIPage() {
         </div>
 
         <div className="max-w-4xl mx-auto text-center">
-          <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl p-12 text-white">
+          <div className="bg-gradient-to-r from-blue-600 to-teal-600 rounded-2xl p-12 text-white">
             <h2 className="text-3xl font-bold mb-4">Ready to Enhance Your Videos?</h2>
             <p className="text-xl mb-8 opacity-90">
               Start improving video quality with AI today. Free trial included.

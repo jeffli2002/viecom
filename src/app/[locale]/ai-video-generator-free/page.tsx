@@ -158,7 +158,7 @@ export default function FreeAIVideoGeneratorPage() {
             </span>
           </div>
 
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-slate-900 dark:text-white mb-6">
+          <h1 className="h1-hero text-center mb-6">
             Create{' '}
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-green-600 to-teal-600">
               Professional AI Videos
@@ -176,7 +176,7 @@ export default function FreeAIVideoGeneratorPage() {
             <Link href="/video-generation">
               <Button
                 size="lg"
-                className="text-lg px-8 py-6 group bg-gradient-to-r from-green-600 to-teal-600 hover:from-green-700 hover:to-teal-700"
+                className="btn-primary text-lg px-8 py-6 group"
               >
                 Start Creating Free Videos
                 <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
@@ -211,7 +211,7 @@ export default function FreeAIVideoGeneratorPage() {
 
         <div className="max-w-5xl mx-auto mb-20">
           <div className="bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 rounded-2xl p-8 md:p-12 border border-slate-200 dark:border-slate-700">
-            <h2 className="text-3xl font-bold text-center mb-12 text-slate-900 dark:text-white">
+            <h2 className="h2-section text-center mb-12">
               What's Included for Free
             </h2>
             <div className="grid md:grid-cols-2 gap-4">
@@ -226,7 +226,7 @@ export default function FreeAIVideoGeneratorPage() {
         </div>
 
         <div className="max-w-6xl mx-auto mb-20">
-          <h2 className="text-3xl font-bold text-center mb-4 text-slate-900 dark:text-white">
+          <h2 className="h2-section text-center mb-4">
             Earn More Free Credits
           </h2>
           <p className="text-center text-slate-600 dark:text-slate-400 mb-12">
@@ -252,7 +252,7 @@ export default function FreeAIVideoGeneratorPage() {
         </div>
 
         <div className="max-w-6xl mx-auto mb-20">
-          <h2 className="text-3xl font-bold text-center mb-4 text-slate-900 dark:text-white">
+          <h2 className="h2-section text-center mb-4">
             Free vs Paid Plans Comparison
           </h2>
           <p className="text-center text-slate-600 dark:text-slate-400 mb-12">
@@ -269,7 +269,7 @@ export default function FreeAIVideoGeneratorPage() {
                     <th className="px-6 py-4 text-center text-sm font-semibold text-slate-900 dark:text-white">
                       Free
                     </th>
-                    <th className="px-6 py-4 text-center text-sm font-semibold text-slate-900 dark:text-white bg-purple-100 dark:bg-purple-900/30">
+                    <th className="px-6 py-4 text-center text-sm font-semibold text-slate-900 dark:text-white bg-teal-100 dark:bg-teal-900/30">
                       Pro
                     </th>
                     <th className="px-6 py-4 text-center text-sm font-semibold text-slate-900 dark:text-white">
@@ -286,7 +286,7 @@ export default function FreeAIVideoGeneratorPage() {
                       <td className="px-6 py-4 text-sm text-center text-slate-700 dark:text-slate-300">
                         {row.free}
                       </td>
-                      <td className="px-6 py-4 text-sm text-center text-slate-700 dark:text-slate-300 bg-purple-50 dark:bg-purple-900/20">
+                      <td className="px-6 py-4 text-sm text-center text-slate-700 dark:text-slate-300 bg-teal-50 dark:bg-teal-900/20">
                         {row.pro}
                       </td>
                       <td className="px-6 py-4 text-sm text-center text-slate-700 dark:text-slate-300">
@@ -301,7 +301,7 @@ export default function FreeAIVideoGeneratorPage() {
         </div>
 
         <div className="max-w-3xl mx-auto mb-20">
-          <h2 className="text-3xl font-bold text-center mb-12 text-slate-900 dark:text-white">
+          <h2 className="h2-section text-center mb-12">
             Frequently Asked Questions
           </h2>
           <div className="space-y-8">
