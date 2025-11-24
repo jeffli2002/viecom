@@ -3,7 +3,11 @@ import { getMetadataBase } from '@/lib/seo/metadata';
 import type { MetadataRoute } from 'next';
 
 // Public pages that should be indexed
-const PUBLIC_PATHS: Array<{ path: string; priority: number; changeFrequency: 'always' | 'hourly' | 'daily' | 'weekly' | 'monthly' | 'yearly' | 'never' }> = [
+const PUBLIC_PATHS: Array<{
+  path: string;
+  priority: number;
+  changeFrequency: 'always' | 'hourly' | 'daily' | 'weekly' | 'monthly' | 'yearly' | 'never';
+}> = [
   { path: '/', priority: 1.0, changeFrequency: 'daily' },
   { path: '/about', priority: 0.8, changeFrequency: 'monthly' },
   { path: '/pricing', priority: 0.9, changeFrequency: 'weekly' },
@@ -16,6 +20,9 @@ const PUBLIC_PATHS: Array<{ path: string; priority: number; changeFrequency: 'al
   { path: '/brand-analysis', priority: 0.8, changeFrequency: 'weekly' },
   { path: '/image-generation', priority: 0.9, changeFrequency: 'daily' },
   { path: '/video-generation', priority: 0.9, changeFrequency: 'daily' },
+  { path: '/image-to-video-ai', priority: 1.0, changeFrequency: 'weekly' },
+  { path: '/ai-video-generator-free', priority: 0.95, changeFrequency: 'weekly' },
+  { path: '/video-enhancer-ai', priority: 0.9, changeFrequency: 'weekly' },
   { path: '/batch-generation', priority: 0.9, changeFrequency: 'daily' },
   { path: '/batch-image-generation', priority: 0.9, changeFrequency: 'daily' },
   { path: '/batch-video-generation', priority: 0.9, changeFrequency: 'daily' },

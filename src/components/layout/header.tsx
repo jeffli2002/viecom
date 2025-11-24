@@ -28,15 +28,15 @@ import {
   Image as ImageIcon,
   LogOut,
   Menu,
+  Moon,
   Sparkles,
+  Sun,
   User,
   Video,
   X,
-  Sun,
-  Moon,
 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 export function Header() {
   const t = useTranslations('nav');
@@ -93,6 +93,29 @@ export function Header() {
         },
       ],
     },
+    {
+      title: 'Features',
+      items: [
+        {
+          title: 'Image to Video AI',
+          href: '/image-to-video-ai',
+          description: 'Transform product photos into engaging videos',
+          icon: Video,
+        },
+        {
+          title: 'Free AI Video Generator',
+          href: '/ai-video-generator-free',
+          description: 'Start with 30 free credits, no credit card',
+          icon: Sparkles,
+        },
+        {
+          title: 'Video Enhancer',
+          href: '/video-enhancer-ai',
+          description: 'Upscale videos to 4K quality with AI',
+          icon: Sparkles,
+        },
+      ],
+    },
   ];
 
   return (
@@ -113,7 +136,9 @@ export function Header() {
             <NavigationMenuList>
               {navItems.map((item) => (
                 <NavigationMenuItem key={item.title}>
-                  <NavigationMenuTrigger className="text-slate-600 dark:text-slate-300">{item.title}</NavigationMenuTrigger>
+                  <NavigationMenuTrigger className="text-slate-600 dark:text-slate-300">
+                    {item.title}
+                  </NavigationMenuTrigger>
                   <NavigationMenuContent>
                     <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px]">
                       {item.items.map((subItem) => (
@@ -154,16 +179,28 @@ export function Header() {
           <Link
             href="/brand-analysis"
             className={`text-sm font-medium transition-colors hover:text-teal-500 dark:hover:text-white ${
-              pathname?.includes('/brand-analysis') ? 'text-teal-500' : 'text-slate-600 dark:text-slate-300'
+              pathname?.includes('/brand-analysis')
+                ? 'text-teal-500'
+                : 'text-slate-600 dark:text-slate-300'
             }`}
           >
             {t('brandAnalysis')}
+          </Link>
+          <Link
+            href="/pricing"
+            className={`text-sm font-medium transition-colors hover:text-teal-500 dark:hover:text-white ${
+              pathname?.includes('/pricing')
+                ? 'text-teal-500'
+                : 'text-slate-600 dark:text-slate-300'
+            }`}
+          >
+            Pricing
           </Link>
         </nav>
 
         {/* User Menu / Auth Buttons */}
         <div className="flex items-center space-x-4">
-          <button 
+          <button
             onClick={() => setDarkMode(!darkMode)}
             className="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400 transition-colors"
           >
@@ -175,13 +212,13 @@ export function Header() {
               <LanguageSwitcher />
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button 
-                    variant="ghost" 
+                  <Button
+                    variant="ghost"
                     className="relative h-10 w-10 rounded-full p-0 !bg-transparent hover:!bg-transparent dark:!bg-transparent dark:hover:!bg-transparent focus:!bg-transparent active:!bg-transparent"
                     style={{ backgroundColor: 'transparent' }}
                   >
-                    <Avatar 
-                      className="h-10 w-10 border-2 border-teal-500 z-10 relative !bg-transparent" 
+                    <Avatar
+                      className="h-10 w-10 border-2 border-teal-500 z-10 relative !bg-transparent"
                       style={{ backgroundColor: 'transparent' }}
                     >
                       <AvatarImage
@@ -190,14 +227,14 @@ export function Header() {
                         className="rounded-full !bg-transparent"
                         style={{ backgroundColor: 'transparent' }}
                       />
-                      <AvatarFallback 
-                        className="text-white rounded-full header-avatar-fallback" 
+                      <AvatarFallback
+                        className="text-white rounded-full header-avatar-fallback"
                         data-header-avatar="true"
-                        style={{ 
-                          backgroundColor: 'rgb(20, 184, 166)', 
+                        style={{
+                          backgroundColor: 'rgb(20, 184, 166)',
                           background: 'rgb(20, 184, 166)',
                           backgroundImage: 'none',
-                          backgroundSize: 'auto'
+                          backgroundSize: 'auto',
                         }}
                       >
                         {user.name?.charAt(0).toUpperCase() || <User className="h-4 w-4" />}
@@ -231,10 +268,19 @@ export function Header() {
             <>
               <LanguageSwitcher />
               <div className="flex items-center space-x-2">
-                <Button variant="ghost" size="sm" asChild className="text-slate-600 dark:text-slate-300">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  asChild
+                  className="text-slate-600 dark:text-slate-300"
+                >
                   <Link href="/login">{t('login')}</Link>
                 </Button>
-                <Button size="sm" asChild className="bg-slate-900 dark:bg-white text-white dark:text-slate-900 hover:opacity-90">
+                <Button
+                  size="sm"
+                  asChild
+                  className="bg-slate-900 dark:bg-white text-white dark:text-slate-900 hover:opacity-90"
+                >
                   <Link href="/signup">{t('signup')}</Link>
                 </Button>
               </div>
