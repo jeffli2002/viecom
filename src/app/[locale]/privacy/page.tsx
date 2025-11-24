@@ -3,12 +3,12 @@ import { Card, CardContent } from '@/components/ui/card';
 export default function PrivacyPage() {
   return (
     <div className="container mx-auto px-4 py-12 max-w-4xl">
-      <h1 className="mb-8 text-4xl font-bold text-gray-900">Privacy Policy</h1>
+      <h1 className="mb-8 text-4xl font-bold text-gray-900 dark:text-white">Privacy Policy</h1>
 
-      <div className="space-y-6 text-gray-700">
+      <div className="space-y-6 text-gray-700 dark:text-slate-300">
         <Card>
           <CardContent className="pt-6 space-y-4">
-            <p className="text-sm text-gray-500">Last updated: November 10, 2024</p>
+            <p className="text-sm text-gray-500 dark:text-slate-400">Last updated: November 10, 2024</p>
 
             <p>
               At Viecom, we take your privacy seriously. This Privacy Policy explains how we
@@ -20,16 +20,16 @@ export default function PrivacyPage() {
 
         <Card>
           <CardContent className="pt-6 space-y-4">
-            <h2 className="text-2xl font-semibold text-gray-900">1. Information We Collect</h2>
+            <h2 className="text-2xl font-semibold text-gray-900 dark:text-white">1. Information We Collect</h2>
 
-            <h3 className="text-lg font-semibold text-gray-800 mt-4">1.1 Account Information</h3>
+            <h3 className="text-lg font-semibold text-gray-800 dark:text-slate-200 mt-4">1.1 Account Information</h3>
             <p>
               When you create an account, we collect your email address, name, and password. If you
               sign up using a social provider (Google), we receive basic profile information from
               that provider.
             </p>
 
-            <h3 className="text-lg font-semibold text-gray-800 mt-4">1.2 Content and Usage Data</h3>
+            <h3 className="text-lg font-semibold text-gray-800 dark:text-slate-200 mt-4">1.2 Content and Usage Data</h3>
             <p>
               We collect the prompts, images, and videos you create or upload to our platform. This
               includes:
@@ -42,14 +42,14 @@ export default function PrivacyPage() {
               <li>Usage statistics and generation history</li>
             </ul>
 
-            <h3 className="text-lg font-semibold text-gray-800 mt-4">1.3 Payment Information</h3>
+            <h3 className="text-lg font-semibold text-gray-800 dark:text-slate-200 mt-4">1.3 Payment Information</h3>
             <p>
               Payment processing is handled by our third-party payment processor (Creem). We do not
               store your full credit card information. We only retain transaction records and
               subscription status.
             </p>
 
-            <h3 className="text-lg font-semibold text-gray-800 mt-4">1.4 Technical Data</h3>
+            <h3 className="text-lg font-semibold text-gray-800 dark:text-slate-200 mt-4">1.4 Technical Data</h3>
             <p>
               We automatically collect certain information about your device and how you interact
               with our service, including:
@@ -65,7 +65,7 @@ export default function PrivacyPage() {
 
         <Card>
           <CardContent className="pt-6 space-y-4">
-            <h2 className="text-2xl font-semibold text-gray-900">2. How We Use Your Information</h2>
+            <h2 className="text-2xl font-semibold text-gray-900 dark:text-white">2. How We Use Your Information</h2>
 
             <p>We use your information to:</p>
             <ul className="list-disc list-inside space-y-2 ml-4">
@@ -82,7 +82,7 @@ export default function PrivacyPage() {
 
         <Card>
           <CardContent className="pt-6 space-y-4">
-            <h2 className="text-2xl font-semibold text-gray-900">3. Data Storage and Security</h2>
+            <h2 className="text-2xl font-semibold text-gray-900 dark:text-white">3. Data Storage and Security</h2>
 
             <p>
               Your generated content is stored securely on Cloudflare R2 storage. We implement
@@ -104,7 +104,7 @@ export default function PrivacyPage() {
 
         <Card>
           <CardContent className="pt-6 space-y-4">
-            <h2 className="text-2xl font-semibold text-gray-900">4. Data Sharing and Disclosure</h2>
+            <h2 className="text-2xl font-semibold text-gray-900 dark:text-white">4. Data Sharing and Disclosure</h2>
 
             <p>We do not sell your personal information. We may share your data with:</p>
             <ul className="list-disc list-inside space-y-2 ml-4">
@@ -130,7 +130,7 @@ export default function PrivacyPage() {
 
         <Card>
           <CardContent className="pt-6 space-y-4">
-            <h2 className="text-2xl font-semibold text-gray-900">5. Your Rights</h2>
+            <h2 className="text-2xl font-semibold text-gray-900 dark:text-white">5. Your Rights</h2>
 
             <p>You have the right to:</p>
             <ul className="list-disc list-inside space-y-2 ml-4">
@@ -153,7 +153,7 @@ export default function PrivacyPage() {
 
         <Card>
           <CardContent className="pt-6 space-y-4">
-            <h2 className="text-2xl font-semibold text-gray-900">6. Cookies and Tracking</h2>
+            <h2 className="text-2xl font-semibold text-gray-900 dark:text-white">6. Cookies and Tracking</h2>
 
             <p>
               We use cookies and similar tracking technologies to enhance your experience. These
@@ -180,7 +180,7 @@ export default function PrivacyPage() {
 
         <Card>
           <CardContent className="pt-6 space-y-4">
-            <h2 className="text-2xl font-semibold text-gray-900">7. Data Retention</h2>
+            <h2 className="text-2xl font-semibold text-gray-900 dark:text-white">7. Data Retention</h2>
 
             <p>
               We retain your data for as long as your account is active or as needed to provide
@@ -192,7 +192,7 @@ export default function PrivacyPage() {
 
         <Card>
           <CardContent className="pt-6 space-y-4">
-            <h2 className="text-2xl font-semibold text-gray-900">8. Children's Privacy</h2>
+            <h2 className="text-2xl font-semibold text-gray-900 dark:text-white">8. Children's Privacy</h2>
 
             <p>
               Our service is not intended for users under 18 years of age. We do not knowingly
@@ -204,7 +204,7 @@ export default function PrivacyPage() {
 
         <Card>
           <CardContent className="pt-6 space-y-4">
-            <h2 className="text-2xl font-semibold text-gray-900">9. International Users</h2>
+            <h2 className="text-2xl font-semibold text-gray-900 dark:text-white">9. International Users</h2>
 
             <p>
               Your information may be transferred to and processed in countries other than your
@@ -216,7 +216,7 @@ export default function PrivacyPage() {
 
         <Card>
           <CardContent className="pt-6 space-y-4">
-            <h2 className="text-2xl font-semibold text-gray-900">10. Changes to This Policy</h2>
+            <h2 className="text-2xl font-semibold text-gray-900 dark:text-white">10. Changes to This Policy</h2>
 
             <p>
               We may update this Privacy Policy from time to time. We will notify you of any
@@ -229,7 +229,7 @@ export default function PrivacyPage() {
 
         <Card>
           <CardContent className="pt-6 space-y-4">
-            <h2 className="text-2xl font-semibold text-gray-900">11. Contact Us</h2>
+            <h2 className="text-2xl font-semibold text-gray-900 dark:text-white">11. Contact Us</h2>
 
             <p>
               If you have any questions about this Privacy Policy or our data practices, please

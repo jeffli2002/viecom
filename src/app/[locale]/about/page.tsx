@@ -16,8 +16,8 @@ export default function AboutPage() {
   return (
     <div className="container mx-auto px-4 py-12 max-w-4xl">
       <div className="mb-12 text-center">
-        <h1 className="mb-4 text-4xl font-bold text-gray-900">About Viecom</h1>
-        <p className="text-lg text-gray-600">
+        <h1 className="mb-4 text-4xl font-bold text-gray-900 dark:text-white">About Viecom</h1>
+        <p className="text-lg text-gray-600 dark:text-slate-300">
           Empowering e-commerce businesses with AI-powered visual content generation
         </p>
       </div>
@@ -31,7 +31,7 @@ export default function AboutPage() {
               Our Mission
             </CardTitle>
           </CardHeader>
-          <CardContent className="text-gray-700 space-y-4">
+          <CardContent className="text-gray-700 dark:text-slate-300 space-y-4">
             <p>
               At Viecom, we believe that every e-commerce business deserves access to high-quality
               visual content. Our mission is to democratize professional product photography and
@@ -53,7 +53,7 @@ export default function AboutPage() {
               What We Do
             </CardTitle>
           </CardHeader>
-          <CardContent className="text-gray-700 space-y-4">
+          <CardContent className="text-gray-700 dark:text-slate-300 space-y-4">
             <p>
               Viecom is an AI-powered content generation platform specifically designed for
               e-commerce. Our platform offers:
@@ -94,7 +94,7 @@ export default function AboutPage() {
           <CardContent className="text-gray-700">
             <div className="grid md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <h4 className="font-semibold text-gray-900">Cost-Effective</h4>
+                <h4 className="font-semibold text-gray-900 dark:text-white">Cost-Effective</h4>
                 <p className="text-sm">
                   Generate unlimited content at a fraction of the cost of traditional photography
                 </p>
@@ -127,7 +127,7 @@ export default function AboutPage() {
               Who We Serve
             </CardTitle>
           </CardHeader>
-          <CardContent className="text-gray-700 space-y-4">
+          <CardContent className="text-gray-700 dark:text-slate-300 space-y-4">
             <p>Viecom is designed for:</p>
             <ul className="list-disc list-inside space-y-2 ml-4">
               <li>E-commerce store owners and managers</li>
@@ -145,7 +145,7 @@ export default function AboutPage() {
           <CardHeader>
             <CardTitle>Our Technology</CardTitle>
           </CardHeader>
-          <CardContent className="text-gray-700 space-y-4">
+          <CardContent className="text-gray-700 dark:text-slate-300 space-y-4">
             <p>
               We leverage state-of-the-art AI models including Google's Nano Banana for image
               generation and Sora 2 for video generation. Our platform is built on modern web
@@ -160,8 +160,8 @@ export default function AboutPage() {
 
         {/* Contact CTA */}
         <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-lg p-8 text-center">
-          <h3 className="text-2xl font-bold text-gray-900 mb-4">Get Started Today</h3>
-          <p className="text-gray-700 mb-6">
+          <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Get Started Today</h3>
+          <p className="text-gray-700 dark:text-slate-300 mb-6">
             Join thousands of e-commerce businesses creating stunning product visuals with AI
           </p>
           <div className="flex gap-4 justify-center">

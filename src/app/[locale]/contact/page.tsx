@@ -7,8 +7,8 @@ export default function ContactPage() {
   return (
     <div className="container mx-auto px-4 py-12 max-w-4xl">
       <div className="mb-12 text-center">
-        <h1 className="mb-4 text-4xl font-bold text-gray-900">Contact Us</h1>
-        <p className="text-lg text-gray-600">
+        <h1 className="mb-4 text-4xl font-bold text-gray-900 dark:text-white">Contact Us</h1>
+        <p className="text-lg text-gray-600 dark:text-slate-300">
           Have questions? We're here to help. Reach out to our team.
         </p>
       </div>
@@ -24,7 +24,7 @@ export default function ContactPage() {
           </CardHeader>
           <CardContent className="space-y-3">
             <div>
-              <p className="text-sm text-gray-600 mb-1">General Inquiries</p>
+              <p className="text-sm text-gray-600 dark:text-slate-400 mb-1">General Inquiries</p>
               <a
                 href="mailto:support@viecom.pro"
                 className="text-teal-500 hover:underline font-medium"
@@ -88,20 +88,20 @@ export default function ContactPage() {
         </CardHeader>
         <CardContent className="space-y-6">
           <div>
-            <h3 className="font-semibold text-gray-900 mb-2">
+            <h3 className="font-semibold text-gray-900 dark:text-white mb-2">
               How quickly can I generate images and videos?
             </h3>
-            <p className="text-gray-700 text-sm">
+            <p className="text-gray-700 dark:text-slate-300 text-sm">
               Images typically generate in 20-30 seconds. Videos take 2-5 minutes depending on
               complexity and server load. Batch generations process multiple items in parallel.
             </p>
           </div>
 
           <div>
-            <h3 className="font-semibold text-gray-900 mb-2">
+            <h3 className="font-semibold text-gray-900 dark:text-white mb-2">
               What happens if I run out of credits?
             </h3>
-            <p className="text-gray-700 text-sm">
+            <p className="text-gray-700 dark:text-slate-300 text-sm">
               You can upgrade to a higher plan for more monthly credits, or you can earn credits
               through daily check-ins, referrals, and social sharing. Free users receive{' '}
               {dailyCheckinCredits} credits per day through daily check-in.
@@ -109,10 +109,10 @@ export default function ContactPage() {
           </div>
 
           <div>
-            <h3 className="font-semibold text-gray-900 mb-2">
+            <h3 className="font-semibold text-gray-900 dark:text-white mb-2">
               Can I use generated content commercially?
             </h3>
-            <p className="text-gray-700 text-sm">
+            <p className="text-gray-700 dark:text-slate-300 text-sm">
               Yes! Pro and Pro+ subscribers receive full commercial usage rights for all generated
               content. Free users have limited commercial use rights. Please review your plan
               details for specifics.
@@ -120,10 +120,10 @@ export default function ContactPage() {
           </div>
 
           <div>
-            <h3 className="font-semibold text-gray-900 mb-2">
+            <h3 className="font-semibold text-gray-900 dark:text-white mb-2">
               Which e-commerce platforms do you support?
             </h3>
-            <p className="text-gray-700 text-sm">
+            <p className="text-gray-700 dark:text-slate-300 text-sm">
               Our content is optimized for all major platforms including Amazon, Shopee, TikTok
               Shop, Shopify, Taobao, Douyin, and Tmall. We provide platform-specific formatting and
               optimization.
@@ -131,16 +131,16 @@ export default function ContactPage() {
           </div>
 
           <div>
-            <h3 className="font-semibold text-gray-900 mb-2">How do I cancel my subscription?</h3>
-            <p className="text-gray-700 text-sm">
+            <h3 className="font-semibold text-gray-900 dark:text-white mb-2">How do I cancel my subscription?</h3>
+            <p className="text-gray-700 dark:text-slate-300 text-sm">
               You can cancel anytime through your account settings. Your access continues until the
               end of your billing period. No refunds for partial months.
             </p>
           </div>
 
           <div>
-            <h3 className="font-semibold text-gray-900 mb-2">Do you offer refunds?</h3>
-            <p className="text-gray-700 text-sm">
+            <h3 className="font-semibold text-gray-900 dark:text-white mb-2">Do you offer refunds?</h3>
+            <p className="text-gray-700 dark:text-slate-300 text-sm">
               We offer a 7-day satisfaction guarantee for new subscriptions. If you're not satisfied
               within the first 7 days, contact us for a full refund. After 7 days, all fees are
               non-refundable.
@@ -158,7 +158,7 @@ export default function ContactPage() {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-gray-700 mb-4">
+          <p className="text-gray-700 dark:text-slate-300 mb-4">
             Follow us on social media for updates, tips, and inspiration:
           </p>
           <div className="flex gap-4">
@@ -192,8 +192,8 @@ export default function ContactPage() {
 
       {/* CTA */}
       <div className="mt-12 bg-gradient-to-r from-purple-50 to-pink-50 rounded-lg p-8 text-center">
-        <h3 className="text-2xl font-bold text-gray-900 mb-4">Ready to Get Started?</h3>
-        <p className="text-gray-700 mb-6">
+        <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Ready to Get Started?</h3>
+        <p className="text-gray-700 dark:text-slate-300 mb-6">
           Create your free account and start generating stunning product visuals today
         </p>
         <a

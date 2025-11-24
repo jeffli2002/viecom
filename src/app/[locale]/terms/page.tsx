@@ -11,12 +11,12 @@ export default function TermsPage() {
   const freeSignupBonus = freePlan?.credits.onSignup || 30;
   return (
     <div className="container mx-auto px-4 py-12 max-w-4xl">
-      <h1 className="mb-8 text-4xl font-bold text-gray-900">Terms of Service</h1>
+      <h1 className="mb-8 text-4xl font-bold text-gray-900 dark:text-white">Terms of Service</h1>
 
-      <div className="space-y-6 text-gray-700">
+      <div className="space-y-6 text-gray-700 dark:text-slate-300">
         <Card>
           <CardContent className="pt-6 space-y-4">
-            <p className="text-sm text-gray-500">Last updated: November 10, 2024</p>
+            <p className="text-sm text-gray-500 dark:text-slate-400">Last updated: November 10, 2024</p>
 
             <p>
               Welcome to Viecom. By accessing or using our AI-powered e-commerce content generation
@@ -27,7 +27,7 @@ export default function TermsPage() {
 
         <Card>
           <CardContent className="pt-6 space-y-4">
-            <h2 className="text-2xl font-semibold text-gray-900">1. Acceptance of Terms</h2>
+            <h2 className="text-2xl font-semibold text-gray-900 dark:text-white">1. Acceptance of Terms</h2>
 
             <p>
               By creating an account or using Viecom's services, you agree to these Terms of Service
@@ -77,7 +77,7 @@ export default function TermsPage() {
           <CardContent className="pt-6 space-y-4">
             <h2 className="text-2xl font-semibold text-gray-900">4. Subscription and Payment</h2>
 
-            <h3 className="text-lg font-semibold text-gray-800">4.1 Plans and Pricing</h3>
+            <h3 className="text-lg font-semibold text-gray-800 dark:text-slate-200">4.1 Plans and Pricing</h3>
             <p>
               We offer various subscription plans with different features and credit allocations.
               Pricing and features are subject to change with 30 days notice.
@@ -302,7 +302,7 @@ export default function TermsPage() {
         </Card>
 
         <div className="mt-8 p-6 bg-teal-50 dark:bg-teal-900/20 border border-teal-200 dark:border-teal-800 rounded-lg">
-          <p className="text-sm text-gray-700">
+          <p className="text-sm text-gray-700 dark:text-slate-300">
             By using Viecom, you acknowledge that you have read, understood, and agree to be bound
             by these Terms of Service and our Privacy Policy.
           </p>

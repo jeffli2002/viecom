@@ -50,10 +50,10 @@ export default function DocsPage() {
     <div className="container mx-auto px-4 py-12 max-w-6xl">
       {/* SEO-optimized Header */}
       <div className="mb-12 text-center">
-        <h1 className="mb-4 text-4xl font-bold text-gray-900">
+        <h1 className="mb-4 text-4xl font-bold text-gray-900 dark:text-white">
           How to Use Viecom AI Image & Video Generator
         </h1>
-        <p className="text-lg text-gray-600 max-w-3xl mx-auto">
+        <p className="text-lg text-gray-600 dark:text-slate-300 max-w-3xl mx-auto">
           Complete step-by-step guides for creating stunning e-commerce visuals with AI. Learn how
           to generate product images, create marketing videos, and scale your content production.
         </p>
@@ -74,8 +74,8 @@ export default function DocsPage() {
                 1
               </div>
               <div className="flex-1">
-                <h3 className="font-semibold text-gray-900 mb-2">Sign Up and Get Free Credits</h3>
-                <p className="text-gray-700 text-sm mb-2">
+                <h3 className="font-semibold text-gray-900 dark:text-white mb-2">Sign Up and Get Free Credits</h3>
+                <p className="text-gray-700 dark:text-slate-300 text-sm mb-2">
                   Create your free account at{' '}
                   <Link href="/signup" className="text-teal-500 hover:underline">
                     viecom.pro/signup
@@ -83,7 +83,7 @@ export default function DocsPage() {
                   and receive {freePlan?.credits.onSignup || 30} free credits immediately. No credit
                   card required.
                 </p>
-                <p className="text-gray-600 text-xs">
+                <p className="text-gray-600 dark:text-slate-400 text-xs">
                   💡 Tip: Earn {dailyCheckin} credits per day through daily check-ins and{' '}
                   {referralReward} credits per referral.
                 </p>
@@ -95,8 +95,8 @@ export default function DocsPage() {
                 2
               </div>
               <div className="flex-1">
-                <h3 className="font-semibold text-gray-900 mb-2">Choose Your Generation Type</h3>
-                <ul className="space-y-2 text-sm text-gray-700">
+                <h3 className="font-semibold text-gray-900 dark:text-white mb-2">Choose Your Generation Type</h3>
+                <ul className="space-y-2 text-sm text-gray-700 dark:text-slate-300">
                   <li className="flex items-start gap-2">
                     <CheckCircle2 className="h-4 w-4 text-green-600 mt-0.5 flex-shrink-0" />
                     <span>
@@ -134,13 +134,13 @@ export default function DocsPage() {
                 3
               </div>
               <div className="flex-1">
-                <h3 className="font-semibold text-gray-900 mb-2">Generate and Download</h3>
-                <p className="text-gray-700 text-sm mb-2">
+                <h3 className="font-semibold text-gray-900 dark:text-white mb-2">Generate and Download</h3>
+                <p className="text-gray-700 dark:text-slate-300 text-sm mb-2">
                   Enter your prompt (or use AI enhancement), select your preferences (aspect ratio,
                   style, quality), and click Generate. Your content will be ready in 30 seconds to
                   13 minutes depending on the type.
                 </p>
-                <p className="text-gray-600 text-xs">
+                <p className="text-gray-600 dark:text-slate-400 text-xs">
                   💾 Free plan: 7 days asset display | Pro/Pro+: 30 days asset display
                 </p>
               </div>
@@ -163,11 +163,11 @@ export default function DocsPage() {
             <div className="space-y-6">
               {/* Text-to-Image */}
               <div>
-                <h3 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                <h3 className="font-semibold text-gray-900 dark:text-white mb-3 flex items-center gap-2">
                   <ArrowRight className="h-4 w-4 text-teal-500" />
                   How to Create Images from Text Descriptions
                 </h3>
-                <ol className="space-y-2 text-sm text-gray-700 ml-6 list-decimal">
+                <ol className="space-y-2 text-sm text-gray-700 dark:text-slate-300 ml-6 list-decimal">
                   <li>
                     Navigate to{' '}
                     <Link href="/image-generation" className="text-teal-500 hover:underline">
@@ -198,18 +198,18 @@ export default function DocsPage() {
                   <li>Wait 20-60 seconds for AI to create your image</li>
                   <li>Download the result or share directly</li>
                 </ol>
-                <p className="text-xs text-gray-600 mt-2">
+                <p className="text-xs text-gray-600 dark:text-slate-400 mt-2">
                   ⚡ Cost: {imageCost} credits per image | Model: Nano Banana
                 </p>
               </div>
 
               {/* Image-to-Image */}
               <div className="border-t border-gray-200 pt-6">
-                <h3 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                <h3 className="font-semibold text-gray-900 dark:text-white mb-3 flex items-center gap-2">
                   <ArrowRight className="h-4 w-4 text-teal-500" />
                   How to Transform Existing Product Images
                 </h3>
-                <ol className="space-y-2 text-sm text-gray-700 ml-6 list-decimal">
+                <ol className="space-y-2 text-sm text-gray-700 dark:text-slate-300 ml-6 list-decimal">
                   <li>
                     Navigate to{' '}
                     <Link
@@ -234,17 +234,17 @@ export default function DocsPage() {
                   </li>
                   <li>AI will transform your image while preserving the composition</li>
                 </ol>
-                <p className="text-xs text-gray-600 mt-2">
+                <p className="text-xs text-gray-600 dark:text-slate-400 mt-2">
                   💡 Use cases: Style transfer, background removal, color adjustment
                 </p>
               </div>
 
               {/* Available Styles */}
               <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
-                <h4 className="font-semibold text-gray-900 mb-2 text-sm">
+                <h4 className="font-semibold text-gray-900 dark:text-white mb-2 text-sm">
                   Available Image Styles:
                 </h4>
-                <div className="grid grid-cols-2 gap-2 text-xs text-gray-700">
+                <div className="grid grid-cols-2 gap-2 text-xs text-gray-700 dark:text-slate-300">
                   <div>
                     • <strong>Studio Shot:</strong> Professional product photography
                   </div>
@@ -278,11 +278,11 @@ export default function DocsPage() {
             <div className="space-y-6">
               {/* Text-to-Video */}
               <div>
-                <h3 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                <h3 className="font-semibold text-gray-900 dark:text-white mb-3 flex items-center gap-2">
                   <ArrowRight className="h-4 w-4 text-teal-500" />
                   How to Create Videos from Text Prompts
                 </h3>
-                <ol className="space-y-2 text-sm text-gray-700 ml-6 list-decimal">
+                <ol className="space-y-2 text-sm text-gray-700 dark:text-slate-300 ml-6 list-decimal">
                   <li>
                     Go to{' '}
                     <Link href="/video-generation" className="text-teal-500 hover:underline">
@@ -313,7 +313,7 @@ export default function DocsPage() {
                   <li>Wait 2-13 minutes depending on quality and length</li>
                 </ol>
                 <div className="mt-3 bg-blue-50 rounded-lg p-3 border border-blue-200">
-                  <p className="text-xs text-blue-800">
+                  <p className="text-xs text-blue-800 dark:text-blue-200">
                     <strong>💰 Credit Costs:</strong> Sora 2:{' '}
                     {creditsConfig.consumption.videoGeneration['sora-2-720p-10s']}-
                     {creditsConfig.consumption.videoGeneration['sora-2-720p-15s']} credits | Sora 2
@@ -325,18 +325,18 @@ export default function DocsPage() {
 
               {/* Image-to-Video */}
               <div className="border-t border-gray-200 pt-6">
-                <h3 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                <h3 className="font-semibold text-gray-900 dark:text-white mb-3 flex items-center gap-2">
                   <ArrowRight className="h-4 w-4 text-teal-500" />
                   How to Animate Product Images into Videos
                 </h3>
                 <div className="mb-3 bg-amber-50 rounded-lg p-3 border border-amber-200">
-                  <p className="text-xs text-amber-800">
+                  <p className="text-xs text-amber-800 dark:text-amber-200">
                     <strong>⚠️ Important:</strong> Image-to-video does NOT support images with
                     people, faces, or human figures. Use product images, objects, or landscapes
                     only.
                   </p>
                 </div>
-                <ol className="space-y-2 text-sm text-gray-700 ml-6 list-decimal">
+                <ol className="space-y-2 text-sm text-gray-700 dark:text-slate-300 ml-6 list-decimal">
                   <li>
                     Go to{' '}
                     <Link
@@ -357,17 +357,17 @@ export default function DocsPage() {
                   <li>Configure model, duration, and quality settings</li>
                   <li>Generate and download your video</li>
                 </ol>
-                <p className="text-xs text-gray-600 mt-2">
+                <p className="text-xs text-gray-600 dark:text-slate-400 mt-2">
                   ✅ Supported: Products, objects, landscapes, abstract content
                 </p>
               </div>
 
               {/* Video Styles */}
               <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
-                <h4 className="font-semibold text-gray-900 mb-2 text-sm">
+                <h4 className="font-semibold text-gray-900 dark:text-white mb-2 text-sm">
                   Available Video Styles:
                 </h4>
-                <div className="grid grid-cols-2 gap-2 text-xs text-gray-700">
+                <div className="grid grid-cols-2 gap-2 text-xs text-gray-700 dark:text-slate-300">
                   <div>
                     • <strong>Spoken Script:</strong> Voiceover-style presentation
                   </div>
@@ -400,11 +400,11 @@ export default function DocsPage() {
           <CardContent className="pt-6">
             <div className="space-y-6">
               <div>
-                <h3 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                <h3 className="font-semibold text-gray-900 dark:text-white mb-3 flex items-center gap-2">
                   <ArrowRight className="h-4 w-4 text-teal-500" />
                   How to Analyze Your Brand Automatically
                 </h3>
-                <ol className="space-y-2 text-sm text-gray-700 ml-6 list-decimal">
+                <ol className="space-y-2 text-sm text-gray-700 dark:text-slate-300 ml-6 list-decimal">
                   <li>
                     Navigate to{' '}
                     <Link href="/brand-analysis" className="text-teal-500 hover:underline">
@@ -426,16 +426,16 @@ export default function DocsPage() {
                   </li>
                   <li>Your brand data will be automatically applied to prompts</li>
                 </ol>
-                <p className="text-xs text-gray-600 mt-2">
+                <p className="text-xs text-gray-600 dark:text-slate-400 mt-2">
                   🎨 Brand context includes: tone, colors, audience, recommended styles
                 </p>
               </div>
 
               <div className="bg-teal-50 dark:bg-teal-900/20 rounded-lg p-4 border border-teal-200 dark:border-teal-800">
-                <h4 className="font-semibold text-purple-900 mb-2 text-sm">
+                <h4 className="font-semibold text-purple-900 dark:text-purple-200 mb-2 text-sm">
                   Benefits of Brand Analysis:
                 </h4>
-                <ul className="space-y-1 text-xs text-purple-800">
+                <ul className="space-y-1 text-xs text-purple-800 dark:text-purple-200">
                   <li>✓ Consistent brand voice across all generated content</li>
                   <li>✓ AI-recommended styles matching your brand</li>
                   <li>✓ Automatic color palette integration</li>
@@ -457,11 +457,11 @@ export default function DocsPage() {
           <CardContent className="pt-6">
             <div className="space-y-6">
               <div>
-                <h3 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                <h3 className="font-semibold text-gray-900 dark:text-white mb-3 flex items-center gap-2">
                   <ArrowRight className="h-4 w-4 text-teal-500" />
                   How to Generate Multiple Images at Once
                 </h3>
-                <ol className="space-y-2 text-sm text-gray-700 ml-6 list-decimal">
+                <ol className="space-y-2 text-sm text-gray-700 dark:text-slate-300 ml-6 list-decimal">
                   <li>
                     Go to{' '}
                     <Link
@@ -487,17 +487,17 @@ export default function DocsPage() {
                   <li>Monitor progress in real-time</li>
                   <li>Download all results as a ZIP file</li>
                 </ol>
-                <p className="text-xs text-gray-600 mt-2">
+                <p className="text-xs text-gray-600 dark:text-slate-400 mt-2">
                   🚀 Concurrency: Free (1), Pro (3), Pro+ (10) concurrent generations
                 </p>
               </div>
 
               <div className="border-t border-gray-200 pt-6">
-                <h3 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                <h3 className="font-semibold text-gray-900 dark:text-white mb-3 flex items-center gap-2">
                   <ArrowRight className="h-4 w-4 text-teal-500" />
                   How to Generate Multiple Videos at Once
                 </h3>
-                <ol className="space-y-2 text-sm text-gray-700 ml-6 list-decimal">
+                <ol className="space-y-2 text-sm text-gray-700 dark:text-slate-300 ml-6 list-decimal">
                   <li>
                     Visit{' '}
                     <Link
@@ -516,14 +516,14 @@ export default function DocsPage() {
                   <li>Faster videos (Sora 2, 720P, 10s) are processed first</li>
                   <li>Download completed videos individually or in bulk</li>
                 </ol>
-                <p className="text-xs text-gray-600 mt-2">
+                <p className="text-xs text-gray-600 dark:text-slate-400 mt-2">
                   ⚡ Pro tip: Use Sora 2 for drafts, Sora 2 Pro 1080P for final deliverables
                 </p>
               </div>
 
               <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
-                <h4 className="font-semibold text-gray-900 mb-2 text-sm">Template File Format:</h4>
-                <div className="text-xs text-gray-700 space-y-1">
+                <h4 className="font-semibold text-gray-900 dark:text-white mb-2 text-sm">Template File Format:</h4>
+                <div className="text-xs text-gray-700 dark:text-slate-300 space-y-1">
                   <p>
                     <strong>Required columns:</strong> prompt (or productName + productDescription)
                   </p>
@@ -552,21 +552,21 @@ export default function DocsPage() {
         <CardContent className="pt-6">
           <div className="space-y-6">
             <div>
-              <h3 className="font-semibold text-gray-900 mb-3">How Do Credits Work?</h3>
-              <p className="text-sm text-gray-700 mb-3">
+              <h3 className="font-semibold text-gray-900 dark:text-white mb-3">How Do Credits Work?</h3>
+              <p className="text-sm text-gray-700 dark:text-slate-300 mb-3">
                 Viecom uses a credit-based system. Each generation consumes credits based on the AI
                 model and settings used.
               </p>
               <div className="grid md:grid-cols-2 gap-4">
                 <div className="bg-blue-50 rounded-lg p-3 border border-blue-200">
-                  <h4 className="font-semibold text-blue-900 text-sm mb-2">Image Generation</h4>
-                  <p className="text-xs text-blue-800">
+                  <h4 className="font-semibold text-blue-900 dark:text-blue-200 text-sm mb-2">Image Generation</h4>
+                  <p className="text-xs text-blue-800 dark:text-blue-200">
                     {imageCost} credits per image (Nano Banana model)
                   </p>
                 </div>
                 <div className="bg-teal-50 dark:bg-teal-900/20 rounded-lg p-3 border border-teal-200 dark:border-teal-800">
-                  <h4 className="font-semibold text-purple-900 text-sm mb-2">Video Generation</h4>
-                  <p className="text-xs text-purple-800">
+                  <h4 className="font-semibold text-purple-900 dark:text-purple-200 text-sm mb-2">Video Generation</h4>
+                  <p className="text-xs text-purple-800 dark:text-purple-200">
                     {videoCostMin}-{videoCostMax} credits per video (varies by model, quality,
                     duration)
                   </p>
@@ -575,21 +575,21 @@ export default function DocsPage() {
             </div>
 
             <div className="border-t border-gray-200 pt-6">
-              <h3 className="font-semibold text-gray-900 mb-3">How to Earn Free Credits?</h3>
+              <h3 className="font-semibold text-gray-900 dark:text-white mb-3">How to Earn Free Credits?</h3>
               <div className="grid md:grid-cols-3 gap-3">
                 <div className="bg-green-50 rounded-lg p-3 border border-green-200">
                   <div className="font-semibold text-green-900 text-sm mb-1">Daily Check-in</div>
                   <div className="text-xs text-green-800">+{dailyCheckin} credits/day</div>
                 </div>
                 <div className="bg-blue-50 rounded-lg p-3 border border-blue-200">
-                  <div className="font-semibold text-blue-900 text-sm mb-1">Referral Program</div>
-                  <div className="text-xs text-blue-800">
+                  <div className="font-semibold text-blue-900 dark:text-blue-200 text-sm mb-1">Referral Program</div>
+                  <div className="text-xs text-blue-800 dark:text-blue-200">
                     +{referralReward} credits per referral
                   </div>
                 </div>
                 <div className="bg-teal-50 dark:bg-teal-900/20 rounded-lg p-3 border border-teal-200 dark:border-teal-800">
-                  <div className="font-semibold text-purple-900 text-sm mb-1">Social Sharing</div>
-                  <div className="text-xs text-purple-800">
+                  <div className="font-semibold text-purple-900 dark:text-purple-200 text-sm mb-1">Social Sharing</div>
+                  <div className="text-xs text-purple-800 dark:text-purple-200">
                     +{creditsConfig.rewards.socialShare.creditsPerShare} credits per share
                   </div>
                 </div>
@@ -597,13 +597,13 @@ export default function DocsPage() {
             </div>
 
             <div className="border-t border-gray-200 pt-6">
-              <h3 className="font-semibold text-gray-900 mb-3">How to Choose the Right Plan?</h3>
+              <h3 className="font-semibold text-gray-900 dark:text-white mb-3">How to Choose the Right Plan?</h3>
               <div className="space-y-3">
                 <div className="flex items-start gap-3">
                   <div className="bg-gray-100 rounded px-2 py-1 text-xs font-bold text-gray-700">
                     FREE
                   </div>
-                  <div className="flex-1 text-sm text-gray-700">
+                  <div className="flex-1 text-sm text-gray-700 dark:text-slate-300">
                     Perfect for testing: {freePlan?.credits.onSignup} credits sign-up bonus, daily
                     check-in rewards, basic features, 7 days asset display
                   </div>
@@ -612,7 +612,7 @@ export default function DocsPage() {
                   <div className="bg-teal-500 text-white rounded px-2 py-1 text-xs font-bold">
                     PRO
                   </div>
-                  <div className="flex-1 text-sm text-gray-700">
+                  <div className="flex-1 text-sm text-gray-700 dark:text-slate-300">
                     For creators: {proPlan?.credits.monthly} credits/month (${proPlan?.price}/mo),
                     Sora 2 & Sora 2 Pro access, batch generation (3 concurrent), commercial license,
                     30 days asset display
@@ -637,10 +637,10 @@ export default function DocsPage() {
         <CardContent>
           <div className="space-y-6">
             <div>
-              <h3 className="font-semibold text-gray-900 mb-2">
+              <h3 className="font-semibold text-gray-900 dark:text-white mb-2">
                 How long does it take to generate content?
               </h3>
-              <p className="text-sm text-gray-700">
+              <p className="text-sm text-gray-700 dark:text-slate-300">
                 <strong>Images:</strong> 20-60 seconds | <strong>Videos:</strong> 2-3 minutes (Sora
                 2, 720P) to 8-13 minutes (Sora 2 Pro, 1080P). Batch generation processes multiple
                 items concurrently based on your plan.
@@ -648,10 +648,10 @@ export default function DocsPage() {
             </div>
 
             <div>
-              <h3 className="font-semibold text-gray-900 mb-2">
+              <h3 className="font-semibold text-gray-900 dark:text-white mb-2">
                 How do I enhance my prompts with AI?
               </h3>
-              <p className="text-sm text-gray-700">
+              <p className="text-sm text-gray-700 dark:text-slate-300">
                 Click the <strong>Enhance Prompt</strong> button (with sparkle icon) on any
                 generation page. AI will analyze your description and add professional details,
                 lighting, composition, and style keywords. You can edit the enhanced prompt before
@@ -660,10 +660,10 @@ export default function DocsPage() {
             </div>
 
             <div>
-              <h3 className="font-semibold text-gray-900 mb-2">
+              <h3 className="font-semibold text-gray-900 dark:text-white mb-2">
                 How to use brand analysis with batch generation?
               </h3>
-              <p className="text-sm text-gray-700">
+              <p className="text-sm text-gray-700 dark:text-slate-300">
                 First, run brand analysis on your website. Then, when you click "Start Creating" and
                 choose batch generation, your brand data (tone, colors, style) will be automatically
                 applied to all generated content. You'll see a "Brand Context Applied" card in the
@@ -672,10 +672,10 @@ export default function DocsPage() {
             </div>
 
             <div>
-              <h3 className="font-semibold text-gray-900 mb-2">
+              <h3 className="font-semibold text-gray-900 dark:text-white mb-2">
                 How to download and manage my generated assets?
               </h3>
-              <p className="text-sm text-gray-700">
+              <p className="text-sm text-gray-700 dark:text-slate-300">
                 All generated content is saved in your{' '}
                 <Link href="/assets" className="text-teal-500 hover:underline">
                   Assets Library
@@ -686,8 +686,8 @@ export default function DocsPage() {
             </div>
 
             <div>
-              <h3 className="font-semibold text-gray-900 mb-2">How to maximize my free credits?</h3>
-              <p className="text-sm text-gray-700">
+              <h3 className="font-semibold text-gray-900 dark:text-white mb-2">How to maximize my free credits?</h3>
+              <p className="text-sm text-gray-700 dark:text-slate-300">
                 Combine all reward methods: {freePlan?.credits.onSignup} credits sign-up bonus +
                 daily check-in ({dailyCheckin} credits/day) + refer friends ({referralReward}{' '}
                 credits each) + share content ({creditsConfig.rewards.socialShare.creditsPerShare}{' '}
@@ -697,10 +697,10 @@ export default function DocsPage() {
             </div>
 
             <div>
-              <h3 className="font-semibold text-gray-900 mb-2">
+              <h3 className="font-semibold text-gray-900 dark:text-white mb-2">
                 How to choose between Sora 2 and Sora 2 Pro?
               </h3>
-              <p className="text-sm text-gray-700">
+              <p className="text-sm text-gray-700 dark:text-slate-300">
                 <strong>Sora 2 (720P):</strong> Best for drafts, iterations, and budget-conscious
                 projects. Costs {creditsConfig.consumption.videoGeneration['sora-2-720p-10s']}-
                 {creditsConfig.consumption.videoGeneration['sora-2-720p-15s']} credits, generates in
@@ -724,7 +724,7 @@ export default function DocsPage() {
       {/* Help CTA */}
       <div className="mt-12 bg-gradient-to-r from-teal-500 to-pink-600 rounded-lg p-8 text-center text-white">
         <h3 className="text-2xl font-bold mb-4">Need More Help?</h3>
-        <p className="text-purple-100 mb-6">
+        <p className="text-purple-100 dark:text-purple-200 mb-6">
           Our support team is ready to assist you with any questions about AI image and video
           generation.
         </p>

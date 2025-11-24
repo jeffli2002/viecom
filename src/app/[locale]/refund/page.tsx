@@ -20,9 +20,9 @@ export const metadata: Metadata = {
 export default function RefundPolicyPage() {
   return (
     <div className="container mx-auto px-4 py-12 max-w-4xl">
-      <h1 className="mb-8 text-4xl font-bold text-gray-900">Refund Policy</h1>
+      <h1 className="mb-8 text-4xl font-bold text-gray-900 dark:text-white">Refund Policy</h1>
 
-      <div className="space-y-6 text-gray-700">
+      <div className="space-y-6 text-gray-700 dark:text-slate-300">
         {/* Important Notice */}
         <Card className="border-amber-200 bg-amber-50">
           <CardContent className="pt-6">
@@ -44,7 +44,7 @@ export default function RefundPolicyPage() {
 
         <Card>
           <CardContent className="pt-6 space-y-4">
-            <p className="text-sm text-gray-500">Last updated: November 12, 2024</p>
+            <p className="text-sm text-gray-500 dark:text-slate-400">Last updated: November 12, 2024</p>
 
             <p>
               This Refund Policy outlines our policies and procedures regarding refunds for Viecom's
@@ -56,7 +56,7 @@ export default function RefundPolicyPage() {
 
         <Card>
           <CardContent className="pt-6 space-y-4">
-            <h2 className="text-2xl font-semibold text-gray-900">1. General Policy</h2>
+            <h2 className="text-2xl font-semibold text-gray-900 dark:text-white">1. General Policy</h2>
 
             <p>
               Due to the nature of digital services and AI-generated content,{' '}
@@ -75,7 +75,7 @@ export default function RefundPolicyPage() {
 
         <Card>
           <CardContent className="pt-6 space-y-4">
-            <h2 className="text-2xl font-semibold text-gray-900">2. Why No Refunds?</h2>
+            <h2 className="text-2xl font-semibold text-gray-900 dark:text-white">2. Why No Refunds?</h2>
 
             <p>
               Our digital services involve the immediate consumption of computational resources and
@@ -97,7 +97,7 @@ export default function RefundPolicyPage() {
 
         <Card>
           <CardContent className="pt-6 space-y-4">
-            <h2 className="text-2xl font-semibold text-gray-900">3. Subscription Cancellation</h2>
+            <h2 className="text-2xl font-semibold text-gray-900 dark:text-white">3. Subscription Cancellation</h2>
 
             <p>While we do not offer refunds, you can cancel your subscription at any time:</p>
             <ul className="list-disc list-inside space-y-2 ml-4">
@@ -127,7 +127,7 @@ export default function RefundPolicyPage() {
 
         <Card>
           <CardContent className="pt-6 space-y-4">
-            <h2 className="text-2xl font-semibold text-gray-900">4. Exceptions</h2>
+            <h2 className="text-2xl font-semibold text-gray-900 dark:text-white">4. Exceptions</h2>
 
             <p>We may consider refund requests only in the following exceptional circumstances:</p>
             <ul className="list-disc list-inside space-y-2 ml-4">
@@ -164,7 +164,7 @@ export default function RefundPolicyPage() {
 
         <Card>
           <CardContent className="pt-6 space-y-4">
-            <h2 className="text-2xl font-semibold text-gray-900">5. Free Trial and Testing</h2>
+            <h2 className="text-2xl font-semibold text-gray-900 dark:text-white">5. Free Trial and Testing</h2>
 
             <p>
               We encourage you to utilize our free tier to test our services before making a
@@ -194,7 +194,7 @@ export default function RefundPolicyPage() {
 
         <Card>
           <CardContent className="pt-6 space-y-4">
-            <h2 className="text-2xl font-semibold text-gray-900">6. Chargebacks</h2>
+            <h2 className="text-2xl font-semibold text-gray-900 dark:text-white">6. Chargebacks</h2>
 
             <p>If you file a chargeback or dispute a valid charge with your payment provider:</p>
             <ul className="list-disc list-inside space-y-2 ml-4">
@@ -213,7 +213,7 @@ export default function RefundPolicyPage() {
 
         <Card>
           <CardContent className="pt-6 space-y-4">
-            <h2 className="text-2xl font-semibold text-gray-900">7. Pricing Changes</h2>
+            <h2 className="text-2xl font-semibold text-gray-900 dark:text-white">7. Pricing Changes</h2>
 
             <p>We reserve the right to modify our pricing at any time. However:</p>
             <ul className="list-disc list-inside space-y-2 ml-4">
@@ -229,7 +229,7 @@ export default function RefundPolicyPage() {
 
         <Card>
           <CardContent className="pt-6 space-y-4">
-            <h2 className="text-2xl font-semibold text-gray-900">8. Contact Us</h2>
+            <h2 className="text-2xl font-semibold text-gray-900 dark:text-white">8. Contact Us</h2>
 
             <p>
               If you have questions about this Refund Policy or need assistance with your account,
@@ -259,7 +259,7 @@ export default function RefundPolicyPage() {
 
         <Card>
           <CardContent className="pt-6 space-y-4">
-            <h2 className="text-2xl font-semibold text-gray-900">9. Policy Updates</h2>
+            <h2 className="text-2xl font-semibold text-gray-900 dark:text-white">9. Policy Updates</h2>
 
             <p>
               We may update this Refund Policy from time to time. Any changes will be posted on this
