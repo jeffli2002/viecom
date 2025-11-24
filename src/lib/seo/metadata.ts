@@ -12,6 +12,16 @@ try {
 }
 
 export const DEFAULT_SEO_KEYWORDS: string[] = [
+  'ai video generator',
+  'image to video ai',
+  'free ai video generator',
+  'image to video',
+  'ai video editor',
+  'video enhancer',
+  'ai image generator',
+  'product video generator',
+  'batch video generation',
+  'e-commerce video ai',
   'Viecom',
   'AI ecommerce studio',
   'AI e-commerce content',
