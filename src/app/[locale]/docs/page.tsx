@@ -40,7 +40,8 @@ export const metadata: Metadata = {
 export default function DocsPage() {
   const freePlan = paymentConfig.plans.find((p) => p.id === 'free');
   const proPlan = paymentConfig.plans.find((p) => p.id === 'pro');
-  const imageCost = creditsConfig.consumption.imageGeneration['nano-banana'];
+  const nanoBananaCost = creditsConfig.consumption.imageGeneration['nano-banana'];
+  const nanoBananaProCost = creditsConfig.consumption.imageGeneration['nano-banana-pro'];
   const videoCostMin = creditsConfig.consumption.videoGeneration['sora-2-720p-10s'];
   const videoCostMax = creditsConfig.consumption.videoGeneration['sora-2-pro-1080p-15s'];
   const dailyCheckin = creditsConfig.rewards.checkin.dailyCredits;
@@ -101,14 +102,14 @@ export default function DocsPage() {
                     <CheckCircle2 className="h-4 w-4 text-green-600 mt-0.5 flex-shrink-0" />
                     <span>
                       <strong>Text-to-Image:</strong> Describe your product and AI creates the image
-                      ({imageCost} credits)
+                      ({nanoBananaCost}-{nanoBananaProCost} credits depending on model)
                     </span>
                   </li>
                   <li className="flex items-start gap-2">
                     <CheckCircle2 className="h-4 w-4 text-green-600 mt-0.5 flex-shrink-0" />
                     <span>
                       <strong>Image-to-Image:</strong> Upload a product image and transform its
-                      style ({imageCost} credits)
+                      style ({nanoBananaCost}-{nanoBananaProCost} credits depending on model)
                     </span>
                   </li>
                   <li className="flex items-start gap-2">
@@ -189,6 +190,9 @@ export default function DocsPage() {
                   <li>Choose aspect ratio (1:1 for square, 16:9 for landscape, etc.)</li>
                   <li>Select image style (Studio Shot, Lifestyle, Minimalist, etc.)</li>
                   <li>
+                    Choose AI model: <strong>Nano Banana</strong> ({nanoBananaCost} credits) for standard quality, or <strong>Nano Banana Pro</strong> ({nanoBananaProCost} credits) for premium quality with enhanced detail and realism
+                  </li>
+                  <li>
                     Choose output format: <strong>PNG</strong> (lossless) or <strong>JPEG</strong>{' '}
                     (smaller file)
                   </li>
@@ -199,7 +203,7 @@ export default function DocsPage() {
                   <li>Download the result or share directly</li>
                 </ol>
                 <p className="text-xs text-gray-600 dark:text-slate-400 mt-2">
-                  ⚡ Cost: {imageCost} credits per image | Model: Nano Banana
+                  ⚡ Cost: {nanoBananaCost}-{nanoBananaProCost} credits per image depending on model (Nano Banana {nanoBananaCost} credits, Nano Banana Pro {nanoBananaProCost} credits)
                 </p>
               </div>
 
@@ -227,6 +231,9 @@ export default function DocsPage() {
                   <li>
                     Enter transformation prompt (e.g., "Transform to watercolor style with pastel
                     colors")
+                  </li>
+                  <li>
+                    Choose AI model: <strong>Nano Banana</strong> ({nanoBananaCost} credits) for standard quality, or <strong>Nano Banana Pro</strong> ({nanoBananaProCost} credits) for premium quality
                   </li>
                   <li>Select aspect ratio and output format</li>
                   <li>
@@ -561,7 +568,7 @@ export default function DocsPage() {
                 <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-3 border border-blue-200 dark:border-blue-800">
                   <h4 className="font-semibold text-blue-900 dark:text-blue-200 text-sm mb-2">Image Generation</h4>
                   <p className="text-xs text-blue-800 dark:text-blue-200">
-                    {imageCost} credits per image (Nano Banana model)
+                    {nanoBananaCost}-{nanoBananaProCost} credits per image (Nano Banana {nanoBananaCost} credits, Nano Banana Pro {nanoBananaProCost} credits, Flux models 5-10 credits)
                   </p>
                 </div>
                 <div className="bg-teal-50 dark:bg-teal-900/20 rounded-lg p-3 border border-teal-200 dark:border-teal-800">

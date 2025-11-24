@@ -4,7 +4,8 @@ import { paymentConfig } from '@/config/payment.config';
 
 export default function TermsPage() {
   // Get configuration values
-  const imageCost = creditsConfig.consumption.imageGeneration['nano-banana'];
+  const nanoBananaCost = creditsConfig.consumption.imageGeneration['nano-banana'];
+  const nanoBananaProCost = creditsConfig.consumption.imageGeneration['nano-banana-pro'];
   const videoCostMin = creditsConfig.consumption.videoGeneration['sora-2-720p-10s'];
   const videoCostMax = creditsConfig.consumption.videoGeneration['sora-2-pro-1080p-15s'];
   const freePlan = paymentConfig.plans.find((p) => p.id === 'free');
@@ -96,7 +97,11 @@ export default function TermsPage() {
               or videos:
             </p>
             <ul className="list-disc list-inside space-y-1 ml-4">
-              <li>Image generation: {imageCost} credits per image</li>
+              <li>
+                Image generation: 5-30 credits per image depending on the model (e.g., Nano Banana{' '}
+                {nanoBananaCost} credits, Nano Banana Pro {nanoBananaProCost} credits, Flux models
+                5-10 credits)
+              </li>
               <li>
                 Video generation: {videoCostMin}-{videoCostMax} credits per video (depending on
                 model, resolution, and duration)
