@@ -22,7 +22,7 @@
   },
   "nav": {
     "home": "Home",
-    "generationTools": "Generation Tools",
+    "generationTools": "Tools",
     "imageGeneration": "AI Image",
     "imageGenerationDesc": "Text-to-Image and Image-to-Image",
     "videoGeneration": "AI Video",

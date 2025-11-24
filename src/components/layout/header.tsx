@@ -91,6 +91,12 @@ export function Header() {
           description: t('batchVideoGenerationDesc'),
           icon: FileSpreadsheet,
         },
+        {
+          title: t('brandAnalysis'),
+          href: '/brand-analysis',
+          description: t('brandAnalysisDesc'),
+          icon: Sparkles,
+        },
       ],
     },
     {
@@ -175,16 +181,6 @@ export function Header() {
             }`}
           >
             {t('assets')}
-          </Link>
-          <Link
-            href="/brand-analysis"
-            className={`text-sm font-medium transition-colors hover:text-teal-500 dark:hover:text-white ${
-              pathname?.includes('/brand-analysis')
-                ? 'text-teal-500'
-                : 'text-slate-600 dark:text-slate-300'
-            }`}
-          >
-            {t('brandAnalysis')}
           </Link>
           <Link
             href="/pricing"
@@ -320,14 +316,6 @@ export function Header() {
               onClick={() => setIsMobileMenuOpen(false)}
             >
               {t('assets')}
-            </Link>
-            <Link
-              href="/brand-analysis"
-              className="flex items-center space-x-2 px-3 py-2 rounded-md hover:bg-accent"
-              onClick={() => setIsMobileMenuOpen(false)}
-            >
-              <Sparkles className="h-4 w-4" />
-              <span>{t('brandAnalysis')}</span>
             </Link>
           </div>
         </div>

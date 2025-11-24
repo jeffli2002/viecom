@@ -22,7 +22,7 @@
   },
   "nav": {
     "home": "首页",
-    "generationTools": "生成工具",
+    "generationTools": "工具",
     "imageGeneration": "AI图片",
     "imageGenerationDesc": "文生图和图生图",
     "videoGeneration": "AI视频",
