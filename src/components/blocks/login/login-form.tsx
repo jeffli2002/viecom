@@ -184,7 +184,7 @@ export function LoginForm({
                 </div>
                 <Button
                   type="submit"
-                  className="w-full"
+                  className="w-full btn-primary"
                   disabled={isLoading || !formData.email || !formData.password}
                   data-testid="login-button"
                 >

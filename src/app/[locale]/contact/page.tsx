@@ -191,7 +191,7 @@ export default function ContactPage() {
       </Card>
 
       {/* CTA */}
-      <div className="mt-12 bg-gradient-to-r from-purple-50 to-pink-50 rounded-lg p-8 text-center">
+      <div className="mt-12 bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 rounded-lg p-8 text-center">
         <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Ready to Get Started?</h3>
         <p className="text-gray-700 dark:text-slate-300 mb-6">
           Create your free account and start generating stunning product visuals today

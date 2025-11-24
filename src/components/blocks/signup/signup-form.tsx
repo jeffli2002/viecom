@@ -210,7 +210,7 @@ export function SignupForm({ className, ...props }: React.ComponentProps<'div'>)
                 </div>
                 <Button
                   type="submit"
-                  className="w-full"
+                  className="w-full btn-primary"
                   disabled={isLoading || !email || !password || !name || !confirmPassword}
                   data-testid="signup-button"
                 >
