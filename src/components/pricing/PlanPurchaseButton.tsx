@@ -206,7 +206,7 @@ export function PlanPurchaseButton({
   };
 
   const highlightedClass = highlighted
-    ? 'bg-purple-600 hover:bg-purple-700 text-white'
+    ? 'bg-teal-500 hover:bg-teal-600 text-white'
     : 'bg-gray-800 hover:bg-gray-900 text-white';
 
   return (

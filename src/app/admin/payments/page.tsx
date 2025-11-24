@@ -103,7 +103,7 @@ export default function AdminPaymentsPage() {
     <div className="p-6 space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold text-gray-900">Payments Management</h1>
+        <h1 className="text-3xl font-bold text-slate-900 dark:text-white">Payments Management</h1>
         <Select value={range} onValueChange={setRange}>
           <SelectTrigger className="w-[180px]">
             <SelectValue />
@@ -151,8 +151,8 @@ export default function AdminPaymentsPage() {
         <Card>
           <CardContent className="pt-6">
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-purple-100 rounded-lg">
-                <DollarSign className="h-5 w-5 text-purple-600" />
+              <div className="p-2 bg-teal-100 dark:bg-teal-900/30 rounded-lg">
+                <DollarSign className="h-5 w-5 text-teal-500" />
               </div>
               <div>
                 <p className="text-sm text-gray-500">Transactions</p>
@@ -231,7 +231,7 @@ export default function AdminPaymentsPage() {
               </thead>
               <tbody>
                 {data.recentPayments.map((payment) => (
-                  <tr key={payment.id} className="border-b hover:bg-gray-50">
+                  <tr key={payment.id} className="border-b hover:bg-slate-50 dark:bg-slate-900">
                     <td className="py-3 px-4 text-sm">
                       {new Date(payment.createdAt).toLocaleString()}
                     </td>

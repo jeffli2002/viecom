@@ -83,7 +83,7 @@ export default function AdminUsersPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Users Management</h1>
+          <h1 className="text-3xl font-bold text-slate-900 dark:text-white">Users Management</h1>
           <p className="text-gray-500 mt-1">Total: {total} users</p>
         </div>
         <div className="flex items-center gap-3">
@@ -143,7 +143,7 @@ export default function AdminUsersPage() {
                 </thead>
                 <tbody>
                   {users.map((user) => (
-                    <tr key={user.id} className="border-b hover:bg-gray-50">
+                    <tr key={user.id} className="border-b hover:bg-slate-50 dark:bg-slate-900">
                       <td className="py-3 px-4 text-sm">{user.email}</td>
                       <td className="py-3 px-4 text-sm">{user.name || '-'}</td>
                       <td className="py-3 px-4 text-sm">
@@ -153,10 +153,10 @@ export default function AdminUsersPage() {
                         <span
                           className={`px-2 py-1 rounded text-xs font-medium ${
                             user.plan === 'proplus'
-                              ? 'bg-purple-100 text-purple-700'
+                              ? 'bg-teal-100 dark:bg-teal-900/30 text-slate-700 dark:text-slate-300'
                               : user.plan === 'pro'
                                 ? 'bg-blue-100 text-blue-700'
-                                : 'bg-gray-100 text-gray-700'
+                                : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300'
                           }`}
                         >
                           {user.plan || 'Free'}
@@ -167,7 +167,7 @@ export default function AdminUsersPage() {
                           className={`px-2 py-1 rounded text-xs font-medium ${
                             user.subscriptionStatus === 'active'
                               ? 'bg-green-100 text-green-700'
-                              : 'bg-gray-100 text-gray-700'
+                              : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300'
                           }`}
                         >
                           {user.subscriptionStatus || 'inactive'}

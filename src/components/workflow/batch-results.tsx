@@ -240,7 +240,7 @@ export function BatchResults({ jobId, assets: initialAssets }: BatchResultsProps
         <div className="flex items-center justify-between">
           <div>
             <h2 className="text-2xl font-bold mb-2">{t('title')}</h2>
-            <p className="text-gray-600">
+            <p className="text-slate-600 dark:text-slate-400">
               {t('success')}: {completedAssets.length} / {t('failed')}: {failedAssets.length} /{' '}
               {t('total')}: {assets.length}
               {jobStatus === 'processing' && (
@@ -263,9 +263,9 @@ export function BatchResults({ jobId, assets: initialAssets }: BatchResultsProps
         </div>
 
         {/* Download Updated Template */}
-        <div className="border rounded-lg p-4 bg-gray-50">
+        <div className="border rounded-lg p-4 bg-slate-50 dark:bg-slate-900">
           <Label className="text-sm font-medium mb-2 block">{t('downloadUpdatedTemplate')}</Label>
-          <p className="text-xs text-gray-600 mb-3">{t('downloadUpdatedTemplateDesc')}</p>
+          <p className="text-xs text-slate-600 dark:text-slate-400 mb-3">{t('downloadUpdatedTemplateDesc')}</p>
           <div className="flex gap-2">
             <Button
               variant="outline"
@@ -331,7 +331,7 @@ export function BatchResults({ jobId, assets: initialAssets }: BatchResultsProps
 
                 {/* Preview */}
                 {asset.status === 'completed' ? (
-                  <div className="relative aspect-square rounded-lg overflow-hidden bg-gray-100 card-image-container">
+                  <div className="relative aspect-square rounded-lg overflow-hidden bg-slate-100 dark:bg-slate-800 card-image-container">
                     {asset.type === 'image' ? (
                       <Image
                         src={getAssetPreviewUrl(asset)}
@@ -351,18 +351,18 @@ export function BatchResults({ jobId, assets: initialAssets }: BatchResultsProps
                     )}
                   </div>
                 ) : (
-                  <div className="aspect-square rounded-lg bg-gray-100 flex items-center justify-center">
+                  <div className="aspect-square rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center">
                     <XCircle className="w-8 h-8 text-red-500" />
                   </div>
                 )}
 
                 {/* Prompt Info */}
                 <div className="space-y-1">
-                  <div className="text-xs text-gray-500">{t('originalPrompt')}</div>
+                  <div className="text-xs text-slate-500 dark:text-slate-400">{t('originalPrompt')}</div>
                   <div className="text-sm line-clamp-2">{asset.prompt}</div>
                   {asset.enhancedPrompt && asset.enhancedPrompt !== asset.prompt && (
                     <>
-                      <div className="text-xs text-gray-500 mt-2">{t('enhancedPrompt')}</div>
+                      <div className="text-xs text-slate-500 dark:text-slate-400 mt-2">{t('enhancedPrompt')}</div>
                       <div className="text-sm line-clamp-2 text-primary">
                         {asset.enhancedPrompt}
                       </div>
@@ -372,7 +372,7 @@ export function BatchResults({ jobId, assets: initialAssets }: BatchResultsProps
 
                 {/* Model Info */}
                 {asset.model && (
-                  <div className="text-xs text-gray-500">
+                  <div className="text-xs text-slate-500 dark:text-slate-400">
                     {t('model')}: {asset.model}
                   </div>
                 )}

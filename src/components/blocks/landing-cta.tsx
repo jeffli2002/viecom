@@ -17,7 +17,7 @@ export function LandingCTA() {
   }, []);
 
   return (
-    <section className="py-32 px-6 bg-gradient-to-br from-violet-600 via-fuchsia-600 to-purple-600 relative overflow-hidden">
+    <section className="py-32 px-6 bg-gradient-to-br from-violet-600 via-fuchsia-600 to-blue-600 relative overflow-hidden">
       <div className="absolute inset-0">
         <div className="absolute top-0 left-1/4 w-96 h-96 bg-white rounded-full mix-blend-soft-light filter blur-3xl opacity-10 animate-blob" />
         <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-white rounded-full mix-blend-soft-light filter blur-3xl opacity-10 animate-blob animation-delay-2000" />

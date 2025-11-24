@@ -54,13 +54,17 @@
     "brandAnalysisDesc": "AI驱动的品牌调性和风格分析"
   },
   "hero": {
+    "badge": "全新：Nano Banana Pro 图片生成引擎",
+    "titleLine1": "创建爆款电商内容",
+    "titleLine2": "只需几秒钟",
+    "subtitle": "使用先进的 AI 模型，将静态产品照片转化为高转化率的视频和生活方式图像。专为 Amazon、TikTok 和 Shopify 量身定制。",
+    "ctaStart": "免费开始生成",
+    "watchDemo": "观看演示",
+    "trustedBy": "全球电商平台卖家信任",
     "title": "AI助力你的电商品牌和销售",
     "description": "专为电商产品打造的AI图片与AI视频生成平台。",
     "descriptionSub": "支持批量生图、生视频，让每个SKU都能拥有统一又高质的视觉呈现。",
-    "trustedBy": "全球50,000+品牌信赖",
-    "ctaStart": "免费开始创作",
     "ctaLogin": "登录",
-    "watchDemo": "观看演示",
     "noCreditCard": "无需信用卡",
     "freeCredits": "40免费积分",
     "cancelAnytime": "随时取消",
@@ -607,5 +611,142 @@
     "updatingPassword": "正在更新密码...",
     "rememberText": "想起密码了？",
     "backToLogin": "返回登录"
+  },
+  "faq": {
+    "title": "常见",
+    "titleHighlight": "问题",
+    "subtitle": "关于 Viecom AI 您需要了解的一切",
+    "q1": {
+      "question": "积分系统如何运作？",
+      "answer": "积分用于AI生成。图片生成消耗5-8积分，视频生成根据模型和分辨率消耗15-130积分。免费用户注册赠送30积分。Pro套餐包含500-900月度积分。您也可以购买积分包，最低9.90美元可得300积分。"
+    },
+    "q2": {
+      "question": "免费套餐包含什么？",
+      "answer": "免费用户注册获得30积分，每日签到奖励（2积分/天），推荐奖励（10积分），社交分享奖励（5积分）。您可以使用这些积分生成图片和视频，支持批量生成（1并发）和7天资产展示。"
+    },
+    "q3": {
+      "question": "支持哪些视频模型和分辨率？",
+      "answer": "我们提供Sora 2（仅720p，15-20积分）和Sora 2 Pro（720p/1080p，45-130积分），支持10秒或15秒视频。Sora 2 Pro提供更高质量和更快的生成速度。所有套餐都可使用积分访问这两种模型。"
+    },
+    "q4": {
+      "question": "生成的内容可以商用吗？",
+      "answer": "可以！Pro和Pro+订阅用户对所有生成的图片和视频拥有完整的商业许可。您可以将它们用于广告、社交媒体、电商列表以及任何商业目的，无需署名。"
+    },
+    "q5": {
+      "question": "批量生成如何工作？",
+      "answer": "上传多张图片或提示词以批量生成内容。免费用户可处理1个并发任务，Pro用户获得3个并发任务，Pro+用户获得10个。我们的智能队列优先处理720p任务，为混合批次提供更快反馈。"
+    },
+    "q6": {
+      "question": "什么是品牌分析，它有什么帮助？",
+      "answer": "我们的AI分析您的网站或上传的资产，提取品牌的色彩方案、调性和风格。这确保所有生成的内容在图片和视频中保持100%品牌一致性，为您节省数小时的手动编辑时间。"
+    },
+    "q7": {
+      "question": "可以随时升级、降级或取消吗？",
+      "answer": "可以！您可以立即升级（按比例计费），在下个计费周期降级，或随时取消。降级在续费时生效以保留您当前周期的权益。积分在同一套餐层级内可结转。"
+    }
+  },
+  "brandAnalysis": {
+    "badge": "品牌守护",
+    "titleLine1": "每个像素诉说",
+    "titleLine2": "品牌故事",
+    "description": "不要让 AI 虚构您的品牌形象。我们的引擎分析您的网站，提取 logo、字体和色彩方案，确保每个生成的资产都自动遵循您的品牌指南。",
+    "feature1": "从 URL 自动提取品牌资产",
+    "feature2": "调性一致性检查",
+    "feature3": "自动将品牌元素带入产品图片和视频创作",
+    "verified": "已验证",
+    "colorPalette": "色彩方案",
+    "typography": "字体",
+    "brandVoiceDetected": "检测到品牌调性",
+    "brandVoiceExample": "\"专业、现代、值得信赖，专注于可持续发展。\""
+  },
+  "transformationShowcase": {
+    "badge": "Nano Banana Pro 能力展示",
+    "title": "将产品可视化到",
+    "titleHighlight": "任何场景",
+    "description": "我们的AI理解产品的几何结构，并将其完美融入模特或场景中。",
+    "inputAssets": "输入图片",
+    "supportedFormats": "支持格式：JPG、PNG、WEBP",
+    "highResReady": "支持高分辨率",
+    "aiProcessing": "AI处理中",
+    "modelName": "Nano Banana Pro",
+    "generatedResult": "生成结果",
+    "scenarios": {
+      "virtualTryOn": {
+        "title": "虚拟试衣",
+        "description": "无需拍摄，即可让任何模特穿上您的服装。",
+        "input1Label": "服装",
+        "input2Label": "模特"
+      },
+      "modelSwap": {
+        "title": "模特替换",
+        "description": "在保留服装细节的同时，将服装从一个模特转移到另一个模特。",
+        "input1Label": "原始服装",
+        "input2Label": "目标模特"
+      },
+      "furnitureStaging": {
+        "title": "家具布景",
+        "description": "即时可视化不同室内风格下的家具效果。",
+        "input1Label": "产品",
+        "input2Label": "房间场景"
+      },
+      "sceneGeneration": {
+        "title": "场景生成",
+        "description": "为任何产品生成超逼真的环境。",
+        "input1Label": "产品拍摄",
+        "input2Label": "场景参考"
+      },
+      "holidayCampaign": {
+        "title": "节日营销",
+        "description": "几秒钟内调整产品图像以适应季节性营销活动。",
+        "input1Label": "产品",
+        "input2Label": "节日主题"
+      }
+    }
+  },
+  "batchGenerationFeature": {
+    "badge": "批量处理",
+    "title": "规模化内容",
+    "titleHighlight": "指数级增长",
+    "description": "需要在5个平台上发起营销活动？一键生成数百个变体用于A/B测试或多渠道分发。",
+    "feature1Title": "多格式导出",
+    "feature1Desc": "自动调整大小并重新组合，适用于Stories、帖子、横幅和广告。",
+    "feature2Title": "CSV批量导入",
+    "feature2Desc": "上传整个产品目录电子表格，让AI完成剩余工作。"
+  },
+  "videoGenerationShowcase": {
+    "title": "从静态到",
+    "titleHighlight": "电影级",
+    "description": "从单张产品图像生成高保真视频资产。通过简单的文本提示控制相机运动、光照和物理效果。",
+    "source": "来源",
+    "ready": "就绪",
+    "prompt": "提示词",
+    "processing": "处理中...",
+    "generateVideo": "生成视频",
+    "recording": "录制中",
+    "queue": "队列",
+    "items": "项",
+    "views": "次观看",
+    "addMediaToQueue": "添加媒体到队列",
+    "videoThumbnail": "视频缩略图",
+    "input": "输入",
+    "thumbnail": "缩略图",
+    "unmute": "取消静音",
+    "mute": "静音",
+    "disableAutoLoop": "禁用自动循环",
+    "enableAutoLoop": "启用自动循环",
+    "autoLoop": "自动循环",
+    "stageInitializing": "正在初始化 Veo 连接...",
+    "stageAnalyzing": "正在分析提示词和几何结构...",
+    "stageGenerating": "正在生成关键帧...",
+    "stageInterpolating": "正在插值运动...",
+    "stageFinalizing": "正在完成 4K 输出...",
+    "engineInitialized": "Veo_Engine_v3.1 已初始化",
+    "geometryInference": "几何推理：正常",
+    "physicsSimulation": "物理模拟：激活中"
+  },
+  "showcaseGallery": {
+    "title": "社区",
+    "titleHighlight": "作品展示",
+    "description": "看看其他人用Viecom AI创作了什么"
   }
 }

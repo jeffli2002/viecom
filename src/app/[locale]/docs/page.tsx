@@ -60,24 +60,24 @@ export default function DocsPage() {
       </div>
 
       {/* Quick Start Guide */}
-      <Card className="mb-8 border-purple-200">
-        <CardHeader className="bg-purple-50">
+      <Card className="mb-8 border-teal-200 dark:border-teal-800">
+        <CardHeader className="bg-teal-50 dark:bg-teal-900/20">
           <CardTitle className="flex items-center gap-2 text-2xl">
-            <Zap className="h-6 w-6 text-purple-600" />
+            <Zap className="h-6 w-6 text-teal-500" />
             How to Get Started in 3 Easy Steps
           </CardTitle>
         </CardHeader>
         <CardContent className="pt-6">
           <div className="space-y-6">
             <div className="flex gap-4">
-              <div className="flex-shrink-0 w-8 h-8 rounded-full bg-purple-600 text-white flex items-center justify-center font-bold">
+              <div className="flex-shrink-0 w-8 h-8 rounded-full bg-teal-500 text-white flex items-center justify-center font-bold">
                 1
               </div>
               <div className="flex-1">
                 <h3 className="font-semibold text-gray-900 mb-2">Sign Up and Get Free Credits</h3>
                 <p className="text-gray-700 text-sm mb-2">
                   Create your free account at{' '}
-                  <Link href="/signup" className="text-purple-600 hover:underline">
+                  <Link href="/signup" className="text-teal-500 hover:underline">
                     viecom.pro/signup
                   </Link>{' '}
                   and receive {freePlan?.credits.onSignup || 30} free credits immediately. No credit
@@ -91,7 +91,7 @@ export default function DocsPage() {
             </div>
 
             <div className="flex gap-4">
-              <div className="flex-shrink-0 w-8 h-8 rounded-full bg-purple-600 text-white flex items-center justify-center font-bold">
+              <div className="flex-shrink-0 w-8 h-8 rounded-full bg-teal-500 text-white flex items-center justify-center font-bold">
                 2
               </div>
               <div className="flex-1">
@@ -130,7 +130,7 @@ export default function DocsPage() {
             </div>
 
             <div className="flex gap-4">
-              <div className="flex-shrink-0 w-8 h-8 rounded-full bg-purple-600 text-white flex items-center justify-center font-bold">
+              <div className="flex-shrink-0 w-8 h-8 rounded-full bg-teal-500 text-white flex items-center justify-center font-bold">
                 3
               </div>
               <div className="flex-1">
@@ -152,10 +152,10 @@ export default function DocsPage() {
       {/* How-to Sections */}
       <div className="space-y-8">
         {/* Image Generation */}
-        <Card className="border-purple-200">
+        <Card className="border-teal-200 dark:border-teal-800">
           <CardHeader className="bg-gradient-to-r from-blue-50 to-purple-50">
             <CardTitle className="flex items-center gap-2 text-xl">
-              <ImageIcon className="h-6 w-6 text-purple-600" />
+              <ImageIcon className="h-6 w-6 text-teal-500" />
               How to Generate AI Images for Products
             </CardTitle>
           </CardHeader>
@@ -164,13 +164,13 @@ export default function DocsPage() {
               {/* Text-to-Image */}
               <div>
                 <h3 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
-                  <ArrowRight className="h-4 w-4 text-purple-600" />
+                  <ArrowRight className="h-4 w-4 text-teal-500" />
                   How to Create Images from Text Descriptions
                 </h3>
                 <ol className="space-y-2 text-sm text-gray-700 ml-6 list-decimal">
                   <li>
                     Navigate to{' '}
-                    <Link href="/image-generation" className="text-purple-600 hover:underline">
+                    <Link href="/image-generation" className="text-teal-500 hover:underline">
                       Image Generation
                     </Link>{' '}
                     page
@@ -206,7 +206,7 @@ export default function DocsPage() {
               {/* Image-to-Image */}
               <div className="border-t border-gray-200 pt-6">
                 <h3 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
-                  <ArrowRight className="h-4 w-4 text-purple-600" />
+                  <ArrowRight className="h-4 w-4 text-teal-500" />
                   How to Transform Existing Product Images
                 </h3>
                 <ol className="space-y-2 text-sm text-gray-700 ml-6 list-decimal">
@@ -214,7 +214,7 @@ export default function DocsPage() {
                     Navigate to{' '}
                     <Link
                       href="/image-generation?mode=image-to-image"
-                      className="text-purple-600 hover:underline"
+                      className="text-teal-500 hover:underline"
                     >
                       Image Generation
                     </Link>{' '}
@@ -267,10 +267,10 @@ export default function DocsPage() {
         </Card>
 
         {/* Video Generation */}
-        <Card className="border-purple-200">
+        <Card className="border-teal-200 dark:border-teal-800">
           <CardHeader className="bg-gradient-to-r from-purple-50 to-pink-50">
             <CardTitle className="flex items-center gap-2 text-xl">
-              <Video className="h-6 w-6 text-purple-600" />
+              <Video className="h-6 w-6 text-teal-500" />
               How to Generate AI Videos for E-commerce
             </CardTitle>
           </CardHeader>
@@ -279,13 +279,13 @@ export default function DocsPage() {
               {/* Text-to-Video */}
               <div>
                 <h3 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
-                  <ArrowRight className="h-4 w-4 text-purple-600" />
+                  <ArrowRight className="h-4 w-4 text-teal-500" />
                   How to Create Videos from Text Prompts
                 </h3>
                 <ol className="space-y-2 text-sm text-gray-700 ml-6 list-decimal">
                   <li>
                     Go to{' '}
-                    <Link href="/video-generation" className="text-purple-600 hover:underline">
+                    <Link href="/video-generation" className="text-teal-500 hover:underline">
                       Video Generation
                     </Link>{' '}
                     page
@@ -326,7 +326,7 @@ export default function DocsPage() {
               {/* Image-to-Video */}
               <div className="border-t border-gray-200 pt-6">
                 <h3 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
-                  <ArrowRight className="h-4 w-4 text-purple-600" />
+                  <ArrowRight className="h-4 w-4 text-teal-500" />
                   How to Animate Product Images into Videos
                 </h3>
                 <div className="mb-3 bg-amber-50 rounded-lg p-3 border border-amber-200">
@@ -341,7 +341,7 @@ export default function DocsPage() {
                     Go to{' '}
                     <Link
                       href="/video-generation?mode=image-to-video"
-                      className="text-purple-600 hover:underline"
+                      className="text-teal-500 hover:underline"
                     >
                       Video Generation
                     </Link>{' '}
@@ -390,10 +390,10 @@ export default function DocsPage() {
         </Card>
 
         {/* Brand Analysis */}
-        <Card className="border-purple-200">
+        <Card className="border-teal-200 dark:border-teal-800">
           <CardHeader className="bg-gradient-to-r from-violet-50 to-purple-50">
             <CardTitle className="flex items-center gap-2 text-xl">
-              <Sparkles className="h-6 w-6 text-purple-600" />
+              <Sparkles className="h-6 w-6 text-teal-500" />
               How to Use Brand Analysis for Consistent Content
             </CardTitle>
           </CardHeader>
@@ -401,13 +401,13 @@ export default function DocsPage() {
             <div className="space-y-6">
               <div>
                 <h3 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
-                  <ArrowRight className="h-4 w-4 text-purple-600" />
+                  <ArrowRight className="h-4 w-4 text-teal-500" />
                   How to Analyze Your Brand Automatically
                 </h3>
                 <ol className="space-y-2 text-sm text-gray-700 ml-6 list-decimal">
                   <li>
                     Navigate to{' '}
-                    <Link href="/brand-analysis" className="text-purple-600 hover:underline">
+                    <Link href="/brand-analysis" className="text-teal-500 hover:underline">
                       Brand Analysis
                     </Link>{' '}
                     page
@@ -431,7 +431,7 @@ export default function DocsPage() {
                 </p>
               </div>
 
-              <div className="bg-purple-50 rounded-lg p-4 border border-purple-200">
+              <div className="bg-teal-50 dark:bg-teal-900/20 rounded-lg p-4 border border-teal-200 dark:border-teal-800">
                 <h4 className="font-semibold text-purple-900 mb-2 text-sm">
                   Benefits of Brand Analysis:
                 </h4>
@@ -447,10 +447,10 @@ export default function DocsPage() {
         </Card>
 
         {/* Batch Generation */}
-        <Card className="border-purple-200">
+        <Card className="border-teal-200 dark:border-teal-800">
           <CardHeader className="bg-gradient-to-r from-green-50 to-purple-50">
             <CardTitle className="flex items-center gap-2 text-xl">
-              <FileSpreadsheet className="h-6 w-6 text-purple-600" />
+              <FileSpreadsheet className="h-6 w-6 text-teal-500" />
               How to Use Batch Generation for Scale
             </CardTitle>
           </CardHeader>
@@ -458,7 +458,7 @@ export default function DocsPage() {
             <div className="space-y-6">
               <div>
                 <h3 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
-                  <ArrowRight className="h-4 w-4 text-purple-600" />
+                  <ArrowRight className="h-4 w-4 text-teal-500" />
                   How to Generate Multiple Images at Once
                 </h3>
                 <ol className="space-y-2 text-sm text-gray-700 ml-6 list-decimal">
@@ -466,7 +466,7 @@ export default function DocsPage() {
                     Go to{' '}
                     <Link
                       href="/batch-image-generation"
-                      className="text-purple-600 hover:underline"
+                      className="text-teal-500 hover:underline"
                     >
                       Batch Image Generation
                     </Link>{' '}
@@ -494,7 +494,7 @@ export default function DocsPage() {
 
               <div className="border-t border-gray-200 pt-6">
                 <h3 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
-                  <ArrowRight className="h-4 w-4 text-purple-600" />
+                  <ArrowRight className="h-4 w-4 text-teal-500" />
                   How to Generate Multiple Videos at Once
                 </h3>
                 <ol className="space-y-2 text-sm text-gray-700 ml-6 list-decimal">
@@ -502,7 +502,7 @@ export default function DocsPage() {
                     Visit{' '}
                     <Link
                       href="/batch-video-generation"
-                      className="text-purple-600 hover:underline"
+                      className="text-teal-500 hover:underline"
                     >
                       Batch Video Generation
                     </Link>{' '}
@@ -542,10 +542,10 @@ export default function DocsPage() {
       </div>
 
       {/* Credits & Pricing Section */}
-      <Card className="mt-8 border-purple-200">
-        <CardHeader className="bg-purple-50">
+      <Card className="mt-8 border-teal-200 dark:border-teal-800">
+        <CardHeader className="bg-teal-50 dark:bg-teal-900/20">
           <CardTitle className="flex items-center gap-2 text-xl">
-            <Wand2 className="h-6 w-6 text-purple-600" />
+            <Wand2 className="h-6 w-6 text-teal-500" />
             How to Manage Credits and Choose Plans
           </CardTitle>
         </CardHeader>
@@ -564,7 +564,7 @@ export default function DocsPage() {
                     {imageCost} credits per image (Nano Banana model)
                   </p>
                 </div>
-                <div className="bg-purple-50 rounded-lg p-3 border border-purple-200">
+                <div className="bg-teal-50 dark:bg-teal-900/20 rounded-lg p-3 border border-teal-200 dark:border-teal-800">
                   <h4 className="font-semibold text-purple-900 text-sm mb-2">Video Generation</h4>
                   <p className="text-xs text-purple-800">
                     {videoCostMin}-{videoCostMax} credits per video (varies by model, quality,
@@ -587,7 +587,7 @@ export default function DocsPage() {
                     +{referralReward} credits per referral
                   </div>
                 </div>
-                <div className="bg-purple-50 rounded-lg p-3 border border-purple-200">
+                <div className="bg-teal-50 dark:bg-teal-900/20 rounded-lg p-3 border border-teal-200 dark:border-teal-800">
                   <div className="font-semibold text-purple-900 text-sm mb-1">Social Sharing</div>
                   <div className="text-xs text-purple-800">
                     +{creditsConfig.rewards.socialShare.creditsPerShare} credits per share
@@ -609,7 +609,7 @@ export default function DocsPage() {
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
-                  <div className="bg-purple-600 text-white rounded px-2 py-1 text-xs font-bold">
+                  <div className="bg-teal-500 text-white rounded px-2 py-1 text-xs font-bold">
                     PRO
                   </div>
                   <div className="flex-1 text-sm text-gray-700">
@@ -618,7 +618,7 @@ export default function DocsPage() {
                     30 days asset display
                   </div>
                 </div>
-                <p className="text-xs text-purple-600 mt-2">
+                <p className="text-xs text-teal-500 mt-2">
                   <Link href="/pricing" className="hover:underline">
                     View full pricing comparison →
                   </Link>
@@ -677,7 +677,7 @@ export default function DocsPage() {
               </h3>
               <p className="text-sm text-gray-700">
                 All generated content is saved in your{' '}
-                <Link href="/assets" className="text-purple-600 hover:underline">
+                <Link href="/assets" className="text-teal-500 hover:underline">
                   Assets Library
                 </Link>
                 . Free plan: assets display for 7 days. Pro/Pro+ plans: 30 days. You can download
@@ -722,7 +722,7 @@ export default function DocsPage() {
       </Card>
 
       {/* Help CTA */}
-      <div className="mt-12 bg-gradient-to-r from-purple-600 to-pink-600 rounded-lg p-8 text-center text-white">
+      <div className="mt-12 bg-gradient-to-r from-teal-500 to-pink-600 rounded-lg p-8 text-center text-white">
         <h3 className="text-2xl font-bold mb-4">Need More Help?</h3>
         <p className="text-purple-100 mb-6">
           Our support team is ready to assist you with any questions about AI image and video
@@ -731,7 +731,7 @@ export default function DocsPage() {
         <div className="flex gap-4 justify-center flex-wrap">
           <Link
             href="/contact"
-            className="inline-flex items-center justify-center px-6 py-3 bg-white text-purple-600 font-semibold rounded-lg hover:bg-gray-100 transition-colors shadow-lg"
+            className="inline-flex items-center justify-center px-6 py-3 bg-white text-teal-500 font-semibold rounded-lg hover:bg-gray-100 transition-colors shadow-lg"
           >
             Contact Support
           </Link>

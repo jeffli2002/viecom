@@ -144,7 +144,7 @@ export default function PrivacyPage() {
 
             <p className="mt-4">
               To exercise these rights, please contact us at{' '}
-              <a href="mailto:privacy@viecom.pro" className="text-purple-600 hover:underline">
+              <a href="mailto:privacy@viecom.pro" className="text-teal-500 hover:underline">
                 privacy@viecom.pro
               </a>
             </p>
@@ -238,13 +238,13 @@ export default function PrivacyPage() {
             <div className="mt-4 space-y-1">
               <p>
                 <strong>Email:</strong>{' '}
-                <a href="mailto:privacy@viecom.pro" className="text-purple-600 hover:underline">
+                <a href="mailto:privacy@viecom.pro" className="text-teal-500 hover:underline">
                   privacy@viecom.pro
                 </a>
               </p>
               <p>
                 <strong>Website:</strong>{' '}
-                <a href="https://viecom.pro" className="text-purple-600 hover:underline">
+                <a href="https://viecom.pro" className="text-teal-500 hover:underline">
                   https://viecom.pro
                 </a>
               </p>

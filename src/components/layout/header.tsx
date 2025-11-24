@@ -32,15 +32,31 @@ import {
   User,
   Video,
   X,
+  Sun,
+  Moon,
 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 export function Header() {
   const t = useTranslations('nav');
   const pathname = usePathname();
   const { user, isAuthenticated, signOut } = useAuthStore();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [darkMode, setDarkMode] = useState(false);
+
+  useEffect(() => {
+    const isDark = document.documentElement.classList.contains('dark');
+    setDarkMode(isDark);
+  }, []);
+
+  useEffect(() => {
+    if (darkMode) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  }, [darkMode]);
 
   const handleSignOut = async () => {
     await signOut();
@@ -80,12 +96,12 @@ export function Header() {
   ];
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-gray-200/50 bg-white/80 backdrop-blur-apple supports-[backdrop-filter]:bg-white/60 dark:border-gray-800/50 dark:bg-gray-900/80 dark:supports-[backdrop-filter]:bg-gray-900/60">
+    <header className="sticky top-0 z-50 w-full border-b border-slate-200/50 bg-white/80 backdrop-blur-xl supports-[backdrop-filter]:bg-white/60 dark:border-white/10 dark:bg-slate-900/80 dark:supports-[backdrop-filter]:bg-slate-900/60">
       <div className="container flex h-16 items-center justify-between">
         {/* Logo */}
         <Link href="/" className="flex items-center">
           <img
-            src="/brandlogo5transb.png"
+            src="/ViecomLogoV6.png"
             alt="Viecom Logo"
             style={{ height: '56px', width: '210px', objectFit: 'contain' }}
           />
@@ -97,7 +113,7 @@ export function Header() {
             <NavigationMenuList>
               {navItems.map((item) => (
                 <NavigationMenuItem key={item.title}>
-                  <NavigationMenuTrigger>{item.title}</NavigationMenuTrigger>
+                  <NavigationMenuTrigger className="text-slate-600 dark:text-slate-300">{item.title}</NavigationMenuTrigger>
                   <NavigationMenuContent>
                     <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px]">
                       {item.items.map((subItem) => (
@@ -129,16 +145,16 @@ export function Header() {
 
           <Link
             href="/assets"
-            className={`text-sm font-medium transition-colors hover:text-primary ${
-              pathname?.includes('/assets') ? 'text-primary' : 'text-muted-foreground'
+            className={`text-sm font-medium transition-colors hover:text-teal-500 dark:hover:text-white ${
+              pathname?.includes('/assets') ? 'text-teal-500' : 'text-slate-600 dark:text-slate-300'
             }`}
           >
             {t('assets')}
           </Link>
           <Link
             href="/brand-analysis"
-            className={`text-sm font-medium transition-colors hover:text-primary ${
-              pathname?.includes('/brand-analysis') ? 'text-primary' : 'text-muted-foreground'
+            className={`text-sm font-medium transition-colors hover:text-teal-500 dark:hover:text-white ${
+              pathname?.includes('/brand-analysis') ? 'text-teal-500' : 'text-slate-600 dark:text-slate-300'
             }`}
           >
             {t('brandAnalysis')}
@@ -147,20 +163,43 @@ export function Header() {
 
         {/* User Menu / Auth Buttons */}
         <div className="flex items-center space-x-4">
+          <button 
+            onClick={() => setDarkMode(!darkMode)}
+            className="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400 transition-colors"
+          >
+            {darkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+          </button>
           {isAuthenticated && user ? (
             <>
               <CheckinDropdown />
               <LanguageSwitcher />
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="relative h-10 w-10 rounded-full p-0">
-                    <Avatar className="h-10 w-10 border-2 border-purple-500">
+                  <Button 
+                    variant="ghost" 
+                    className="relative h-10 w-10 rounded-full p-0 !bg-transparent hover:!bg-transparent dark:!bg-transparent dark:hover:!bg-transparent focus:!bg-transparent active:!bg-transparent"
+                    style={{ backgroundColor: 'transparent' }}
+                  >
+                    <Avatar 
+                      className="h-10 w-10 border-2 border-teal-500 z-10 relative !bg-transparent" 
+                      style={{ backgroundColor: 'transparent' }}
+                    >
                       <AvatarImage
                         src={user.image || ''}
                         alt={user.name || ''}
-                        className="rounded-full"
+                        className="rounded-full !bg-transparent"
+                        style={{ backgroundColor: 'transparent' }}
                       />
-                      <AvatarFallback className="bg-purple-600 text-white rounded-full">
+                      <AvatarFallback 
+                        className="text-white rounded-full header-avatar-fallback" 
+                        data-header-avatar="true"
+                        style={{ 
+                          backgroundColor: 'rgb(20, 184, 166)', 
+                          background: 'rgb(20, 184, 166)',
+                          backgroundImage: 'none',
+                          backgroundSize: 'auto'
+                        }}
+                      >
                         {user.name?.charAt(0).toUpperCase() || <User className="h-4 w-4" />}
                       </AvatarFallback>
                     </Avatar>
@@ -192,10 +231,10 @@ export function Header() {
             <>
               <LanguageSwitcher />
               <div className="flex items-center space-x-2">
-                <Button variant="ghost" size="sm" asChild>
+                <Button variant="ghost" size="sm" asChild className="text-slate-600 dark:text-slate-300">
                   <Link href="/login">{t('login')}</Link>
                 </Button>
-                <Button size="sm" asChild>
+                <Button size="sm" asChild className="bg-slate-900 dark:bg-white text-white dark:text-slate-900 hover:opacity-90">
                   <Link href="/signup">{t('signup')}</Link>
                 </Button>
               </div>

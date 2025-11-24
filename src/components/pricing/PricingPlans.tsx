@@ -61,14 +61,14 @@ export function PricingPlans({ plans, creditPacks }: PricingPlansProps) {
   return (
     <>
       <div className="flex justify-center mb-12">
-        <div className="inline-flex items-center gap-3 bg-gray-100 rounded-full p-1">
+        <div className="inline-flex items-center gap-3 bg-slate-100 dark:bg-slate-800 rounded-full p-1">
           <Button
             variant="ghost"
             size="sm"
             className={`rounded-full px-6 ${
               billingInterval === 'month'
-                ? 'bg-white shadow-sm text-purple-700 hover:bg-white hover:text-purple-700'
-                : 'text-gray-600 hover:text-gray-900 hover:bg-transparent'
+                ? 'bg-white dark:bg-slate-900 shadow-sm text-teal-500 hover:bg-white dark:hover:bg-slate-900 hover:text-teal-500'
+                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-transparent'
             }`}
             onClick={() => setBillingInterval('month')}
           >
@@ -79,8 +79,8 @@ export function PricingPlans({ plans, creditPacks }: PricingPlansProps) {
             size="sm"
             className={`rounded-full px-6 ${
               billingInterval === 'year'
-                ? 'bg-white shadow-sm text-purple-700 hover:bg-white hover:text-purple-700'
-                : 'text-gray-600 hover:text-gray-900 hover:bg-transparent'
+                ? 'bg-white dark:bg-slate-900 shadow-sm text-teal-500 hover:bg-white dark:hover:bg-slate-900 hover:text-teal-500'
+                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-transparent'
             }`}
             onClick={() => setBillingInterval('year')}
           >
@@ -123,13 +123,13 @@ export function PricingPlans({ plans, creditPacks }: PricingPlansProps) {
               key={plan.id}
               className={`relative ${
                 plan.highlighted
-                  ? 'border-purple-500 border-2 shadow-xl scale-105'
-                  : 'border-gray-200'
+                  ? 'border-teal-500 border-2 shadow-xl scale-105'
+                  : 'border-slate-200 dark:border-slate-700'
               }`}
             >
               {plan.popular && (
                 <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
-                  <Badge className="bg-purple-600 text-white px-4 py-1">Most Popular</Badge>
+                  <Badge className="bg-teal-500 text-white px-4 py-1">Most Popular</Badge>
                 </div>
               )}
 
@@ -137,24 +137,24 @@ export function PricingPlans({ plans, creditPacks }: PricingPlansProps) {
                 <CardTitle className="text-2xl mb-2">{plan.name}</CardTitle>
                 <div className="mb-2 flex items-center justify-center gap-3">
                   {displayPrice === 0 ? (
-                    <span className="text-4xl font-bold text-gray-900">$0</span>
+                    <span className="text-4xl font-bold text-slate-900 dark:text-white">$0</span>
                   ) : (
                     <>
                       <div className="flex flex-col items-center">
                         <div className="flex items-baseline gap-2">
-                          <span className="text-4xl font-bold text-gray-900">
+                          <span className="text-4xl font-bold text-slate-900 dark:text-white">
                             $
                             {billingInterval === 'year'
                               ? (displayPrice / 12).toFixed(2)
                               : displayPrice}
                           </span>
                           {billingInterval === 'year' && (
-                            <span className="text-xl text-gray-400 line-through">
+                            <span className="text-xl text-slate-400 dark:text-slate-500 line-through">
                               ${plan.price}
                             </span>
                           )}
                         </div>
-                        <span className="text-gray-600 text-sm">/mo</span>
+                        <span className="text-slate-600 dark:text-slate-400 text-sm">/mo</span>
                         {billingInterval === 'year' && (
                           <Badge className="mt-1 bg-green-500 text-white border-0 text-xs px-2">
                             Save {savings?.percentage}%
@@ -166,13 +166,13 @@ export function PricingPlans({ plans, creditPacks }: PricingPlansProps) {
                 </div>
 
                 {displayCredits > 0 && (
-                  <p className="text-sm text-purple-600 font-medium mt-2">
+                  <p className="text-sm text-teal-500 font-medium mt-2">
                     {displayCredits.toLocaleString()} credits
                     {billingInterval === 'year' ? '/year' : '/month'}
                   </p>
                 )}
 
-                <p className="text-sm text-gray-600 mt-2">{plan.description}</p>
+                <p className="text-sm text-body mt-2">{plan.description}</p>
               </CardHeader>
 
               <CardContent className="flex flex-col h-full">
@@ -194,8 +194,8 @@ export function PricingPlans({ plans, creditPacks }: PricingPlansProps) {
 
                     return (
                       <li key={`${plan.id}-${feature}-${idx}`} className="flex items-start gap-2">
-                        <Check className="h-5 w-5 text-green-600 flex-shrink-0 mt-0.5" />
-                        <span className="text-sm text-gray-700">{displayFeature}</span>
+                        <Check className="h-5 w-5 text-teal-500 flex-shrink-0 mt-0.5" />
+                        <span className="text-sm text-body">{displayFeature}</span>
                       </li>
                     );
                   })}
@@ -218,8 +218,8 @@ export function PricingPlans({ plans, creditPacks }: PricingPlansProps) {
 
       <div className="mb-12">
         <div className="text-center mb-8">
-          <h2 className="text-3xl font-bold text-gray-900 mb-2">One-Time Credit Packs</h2>
-          <p className="text-gray-600">
+          <h2 className="text-3xl font-bold text-slate-900 dark:text-white mb-2">One-Time Credit Packs</h2>
+          <p className="text-slate-600 dark:text-slate-400">
             Need extra credits? Purchase credit packs without a subscription
           </p>
         </div>
@@ -229,11 +229,11 @@ export function PricingPlans({ plans, creditPacks }: PricingPlansProps) {
             <Card
               key={pack.id}
               className={`relative ${
-                pack.popular ? 'border-2 border-purple-500 shadow-lg' : 'border border-gray-200'
+                pack.popular ? 'border-2 border-teal-500 shadow-lg' : 'border border-slate-200 dark:border-slate-700'
               } lg:flex-1`}
             >
               {pack.badge && (
-                <Badge className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-gradient-to-r from-purple-600 to-pink-600 text-white border-0">
+                <Badge className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-gradient-to-r from-teal-500 to-pink-600 text-white border-0">
                   {pack.badge}
                 </Badge>
               )}
@@ -246,9 +246,9 @@ export function PricingPlans({ plans, creditPacks }: PricingPlansProps) {
 
               <CardHeader className="text-center">
                 <div className="mb-2">
-                  <span className="text-4xl font-bold text-gray-900">${pack.price}</span>
+                  <span className="text-4xl font-bold text-slate-900 dark:text-white">${pack.price}</span>
                 </div>
-                <p className="text-sm text-gray-600">{pack.credits.toLocaleString()} credits</p>
+                <p className="text-sm text-slate-600 dark:text-slate-400">{pack.credits.toLocaleString()} credits</p>
               </CardHeader>
 
               <CardContent className="space-y-4">

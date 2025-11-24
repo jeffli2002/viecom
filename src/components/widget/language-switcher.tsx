@@ -25,13 +25,13 @@ export function LanguageSwitcher() {
 
   return (
     <Select value={locale} onValueChange={handleLanguageChange}>
-      <SelectTrigger className="w-[120px]">
+      <SelectTrigger className="language-switcher-trigger">
         <Globe className="mr-2 h-4 w-4" />
         <SelectValue />
       </SelectTrigger>
-      <SelectContent>
-        <SelectItem value="en">English</SelectItem>
-        <SelectItem value="zh">中文</SelectItem>
+      <SelectContent className="language-switcher-content">
+        <SelectItem value="en" className="language-switcher-item">English</SelectItem>
+        <SelectItem value="zh" className="language-switcher-item">中文</SelectItem>
       </SelectContent>
     </Select>
   );

@@ -18,7 +18,7 @@ export default function ContactPage() {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Mail className="h-5 w-5 text-purple-600" />
+              <Mail className="h-5 w-5 text-teal-500" />
               Email Support
             </CardTitle>
           </CardHeader>
@@ -27,7 +27,7 @@ export default function ContactPage() {
               <p className="text-sm text-gray-600 mb-1">General Inquiries</p>
               <a
                 href="mailto:support@viecom.pro"
-                className="text-purple-600 hover:underline font-medium"
+                className="text-teal-500 hover:underline font-medium"
               >
                 support@viecom.pro
               </a>
@@ -36,7 +36,7 @@ export default function ContactPage() {
               <p className="text-sm text-gray-600 mb-1">Sales & Enterprise</p>
               <a
                 href="mailto:sales@viecom.pro"
-                className="text-purple-600 hover:underline font-medium"
+                className="text-teal-500 hover:underline font-medium"
               >
                 sales@viecom.pro
               </a>
@@ -45,7 +45,7 @@ export default function ContactPage() {
               <p className="text-sm text-gray-600 mb-1">Technical Support</p>
               <a
                 href="mailto:tech@viecom.pro"
-                className="text-purple-600 hover:underline font-medium"
+                className="text-teal-500 hover:underline font-medium"
               >
                 tech@viecom.pro
               </a>
@@ -57,7 +57,7 @@ export default function ContactPage() {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Clock className="h-5 w-5 text-purple-600" />
+              <Clock className="h-5 w-5 text-teal-500" />
               Response Time
             </CardTitle>
           </CardHeader>
@@ -82,7 +82,7 @@ export default function ContactPage() {
       <Card className="mb-12">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <MessageSquare className="h-5 w-5 text-purple-600" />
+            <MessageSquare className="h-5 w-5 text-teal-500" />
             Frequently Asked Questions
           </CardTitle>
         </CardHeader>
@@ -153,7 +153,7 @@ export default function ContactPage() {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Globe className="h-5 w-5 text-purple-600" />
+            <Globe className="h-5 w-5 text-teal-500" />
             Connect With Us
           </CardTitle>
         </CardHeader>
@@ -166,7 +166,7 @@ export default function ContactPage() {
               href="https://twitter.com/viecom"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-purple-600 hover:text-purple-700 font-medium"
+              className="text-teal-500 hover:text-slate-700 dark:text-slate-300 font-medium"
             >
               Twitter
             </a>
@@ -174,7 +174,7 @@ export default function ContactPage() {
               href="https://linkedin.com/company/viecom"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-purple-600 hover:text-purple-700 font-medium"
+              className="text-teal-500 hover:text-slate-700 dark:text-slate-300 font-medium"
             >
               LinkedIn
             </a>
@@ -182,7 +182,7 @@ export default function ContactPage() {
               href="https://discord.gg/viecom"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-purple-600 hover:text-purple-700 font-medium"
+              className="text-teal-500 hover:text-slate-700 dark:text-slate-300 font-medium"
             >
               Discord Community
             </a>
@@ -198,7 +198,7 @@ export default function ContactPage() {
         </p>
         <a
           href="/signup"
-          className="inline-flex items-center justify-center px-6 py-3 bg-purple-600 text-white font-semibold rounded-lg hover:bg-purple-700 transition-colors"
+          className="inline-flex items-center justify-center px-6 py-3 bg-teal-500 text-white font-semibold rounded-lg hover:bg-teal-600 transition-colors"
         >
           Start Free Trial
         </a>

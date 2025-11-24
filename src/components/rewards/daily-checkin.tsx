@@ -181,20 +181,20 @@ export function DailyCheckin({ className }: DailyCheckinProps) {
   const last7Days = getLast7Days();
 
   return (
-    <Card className={`border-purple-200 bg-white p-6 ${className || ''}`}>
+    <Card className={`border-teal-200 dark:border-teal-800 bg-white p-6 ${className || ''}`}>
       {/* Header */}
       <div className="flex items-start justify-between mb-6">
         <div className="flex-1">
           <div className="flex items-center gap-2 mb-2">
-            <Calendar className="h-5 w-5 text-purple-600" />
-            <h3 className="text-xl font-bold text-gray-900">Daily Check-In</h3>
+            <Calendar className="h-5 w-5 text-teal-500" />
+            <h3 className="text-xl font-bold text-slate-900 dark:text-white">Daily Check-In</h3>
           </div>
-          <p className="text-sm text-gray-500">
+          <p className="text-sm text-slate-500 dark:text-slate-400">
             Check in daily to earn credits and build your streak
           </p>
         </div>
         {creditBalance && (
-          <Badge className="bg-gradient-to-r from-purple-500 to-pink-500 text-white border-0 px-4 py-2">
+          <Badge className="bg-gradient-to-r from-teal-500 to-blue-500 text-white border-0 px-4 py-2">
             <Sparkles className="h-4 w-4 mr-1" />
             {creditBalance.balance} Credits
           </Badge>
@@ -207,8 +207,8 @@ export function DailyCheckin({ className }: DailyCheckinProps) {
           <Flame className="h-12 w-12 text-orange-500" />
         </div>
         <div className="flex-1">
-          <p className="text-sm text-gray-600 mb-1">Current Streak</p>
-          <p className="text-3xl font-bold text-gray-900">{consecutiveDays} Days</p>
+          <p className="text-sm text-slate-600 dark:text-slate-400 mb-1">Current Streak</p>
+          <p className="text-3xl font-bold text-slate-900 dark:text-white">{consecutiveDays} Days</p>
         </div>
       </div>
 
@@ -216,15 +216,15 @@ export function DailyCheckin({ className }: DailyCheckinProps) {
       <div className="mb-6">
         <div className="flex items-center justify-between mb-2">
           <div className="flex items-center gap-2">
-            <Gift className="h-4 w-4 text-purple-600" />
-            <span className="text-sm font-medium text-gray-900">7-Day Bonus Progress</span>
+            <Gift className="h-4 w-4 text-teal-500" />
+            <span className="text-sm font-medium text-slate-900 dark:text-white">7-Day Bonus Progress</span>
           </div>
-          <span className="text-sm text-gray-500">
+          <span className="text-sm text-slate-500 dark:text-slate-400">
             {progressDays}/{consecutiveDaysRequired} days
           </span>
         </div>
         <Progress value={progressPercentage} className="h-2 mb-2" />
-        <p className="text-sm text-gray-500">
+        <p className="text-sm text-slate-500 dark:text-slate-400">
           {progressDays >= consecutiveDaysRequired
             ? '🎉 Bonus unlocked! Keep your streak going!'
             : `Start your streak to unlock +${weeklyBonusCredits} bonus credits!`}
@@ -233,21 +233,21 @@ export function DailyCheckin({ className }: DailyCheckinProps) {
 
       {/* Last 7 Days Calendar */}
       <div className="mb-6">
-        <p className="text-sm font-medium text-gray-900 mb-3">Last 7 Days</p>
+        <p className="text-sm font-medium text-slate-900 dark:text-white mb-3">Last 7 Days</p>
         <div className="grid grid-cols-7 gap-2">
           {last7Days.map((day, index) => (
             <div
               key={day.checkinDate ?? `${day.dayName}-${index}`}
               className="flex flex-col items-center"
             >
-              <span className="text-xs text-gray-600 mb-2">{day.dayName}</span>
+              <span className="text-xs text-slate-600 dark:text-slate-400 mb-2">{day.dayName}</span>
               <div
                 className={`w-10 h-10 rounded-full flex items-center justify-center border-2 ${
                   day.isCheckedIn
-                    ? 'bg-purple-500 border-purple-500 text-white'
+                    ? 'bg-teal-500 border-teal-500 text-white'
                     : day.isToday
-                      ? 'border-purple-500 border-2'
-                      : 'border-gray-200'
+                      ? 'border-teal-500 border-2'
+                      : 'border-slate-200 dark:border-slate-700'
                 }`}
               >
                 {day.isCheckedIn ? '✓' : ''}
@@ -261,7 +261,7 @@ export function DailyCheckin({ className }: DailyCheckinProps) {
       <Button
         onClick={handleCheckin}
         disabled={isCheckingIn || checkinStatus?.checkedInToday || false}
-        className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-semibold py-6 text-base mb-4"
+        className="w-full bg-gradient-to-r from-teal-500 to-blue-500 hover:from-teal-600 hover:to-blue-600 text-white font-semibold py-6 text-base mb-4"
       >
         <Sparkles className="h-5 w-5 mr-2" />
         {isCheckingIn
@@ -273,19 +273,19 @@ export function DailyCheckin({ className }: DailyCheckinProps) {
 
       {/* Reward Summary */}
       <div className="grid grid-cols-2 gap-4">
-        <div className="bg-purple-50 rounded-xl p-4 border border-purple-100">
+        <div className="bg-teal-50 dark:bg-teal-900/20 rounded-xl p-4 border border-teal-100 dark:border-teal-800">
           <div className="flex items-center gap-2 mb-2">
-            <Sparkles className="h-4 w-4 text-purple-600" />
-            <span className="text-sm font-medium text-gray-700">Daily Reward</span>
+            <Sparkles className="h-4 w-4 text-teal-500" />
+            <span className="text-sm font-medium text-slate-700 dark:text-slate-300">Daily Reward</span>
           </div>
-          <p className="text-2xl font-bold text-gray-900">+{dailyCredits} Credits</p>
+          <p className="text-2xl font-bold text-slate-900 dark:text-white">+{dailyCredits} Credits</p>
         </div>
         <div className="bg-pink-50 rounded-xl p-4 border border-pink-100">
           <div className="flex items-center gap-2 mb-2">
-            <Gift className="h-4 w-4 text-purple-600" />
-            <span className="text-sm font-medium text-gray-700">7-Day Bonus</span>
+            <Gift className="h-4 w-4 text-teal-500" />
+            <span className="text-sm font-medium text-slate-700 dark:text-slate-300">7-Day Bonus</span>
           </div>
-          <p className="text-2xl font-bold text-gray-900">+{weeklyBonusCredits} Credits</p>
+          <p className="text-2xl font-bold text-slate-900 dark:text-white">+{weeklyBonusCredits} Credits</p>
         </div>
       </div>
     </Card>

@@ -624,28 +624,28 @@ const BillingClient = ({ plans }: BillingClientProps) => {
   return (
     <div className="container mx-auto max-w-5xl space-y-8 px-4 py-10">
       <div>
-        <p className="text-sm font-semibold text-purple-600">Billing & Subscription</p>
-        <h1 className="mt-2 text-3xl font-bold text-gray-900">Manage your plan</h1>
-        <p className="mt-1 text-gray-600">
+        <p className="text-sm font-semibold text-teal-500">Billing & Subscription</p>
+        <h1 className="mt-2 text-3xl font-bold text-slate-900 dark:text-white">Manage your plan</h1>
+        <p className="mt-1 text-slate-600 dark:text-slate-400">
           View your current subscription, manage payment methods, and upgrade or downgrade plans.
         </p>
       </div>
 
       {/* Show upgrade notice at the top if there's a scheduled plan change */}
       {hasScheduledChange && scheduledPlanDetails && (
-        <Alert className="border-purple-300 bg-gradient-to-r from-purple-50 to-violet-50 shadow-lg">
-          <AlertTitle className="flex items-center gap-2 text-lg font-bold text-purple-900">
-            <TrendingUp className="h-5 w-5 text-purple-600" />
+        <Alert className="border-teal-400 dark:border-teal-600 bg-gradient-to-r from-purple-50 to-violet-50 shadow-lg">
+          <AlertTitle className="flex items-center gap-2 text-lg font-bold text-slate-900 dark:text-white">
+            <TrendingUp className="h-5 w-5 text-teal-500" />
             Plan Upgrade Scheduled: {scheduledPlanDetails.plan.name}
           </AlertTitle>
           <AlertDescription className="mt-2 text-base text-purple-800">
             <p className="font-semibold mb-2">
               Your subscription will upgrade to{' '}
-              <span className="font-bold text-purple-900">{scheduledPlanDetails.plan.name}</span>{' '}
+              <span className="font-bold text-slate-900 dark:text-white">{scheduledPlanDetails.plan.name}</span>{' '}
               on:
             </p>
             <p className="mb-3">
-              <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-md bg-purple-100 text-purple-900 font-bold text-lg">
+              <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-md bg-teal-100 dark:bg-teal-900/30 text-slate-900 dark:text-white font-bold text-lg">
                 <Calendar className="h-4 w-4" />
                 {formatDate(scheduledPlanDetails.takesEffectAt || subscription?.periodEnd)}
               </span>
@@ -668,7 +668,7 @@ const BillingClient = ({ plans }: BillingClientProps) => {
                 <span className="font-medium">{scheduledPlanDetails.credits}</span>
               </p>
             </div>
-            <p className="mt-3 pt-3 border-t border-purple-200 text-sm">
+            <p className="mt-3 pt-3 border-t border-teal-200 dark:border-teal-800 text-sm">
               Your current <span className="font-medium">{subscription?.planName || 'plan'}</span>{' '}
               remains active until then.
             </p>
@@ -678,7 +678,7 @@ const BillingClient = ({ plans }: BillingClientProps) => {
 
       {/* Show temporary notice if plan change was just requested */}
       {planChangeNotice && !hasScheduledChange && (
-        <Alert className="border-purple-200 bg-purple-50 text-purple-900">
+        <Alert className="border-teal-200 dark:border-teal-800 bg-teal-50 dark:bg-teal-900/20 text-slate-900 dark:text-white">
           <AlertTitle>
             {planChangeNotice.type === 'upgrade'
               ? `Upgrade scheduled${planChangeAlert?.planName ? `: ${planChangeAlert.planName}` : ''}`
@@ -743,7 +743,7 @@ const BillingClient = ({ plans }: BillingClientProps) => {
         </CardHeader>
         <CardContent className="space-y-6">
           {loading ? (
-            <div className="flex items-center gap-3 text-sm text-gray-500">
+            <div className="flex items-center gap-3 text-sm text-slate-500 dark:text-slate-400">
               <Loader2 className="h-4 w-4 animate-spin" />
               Loading subscription...
             </div>
@@ -751,36 +751,36 @@ const BillingClient = ({ plans }: BillingClientProps) => {
             <>
               <div className="grid gap-4 md:grid-cols-3">
                 <div className="rounded-lg border p-4">
-                  <p className="text-sm text-gray-500">Plan</p>
-                  <p className="mt-1 font-semibold text-gray-900">
+                  <p className="text-sm text-slate-500 dark:text-slate-400">Plan</p>
+                  <p className="mt-1 font-semibold text-slate-900 dark:text-white">
                     {subscription.planName || 'Creem Subscription'}
                   </p>
                   {subscription.interval && (
-                    <p className="text-xs text-gray-500">
+                    <p className="text-xs text-slate-500 dark:text-slate-400">
                       {intervalLabels[subscription.interval] || subscription.interval}
                     </p>
                   )}
                 </div>
                 <div className="rounded-lg border p-4">
-                  <p className="text-sm text-gray-500">Status</p>
-                  <p className="mt-1 font-semibold text-gray-900">{currentStatusLabel}</p>
+                  <p className="text-sm text-slate-500 dark:text-slate-400">Status</p>
+                  <p className="mt-1 font-semibold text-slate-900 dark:text-white">{currentStatusLabel}</p>
                   {hasScheduledCancellation && (
                     <p className="text-xs text-orange-600">Scheduled to cancel at period end</p>
                   )}
                 </div>
                 <div className="rounded-lg border p-4">
-                  <p className="text-sm text-gray-500">Next renewal</p>
+                  <p className="text-sm text-slate-500 dark:text-slate-400">Next renewal</p>
                   {subscription.periodEnd ? (
                     <>
-                      <p className="mt-1 font-semibold text-gray-900">{nextRenewalDate}</p>
+                      <p className="mt-1 font-semibold text-slate-900 dark:text-white">{nextRenewalDate}</p>
                       {subscription.interval && (
-                        <p className="text-xs text-gray-500">
+                        <p className="text-xs text-slate-500 dark:text-slate-400">
                           {intervalLabels[subscription.interval] || subscription.interval}
                         </p>
                       )}
                     </>
                   ) : (
-                    <p className="mt-1 text-sm text-gray-500">Not applicable</p>
+                    <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">Not applicable</p>
                   )}
                 </div>
               </div>
@@ -819,7 +819,7 @@ const BillingClient = ({ plans }: BillingClientProps) => {
               </div>
             </>
           ) : (
-            <p className="text-sm text-gray-600">
+            <p className="text-sm text-slate-600 dark:text-slate-400">
               No active Creem subscription found. Choose a plan below to get started.
             </p>
           )}
@@ -836,12 +836,12 @@ const BillingClient = ({ plans }: BillingClientProps) => {
             </CardDescription>
           </div>
           <div className="flex items-center gap-3 rounded-full border px-4 py-2">
-            <span className="text-sm text-gray-600">Monthly</span>
+            <span className="text-sm text-slate-600 dark:text-slate-400">Monthly</span>
             <Switch
               checked={interval === 'year'}
               onCheckedChange={(checked: boolean) => setInterval(checked ? 'year' : 'month')}
             />
-            <span className="text-sm text-gray-600">Yearly</span>
+            <span className="text-sm text-slate-600 dark:text-slate-400">Yearly</span>
           </div>
         </CardHeader>
         <CardContent>
@@ -856,29 +856,29 @@ const BillingClient = ({ plans }: BillingClientProps) => {
                 <div
                   key={plan.id}
                   className={`rounded-2xl border p-6 ${
-                    plan.popular ? 'border-purple-500 shadow-lg' : 'border-gray-200'
+                    plan.popular ? 'border-teal-500 shadow-lg' : 'border-slate-200 dark:border-slate-700'
                   }`}
                 >
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-sm font-semibold uppercase text-gray-500">{plan.name}</p>
-                      <p className="text-xl font-bold text-gray-900">{plan.description}</p>
+                      <p className="text-sm font-semibold uppercase text-slate-500 dark:text-slate-400">{plan.name}</p>
+                      <p className="text-xl font-bold text-slate-900 dark:text-white">{plan.description}</p>
                     </div>
                     {plan.popular && (
-                      <Badge className="bg-purple-600 text-white">Most Popular</Badge>
+                      <Badge className="bg-teal-500 text-white">Most Popular</Badge>
                     )}
                   </div>
 
                   <div className="mt-4 flex items-baseline gap-2">
-                    <span className="text-4xl font-bold text-gray-900">{priceLabel}</span>
+                    <span className="text-4xl font-bold text-slate-900 dark:text-white">{priceLabel}</span>
                     {displayPrice && displayPrice > 0 && (
-                      <span className="text-sm text-gray-500">
+                      <span className="text-sm text-slate-500 dark:text-slate-400">
                         /{interval === 'year' ? 'year' : 'month'}
                       </span>
                     )}
                   </div>
 
-                  <p className="mt-2 text-sm text-gray-500">
+                  <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">
                     {interval === 'year' ? 'Billed annually' : 'Billed monthly'}
                   </p>
 

@@ -713,7 +713,7 @@ export function BrandAnalysisPage() {
                   </TabsTrigger>
                   <TabsTrigger
                     value="visual"
-                    className="gap-2 py-3 px-4 rounded-lg data-[state=active]:bg-gradient-to-br data-[state=active]:from-purple-600 data-[state=active]:to-purple-700 data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:shadow-purple-500/50 transition-all hover:scale-105 data-[state=inactive]:hover:bg-slate-100"
+                    className="gap-2 py-3 px-4 rounded-lg data-[state=active]:bg-gradient-to-br data-[state=active]:from-teal-500 data-[state=active]:to-teal-600 data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:shadow-teal-500/50 transition-all hover:scale-105 data-[state=inactive]:hover:bg-slate-100 dark:data-[state=inactive]:hover:bg-slate-800"
                   >
                     <Palette className="size-4" />
                     <span className="hidden md:inline font-semibold">{t('tabs.visual')}</span>
@@ -830,9 +830,9 @@ export function BrandAnalysisPage() {
                 <TabsContent value="visual" className="space-y-6 mt-6">
                   {/* Colors */}
                   <Card className="border-2">
-                    <CardHeader className="bg-gradient-to-r from-purple-50 to-transparent">
+                    <CardHeader className="bg-gradient-to-r from-teal-50 to-transparent dark:from-teal-900/20">
                       <CardTitle className="flex items-center gap-2">
-                        <Palette className="size-5 text-purple-600" />
+                        <Palette className="size-5 text-teal-500" />
                         {t('visual.colorScheme')}
                       </CardTitle>
                       <CardDescription>{t('visual.colorDescription')}</CardDescription>
@@ -899,7 +899,7 @@ export function BrandAnalysisPage() {
                               <button
                                 type="button"
                                 key={color}
-                                className="space-y-2 p-4 rounded-xl bg-slate-50 border-2 border-slate-200 hover:border-purple-300 transition-colors cursor-pointer text-left"
+                                className="space-y-2 p-4 rounded-xl bg-slate-50 dark:bg-slate-800 border-2 border-slate-200 dark:border-slate-700 hover:border-teal-500 transition-colors cursor-pointer text-left"
                                 onClick={() => copyToClipboard(color)}
                                 aria-label={t('visual.clickToCopy')}
                               >
@@ -987,7 +987,7 @@ export function BrandAnalysisPage() {
                       <Card className="border-2">
                         <CardHeader>
                           <CardTitle className="text-lg flex items-center gap-2">
-                            <FileText className="size-5 text-purple-600" />
+                            <FileText className="size-5 text-teal-500" />
                             {t('visual.typography')}
                           </CardTitle>
                         </CardHeader>
@@ -1098,9 +1098,9 @@ export function BrandAnalysisPage() {
                     </Card>
 
                     <Card className="border-2">
-                      <CardHeader className="bg-gradient-to-r from-purple-50 to-transparent">
+                      <CardHeader className="bg-gradient-to-r from-teal-50 to-transparent dark:from-teal-900/20">
                         <CardTitle className="flex items-center gap-2">
-                          <Zap className="size-5 text-purple-600" />
+                          <Zap className="size-5 text-teal-500" />
                           {t('content.socialTone')}
                         </CardTitle>
                       </CardHeader>

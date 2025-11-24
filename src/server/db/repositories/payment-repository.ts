@@ -360,18 +360,16 @@ export class PaymentRepository {
       // Credit pack purchases store creemEventId in metadata JSON
       // metadata is stored as text (JSON string), so we can search directly
       const { creditTransactions } = await import('@/server/db/schema');
-      
+
       // Escape special characters in creemEventId for LIKE pattern
       const escapedEventId = creemEventId.replace(/[%_\\]/g, '\\$&');
       const searchPattern = `%"creemEventId":"${escapedEventId}"%`;
-      
+
       try {
         const creditTransactionResult = await db
           .select()
           .from(creditTransactions)
-          .where(
-            sql`${creditTransactions.metadata} LIKE ${searchPattern}`
-          )
+          .where(sql`${creditTransactions.metadata} LIKE ${searchPattern}`)
           .limit(1);
 
         return creditTransactionResult.length > 0;

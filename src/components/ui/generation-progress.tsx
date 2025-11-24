@@ -11,7 +11,7 @@ export function GenerationProgressBar({ value, className }: GenerationProgressBa
   return (
     <div
       className={cn(
-        'h-2 w-full overflow-hidden rounded-full bg-purple-100/70 shadow-inner',
+        'h-2 w-full overflow-hidden rounded-full bg-teal-100 dark:bg-teal-900/30/70 shadow-inner',
         className
       )}
     >

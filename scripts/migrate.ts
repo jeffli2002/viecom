@@ -6,9 +6,9 @@
 
 import { resolve } from 'node:path';
 import { config } from 'dotenv';
-import { Pool } from 'pg';
 import { drizzle } from 'drizzle-orm/node-postgres';
 import { migrate } from 'drizzle-orm/node-postgres/migrator';
+import { Pool } from 'pg';
 import { env } from '../src/env';
 
 // Load .env.local file

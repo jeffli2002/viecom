@@ -32,13 +32,15 @@ async function applyMigration0004() {
     // Mark migration as applied in __drizzle_migrations
     const { createHash } = await import('node:crypto');
     const hash = createHash('sha256').update(migrationSQL).digest('hex').substring(0, 16);
-    
-    const existing = await pool.query('SELECT id FROM __drizzle_migrations WHERE hash = $1', [hash]);
+
+    const existing = await pool.query('SELECT id FROM __drizzle_migrations WHERE hash = $1', [
+      hash,
+    ]);
     if (existing.rows.length === 0) {
-      await pool.query(
-        'INSERT INTO __drizzle_migrations (hash, created_at) VALUES ($1, $2)',
-        [hash, Date.now()]
-      );
+      await pool.query('INSERT INTO __drizzle_migrations (hash, created_at) VALUES ($1, $2)', [
+        hash,
+        Date.now(),
+      ]);
       console.log('✅ Migration 0004 marked as applied in __drizzle_migrations');
     } else {
       console.log('ℹ️  Migration 0004 already marked as applied');
@@ -77,4 +79,3 @@ async function applyMigration0004() {
 }
 
 applyMigration0004();
-

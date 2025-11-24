@@ -92,7 +92,7 @@ export default function AdminLoginPage() {
                 />
                 Remember me
               </label>
-              <Link href="/reset-password" className="text-sm text-purple-600 hover:underline">
+              <Link href="/reset-password" className="text-sm text-teal-500 hover:underline">
                 Forgot password?
               </Link>
             </div>

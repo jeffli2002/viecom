@@ -54,13 +54,17 @@
     "brandAnalysisDesc": "AI-powered brand tone and style analysis"
   },
   "hero": {
+    "badge": "New: Nano Banana Pro Image Generation Engine",
+    "titleLine1": "Create Viral E-commerce",
+    "titleLine2": "Content in Seconds",
+    "subtitle": "Turn static product photos into high-converting videos and lifestyle imagery using our advanced AI models. Tailored for Amazon, TikTok, and Shopify.",
+    "ctaStart": "Start Generating Free",
+    "watchDemo": "Watch Demo",
+    "trustedBy": "Trusted by E-commerce Platform Sellers",
     "title": "AI-Powered Visuals, Designed for E-Commerce Brands",
     "description": "Create your stylish product images and videos with AI brand analysis.",
     "descriptionSub": "Batch generate visuals instantly and scale your e-commerce creativity.",
-    "trustedBy": "Trusted by 50,000+ brands worldwide",
-    "ctaStart": "Start Creating - It's Free",
     "ctaLogin": "Login",
-    "watchDemo": "Watch Demo",
     "noCreditCard": "No credit card",
     "freeCredits": "40 free credits",
     "cancelAnytime": "Cancel anytime",
@@ -607,5 +611,142 @@
     "updatingPassword": "Updating password...",
     "rememberText": "Remember your password?",
     "backToLogin": "Back to login"
+  },
+  "faq": {
+    "title": "Frequently Asked",
+    "titleHighlight": "Questions",
+    "subtitle": "Everything you need to know about Viecom AI",
+    "q1": {
+      "question": "How does the credit system work?",
+      "answer": "Credits are used for AI generations. Image generation costs 5-8 credits, videos cost 15-130 credits depending on model and resolution. Free users get 30 signup credits. Pro plans include 500-900 monthly credits. You can also purchase credit packs starting at $9.90 for 300 credits."
+    },
+    "q2": {
+      "question": "What's included in the Free plan?",
+      "answer": "Free users get 30 credits on signup, daily check-in rewards (2 credits/day), referral rewards (10 credits), and social share rewards (5 credits). You can generate images and videos using these credits, with batch generation support (1 concurrent) and 7-day asset display."
+    },
+    "q3": {
+      "question": "What video models and resolutions are available?",
+      "answer": "We offer Sora 2 (720p only, 15-20 credits) and Sora 2 Pro (720p/1080p, 45-130 credits) for 10s or 15s videos. Sora 2 Pro delivers higher quality with faster generation times. All plans can access both models using credits."
+    },
+    "q4": {
+      "question": "Can I use generated content commercially?",
+      "answer": "Yes! Pro and Pro+ subscribers receive a full commercial license for all generated images and videos. You can use them for advertising, social media, e-commerce listings, and any commercial purpose without attribution."
+    },
+    "q5": {
+      "question": "How does batch generation work?",
+      "answer": "Upload multiple images or prompts to generate content in batches. Free users can process 1 concurrent task, Pro users get 3 concurrent tasks, and Pro+ users get 10. Our smart queue prioritizes 720p tasks for faster feedback on mixed batches."
+    },
+    "q6": {
+      "question": "What is brand analysis and how does it help?",
+      "answer": "Our AI analyzes your website or uploaded assets to extract your brand's color palette, tone, and style. This ensures all generated content maintains 100% brand consistency across images and videos, saving you hours of manual editing."
+    },
+    "q7": {
+      "question": "Can I upgrade, downgrade, or cancel anytime?",
+      "answer": "Yes! You can upgrade immediately (prorated billing), downgrade at next billing cycle, or cancel anytime. Downgrades take effect at renewal to preserve your current period benefits. Credits roll over within the same plan tier."
+    }
+  },
+  "brandAnalysis": {
+    "badge": "Brand Guard",
+    "titleLine1": "Keep Every Pixel",
+    "titleLine2": "On Brand",
+    "description": "Don't let AI hallucinate your identity. Our engine analyzes your website to extract logos, fonts, and color palettes, ensuring every generated asset follows your brand guidelines automatically.",
+    "feature1": "Auto-extract brand assets from URL",
+    "feature2": "Tone of voice consistency check",
+    "feature3": "Automatically integrate brand elements into product images and video creation",
+    "verified": "Verified",
+    "colorPalette": "Color Palette",
+    "typography": "Typography",
+    "brandVoiceDetected": "Brand Voice Detected",
+    "brandVoiceExample": "\"Professional, modern, and trustworthy with a focus on sustainability.\""
+  },
+  "transformationShowcase": {
+    "badge": "Nano Banana Pro Capabilities",
+    "title": "Visualize Your Products in",
+    "titleHighlight": "Any Context",
+    "description": "Our AI understands the geometry of your product and blends it perfectly with models or scenes.",
+    "inputAssets": "Input Images",
+    "supportedFormats": "Supported: JPG, PNG, WEBP",
+    "highResReady": "High Res Ready",
+    "aiProcessing": "AI Processing",
+    "modelName": "Nano Banana Pro",
+    "generatedResult": "Generated Result",
+    "scenarios": {
+      "virtualTryOn": {
+        "title": "Virtual Try-On",
+        "description": "Instantly dress any model in your apparel without a photoshoot.",
+        "input1Label": "Garment",
+        "input2Label": "Model"
+      },
+      "modelSwap": {
+        "title": "Model Swap",
+        "description": "Transfer an outfit from one model to another while preserving garment details.",
+        "input1Label": "Source Outfit",
+        "input2Label": "Target Model"
+      },
+      "furnitureStaging": {
+        "title": "Furniture Staging",
+        "description": "Visualize furniture in different interior styles instantly.",
+        "input1Label": "Product",
+        "input2Label": "Room Scene"
+      },
+      "sceneGeneration": {
+        "title": "Scene Generation",
+        "description": "Generate hyper-realistic environments for any product.",
+        "input1Label": "Product Shot",
+        "input2Label": "Context Ref"
+      },
+      "holidayCampaign": {
+        "title": "Holiday Campaign",
+        "description": "Adapt product imagery for seasonal campaigns in seconds.",
+        "input1Label": "Product",
+        "input2Label": "Holiday Theme"
+      }
+    }
+  },
+  "batchGenerationFeature": {
+    "badge": "Batch Processing",
+    "title": "Scale Content",
+    "titleHighlight": "Exponentially",
+    "description": "Need to launch a campaign across 5 platforms? Generate hundreds of variations for A/B testing or multi-channel distribution in a single click.",
+    "feature1Title": "Multi-Format Export",
+    "feature1Desc": "Automatically resize and recompose for Stories, Posts, Banners, and Ads.",
+    "feature2Title": "CSV Bulk Import",
+    "feature2Desc": "Upload your entire product catalog spreadsheet and let AI do the rest."
+  },
+  "videoGenerationShowcase": {
+    "title": "Static to",
+    "titleHighlight": "Cinematic",
+    "description": "Generate high-fidelity video assets from a single product image. Control camera motion, lighting, and physics with simple text prompts.",
+    "source": "Source",
+    "ready": "READY",
+    "prompt": "Prompt",
+    "processing": "Processing...",
+    "generateVideo": "Generate Video",
+    "recording": "REC",
+    "queue": "Queue",
+    "items": "Items",
+    "views": "views",
+    "addMediaToQueue": "Add Media to Queue",
+    "videoThumbnail": "Video thumbnail",
+    "input": "Input",
+    "thumbnail": "Thumbnail",
+    "unmute": "Unmute",
+    "mute": "Mute",
+    "disableAutoLoop": "Disable auto-loop",
+    "enableAutoLoop": "Enable auto-loop",
+    "autoLoop": "AUTO-LOOP",
+    "stageInitializing": "Initializing connection to Veo...",
+    "stageAnalyzing": "Analyzing prompt & geometry...",
+    "stageGenerating": "Generating keyframes...",
+    "stageInterpolating": "Interpolating motion...",
+    "stageFinalizing": "Finalizing 4K output...",
+    "engineInitialized": "Veo_Engine_v3.1 initialized",
+    "geometryInference": "Geometry inference: OK",
+    "physicsSimulation": "Physics simulation: ACTIVE"
+  },
+  "showcaseGallery": {
+    "title": "Community",
+    "titleHighlight": "Showcase",
+    "description": "See what others are creating with Viecom AI"
   }
 }

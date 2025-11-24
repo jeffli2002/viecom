@@ -287,13 +287,13 @@ export default function TermsPage() {
               <p>For questions about these Terms of Service, contact us at:</p>
               <p>
                 <strong>Email:</strong>{' '}
-                <a href="mailto:legal@viecom.pro" className="text-purple-600 hover:underline">
+                <a href="mailto:legal@viecom.pro" className="text-teal-500 hover:underline">
                   legal@viecom.pro
                 </a>
               </p>
               <p>
                 <strong>Support:</strong>{' '}
-                <a href="mailto:support@viecom.pro" className="text-purple-600 hover:underline">
+                <a href="mailto:support@viecom.pro" className="text-teal-500 hover:underline">
                   support@viecom.pro
                 </a>
               </p>
@@ -301,7 +301,7 @@ export default function TermsPage() {
           </CardContent>
         </Card>
 
-        <div className="mt-8 p-6 bg-purple-50 border border-purple-200 rounded-lg">
+        <div className="mt-8 p-6 bg-teal-50 dark:bg-teal-900/20 border border-teal-200 dark:border-teal-800 rounded-lg">
           <p className="text-sm text-gray-700">
             By using Viecom, you acknowledge that you have read, understood, and agree to be bound
             by these Terms of Service and our Privacy Policy.

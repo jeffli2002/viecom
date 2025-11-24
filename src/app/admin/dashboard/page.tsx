@@ -96,7 +96,7 @@ export default function AdminDashboardPage() {
     <div className="p-6 space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
+        <h1 className="text-3xl font-bold text-slate-900 dark:text-white">Dashboard</h1>
         <Select value={range} onValueChange={setRange}>
           <SelectTrigger className="w-[180px]">
             <SelectValue />
@@ -142,8 +142,8 @@ export default function AdminDashboardPage() {
         <Card>
           <CardContent className="pt-6">
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-purple-100 rounded-lg">
-                <Users className="h-5 w-5 text-purple-600" />
+              <div className="p-2 bg-teal-100 dark:bg-teal-900/30 rounded-lg">
+                <Users className="h-5 w-5 text-teal-500" />
               </div>
               <div>
                 <p className="text-sm text-gray-500">Active Subscriptions</p>

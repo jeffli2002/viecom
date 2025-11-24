@@ -135,11 +135,11 @@ export function BatchUpload() {
       <div className="space-y-6">
         <div>
           <h2 className="text-2xl font-bold mb-2">{t('title')}</h2>
-          <p className="text-gray-600">{t('subtitle')}</p>
+          <p className="text-slate-600 dark:text-slate-400">{t('subtitle')}</p>
         </div>
 
         {/* Template Download Section */}
-        <div className="border rounded-lg p-4 bg-gray-50">
+        <div className="border rounded-lg p-4 bg-slate-50 dark:bg-slate-900">
           <Label className="text-sm font-medium mb-3 block">{t('downloadTemplate')}</Label>
           <div className="flex gap-3">
             <Button
@@ -159,7 +159,7 @@ export function BatchUpload() {
               {t('downloadCSV')}
             </Button>
           </div>
-          <p className="text-xs text-gray-500 mt-2">
+          <p className="text-xs text-slate-500 dark:text-slate-400 mt-2">
             Template includes all required fields: generation parameters, product information,
             pricing, inventory, and publishing options
           </p>
@@ -179,7 +179,7 @@ export function BatchUpload() {
               disabled={isUploading}
             />
             {file && (
-              <p className="text-sm text-gray-600 mt-2">
+              <p className="text-sm text-slate-600 dark:text-slate-400 mt-2">
                 已选择: {file.name} ({(file.size / 1024).toFixed(2)} KB)
               </p>
             )}
@@ -204,7 +204,7 @@ export function BatchUpload() {
         {!jobId && (
           <div className="border-t pt-4">
             <h3 className="font-medium mb-2">{t('instructions')}：</h3>
-            <ul className="text-sm text-gray-600 space-y-1 list-disc list-inside">
+            <ul className="text-sm text-slate-600 dark:text-slate-400 space-y-1 list-disc list-inside">
               <li>{t('instruction1')}</li>
               <li>{t('instruction2')}</li>
               <li>{t('instruction3')}</li>

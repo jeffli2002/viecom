@@ -955,13 +955,13 @@ export function BatchGenerationFlow({ generationType }: BatchGenerationFlowProps
     <div className="space-y-6">
       {/* Brand Info Banner (if from brand analysis) */}
       {brandInfo && (
-        <Card className="border border-violet-200 bg-gray-50">
+        <Card className="border border-teal-200 bg-slate-50 dark:bg-slate-900">
           <CardContent className="p-6">
             <div className="flex items-start justify-between">
               <div className="flex-1">
                 <div className="flex items-center gap-3 mb-2">
-                  <div className="p-2 rounded-lg bg-violet-100">
-                    <Sparkles className="size-5 text-violet-600" />
+                  <div className="p-2 rounded-lg bg-teal-100">
+                    <Sparkles className="size-5 text-teal-600" />
                   </div>
                   <div>
                     <h3 className="text-lg font-bold text-slate-900">
@@ -972,13 +972,13 @@ export function BatchGenerationFlow({ generationType }: BatchGenerationFlowProps
                 </div>
                 <div className="flex flex-wrap gap-2 mt-3">
                   {brandInfo.selectedStyle && (
-                    <Badge className="bg-violet-100 text-violet-700 hover:bg-violet-200 border border-violet-200">
+                    <Badge className="bg-teal-100 text-teal-700 hover:bg-teal-200 border border-teal-200">
                       <Zap className="size-3 mr-1" />
                       {t('selectedStyle') || '风格'}: {brandInfo.selectedStyle}
                     </Badge>
                   )}
                   {brandInfo.brandTone && (
-                    <Badge className="bg-purple-100 text-purple-700 hover:bg-purple-200 border border-purple-200">
+                    <Badge className="bg-teal-100 dark:bg-teal-900/30 text-slate-700 dark:text-slate-300 hover:bg-teal-200 border border-teal-200 dark:border-teal-800">
                       {t('brandTone') || '品牌调性'}:{' '}
                       {typeof brandInfo.brandTone === 'string'
                         ? brandInfo.brandTone
@@ -1021,13 +1021,13 @@ export function BatchGenerationFlow({ generationType }: BatchGenerationFlowProps
                 <h2 className="text-2xl font-bold mb-2">
                   {generationType === 'image' ? t('titleImage') : t('titleVideo')}
                 </h2>
-                <p className="text-gray-600">
+                <p className="text-slate-600 dark:text-slate-400">
                   {generationType === 'image' ? t('subtitleImage') : t('subtitleVideo')}
                 </p>
               </div>
 
               {/* Generation Settings */}
-              <div className="border rounded-lg p-4 bg-gray-50 space-y-4">
+              <div className="border rounded-lg p-4 bg-slate-50 dark:bg-slate-900 space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <Label className="text-sm font-medium mb-2 block">{t('generationMode')}</Label>
@@ -1114,8 +1114,8 @@ export function BatchGenerationFlow({ generationType }: BatchGenerationFlowProps
                         disabled={isGenerating}
                         className={`flex items-center justify-center rounded-lg border-2 py-2.5 px-4 text-sm font-medium transition-all ${
                           outputFormat === 'PNG'
-                            ? 'border-purple-500 bg-purple-50 text-purple-700'
-                            : 'border-gray-200 bg-white text-gray-700 hover:border-purple-300'
+                            ? 'border-teal-500 bg-teal-50 dark:bg-teal-900/20 text-slate-700 dark:text-slate-300'
+                            : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 hover:border-teal-400 dark:border-teal-600'
                         } disabled:opacity-50 disabled:cursor-not-allowed`}
                       >
                         <span>PNG</span>
@@ -1142,8 +1142,8 @@ export function BatchGenerationFlow({ generationType }: BatchGenerationFlowProps
                         disabled={isGenerating}
                         className={`flex items-center justify-center rounded-lg border-2 py-2.5 px-4 text-sm font-medium transition-all ${
                           outputFormat === 'JPEG'
-                            ? 'border-purple-500 bg-purple-50 text-purple-700'
-                            : 'border-gray-200 bg-white text-gray-700 hover:border-purple-300'
+                            ? 'border-teal-500 bg-teal-50 dark:bg-teal-900/20 text-slate-700 dark:text-slate-300'
+                            : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 hover:border-teal-400 dark:border-teal-600'
                         } disabled:opacity-50 disabled:cursor-not-allowed`}
                       >
                         <span>JPEG</span>
@@ -1218,8 +1218,8 @@ export function BatchGenerationFlow({ generationType }: BatchGenerationFlowProps
                             disabled={isGenerating}
                             className={`flex items-center justify-center rounded-lg border-2 py-2 px-3 text-sm font-medium transition-all ${
                               videoDuration === 10
-                                ? 'border-purple-500 bg-purple-50 text-purple-700'
-                                : 'border-gray-200 bg-white text-gray-700 hover:border-purple-300'
+                                ? 'border-teal-500 bg-teal-50 dark:bg-teal-900/20 text-slate-700 dark:text-slate-300'
+                                : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 hover:border-teal-400 dark:border-teal-600'
                             } disabled:opacity-50 disabled:cursor-not-allowed`}
                           >
                             10s
@@ -1230,8 +1230,8 @@ export function BatchGenerationFlow({ generationType }: BatchGenerationFlowProps
                             disabled={isGenerating}
                             className={`flex items-center justify-center rounded-lg border-2 py-2 px-3 text-sm font-medium transition-all ${
                               videoDuration === 15
-                                ? 'border-purple-500 bg-purple-50 text-purple-700'
-                                : 'border-gray-200 bg-white text-gray-700 hover:border-purple-300'
+                                ? 'border-teal-500 bg-teal-50 dark:bg-teal-900/20 text-slate-700 dark:text-slate-300'
+                                : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 hover:border-teal-400 dark:border-teal-600'
                             } disabled:opacity-50 disabled:cursor-not-allowed`}
                           >
                             15s
@@ -1251,8 +1251,8 @@ export function BatchGenerationFlow({ generationType }: BatchGenerationFlowProps
                             disabled={isGenerating}
                             className={`flex items-center justify-center rounded-lg border-2 py-2.5 px-4 text-sm font-medium transition-all ${
                               videoQuality === 'standard'
-                                ? 'border-purple-500 bg-purple-50 text-purple-700'
-                                : 'border-gray-200 bg-white text-gray-700 hover:border-purple-300'
+                                ? 'border-teal-500 bg-teal-50 dark:bg-teal-900/20 text-slate-700 dark:text-slate-300'
+                                : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 hover:border-teal-400 dark:border-teal-600'
                             } disabled:opacity-50 disabled:cursor-not-allowed`}
                           >
                             <span>Standard (720P)</span>
@@ -1279,8 +1279,8 @@ export function BatchGenerationFlow({ generationType }: BatchGenerationFlowProps
                             disabled={isGenerating}
                             className={`flex items-center justify-center rounded-lg border-2 py-2.5 px-4 text-sm font-medium transition-all ${
                               videoQuality === 'high'
-                                ? 'border-purple-500 bg-purple-50 text-purple-700'
-                                : 'border-gray-200 bg-white text-gray-700 hover:border-purple-300'
+                                ? 'border-teal-500 bg-teal-50 dark:bg-teal-900/20 text-slate-700 dark:text-slate-300'
+                                : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 hover:border-teal-400 dark:border-teal-600'
                             } disabled:opacity-50 disabled:cursor-not-allowed`}
                           >
                             <span>High (1080P)</span>
@@ -1309,7 +1309,7 @@ export function BatchGenerationFlow({ generationType }: BatchGenerationFlowProps
               </div>
 
               {/* Template Download */}
-              <div className="border rounded-lg p-4 bg-gray-50">
+              <div className="border rounded-lg p-4 bg-slate-50 dark:bg-slate-900">
                 <Label className="text-sm font-medium mb-3 block">{t('downloadTemplate')}</Label>
                 <div className="flex gap-3">
                   <Button
@@ -1371,22 +1371,22 @@ export function BatchGenerationFlow({ generationType }: BatchGenerationFlowProps
                       relative w-full rounded-xl border-2 border-dashed transition-all duration-300
                       ${
                         isDragging
-                          ? 'border-violet-500 bg-gradient-to-br from-violet-50 to-purple-50 scale-[1.02]'
-                          : 'border-violet-300 bg-gradient-to-br from-violet-50/50 to-purple-50/50 hover:border-violet-400 hover:from-violet-50 hover:to-purple-50'
+                          ? 'border-teal-500 bg-gradient-to-br from-teal-50 to-blue-50 scale-[1.02]'
+                          : 'border-teal-300 bg-gradient-to-br from-teal-50/50 to-blue-50/50 hover:border-teal-400 hover:from-teal-50 hover:to-blue-50'
                       }
-                      ${file ? 'border-violet-500 bg-gradient-to-br from-violet-50 to-purple-50' : ''}
+                      ${file ? 'border-teal-500 bg-gradient-to-br from-teal-50 to-blue-50' : ''}
                     `}
                   >
                     <div className="p-8 text-center">
                       <Upload
-                        className={`mx-auto mb-3 h-12 w-12 ${isDragging || file ? 'text-violet-500' : 'text-violet-400'}`}
+                        className={`mx-auto mb-3 h-12 w-12 ${isDragging || file ? 'text-teal-500' : 'text-teal-400'}`}
                       />
                       {file ? (
                         <>
-                          <p className="text-sm font-medium text-violet-700 mb-1">
+                          <p className="text-sm font-medium text-teal-700 mb-1">
                             {t('fileSelected')}: {file.name}
                           </p>
-                          <p className="text-xs text-violet-600">
+                          <p className="text-xs text-teal-600">
                             {(file.size / 1024).toFixed(2)} KB
                             {isValidating && ` - ${t('validating')}`}
                           </p>
@@ -1411,10 +1411,10 @@ export function BatchGenerationFlow({ generationType }: BatchGenerationFlowProps
                         </>
                       ) : (
                         <>
-                          <p className="text-sm font-medium text-violet-700 mb-1">
+                          <p className="text-sm font-medium text-teal-700 mb-1">
                             {t('clickToUpload')}
                           </p>
-                          <p className="text-xs text-violet-600">{t('fileTypes')}</p>
+                          <p className="text-xs text-teal-600">{t('fileTypes')}</p>
                         </>
                       )}
                     </div>
@@ -1460,19 +1460,19 @@ export function BatchGenerationFlow({ generationType }: BatchGenerationFlowProps
             {/* Overall Statistics */}
             <div className="space-y-4">
               <div className="grid grid-cols-2 gap-3">
-                <div className="bg-gray-50 rounded-lg p-3 border border-slate-200">
+                <div className="bg-slate-50 dark:bg-slate-900 rounded-lg p-3 border border-slate-200">
                   <div className="text-2xl font-bold text-slate-700">{totalRows}</div>
                   <div className="text-xs text-slate-600 mt-1">{t('total')}</div>
                 </div>
-                <div className="bg-gray-50 rounded-lg p-3 border border-slate-200">
+                <div className="bg-slate-50 dark:bg-slate-900 rounded-lg p-3 border border-slate-200">
                   <div className="text-2xl font-bold text-green-600">{completedCount}</div>
                   <div className="text-xs text-slate-600 mt-1">{t('completed')}</div>
                 </div>
-                <div className="bg-gray-50 rounded-lg p-3 border border-slate-200">
+                <div className="bg-slate-50 dark:bg-slate-900 rounded-lg p-3 border border-slate-200">
                   <div className="text-2xl font-bold text-amber-600">{generatingCount}</div>
                   <div className="text-xs text-slate-600 mt-1">{t('generatingStatus')}</div>
                 </div>
-                <div className="bg-gray-50 rounded-lg p-3 border border-slate-200">
+                <div className="bg-slate-50 dark:bg-slate-900 rounded-lg p-3 border border-slate-200">
                   <div className="text-2xl font-bold text-red-600">{failedCount}</div>
                   <div className="text-xs text-slate-600 mt-1">{t('failed')}</div>
                 </div>
@@ -1482,7 +1482,7 @@ export function BatchGenerationFlow({ generationType }: BatchGenerationFlowProps
               {isGenerating && generationProgress.total > 0 && (
                 <div className="space-y-2 pt-2 border-t">
                   <div className="flex items-center justify-between text-sm">
-                    <span className="text-gray-600">{t('overallProgress')}</span>
+                    <span className="text-slate-600 dark:text-slate-400">{t('overallProgress')}</span>
                     <span className="font-medium">
                       {generationProgress.current} / {generationProgress.total}
                     </span>
@@ -1491,7 +1491,7 @@ export function BatchGenerationFlow({ generationType }: BatchGenerationFlowProps
                     value={(generationProgress.current / generationProgress.total) * 100}
                     className="h-2"
                   />
-                  <p className="text-xs text-gray-500 text-center">
+                  <p className="text-xs text-slate-500 dark:text-slate-400 text-center">
                     {Math.round((generationProgress.current / generationProgress.total) * 100)}%{' '}
                     {t('completedPercentage')}
                   </p>
@@ -1502,7 +1502,7 @@ export function BatchGenerationFlow({ generationType }: BatchGenerationFlowProps
               {totalRows > 0 && (
                 <div className="pt-2 border-t">
                   <div className="flex items-center justify-between text-sm mb-2">
-                    <span className="text-gray-600">{t('completionRate')}</span>
+                    <span className="text-slate-600 dark:text-slate-400">{t('completionRate')}</span>
                     <span className="font-medium">
                       {Math.round((completedCount / totalRows) * 100)}%
                     </span>
@@ -1513,13 +1513,13 @@ export function BatchGenerationFlow({ generationType }: BatchGenerationFlowProps
 
               {/* Status Breakdown */}
               <div className="pt-2 border-t space-y-2">
-                <h4 className="text-sm font-medium text-gray-700">{t('statusDistribution')}</h4>
+                <h4 className="text-sm font-medium text-slate-700 dark:text-slate-300">{t('statusDistribution')}</h4>
                 <div className="space-y-1.5">
                   {completedCount > 0 && (
                     <div className="flex items-center justify-between text-xs">
                       <div className="flex items-center gap-2">
                         <CheckCircle2 className="w-3 h-3 text-green-500" />
-                        <span className="text-gray-600">{t('completed')}</span>
+                        <span className="text-slate-600 dark:text-slate-400">{t('completed')}</span>
                       </div>
                       <span className="font-medium">{completedCount}</span>
                     </div>
@@ -1528,7 +1528,7 @@ export function BatchGenerationFlow({ generationType }: BatchGenerationFlowProps
                     <div className="flex items-center justify-between text-xs">
                       <div className="flex items-center gap-2">
                         <Loader2 className="w-3 h-3 text-blue-500 animate-spin" />
-                        <span className="text-gray-600">{t('generatingStatus')}</span>
+                        <span className="text-slate-600 dark:text-slate-400">{t('generatingStatus')}</span>
                       </div>
                       <span className="font-medium">{generatingCount}</span>
                     </div>
@@ -1537,7 +1537,7 @@ export function BatchGenerationFlow({ generationType }: BatchGenerationFlowProps
                     <div className="flex items-center justify-between text-xs">
                       <div className="flex items-center gap-2">
                         <XCircle className="w-3 h-3 text-red-500" />
-                        <span className="text-gray-600">{t('failed')}</span>
+                        <span className="text-slate-600 dark:text-slate-400">{t('failed')}</span>
                       </div>
                       <span className="font-medium">{failedCount}</span>
                     </div>
@@ -1545,8 +1545,8 @@ export function BatchGenerationFlow({ generationType }: BatchGenerationFlowProps
                   {pendingCount > 0 && (
                     <div className="flex items-center justify-between text-xs">
                       <div className="flex items-center gap-2">
-                        <Upload className="w-3 h-3 text-gray-400" />
-                        <span className="text-gray-600">{t('waiting')}</span>
+                        <Upload className="w-3 h-3 text-slate-400 dark:text-slate-500" />
+                        <span className="text-slate-600 dark:text-slate-400">{t('waiting')}</span>
                       </div>
                       <span className="font-medium">{pendingCount}</span>
                     </div>
@@ -1579,7 +1579,7 @@ export function BatchGenerationFlow({ generationType }: BatchGenerationFlowProps
                     {t('dataPreview')} ({rows.length} {t('rows')})
                   </h3>
                   {!file && (
-                    <p className="text-xs text-violet-600 mt-1">📦 {t('recoveredFromCache')}</p>
+                    <p className="text-xs text-teal-600 mt-1">📦 {t('recoveredFromCache')}</p>
                   )}
                 </div>
                 <div className="flex gap-2">
@@ -1683,7 +1683,7 @@ export function BatchGenerationFlow({ generationType }: BatchGenerationFlowProps
                   >
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-0">
                       {/* Left: Product Information */}
-                      <div className="p-6 bg-white flex flex-col min-h-[500px]">
+                      <div className="p-6 bg-white dark:bg-slate-900 flex flex-col min-h-[500px]">
                         <div className="flex items-start gap-3 mb-4">
                           <Checkbox
                             checked={row.isSelected}
@@ -1701,13 +1701,13 @@ export function BatchGenerationFlow({ generationType }: BatchGenerationFlowProps
                           <div className="flex-1 space-y-3">
                             {row.productName && (
                               <div>
-                                <Label className="text-xs text-gray-500">{t('productName')}</Label>
+                                <Label className="text-xs text-slate-500 dark:text-slate-400">{t('productName')}</Label>
                                 <p className="text-sm font-medium">{row.productName}</p>
                               </div>
                             )}
                             {row.productDescription && (
                               <div>
-                                <Label className="text-xs text-gray-500">
+                                <Label className="text-xs text-slate-500 dark:text-slate-400">
                                   {t('productDescription')}
                                 </Label>
                                 <p className="text-sm">{row.productDescription}</p>
@@ -1715,13 +1715,13 @@ export function BatchGenerationFlow({ generationType }: BatchGenerationFlowProps
                             )}
                             <div>
                               <div className="flex items-center justify-between mb-1">
-                                <Label className="text-xs text-gray-500">
+                                <Label className="text-xs text-slate-500 dark:text-slate-400">
                                   {t('originalPrompt')} ({t('rowNumber')} {row.rowIndex})
                                 </Label>
                                 <Button
                                   variant="ghost"
                                   size="sm"
-                                  className="h-6 px-2 text-xs text-gray-500 hover:text-gray-700"
+                                  className="h-6 px-2 text-xs text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:text-slate-300"
                                   onClick={(e) => {
                                     e.stopPropagation();
                                     const textarea = document.getElementById(
@@ -1764,7 +1764,7 @@ export function BatchGenerationFlow({ generationType }: BatchGenerationFlowProps
                                     !row.prompt.trim()
                                   }
                                   size="sm"
-                                  className="absolute right-2 bottom-2 bg-gradient-to-br from-violet-50 to-purple-50 border-violet-300 text-violet-700 hover:from-violet-100 hover:to-purple-100 hover:border-violet-400"
+                                  className="absolute right-2 bottom-2 bg-gradient-to-br from-teal-50 to-blue-50 border-teal-300 text-teal-700 hover:from-teal-100 hover:to-blue-100 hover:border-teal-400"
                                 >
                                   {row.status === 'enhancing' ? (
                                     <>
@@ -1782,14 +1782,14 @@ export function BatchGenerationFlow({ generationType }: BatchGenerationFlowProps
                             </div>
                             <div className="flex-1 flex flex-col mt-auto">
                               <div className="flex items-center justify-between mb-1">
-                                <Label className="text-xs text-gray-500">
+                                <Label className="text-xs text-slate-500 dark:text-slate-400">
                                   {t('enhancePrompt')}
                                 </Label>
                                 {row.enhancedPrompt && (
                                   <Button
                                     variant="ghost"
                                     size="sm"
-                                    className="h-6 px-2 text-xs text-gray-500 hover:text-gray-700"
+                                    className="h-6 px-2 text-xs text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:text-slate-300"
                                     onClick={(e) => {
                                       e.stopPropagation();
                                       const textarea = document.getElementById(
@@ -1831,10 +1831,10 @@ export function BatchGenerationFlow({ generationType }: BatchGenerationFlowProps
                       </div>
 
                       {/* Right: Generated Asset Display */}
-                      <div className="p-6 bg-gray-50 border-l lg:border-l lg:border-t-0 border-t flex items-center justify-center min-h-[500px]">
+                      <div className="p-6 bg-slate-50 dark:bg-slate-900 border-l lg:border-l lg:border-t-0 border-t flex items-center justify-center min-h-[500px]">
                         {row.status === 'completed' && row.assetUrl ? (
                           <div className="group relative w-full max-w-md">
-                            <div className="relative aspect-square bg-white rounded-lg overflow-hidden border shadow-sm">
+                            <div className="relative aspect-square bg-white dark:bg-slate-900 rounded-lg overflow-hidden border shadow-sm">
                               {generationType === 'image' ? (
                                 <img
                                   src={getRowPreviewUrl(row) || row.assetUrl || ''}
@@ -1868,7 +1868,7 @@ export function BatchGenerationFlow({ generationType }: BatchGenerationFlowProps
                                       rowIndex: row.rowIndex,
                                     });
                                   }}
-                                  className="bg-white/90 hover:bg-white"
+                                  className="bg-white dark:bg-slate-900/90 hover:bg-white dark:bg-slate-900"
                                 >
                                   <Maximize2 className="w-4 h-4 mr-1" />
                                   {t('preview')}
@@ -1886,7 +1886,7 @@ export function BatchGenerationFlow({ generationType }: BatchGenerationFlowProps
                                     a.click();
                                     document.body.removeChild(a);
                                   }}
-                                  className="bg-white/90 hover:bg-white"
+                                  className="bg-white dark:bg-slate-900/90 hover:bg-white dark:bg-slate-900"
                                 >
                                   <Download className="w-4 h-4 mr-1" />
                                   {t('download')}
@@ -1895,14 +1895,14 @@ export function BatchGenerationFlow({ generationType }: BatchGenerationFlowProps
                             </div>
                             <div className="mt-3 flex items-center justify-center gap-2">
                               <CheckCircle2 className="w-4 h-4 text-green-500" />
-                              <span className="text-sm text-gray-600 font-medium">
+                              <span className="text-sm text-slate-600 dark:text-slate-400 font-medium">
                                 {t('generationComplete')}
                               </span>
                             </div>
                           </div>
                         ) : row.status === 'generating' ? (
                           <div className="flex flex-col items-center justify-center w-full max-w-md space-y-4">
-                            <div className="relative aspect-square w-full bg-white rounded-lg border shadow-sm flex items-center justify-center">
+                            <div className="relative aspect-square w-full bg-white dark:bg-slate-900 rounded-lg border shadow-sm flex items-center justify-center">
                               <Loader2 className="w-12 h-12 animate-spin text-blue-500" />
                             </div>
                             <div className="space-y-2 w-full">
@@ -1919,7 +1919,7 @@ export function BatchGenerationFlow({ generationType }: BatchGenerationFlowProps
                           </div>
                         ) : row.status === 'failed' ? (
                           <div className="flex flex-col items-center justify-center w-full max-w-md space-y-3">
-                            <div className="relative aspect-square w-full bg-gray-100 rounded-lg border flex items-center justify-center">
+                            <div className="relative aspect-square w-full bg-slate-100 dark:bg-slate-800 rounded-lg border flex items-center justify-center">
                               <XCircle className="w-12 h-12 text-red-500" />
                             </div>
                             <div className="text-center">
@@ -1932,8 +1932,8 @@ export function BatchGenerationFlow({ generationType }: BatchGenerationFlowProps
                             </div>
                           </div>
                         ) : (
-                          <div className="flex flex-col items-center justify-center w-full max-w-md text-gray-400">
-                            <div className="relative aspect-square w-full bg-gray-50 rounded-lg border-2 border-dashed flex items-center justify-center">
+                          <div className="flex flex-col items-center justify-center w-full max-w-md text-slate-400 dark:text-slate-500">
+                            <div className="relative aspect-square w-full bg-slate-50 dark:bg-slate-900 rounded-lg border-2 border-dashed flex items-center justify-center">
                               <Upload className="w-12 h-12 opacity-50" />
                             </div>
                             <p className="text-sm mt-3 text-center">{t('waiting')}</p>
@@ -1963,7 +1963,7 @@ export function BatchGenerationFlow({ generationType }: BatchGenerationFlowProps
                         {t('startBatchGeneration')} ({rows.filter((r) => r.isSelected).length}{' '}
                         {t('rowsSelected')})
                         {rows.filter((r) => r.isSelected && r.enhancedPrompt).length > 0 && (
-                          <span className="text-xs text-violet-600 ml-1">
+                          <span className="text-xs text-teal-600 ml-1">
                             ({rows.filter((r) => r.isSelected && r.enhancedPrompt).length}{' '}
                             {t('enhanced')})
                           </span>

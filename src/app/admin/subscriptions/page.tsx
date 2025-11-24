@@ -97,7 +97,7 @@ export default function AdminSubscriptionsPage() {
     <div className="p-6 space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold text-gray-900">Subscriptions Management</h1>
+        <h1 className="text-3xl font-bold text-slate-900 dark:text-white">Subscriptions Management</h1>
         <div className="flex items-center gap-3">
           <Select value={range} onValueChange={setRange}>
             <SelectTrigger className="w-[180px]">
@@ -126,8 +126,8 @@ export default function AdminSubscriptionsPage() {
         <Card>
           <CardContent className="pt-6">
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-gray-100 rounded-lg">
-                <Users className="h-5 w-5 text-gray-600" />
+              <div className="p-2 bg-slate-100 dark:bg-slate-800 rounded-lg">
+                <Users className="h-5 w-5 text-slate-600 dark:text-slate-400" />
               </div>
               <div>
                 <p className="text-sm text-gray-500">Free Plan Users</p>
@@ -154,8 +154,8 @@ export default function AdminSubscriptionsPage() {
         <Card>
           <CardContent className="pt-6">
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-purple-100 rounded-lg">
-                <Users className="h-5 w-5 text-purple-600" />
+              <div className="p-2 bg-teal-100 dark:bg-teal-900/30 rounded-lg">
+                <Users className="h-5 w-5 text-teal-500" />
               </div>
               <div>
                 <p className="text-sm text-gray-500">Pro+ Plan Users</p>
@@ -185,7 +185,7 @@ export default function AdminSubscriptionsPage() {
         <Card>
           <CardContent className="pt-6">
             <p className="text-sm text-gray-500">Expired</p>
-            <p className="text-3xl font-bold text-gray-600">{data.statusCounts.expired}</p>
+            <p className="text-3xl font-bold text-slate-600 dark:text-slate-400">{data.statusCounts.expired}</p>
           </CardContent>
         </Card>
       </div>
@@ -210,16 +210,16 @@ export default function AdminSubscriptionsPage() {
               </thead>
               <tbody>
                 {data.recentSubscriptions.map((sub) => (
-                  <tr key={sub.id} className="border-b hover:bg-gray-50">
+                  <tr key={sub.id} className="border-b hover:bg-slate-50 dark:bg-slate-900">
                     <td className="py-3 px-4 text-sm">{sub.userEmail}</td>
                     <td className="py-3 px-4">
                       <span
                         className={`px-2 py-1 rounded text-xs font-medium ${
                           sub.plan === 'proplus'
-                            ? 'bg-purple-100 text-purple-700'
+                            ? 'bg-teal-100 dark:bg-teal-900/30 text-slate-700 dark:text-slate-300'
                             : sub.plan === 'pro'
                               ? 'bg-blue-100 text-blue-700'
-                              : 'bg-gray-100 text-gray-700'
+                              : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300'
                         }`}
                       >
                         {sub.plan}
@@ -232,7 +232,7 @@ export default function AdminSubscriptionsPage() {
                             ? 'bg-green-100 text-green-700'
                             : sub.status === 'canceled'
                               ? 'bg-amber-100 text-amber-700'
-                              : 'bg-gray-100 text-gray-700'
+                              : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300'
                         }`}
                       >
                         {sub.status}

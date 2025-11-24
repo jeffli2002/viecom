@@ -23,12 +23,12 @@ export function AdminTopBar() {
   return (
     <div className="flex items-center justify-between px-6 py-4 bg-white border-b">
       <div className="flex items-center gap-4">
-        <h1 className="text-lg font-semibold text-gray-900">Admin Dashboard</h1>
+        <h1 className="text-lg font-semibold text-slate-900 dark:text-white">Admin Dashboard</h1>
       </div>
 
       <div className="flex items-center gap-3">
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-slate-400 dark:text-slate-500" />
           <Input type="text" placeholder="Search email..." className="pl-10 w-64" />
         </div>
 

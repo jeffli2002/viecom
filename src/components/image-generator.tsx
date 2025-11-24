@@ -691,14 +691,14 @@ export default function ImageGenerator() {
         <TabsList className="mx-auto mb-8 grid w-full max-w-md grid-cols-2 bg-transparent gap-3 p-0">
           <TabsTrigger
             value="text-to-image"
-            className="font-medium data-[state=active]:bg-purple-600 data-[state=active]:text-white data-[state=inactive]:border-2 data-[state=inactive]:border-gray-300 data-[state=inactive]:rounded-full data-[state=inactive]:bg-white data-[state=inactive]:text-gray-700 rounded-full py-3 transition-all"
+            className="font-medium data-[state=active]:bg-teal-500 data-[state=active]:text-white data-[state=inactive]:border-2 data-[state=inactive]:border-slate-300 dark:data-[state=inactive]:border-slate-700 data-[state=inactive]:rounded-full data-[state=inactive]:bg-white dark:data-[state=inactive]:bg-slate-900 data-[state=inactive]:text-slate-700 dark:data-[state=inactive]:text-slate-300 rounded-full py-3 transition-all"
           >
             <Sparkles className="mr-2 h-4 w-4" />
             {t('modeTextToImage')}
           </TabsTrigger>
           <TabsTrigger
             value="image-to-image"
-            className="font-medium data-[state=active]:bg-purple-600 data-[state=active]:text-white data-[state=inactive]:border-2 data-[state=inactive]:border-gray-300 data-[state=inactive]:rounded-full data-[state=inactive]:bg-white data-[state=inactive]:text-gray-700 rounded-full py-3 transition-all"
+            className="font-medium data-[state=active]:bg-teal-500 data-[state=active]:text-white data-[state=inactive]:border-2 data-[state=inactive]:border-slate-300 dark:data-[state=inactive]:border-slate-700 data-[state=inactive]:rounded-full data-[state=inactive]:bg-white dark:data-[state=inactive]:bg-slate-900 data-[state=inactive]:text-slate-700 dark:data-[state=inactive]:text-slate-300 rounded-full py-3 transition-all"
           >
             <ImageIcon className="mr-2 h-4 w-4" />
             {t('modeImageToImage')}
@@ -709,14 +709,14 @@ export default function ImageGenerator() {
           <div className="space-y-6">
             <TabsContent value="text-to-image" className="mt-0 space-y-6">
               {brandAnalysis && (
-                <div className="rounded-lg border border-purple-200 bg-purple-50 p-3">
+                <div className="rounded-lg border border-teal-200 dark:border-teal-800 bg-teal-50 dark:bg-teal-900/20 p-3">
                   <div className="flex items-center gap-2">
-                    <Sparkles className="h-4 w-4 text-purple-600" />
-                    <span className="text-sm font-medium text-purple-900">
+                    <Sparkles className="h-4 w-4 text-teal-500" />
+                    <span className="text-sm font-medium text-slate-900 dark:text-white">
                       Brand context will be automatically applied to your generation
                     </span>
                   </div>
-                  <p className="mt-1 text-xs text-purple-700">
+                  <p className="mt-1 text-xs text-slate-700 dark:text-slate-300">
                     Style: {brandAnalysis.styleKeywords.slice(0, 3).join(', ')}
                     {brandAnalysis.styleKeywords.length > 3 && '...'}
                   </p>
@@ -731,7 +731,7 @@ export default function ImageGenerator() {
                     type="button"
                     variant="ghost"
                     size="sm"
-                    className="h-7 text-xs text-purple-600 hover:text-purple-700"
+                    className="h-7 text-xs text-teal-500 hover:text-slate-700 dark:text-slate-300"
                     onClick={handleClearPrompt}
                   >
                     <Eraser className="mr-1 h-3.5 w-3.5" />
@@ -745,14 +745,14 @@ export default function ImageGenerator() {
                     onChange={(e) => setPrompt(e.target.value.slice(0, maxPromptLength))}
                     rows={8}
                     ref={promptTextareaRef}
-                    className="resize-none border-gray-200 pr-24 pb-12 font-light focus:border-purple-400 focus:ring-purple-400/20"
+                    className="resize-none border-gray-200 pr-24 pb-12 font-light focus:border-teal-500 focus:ring-teal-500/20"
                   />
                   <Button
                     onClick={handleEnhancePrompt}
                     disabled={isEnhancing || !prompt.trim()}
                     size="sm"
                     variant="outline"
-                    className="absolute right-2 bottom-2 inline-flex items-center gap-2 rounded-lg border-2 border-purple-500 bg-purple-50 px-3 py-1.5 font-medium text-purple-700 text-sm shadow-sm transition-all duration-300 hover:bg-purple-100"
+                    className="absolute right-2 bottom-2 inline-flex items-center gap-2 rounded-lg border-2 border-teal-500 bg-teal-50 dark:bg-teal-900/20 px-3 py-1.5 font-medium text-slate-700 dark:text-slate-300 text-sm shadow-sm transition-all duration-300 hover:bg-teal-100 dark:bg-teal-900/30"
                   >
                     {isEnhancing ? (
                       <Loader2 className="h-4 w-4 animate-spin" />
@@ -766,9 +766,9 @@ export default function ImageGenerator() {
                   {prompt.length} / {maxPromptLength}
                 </div>
                 {enhancedPrompt && (
-                  <div className="mt-4 rounded-xl border border-purple-200 bg-purple-50 p-4 shadow-sm">
+                  <div className="mt-4 rounded-xl border border-teal-200 dark:border-teal-800 bg-teal-50 dark:bg-teal-900/20 p-4 shadow-sm">
                     <div className="mb-2 flex items-center justify-between">
-                      <h4 className="flex items-center gap-2 font-semibold text-purple-700 text-sm">
+                      <h4 className="flex items-center gap-2 font-semibold text-slate-700 dark:text-slate-300 text-sm">
                         <Sparkles className="h-4 w-4" />
                         {t('enhancedPrompt')}
                       </h4>
@@ -777,7 +777,7 @@ export default function ImageGenerator() {
                           onClick={handleCopyEnhancedPrompt}
                           size="sm"
                           variant="ghost"
-                          className="h-6 w-6 p-0 text-gray-600 hover:text-purple-700"
+                          className="h-6 w-6 p-0 text-gray-600 hover:text-slate-700 dark:text-slate-300"
                           title={t('copyAll') || 'Copy all'}
                         >
                           <Copy className="h-4 w-4" />
@@ -795,10 +795,10 @@ export default function ImageGenerator() {
                     <Textarea
                       value={enhancedPrompt}
                       onChange={(e) => setEnhancedPrompt(e.target.value.slice(0, maxPromptLength))}
-                      className="resize-none border border-purple-200 bg-white text-sm"
+                      className="resize-none border border-teal-200 dark:border-teal-800 bg-white text-sm"
                       rows={5}
                     />
-                    <p className="mt-1 text-right text-purple-600 text-xs">
+                    <p className="mt-1 text-right text-teal-500 text-xs">
                       {enhancedPrompt.length} / {maxPromptLength}
                     </p>
                   </div>
@@ -814,14 +814,14 @@ export default function ImageGenerator() {
                 </Label>
 
                 <div
-                  className="rounded-xl border border-dashed border-gray-300 p-4 transition-colors hover:border-purple-400"
+                  className="rounded-xl border border-dashed border-gray-300 p-4 transition-colors hover:border-teal-500"
                   onDragOver={handleDragOver}
                   onDrop={handleDrop}
                 >
                   {sourceImages.length === 0 ? (
                     <button
                       type="button"
-                      className="hover-card cursor-pointer rounded-xl border border-dashed border-gray-300 p-8 text-center transition-colors hover:border-purple-400 w-full"
+                      className="hover-card cursor-pointer rounded-xl border border-dashed border-gray-300 p-8 text-center transition-colors hover:border-teal-500 w-full"
                       onClick={triggerFileInput}
                       onKeyDown={(e) => {
                         if (e.key === 'Enter' || e.key === ' ') {
@@ -844,7 +844,7 @@ export default function ImageGenerator() {
                         >
                           <button
                             type="button"
-                            className="w-full overflow-hidden rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                            className="w-full overflow-hidden rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-teal-500"
                             onClick={() =>
                               setLightboxImage({
                                 url: image.dataUrl,
@@ -872,7 +872,7 @@ export default function ImageGenerator() {
                         <button
                           type="button"
                           onClick={triggerFileInput}
-                          className="flex min-h-48 w-full flex-col items-center justify-center rounded-xl border border-dashed border-gray-300 text-gray-500 transition-colors hover:border-purple-400 hover:text-purple-600"
+                          className="flex min-h-48 w-full flex-col items-center justify-center rounded-xl border border-dashed border-gray-300 text-gray-500 transition-colors hover:border-teal-500 hover:text-teal-500"
                         >
                           <Upload className="mb-2 h-8 w-8" />
                           <span className="text-sm font-medium">{t('addAnotherImage')}</span>
@@ -889,7 +889,7 @@ export default function ImageGenerator() {
                   <button
                     type="button"
                     onClick={triggerFileInput}
-                    className="text-purple-600 font-medium hover:underline"
+                    className="text-teal-500 font-medium hover:underline"
                   >
                     {t('uploadImages')}
                   </button>
@@ -914,7 +914,7 @@ export default function ImageGenerator() {
                     type="button"
                     variant="ghost"
                     size="sm"
-                    className="h-7 text-xs text-purple-600 hover:text-purple-700"
+                    className="h-7 text-xs text-teal-500 hover:text-slate-700 dark:text-slate-300"
                     onClick={handleClearPrompt}
                   >
                     <Eraser className="mr-1 h-3.5 w-3.5" />
@@ -927,7 +927,7 @@ export default function ImageGenerator() {
                     value={prompt}
                     onChange={(e) => setPrompt(e.target.value.slice(0, maxPromptLength))}
                     rows={4}
-                    className="resize-none border-gray-200 pr-24 pb-12 font-light focus:border-purple-400 focus:ring-purple-400/20"
+                    className="resize-none border-gray-200 pr-24 pb-12 font-light focus:border-teal-500 focus:ring-teal-500/20"
                     ref={promptTextareaRef}
                   />
                   <Button
@@ -935,7 +935,7 @@ export default function ImageGenerator() {
                     disabled={isEnhancing || !prompt.trim()}
                     size="sm"
                     variant="outline"
-                    className="absolute right-2 bottom-2 inline-flex items-center gap-2 rounded-lg border-2 border-purple-500 bg-purple-50 px-3 py-1.5 font-medium text-purple-700 text-sm shadow-sm transition-all duration-300 hover:bg-purple-100"
+                    className="absolute right-2 bottom-2 inline-flex items-center gap-2 rounded-lg border-2 border-teal-500 bg-teal-50 dark:bg-teal-900/20 px-3 py-1.5 font-medium text-slate-700 dark:text-slate-300 text-sm shadow-sm transition-all duration-300 hover:bg-teal-100 dark:bg-teal-900/30"
                   >
                     {isEnhancing ? (
                       <Loader2 className="h-4 w-4 animate-spin" />
@@ -949,9 +949,9 @@ export default function ImageGenerator() {
                   {prompt.length} / {maxPromptLength}
                 </div>
                 {enhancedPrompt && (
-                  <div className="mt-4 rounded-xl border border-purple-200 bg-purple-50 p-4 shadow-sm">
+                  <div className="mt-4 rounded-xl border border-teal-200 dark:border-teal-800 bg-teal-50 dark:bg-teal-900/20 p-4 shadow-sm">
                     <div className="mb-2 flex items-center justify-between">
-                      <h4 className="flex items-center gap-2 font-semibold text-purple-700 text-sm">
+                      <h4 className="flex items-center gap-2 font-semibold text-slate-700 dark:text-slate-300 text-sm">
                         <Sparkles className="h-4 w-4" />
                         {t('enhancedPrompt')}
                       </h4>
@@ -960,7 +960,7 @@ export default function ImageGenerator() {
                           onClick={handleCopyEnhancedPrompt}
                           size="sm"
                           variant="ghost"
-                          className="h-6 w-6 p-0 text-gray-600 hover:text-purple-700"
+                          className="h-6 w-6 p-0 text-gray-600 hover:text-slate-700 dark:text-slate-300"
                           title={t('copyAll') || 'Copy all'}
                         >
                           <Copy className="h-4 w-4" />
@@ -978,10 +978,10 @@ export default function ImageGenerator() {
                     <Textarea
                       value={enhancedPrompt}
                       onChange={(e) => setEnhancedPrompt(e.target.value.slice(0, maxPromptLength))}
-                      className="resize-none border border-purple-200 bg-white text-sm"
+                      className="resize-none border border-teal-200 dark:border-teal-800 bg-white text-sm"
                       rows={5}
                     />
-                    <p className="mt-1 text-right text-purple-600 text-xs">
+                    <p className="mt-1 text-right text-teal-500 text-xs">
                       {enhancedPrompt.length} / {maxPromptLength}
                     </p>
                   </div>
@@ -1046,8 +1046,8 @@ export default function ImageGenerator() {
                   onClick={() => setOutputFormat('PNG')}
                   className={`flex items-center justify-center rounded-lg border-2 py-3 px-4 text-sm font-medium transition-all ${
                     outputFormat === 'PNG'
-                      ? 'border-purple-500 bg-purple-50 text-purple-700'
-                      : 'border-gray-200 bg-white text-gray-700 hover:border-purple-300'
+                      ? 'border-teal-500 bg-teal-50 dark:bg-teal-900/20 text-slate-700 dark:text-slate-300'
+                      : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-gray-700 hover:border-teal-500'
                   }`}
                 >
                   <span>PNG</span>
@@ -1073,8 +1073,8 @@ export default function ImageGenerator() {
                   onClick={() => setOutputFormat('JPEG')}
                   className={`flex items-center justify-center rounded-lg border-2 py-3 px-4 text-sm font-medium transition-all ${
                     outputFormat === 'JPEG'
-                      ? 'border-purple-500 bg-purple-50 text-purple-700'
-                      : 'border-gray-200 bg-white text-gray-700 hover:border-purple-300'
+                      ? 'border-teal-500 bg-teal-50 dark:bg-teal-900/20 text-slate-700 dark:text-slate-300'
+                      : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-gray-700 hover:border-teal-500'
                   }`}
                 >
                   <span>JPEG</span>
@@ -1101,7 +1101,7 @@ export default function ImageGenerator() {
             <Button
               onClick={handleGenerate}
               disabled={isGenerating || !canGenerate}
-              className="w-full transform border-0 bg-gradient-to-r from-purple-600 via-pink-600 to-purple-600 font-bold text-lg text-white shadow-2xl shadow-purple-500/50 transition-all duration-300 hover:scale-105 hover:from-purple-700 hover:via-pink-700 hover:to-purple-700"
+              className="w-full btn-primary"
               size="lg"
             >
               {isGenerating ? (
@@ -1121,27 +1121,27 @@ export default function ImageGenerator() {
           <div className="lg:sticky lg:top-24 lg:h-fit">
             <Card className="p-6">
               {!result && !isGenerating && (
-                <div className="flex aspect-square items-center justify-center rounded-xl bg-gray-100">
+                <div className="flex aspect-square items-center justify-center rounded-xl bg-slate-100 dark:bg-slate-800">
                   <div className="space-y-3 text-center">
-                    <ImageIcon className="mx-auto h-16 w-16 text-gray-400" />
-                    <p className="font-light text-gray-500 text-sm">{t('imageWillAppearHere')}</p>
+                    <ImageIcon className="mx-auto h-16 w-16 text-slate-400 dark:text-slate-500" />
+                    <p className="font-light text-slate-500 dark:text-slate-400 text-sm">{t('imageWillAppearHere')}</p>
                   </div>
                 </div>
               )}
 
               {isGenerating && (
-                <div className="flex aspect-square flex-col items-center justify-center rounded-xl bg-gray-100 p-6 text-center">
-                  <Loader2 className="mb-4 h-12 w-12 animate-spin text-purple-600" />
-                  <p className="font-medium text-gray-700">
+                <div className="flex aspect-square flex-col items-center justify-center rounded-xl bg-slate-100 dark:bg-slate-800 p-6 text-center">
+                  <Loader2 className="mb-4 h-12 w-12 animate-spin text-teal-500" />
+                  <p className="font-medium text-slate-700 dark:text-slate-300">
                     {progressMessage || t('generatingImage')}
                   </p>
                   <div className="mt-4 w-full max-w-xs space-y-2">
                     <GenerationProgressBar value={progressValue} />
-                    <p className="text-xs font-medium text-gray-500">
+                    <p className="text-xs font-medium text-slate-500 dark:text-slate-400">
                       {Math.round(progressValue)}%
                     </p>
                   </div>
-                  <p className="mt-3 font-light text-gray-500 text-xs">
+                  <p className="mt-3 font-light text-slate-500 dark:text-slate-400 text-xs">
                     {t('generatingTakeMoments')}
                   </p>
                 </div>
@@ -1151,7 +1151,7 @@ export default function ImageGenerator() {
                 <div className="space-y-4">
                   <button
                     type="button"
-                    className="w-full overflow-hidden rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    className="w-full overflow-hidden rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500"
                     onClick={() =>
                       setLightboxImage({
                         url: result.previewUrl ?? result.imageUrl,

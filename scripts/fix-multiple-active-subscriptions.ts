@@ -10,8 +10,8 @@
  * Run with: pnpm tsx scripts/fix-multiple-active-subscriptions.ts
  */
 
-import { existsSync } from 'fs';
-import { resolve } from 'path';
+import { existsSync } from 'node:fs';
+import { resolve } from 'node:path';
 import { config } from 'dotenv';
 
 // Load environment variables from .env.local or .env file FIRST
@@ -212,6 +212,10 @@ async function fixMultipleActiveSubscriptions() {
     );
 
     const keepSub = activeSubs[0];
+    if (!keepSub) {
+      console.log('  ⚠️  No subscription to keep');
+      continue;
+    }
     const cancelSubs = activeSubs.slice(1);
 
     console.log(

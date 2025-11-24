@@ -140,17 +140,6 @@ function DashboardPageContent() {
     };
   }, [upcomingPlan]);
 
-  useEffect(() => {
-    if (!authLoading && !isAuthenticated) {
-      router.push('/login');
-      return;
-    }
-
-    if (isAuthenticated) {
-      fetchDashboardData();
-    }
-  }, [isAuthenticated, authLoading, router]);
-
   const fetchDashboardData = async () => {
     try {
       // Fetch credit balance
@@ -194,6 +183,18 @@ function DashboardPageContent() {
     }
   };
 
+  useEffect(() => {
+    if (!authLoading && !isAuthenticated) {
+      router.push('/login');
+      return;
+    }
+
+    if (isAuthenticated) {
+      fetchDashboardData();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isAuthenticated, authLoading]);
+
   const handleRefresh = async () => {
     setIsRefreshing(true);
     await fetchDashboardData();
@@ -209,7 +210,7 @@ function DashboardPageContent() {
       case 'refund':
         return <ArrowUpRight className="h-4 w-4 text-blue-500" />;
       default:
-        return <RefreshCw className="h-4 w-4 text-gray-500" />;
+        return <RefreshCw className="h-4 w-4 text-slate-500 dark:text-slate-400" />;
     }
   };
 
@@ -222,7 +223,7 @@ function DashboardPageContent() {
       case 'refund':
         return 'text-blue-600';
       default:
-        return 'text-gray-600';
+        return 'text-slate-600 dark:text-slate-400';
     }
   };
 
@@ -253,11 +254,11 @@ function DashboardPageContent() {
   }
 
   return (
-    <div className="container mx-auto space-y-6 p-6">
+    <div className="container-base space-y-6 py-12">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="mb-2 text-4xl font-bold">{t('title')}</h1>
-          <p className="text-muted-foreground">
+          <h1 className="h2-section mb-2">{t('title')}</h1>
+          <p className="text-body">
             {t('welcome')}, {user?.name || user?.email}
           </p>
         </div>
@@ -268,21 +269,21 @@ function DashboardPageContent() {
       </div>
 
       {scheduledPlanDetails && (
-        <Alert className="border-purple-300 bg-gradient-to-r from-purple-50 to-violet-50 shadow-lg">
-          <AlertTitle className="flex items-center gap-2 text-lg font-bold text-purple-900">
-            <TrendingUp className="h-5 w-5 text-purple-600" />
+        <Alert className="border-teal-300 dark:border-teal-800 bg-gradient-to-r from-teal-50 to-blue-50 dark:from-teal-900/20 dark:to-blue-900/20 shadow-lg">
+          <AlertTitle className="flex items-center gap-2 text-lg font-bold text-slate-900 dark:text-white">
+            <TrendingUp className="h-5 w-5 text-teal-500" />
             {locale === 'zh'
               ? `套餐升级已排程：${scheduledPlanDetails.planName}`
               : `Plan Upgrade Scheduled: ${scheduledPlanDetails.planName}`}
           </AlertTitle>
-          <AlertDescription className="mt-2 text-base text-purple-800">
+          <AlertDescription className="mt-2 text-base text-slate-800 dark:text-slate-200">
             <p className="font-semibold mb-2">
               {locale === 'zh'
                 ? `您的订阅将在以下日期升级为 ${scheduledPlanDetails.planName}：`
                 : `Your subscription will upgrade to ${scheduledPlanDetails.planName} on:`}
             </p>
             <p className="mb-3">
-              <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-md bg-purple-100 text-purple-900 font-bold text-lg">
+              <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-md bg-teal-100 dark:bg-teal-900/30 text-slate-900 dark:text-white font-bold text-lg">
                 <Calendar className="h-4 w-4" />
                 {formatDateDisplay(scheduledPlanDetails.takesEffectAt)}
               </span>
@@ -315,7 +316,7 @@ function DashboardPageContent() {
                 <span className="font-medium">{scheduledPlanDetails.credits}</span>
               </p>
             </div>
-            <p className="mt-3 pt-3 border-t border-purple-200 text-sm">
+            <p className="mt-3 pt-3 border-t border-teal-200 dark:border-teal-800 text-sm">
               {locale === 'zh'
                 ? `当前 ${planId === 'proplus' ? 'Pro+' : planId === 'pro' ? 'Pro' : 'Free'} 套餐将在此日期之前保持有效。`
                 : `Your current ${planId === 'proplus' ? 'Pro+' : planId === 'pro' ? 'Pro' : 'Free'} plan remains active until then.`}
@@ -408,7 +409,7 @@ function DashboardPageContent() {
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-base">
-                  <ImageIcon className="h-5 w-5 text-blue-500" />
+                  <ImageIcon className="h-5 w-5 text-teal-500" />
                   图片生成 (每日)
                 </CardTitle>
                 <CardDescription>今日生成限制</CardDescription>
@@ -439,7 +440,7 @@ function DashboardPageContent() {
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-base">
-                  <Video className="h-5 w-5 text-purple-500" />
+                  <Video className="h-5 w-5 text-blue-500" />
                   视频生成 (每日)
                 </CardTitle>
                 <CardDescription>今日生成限制</CardDescription>
@@ -470,7 +471,7 @@ function DashboardPageContent() {
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-base">
-                  <Video className="h-5 w-5 text-pink-500" />
+                  <Video className="h-5 w-5 text-teal-500" />
                   视频生成 (每月)
                 </CardTitle>
                 <CardDescription>本月生成限制</CardDescription>
@@ -570,7 +571,7 @@ function DashboardPageContent() {
           </div>
           <div className="mt-4 flex flex-col gap-2">
             <Link href="/image-generation">
-              <Button className="w-full" size="sm">
+              <Button className="w-full btn-primary" size="sm">
                 {t('generateImage')}
               </Button>
             </Link>

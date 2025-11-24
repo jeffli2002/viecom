@@ -27,7 +27,7 @@ export default function AboutPage() {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Target className="h-5 w-5 text-purple-600" />
+              <Target className="h-5 w-5 text-teal-500" />
               Our Mission
             </CardTitle>
           </CardHeader>
@@ -49,7 +49,7 @@ export default function AboutPage() {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Sparkles className="h-5 w-5 text-purple-600" />
+              <Sparkles className="h-5 w-5 text-teal-500" />
               What We Do
             </CardTitle>
           </CardHeader>
@@ -87,7 +87,7 @@ export default function AboutPage() {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Zap className="h-5 w-5 text-purple-600" />
+              <Zap className="h-5 w-5 text-teal-500" />
               Why Choose Viecom
             </CardTitle>
           </CardHeader>
@@ -123,7 +123,7 @@ export default function AboutPage() {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Users className="h-5 w-5 text-purple-600" />
+              <Users className="h-5 w-5 text-teal-500" />
               Who We Serve
             </CardTitle>
           </CardHeader>
@@ -167,13 +167,13 @@ export default function AboutPage() {
           <div className="flex gap-4 justify-center">
             <a
               href="/signup"
-              className="inline-flex items-center justify-center px-6 py-3 bg-purple-600 text-white font-semibold rounded-lg hover:bg-purple-700 transition-colors"
+              className="inline-flex items-center justify-center px-6 py-3 bg-teal-500 text-white font-semibold rounded-lg hover:bg-teal-600 transition-colors"
             >
               Start Free Trial
             </a>
             <a
               href="/contact"
-              className="inline-flex items-center justify-center px-6 py-3 border-2 border-purple-600 text-purple-600 font-semibold rounded-lg hover:bg-purple-50 transition-colors"
+              className="inline-flex items-center justify-center px-6 py-3 border-2 border-purple-600 text-teal-500 font-semibold rounded-lg hover:bg-teal-50 dark:bg-teal-900/20 transition-colors"
             >
               Contact Sales
             </a>

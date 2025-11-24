@@ -2,46 +2,65 @@
 
 import { Link } from '@/i18n/navigation';
 import { useTranslations } from 'next-intl';
+import { Twitter, Mail } from 'lucide-react';
 
 export function Footer() {
   const t = useTranslations('nav');
 
   return (
-    <footer className="border-t border-gray-200/50 bg-white dark:border-gray-800/50 dark:bg-gray-50">
-      <div className="container py-16 md:py-20">
-        <div className="grid grid-cols-1 gap-8 md:grid-cols-4">
+    <footer className="bg-main pt-20 pb-10 border-t border-slate-200 dark:border-white/5 transition-colors duration-300">
+      <div className="container-base">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
           {/* Brand */}
-          <div className="space-y-4">
+          <div className="space-y-6">
             <div className="flex items-center">
               <img
-                src="/brandlogo5transb.png"
+                src="/ViecomLogoV6.png"
                 alt="Viecom Logo"
                 style={{ height: '56px', width: '210px', objectFit: 'contain' }}
               />
             </div>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-body leading-relaxed">
               {t('footerDescription') || '为电商企业提供高质量的AI图片和视频生成服务'}
             </p>
+            <div className="flex gap-4">
+              <a 
+                href="https://x.com/jeffli2002" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="p-2 rounded-full bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-teal-500 hover:text-white transition-all"
+                aria-label="X (Twitter)"
+              >
+                <Twitter className="w-5 h-5" />
+              </a>
+              <a 
+                href="mailto:support@viecom.pro" 
+                className="p-2 rounded-full bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-teal-500 hover:text-white transition-all"
+                aria-label="Email"
+              >
+                <Mail className="w-5 h-5" />
+              </a>
+            </div>
           </div>
 
           {/* Product */}
           <div>
-            <h3 className="mb-4 text-sm font-semibold">{t('footerProduct') || '产品'}</h3>
-            <ul className="space-y-2 text-sm">
+            <h4 className="font-bold text-slate-900 dark:text-white mb-6">{t('footerProduct') || '产品'}</h4>
+            <ul className="space-y-4 text-sm text-slate-600 dark:text-slate-400">
               <li>
-                <Link href="/image-generation" className="text-muted-foreground hover:text-primary">
+                <Link href="/image-generation" className="hover:text-teal-500 transition-colors">
                   {t('imageGeneration')}
                 </Link>
               </li>
               <li>
-                <Link href="/video-generation" className="text-muted-foreground hover:text-primary">
+                <Link href="/video-generation" className="hover:text-teal-500 transition-colors">
                   {t('videoGeneration')}
                 </Link>
               </li>
               <li>
                 <Link
                   href="/batch-image-generation"
-                  className="text-muted-foreground hover:text-primary"
+                  className="hover:text-teal-500 transition-colors"
                 >
                   {t('batchImageGeneration')}
                 </Link>
@@ -49,7 +68,7 @@ export function Footer() {
               <li>
                 <Link
                   href="/batch-video-generation"
-                  className="text-muted-foreground hover:text-primary"
+                  className="hover:text-teal-500 transition-colors"
                 >
                   {t('batchVideoGeneration')}
                 </Link>
@@ -59,20 +78,20 @@ export function Footer() {
 
           {/* Resources */}
           <div>
-            <h3 className="mb-4 text-sm font-semibold">{t('footerResources') || '资源'}</h3>
-            <ul className="space-y-2 text-sm">
+            <h4 className="font-bold text-slate-900 dark:text-white mb-6">{t('footerResources') || '资源'}</h4>
+            <ul className="space-y-4 text-sm text-slate-600 dark:text-slate-400">
               <li>
-                <Link href="/assets" className="text-muted-foreground hover:text-primary">
+                <Link href="/assets" className="hover:text-teal-500 transition-colors">
                   {t('assets')}
                 </Link>
               </li>
               <li>
-                <Link href="/docs" className="text-muted-foreground hover:text-primary">
+                <Link href="/docs" className="hover:text-teal-500 transition-colors">
                   {t('footerDocs') || '文档'}
                 </Link>
               </li>
               <li>
-                <Link href="/pricing" className="text-muted-foreground hover:text-primary">
+                <Link href="/pricing" className="hover:text-teal-500 transition-colors">
                   {t('footerPricing') || '定价'}
                 </Link>
               </li>
@@ -81,30 +100,30 @@ export function Footer() {
 
           {/* Company */}
           <div>
-            <h3 className="mb-4 text-sm font-semibold">{t('footerCompany') || '公司'}</h3>
-            <ul className="space-y-2 text-sm">
+            <h4 className="font-bold text-slate-900 dark:text-white mb-6">{t('footerCompany') || '公司'}</h4>
+            <ul className="space-y-4 text-sm text-slate-600 dark:text-slate-400">
               <li>
-                <Link href="/about" className="text-muted-foreground hover:text-primary">
+                <Link href="/about" className="hover:text-teal-500 transition-colors">
                   {t('footerAbout') || '关于我们'}
                 </Link>
               </li>
               <li>
-                <Link href="/contact" className="text-muted-foreground hover:text-primary">
+                <Link href="/contact" className="hover:text-teal-500 transition-colors">
                   {t('footerContact') || '联系我们'}
                 </Link>
               </li>
               <li>
-                <Link href="/privacy" className="text-muted-foreground hover:text-primary">
+                <Link href="/privacy" className="hover:text-teal-500 transition-colors">
                   {t('footerPrivacy') || '隐私政策'}
                 </Link>
               </li>
               <li>
-                <Link href="/terms" className="text-muted-foreground hover:text-primary">
+                <Link href="/terms" className="hover:text-teal-500 transition-colors">
                   {t('footerTerms') || '服务条款'}
                 </Link>
               </li>
               <li>
-                <Link href="/refund" className="text-muted-foreground hover:text-primary">
+                <Link href="/refund" className="hover:text-teal-500 transition-colors">
                   {t('footerRefund') || '退款政策'}
                 </Link>
               </li>
@@ -112,7 +131,7 @@ export function Footer() {
           </div>
         </div>
 
-        <div className="mt-12 border-t pt-8 text-center text-sm text-muted-foreground">
+        <div className="pt-8 border-t border-slate-200 dark:border-white/5 flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-slate-500 dark:text-slate-500">
           <p>© {new Date().getFullYear()} Viecom. All rights reserved.</p>
         </div>
       </div>

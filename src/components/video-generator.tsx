@@ -402,11 +402,13 @@ export default function VideoGenerator() {
 
   return (
     <>
-      <UpgradePrompt
-        isOpen={showUpgradePrompt}
-        onClose={closeUpgradePrompt}
-        type="videoGeneration"
-      />
+      {showUpgradePrompt && (
+        <UpgradePrompt
+          isOpen={showUpgradePrompt}
+          onClose={closeUpgradePrompt}
+          type="videoGeneration"
+        />
+      )}
       <div className="mx-auto max-w-7xl space-y-6">
         <div className="grid gap-8 lg:grid-cols-2">
           <div className="space-y-6">
@@ -416,14 +418,14 @@ export default function VideoGenerator() {
                   <TabsList className="grid w-full grid-cols-2 bg-transparent gap-3 p-0">
                     <TabsTrigger
                       value="text-to-video"
-                      className="font-medium data-[state=active]:bg-purple-600 data-[state=active]:text-white data-[state=inactive]:border-2 data-[state=inactive]:border-gray-300 data-[state=inactive]:rounded-full data-[state=inactive]:bg-white data-[state=inactive]:text-gray-700 rounded-full py-3 transition-all"
+                      className="font-medium data-[state=active]:bg-teal-500 data-[state=active]:text-white data-[state=inactive]:border-2 data-[state=inactive]:border-slate-300 dark:border-slate-700 data-[state=inactive]:rounded-full data-[state=inactive]:bg-white dark:bg-slate-900 data-[state=inactive]:text-slate-700 dark:text-slate-300 rounded-full py-3 transition-all"
                     >
                       <Sparkles className="mr-2 h-4 w-4" />
                       {t('modeTextToVideo')}
                     </TabsTrigger>
                     <TabsTrigger
                       value="image-to-video"
-                      className="font-medium data-[state=active]:bg-purple-600 data-[state=active]:text-white data-[state=inactive]:border-2 data-[state=inactive]:border-gray-300 data-[state=inactive]:rounded-full data-[state=inactive]:bg-white data-[state=inactive]:text-gray-700 rounded-full py-3 transition-all"
+                      className="font-medium data-[state=active]:bg-teal-500 data-[state=active]:text-white data-[state=inactive]:border-2 data-[state=inactive]:border-slate-300 dark:border-slate-700 data-[state=inactive]:rounded-full data-[state=inactive]:bg-white dark:bg-slate-900 data-[state=inactive]:text-slate-700 dark:text-slate-300 rounded-full py-3 transition-all"
                     >
                       <VideoIcon className="mr-2 h-4 w-4" />
                       {t('modeImageToVideo')}
@@ -432,14 +434,14 @@ export default function VideoGenerator() {
 
                   <TabsContent value="text-to-video" className="mt-6 space-y-6">
                     {brandAnalysis && (
-                      <div className="rounded-lg border border-purple-200 bg-purple-50 p-3">
+                      <div className="rounded-lg border border-teal-200 dark:border-teal-800 bg-teal-50 dark:bg-teal-900/20 p-3">
                         <div className="flex items-center gap-2">
-                          <Sparkles className="h-4 w-4 text-purple-600" />
-                          <span className="text-sm font-medium text-purple-900">
+                          <Sparkles className="h-4 w-4 text-teal-500" />
+                          <span className="text-sm font-medium text-slate-900 dark:text-white">
                             Brand context will be automatically applied to your generation
                           </span>
                         </div>
-                        <p className="mt-1 text-xs text-purple-700">
+                        <p className="mt-1 text-xs text-slate-700 dark:text-slate-300">
                           Style: {brandAnalysis.styleKeywords.slice(0, 3).join(', ')}
                           {brandAnalysis.styleKeywords.length > 3 && '...'}
                         </p>
@@ -447,14 +449,14 @@ export default function VideoGenerator() {
                     )}
                     <div className="space-y-2">
                       <div className="flex items-center justify-between">
-                        <Label className="font-light text-gray-700 text-sm">
+                        <Label className="font-light text-slate-700 dark:text-slate-300 text-sm">
                           {t('videoPrompt')} <span className="text-red-500">*</span>
                         </Label>
                         <Button
                           type="button"
                           variant="ghost"
                           size="sm"
-                          className="h-7 text-xs text-purple-600 hover:text-purple-700"
+                          className="h-7 text-xs text-teal-500 hover:text-slate-700 dark:text-slate-300"
                           onClick={handleClearPrompt}
                         >
                           <Eraser className="mr-1 h-3.5 w-3.5" />
@@ -467,13 +469,13 @@ export default function VideoGenerator() {
                           value={prompt}
                           onChange={(e) => setPrompt(e.target.value.slice(0, maxPromptLength))}
                           rows={6}
-                          className="resize-none border-gray-200 pr-24 pb-12 font-light focus:border-purple-400 focus:ring-purple-400/20"
+                          className="resize-none border-slate-200 dark:border-slate-700 pr-24 pb-12 font-light focus:border-teal-500 focus:ring-teal-500/20"
                           ref={promptTextareaRef}
                         />
                         <Button
                           onClick={handleEnhancePrompt}
                           disabled={!prompt.trim() || isEnhancing}
-                          className="absolute right-2 bottom-2 inline-flex items-center gap-2 rounded-lg border-2 border-purple-500 bg-purple-50 px-3 py-1.5 font-medium text-purple-700 text-sm shadow-sm transition-all duration-300 hover:bg-purple-100"
+                          className="absolute right-2 bottom-2 inline-flex items-center gap-2 rounded-lg border-2 border-teal-500 bg-teal-50 dark:bg-teal-900/20 px-3 py-1.5 font-medium text-slate-700 dark:text-slate-300 text-sm shadow-sm transition-all duration-300 hover:bg-teal-100 dark:bg-teal-900/30"
                         >
                           {isEnhancing ? (
                             <Loader2 className="h-4 w-4 animate-spin" />
@@ -483,13 +485,13 @@ export default function VideoGenerator() {
                           {isEnhancing ? t('enhancing') : t('enhance')}
                         </Button>
                       </div>
-                      <div className="text-right font-light text-gray-400 text-xs">
+                      <div className="text-right font-light text-slate-400 dark:text-slate-500 text-xs">
                         {prompt.length} / {maxPromptLength}
                       </div>
                       {enhancedPrompt && (
-                        <div className="mt-4 rounded-xl border border-purple-200 bg-purple-50 p-4 shadow-sm">
+                        <div className="mt-4 rounded-xl border border-teal-200 dark:border-teal-800 bg-teal-50 dark:bg-teal-900/20 p-4 shadow-sm">
                           <div className="mb-2 flex items-center justify-between">
-                            <h4 className="flex items-center gap-2 font-semibold text-purple-700 text-sm">
+                            <h4 className="flex items-center gap-2 font-semibold text-slate-700 dark:text-slate-300 text-sm">
                               <Sparkles className="h-4 w-4" />
                               {t('enhancedPrompt')}
                             </h4>
@@ -497,7 +499,7 @@ export default function VideoGenerator() {
                               onClick={() => setEnhancedPrompt('')}
                               size="sm"
                               variant="ghost"
-                              className="h-6 w-6 p-0 text-gray-600"
+                              className="h-6 w-6 p-0 text-slate-600 dark:text-slate-400"
                             >
                               <X className="h-4 w-4" />
                             </Button>
@@ -507,10 +509,10 @@ export default function VideoGenerator() {
                             onChange={(e) =>
                               setEnhancedPrompt(e.target.value.slice(0, maxPromptLength))
                             }
-                            className="resize-none border border-purple-200 bg-white text-sm"
+                            className="resize-none border border-teal-200 dark:border-teal-800 bg-white dark:bg-slate-900 text-sm"
                             rows={5}
                           />
-                          <p className="mt-1 text-right text-purple-600 text-xs">
+                          <p className="mt-1 text-right text-teal-500 text-xs">
                             {enhancedPrompt.length} / {maxPromptLength}
                           </p>
                         </div>
@@ -535,7 +537,7 @@ export default function VideoGenerator() {
                     </div>
 
                     <div className="space-y-2">
-                      <Label className="font-light text-gray-700 text-sm">{t('sourceImage')}</Label>
+                      <Label className="font-light text-slate-700 dark:text-slate-300 text-sm">{t('sourceImage')}</Label>
 
                       {!imagePreview ? (
                         <button
@@ -543,21 +545,21 @@ export default function VideoGenerator() {
                           onClick={triggerFileInput}
                           onDragOver={handleDragOver}
                           onDrop={handleDrop}
-                          className="w-full hover-card cursor-pointer rounded-xl border border-dashed border-gray-300 p-8 text-center transition-colors hover:border-purple-400"
+                          className="w-full hover-card cursor-pointer rounded-xl border border-dashed border-slate-300 dark:border-slate-700 p-8 text-center transition-colors hover:border-teal-500"
                           aria-label={t('clickToUpload')}
                         >
-                          <Upload className="mx-auto mb-3 h-12 w-12 text-gray-400" />
-                          <p className="mb-1 font-light text-gray-600 text-sm">
+                          <Upload className="mx-auto mb-3 h-12 w-12 text-slate-400 dark:text-slate-500" />
+                          <p className="mb-1 font-light text-slate-600 dark:text-slate-400 text-sm">
                             {t('clickToUpload')}
                           </p>
-                          <p className="font-light text-gray-400 text-xs">{t('imageFormatDesc')}</p>
+                          <p className="font-light text-slate-400 dark:text-slate-500 text-xs">{t('imageFormatDesc')}</p>
                         </button>
                       ) : (
                         <div className="relative">
                           <img
                             src={imagePreview}
                             alt="Preview"
-                            className="w-full rounded-xl border border-gray-200"
+                            className="w-full rounded-xl border border-slate-200 dark:border-slate-700"
                           />
                           <button
                             type="button"
@@ -580,14 +582,14 @@ export default function VideoGenerator() {
 
                     <div className="space-y-2">
                       <div className="flex items-center justify-between">
-                        <Label className="font-light text-gray-700 text-sm">
+                        <Label className="font-light text-slate-700 dark:text-slate-300 text-sm">
                           {t('videoPrompt')} <span className="text-red-500">*</span>
                         </Label>
                         <Button
                           type="button"
                           variant="ghost"
                           size="sm"
-                          className="h-7 text-xs text-purple-600 hover:text-purple-700"
+                          className="h-7 text-xs text-teal-500 hover:text-slate-700 dark:text-slate-300"
                           onClick={handleClearPrompt}
                         >
                           <Eraser className="mr-1 h-3.5 w-3.5" />
@@ -600,13 +602,13 @@ export default function VideoGenerator() {
                           value={prompt}
                           onChange={(e) => setPrompt(e.target.value.slice(0, maxPromptLength))}
                           rows={4}
-                          className="resize-none border-gray-200 pr-24 pb-12 font-light focus:border-purple-400 focus:ring-purple-400/20"
+                          className="resize-none border-slate-200 dark:border-slate-700 pr-24 pb-12 font-light focus:border-teal-500 focus:ring-teal-500/20"
                           ref={promptTextareaRef}
                         />
                         <Button
                           onClick={handleEnhancePrompt}
                           disabled={!prompt.trim() || isEnhancing}
-                          className="absolute right-2 bottom-2 inline-flex items-center gap-2 rounded-lg border-2 border-purple-500 bg-purple-50 px-3 py-1.5 font-medium text-purple-700 text-sm shadow-sm transition-all duration-300 hover:bg-purple-100"
+                          className="absolute right-2 bottom-2 inline-flex items-center gap-2 rounded-lg border-2 border-teal-500 bg-teal-50 dark:bg-teal-900/20 px-3 py-1.5 font-medium text-slate-700 dark:text-slate-300 text-sm shadow-sm transition-all duration-300 hover:bg-teal-100 dark:bg-teal-900/30"
                         >
                           {isEnhancing ? (
                             <Loader2 className="h-4 w-4 animate-spin" />
@@ -616,13 +618,13 @@ export default function VideoGenerator() {
                           {isEnhancing ? t('enhancing') : t('enhance')}
                         </Button>
                       </div>
-                      <div className="text-right font-light text-gray-400 text-xs">
+                      <div className="text-right font-light text-slate-400 dark:text-slate-500 text-xs">
                         {prompt.length} / {maxPromptLength}
                       </div>
                       {enhancedPrompt && (
-                        <div className="mt-4 rounded-xl border border-purple-200 bg-purple-50 p-4 shadow-sm">
+                        <div className="mt-4 rounded-xl border border-teal-200 dark:border-teal-800 bg-teal-50 dark:bg-teal-900/20 p-4 shadow-sm">
                           <div className="mb-2 flex items-center justify-between">
-                            <h4 className="flex items-center gap-2 font-semibold text-purple-700 text-sm">
+                            <h4 className="flex items-center gap-2 font-semibold text-slate-700 dark:text-slate-300 text-sm">
                               <Sparkles className="h-4 w-4" />
                               {t('enhancedPrompt')}
                             </h4>
@@ -630,7 +632,7 @@ export default function VideoGenerator() {
                               onClick={() => setEnhancedPrompt('')}
                               size="sm"
                               variant="ghost"
-                              className="h-6 w-6 p-0 text-gray-600"
+                              className="h-6 w-6 p-0 text-slate-600 dark:text-slate-400"
                             >
                               <X className="h-4 w-4" />
                             </Button>
@@ -640,10 +642,10 @@ export default function VideoGenerator() {
                             onChange={(e) =>
                               setEnhancedPrompt(e.target.value.slice(0, maxPromptLength))
                             }
-                            className="resize-none border border-purple-200 bg-white text-sm"
+                            className="resize-none border border-teal-200 dark:border-teal-800 bg-white dark:bg-slate-900 text-sm"
                             rows={5}
                           />
-                          <p className="mt-1 text-right text-purple-600 text-xs">
+                          <p className="mt-1 text-right text-teal-500 text-xs">
                             {enhancedPrompt.length} / {maxPromptLength}
                           </p>
                         </div>
@@ -654,9 +656,9 @@ export default function VideoGenerator() {
 
                 {/* Video Style Selection */}
                 <div className="space-y-2">
-                  <Label className="font-light text-gray-700 text-sm">{t('videoStyle')}</Label>
+                  <Label className="font-light text-slate-700 dark:text-slate-300 text-sm">{t('videoStyle')}</Label>
                   <Select value={videoStyle} onValueChange={setVideoStyle}>
-                    <SelectTrigger className="border-gray-200 font-light">
+                    <SelectTrigger className="border-slate-200 dark:border-slate-700 font-light">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -671,7 +673,7 @@ export default function VideoGenerator() {
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label className="font-light text-gray-700 text-sm">{t('model')}</Label>
+                    <Label className="font-light text-slate-700 dark:text-slate-300 text-sm">{t('model')}</Label>
                     <Select
                       value={model}
                       onValueChange={(value) => {
@@ -682,7 +684,7 @@ export default function VideoGenerator() {
                         }
                       }}
                     >
-                      <SelectTrigger className="border-gray-200 font-light">
+                      <SelectTrigger className="border-slate-200 dark:border-slate-700 font-light">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
@@ -697,9 +699,9 @@ export default function VideoGenerator() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label className="font-light text-gray-700 text-sm">{t('aspectRatio')}</Label>
+                    <Label className="font-light text-slate-700 dark:text-slate-300 text-sm">{t('aspectRatio')}</Label>
                     <Select value={aspectRatio} onValueChange={setAspectRatio}>
-                      <SelectTrigger className="border-gray-200 font-light">
+                      <SelectTrigger className="border-slate-200 dark:border-slate-700 font-light">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
@@ -713,15 +715,15 @@ export default function VideoGenerator() {
                 {/* Quality Selector - Only show for Sora 2 Pro */}
                 {model === 'sora-2-pro' && (
                   <div className="space-y-2">
-                    <Label className="font-light text-gray-700 text-sm">{t('quality')}</Label>
+                    <Label className="font-light text-slate-700 dark:text-slate-300 text-sm">{t('quality')}</Label>
                     <div className="grid grid-cols-2 gap-3">
                       <button
                         type="button"
                         onClick={() => setQuality('standard')}
                         className={`flex items-center justify-center rounded-lg border-2 py-3 px-4 text-sm font-medium transition-all ${
                           quality === 'standard'
-                            ? 'border-purple-500 bg-purple-50 text-purple-700'
-                            : 'border-gray-200 bg-white text-gray-700 hover:border-purple-300'
+                            ? 'border-teal-500 bg-teal-50 dark:bg-teal-900/20 text-slate-700 dark:text-slate-300'
+                            : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 hover:border-teal-400 dark:border-teal-600'
                         }`}
                       >
                         <span>{t('qualityStandard')}</span>
@@ -747,8 +749,8 @@ export default function VideoGenerator() {
                         onClick={() => setQuality('high')}
                         className={`flex items-center justify-center rounded-lg border-2 py-3 px-4 text-sm font-medium transition-all ${
                           quality === 'high'
-                            ? 'border-purple-500 bg-purple-50 text-purple-700'
-                            : 'border-gray-200 bg-white text-gray-700 hover:border-purple-300'
+                            ? 'border-teal-500 bg-teal-50 dark:bg-teal-900/20 text-slate-700 dark:text-slate-300'
+                            : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 hover:border-teal-400 dark:border-teal-600'
                         }`}
                       >
                         <span>{t('qualityHigh')}</span>
@@ -774,15 +776,15 @@ export default function VideoGenerator() {
                 )}
 
                 <div className="space-y-2">
-                  <Label className="font-light text-gray-700 text-sm">{t('videoDuration')}</Label>
+                  <Label className="font-light text-slate-700 dark:text-slate-300 text-sm">{t('videoDuration')}</Label>
                   <div className="grid grid-cols-2 gap-3">
                     <button
                       type="button"
                       onClick={() => setDuration(10)}
                       className={`flex items-center justify-center rounded-lg border-2 py-3 px-4 text-sm font-medium transition-all ${
                         duration === 10
-                          ? 'border-purple-500 bg-purple-50 text-purple-700'
-                          : 'border-gray-200 bg-white text-gray-700 hover:border-purple-300'
+                          ? 'border-teal-500 bg-teal-50 dark:bg-teal-900/20 text-slate-700 dark:text-slate-300'
+                          : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 hover:border-teal-400 dark:border-teal-600'
                       }`}
                     >
                       <span>{t('duration10')}</span>
@@ -808,8 +810,8 @@ export default function VideoGenerator() {
                       onClick={() => setDuration(15)}
                       className={`flex items-center justify-center rounded-lg border-2 py-3 px-4 text-sm font-medium transition-all ${
                         duration === 15
-                          ? 'border-purple-500 bg-purple-50 text-purple-700'
-                          : 'border-gray-200 bg-white text-gray-700 hover:border-purple-300'
+                          ? 'border-teal-500 bg-teal-50 dark:bg-teal-900/20 text-slate-700 dark:text-slate-300'
+                          : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 hover:border-teal-400 dark:border-teal-600'
                       }`}
                     >
                       <span>{t('duration15')}</span>
@@ -836,7 +838,7 @@ export default function VideoGenerator() {
                 <Button
                   onClick={handleGenerate}
                   disabled={isGenerating || !canGenerate}
-                  className="w-full transform border-0 bg-gradient-to-r from-purple-600 via-pink-600 to-purple-600 font-bold text-lg text-white shadow-2xl shadow-purple-500/50 transition-all duration-300 hover:scale-105 hover:from-purple-700 hover:via-pink-700 hover:to-purple-700"
+                  className="w-full transform border-0 bg-gradient-to-r from-teal-500 via-blue-500 to-teal-500 font-bold text-lg text-white shadow-2xl shadow-teal-500/50 transition-all duration-300 hover:scale-105 hover:from-teal-600 hover:via-blue-600 hover:to-teal-600"
                   size="lg"
                 >
                   {isGenerating ? (
@@ -858,27 +860,27 @@ export default function VideoGenerator() {
           <div className="lg:sticky lg:top-24 lg:h-fit">
             <Card className="p-6">
               {!result && !isGenerating && (
-                <div className="flex aspect-video items-center justify-center rounded-xl bg-gray-100">
+                <div className="flex aspect-video items-center justify-center rounded-xl bg-slate-100 dark:bg-slate-800">
                   <div className="space-y-3 text-center">
-                    <VideoIcon className="mx-auto h-16 w-16 text-gray-400" />
-                    <p className="font-light text-gray-500 text-sm">{t('videoWillAppearHere')}</p>
+                    <VideoIcon className="mx-auto h-16 w-16 text-slate-400 dark:text-slate-500" />
+                    <p className="font-light text-slate-500 dark:text-slate-400 text-sm">{t('videoWillAppearHere')}</p>
                   </div>
                 </div>
               )}
 
               {isGenerating && (
-                <div className="flex aspect-video flex-col items-center justify-center rounded-xl bg-gray-100 p-6 text-center">
-                  <Loader2 className="mb-4 h-12 w-12 animate-spin text-purple-600" />
-                  <p className="font-medium text-gray-700">
+                <div className="flex aspect-video flex-col items-center justify-center rounded-xl bg-slate-100 dark:bg-slate-800 p-6 text-center">
+                  <Loader2 className="mb-4 h-12 w-12 animate-spin text-teal-500" />
+                  <p className="font-medium text-slate-700 dark:text-slate-300">
                     {progressMessage || t('generatingVideo')}
                   </p>
                   <div className="mt-4 w-full max-w-md space-y-2">
                     <GenerationProgressBar value={progressValue} />
-                    <p className="text-xs font-medium text-gray-500">
+                    <p className="text-xs font-medium text-slate-500 dark:text-slate-400">
                       {Math.round(progressValue)}%
                     </p>
                   </div>
-                  <p className="mt-3 font-light text-gray-500 text-sm">
+                  <p className="mt-3 font-light text-slate-500 dark:text-slate-400 text-sm">
                     {t('generatingTakeMinutes')}
                   </p>
                 </div>
@@ -909,7 +911,7 @@ export default function VideoGenerator() {
                     <Button
                       onClick={() => handleDownload(result.videoUrl)}
                       variant="outline"
-                      className="border-gray-200 font-light"
+                      className="border-slate-200 dark:border-slate-700 font-light"
                     >
                       <Download className="mr-2 h-4 w-4" />
                       {t('download')}
@@ -917,7 +919,7 @@ export default function VideoGenerator() {
                     <Button
                       onClick={handleShare}
                       variant="outline"
-                      className="border-gray-200 font-light"
+                      className="border-slate-200 dark:border-slate-700 font-light"
                     >
                       <Share2 className="mr-2 h-4 w-4" />
                       {t('share')}

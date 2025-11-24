@@ -1,111 +1,78 @@
 'use client';
 
-import { Button } from '@/components/ui/button';
-import { useAuthStore } from '@/store/auth-store';
-import { ArrowRight, FileSpreadsheet, Image as ImageIcon, Sparkles, Video } from 'lucide-react';
+import { Play, Sparkles, Zap } from 'lucide-react';
+import { Link } from '@/i18n/navigation';
+import { useIsAuthenticated } from '@/store/auth-store';
 import { useTranslations } from 'next-intl';
-import Link from 'next/link';
+
+const PLATFORMS = [
+  { name: 'Amazon', logo: 'https://upload.wikimedia.org/wikipedia/commons/a/a9/Amazon_logo.svg', width: 'w-24' },
+  { name: 'TikTok', logo: 'https://upload.wikimedia.org/wikipedia/en/a/a9/TikTok_logo.svg', width: 'w-24' },
+  { name: 'Shopee', logo: 'https://upload.wikimedia.org/wikipedia/commons/f/fe/Shopee.svg', width: 'w-24' },
+  { name: 'eBay', logo: 'https://upload.wikimedia.org/wikipedia/commons/1/1b/EBay_logo.svg', width: 'w-20' },
+  { name: 'Etsy', logo: 'https://upload.wikimedia.org/wikipedia/commons/8/89/Etsy_logo.svg', width: 'w-16' },
+];
 
 export function Hero() {
   const t = useTranslations('hero');
-  const { isAuthenticated } = useAuthStore();
+  const isAuthenticated = useIsAuthenticated();
+  
+  // Determine the link based on authentication status
+  const ctaHref = isAuthenticated 
+    ? '/image-generation' 
+    : `/signup?callbackUrl=${encodeURIComponent('/image-generation')}`;
 
   return (
-    <section className="section-container relative flex min-h-[85vh] items-center overflow-hidden bg-muted/30">
-      {/* Apple-style background with subtle pattern */}
-      <div className="-z-10 absolute inset-0">
-        <div className="absolute inset-0 bg-gradient-to-b from-muted/40 via-muted/30 to-muted/20" />
-        <div className="-translate-x-1/2 -translate-y-1/2 absolute top-1/2 left-1/2 h-[1400px] w-[1400px]">
-          <div className="absolute inset-0 bg-gradient-radial from-primary/5 via-primary/2 to-transparent blur-3xl" />
-        </div>
-        {/* Subtle grid pattern */}
-        <div className="absolute inset-0 bg-[size:50px_50px] bg-grid-white/[0.02] dark:bg-grid-black/[0.02]" />
+    <header className="relative pt-32 pb-20 overflow-hidden bg-main border-b border-slate-200 dark:border-white/5">
+      <div className="absolute inset-0">
+        <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?auto=format&fit=crop&q=80&w=2000')] opacity-5 dark:opacity-10 bg-cover bg-center mix-blend-overlay"></div>
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-white/90 to-white dark:via-slate-900/90 dark:to-slate-900"></div>
       </div>
-
-      <div className="container relative py-20 md:py-24">
-        {/* Announcement badge */}
-        <div className="fade-in slide-up mb-12 flex animate-in justify-center duration-400">
-          <div className="inline-flex items-center rounded-full border border-gray-300 bg-white px-6 py-3 text-gray-900 text-sm shadow-sm backdrop-blur-sm dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100">
-            <Sparkles className="mr-2 h-4 w-4" />
-            <span className="font-semibold">AI驱动的电商内容生成工具</span>
-          </div>
+      
+      <div className="container-base relative z-10 text-center">
+        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-teal-500/10 border border-teal-500/20 text-teal-500 dark:text-teal-400 mb-8 backdrop-blur-sm">
+          <Sparkles className="w-4 h-4" />
+          <span className="text-sm font-medium">{t('badge')}</span>
+        </div>
+        
+        <h1 className="h1-hero">
+          {t('titleLine1')} <br/>
+          <span className="text-gradient">{t('titleLine2')}</span>
+        </h1>
+        
+        <p className="text-xl text-body mb-10 max-w-2xl mx-auto leading-relaxed">
+          {t('subtitle')}
+        </p>
+        
+        <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-16">
+          <Link href={ctaHref} className="btn-primary">
+            <Zap className="w-5 h-5" />
+            {t('ctaStart')}
+          </Link>
+          <a 
+            href="#video-sample"
+            className="px-8 py-4 bg-white dark:bg-white/10 hover:bg-slate-50 dark:hover:bg-white/20 text-slate-900 dark:text-white font-medium rounded-xl backdrop-blur-md border border-slate-200 dark:border-white/10 transition-all flex items-center gap-2 shadow-sm dark:shadow-none"
+          >
+            <Play className="w-5 h-5 fill-current" />
+            {t('watchDemo')}
+          </a>
         </div>
 
-        <div className="mx-auto max-w-6xl text-center">
-          {/* Heading */}
-          <h1 className="fade-in slide-up animate-in delay-100 duration-700">
-            <span className="font-bold text-xl leading-[1.2] tracking-tight sm:text-2xl md:text-3xl lg:text-4xl">
-              {t('title')}
-            </span>
-          </h1>
-
-          {/* Description */}
-          <p className="fade-in slide-up mx-auto mt-6 max-w-3xl animate-in text-base text-gray-700 delay-200 duration-700 md:text-lg">
-            {t('description')}
-          </p>
-          <p className="fade-in slide-up mx-auto mt-3 max-w-3xl animate-in text-sm text-gray-600 delay-250 duration-700 md:text-base">
-            {t('descriptionSub')}
-          </p>
-
-          {/* CTA Buttons */}
-          <div className="fade-in slide-up mt-10 flex flex-col items-center justify-center gap-4 animate-in delay-300 duration-700 sm:flex-row">
-            {isAuthenticated ? (
-              <>
-                <Link href="/image-generation">
-                  <Button size="lg" className="group h-12 px-8 text-base">
-                    {t('featureImage')}
-                    <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
-                  </Button>
-                </Link>
-                <Link href="/batch-image-generation">
-                  <Button size="lg" variant="outline" className="h-12 px-8 text-base">
-                    {t('featureBatch')}
-                  </Button>
-                </Link>
-              </>
-            ) : (
-              <>
-                <Link href="/signup">
-                  <Button size="lg" className="group h-12 px-8 text-base">
-                    {t('ctaStart')}
-                    <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
-                  </Button>
-                </Link>
-                <Link href="/login">
-                  <Button size="lg" variant="outline" className="h-12 px-8 text-base">
-                    {t('ctaLogin')}
-                  </Button>
-                </Link>
-              </>
-            )}
-          </div>
-
-          {/* Features Grid */}
-          <div className="fade-in slide-up mt-16 grid grid-cols-1 gap-6 animate-in delay-400 duration-700 sm:grid-cols-3">
-            <div className="group rounded-2xl border border-gray-200 bg-white/80 p-8 text-center backdrop-blur-sm transition-all hover:border-primary/20 hover:shadow-lg dark:border-gray-800 dark:bg-gray-900/80">
-              <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10">
-                <ImageIcon className="h-6 w-6 text-primary" />
-              </div>
-              <h3 className="mb-2 text-lg font-semibold">{t('featureImage')}</h3>
-              <p className="text-sm text-muted-foreground">{t('featureImageDesc')}</p>
-            </div>
-            <div className="group rounded-2xl border border-gray-200 bg-white/80 p-8 text-center backdrop-blur-sm transition-all hover:border-primary/20 hover:shadow-lg dark:border-gray-800 dark:bg-gray-900/80">
-              <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10">
-                <Video className="h-6 w-6 text-primary" />
-              </div>
-              <h3 className="mb-2 text-lg font-semibold">{t('featureVideo')}</h3>
-              <p className="text-sm text-muted-foreground">{t('featureVideoDesc')}</p>
-            </div>
-            <div className="group rounded-2xl border border-gray-200 bg-white/80 p-8 text-center backdrop-blur-sm transition-all hover:border-primary/20 hover:shadow-lg dark:border-gray-800 dark:bg-gray-900/80">
-              <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10">
-                <FileSpreadsheet className="h-6 w-6 text-primary" />
-              </div>
-              <h3 className="mb-2 text-lg font-semibold">{t('featureBatch')}</h3>
-              <p className="text-sm text-muted-foreground">{t('featureBatchDesc')}</p>
-            </div>
+        <div className="pt-8 border-t border-slate-200 dark:border-white/10">
+          <p className="text-slate-500 text-sm font-medium mb-6 uppercase tracking-widest">{t('trustedBy')}</p>
+          <div className="flex flex-wrap justify-center gap-8 md:gap-16 items-center opacity-60">
+             {PLATFORMS.map((platform) => (
+               <div key={platform.name} className="group relative">
+                 <img 
+                   src={platform.logo} 
+                   alt={platform.name} 
+                   className="h-8 md:h-10 w-auto object-contain dark:brightness-0 dark:invert transition-all duration-300 opacity-60 group-hover:opacity-100 filter grayscale hover:grayscale-0"
+                 />
+               </div>
+             ))}
           </div>
         </div>
       </div>
-    </section>
+    </header>
   );
 }

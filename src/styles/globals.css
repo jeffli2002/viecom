@@ -115,73 +115,73 @@
 }
 
 .dark {
-  --background: #1a1a1a;
+  --background: #0f172a;
   --foreground: #fafafa;
-  --card: #1a1a1a;
+  --card: #1e293b;
   --card-foreground: #fafafa;
-  --popover: #1a1a1a;
+  --popover: #1e293b;
   --popover-foreground: #fafafa;
   --primary: #fafafa;
   --primary-foreground: #333333;
-  --secondary: #404040;
+  --secondary: #334155;
   --secondary-foreground: #fafafa;
-  --muted: #404040;
+  --muted: #334155;
   --muted-foreground: #b4b4b4;
-  --accent: #404040;
+  --accent: #334155;
   --accent-foreground: #fafafa;
   --destructive: #e63946;
   --destructive-foreground: #ff6b7a;
-  --border: #404040;
-  --input: #404040;
+  --border: #334155;
+  --input: #334155;
   --ring: #5a5a5a;
   --chart-1: #8b5cf6;
   --chart-2: #10b981;
   --chart-3: #f59e0b;
   --chart-4: #ec4899;
   --chart-5: #f97316;
-  --sidebar: #333333;
+  --sidebar: #1e293b;
   --sidebar-foreground: #fafafa;
   --sidebar-primary: #8b5cf6;
   --sidebar-primary-foreground: #fafafa;
-  --sidebar-accent: #404040;
+  --sidebar-accent: #334155;
   --sidebar-accent-foreground: #fafafa;
-  --sidebar-border: #404040;
+  --sidebar-border: #334155;
   --sidebar-ring: #5a5a5a;
 }
 
 @supports (color: oklch(0 0 0)) {
   .dark {
-    --background: oklch(0.145 0 0);
+    --background: oklch(0.18 0.02 250);
     --foreground: oklch(0.985 0 0);
-    --card: oklch(0.145 0 0);
+    --card: oklch(0.22 0.02 250);
     --card-foreground: oklch(0.985 0 0);
-    --popover: oklch(0.145 0 0);
+    --popover: oklch(0.22 0.02 250);
     --popover-foreground: oklch(0.985 0 0);
     --primary: oklch(0.985 0 0);
     --primary-foreground: oklch(0.205 0 0);
-    --secondary: oklch(0.269 0 0);
+    --secondary: oklch(0.30 0.02 250);
     --secondary-foreground: oklch(0.985 0 0);
-    --muted: oklch(0.269 0 0);
+    --muted: oklch(0.30 0.02 250);
     --muted-foreground: oklch(0.708 0 0);
-    --accent: oklch(0.269 0 0);
+    --accent: oklch(0.30 0.02 250);
     --accent-foreground: oklch(0.985 0 0);
     --destructive: oklch(0.396 0.141 25.723);
     --destructive-foreground: oklch(0.637 0.237 25.331);
-    --border: oklch(0.269 0 0);
-    --input: oklch(0.269 0 0);
+    --border: oklch(0.30 0.02 250);
+    --input: oklch(0.30 0.02 250);
     --ring: oklch(0.439 0 0);
     --chart-1: oklch(0.488 0.243 264.376);
     --chart-2: oklch(0.696 0.17 162.48);
     --chart-3: oklch(0.769 0.188 70.08);
     --chart-4: oklch(0.627 0.265 303.9);
     --chart-5: oklch(0.645 0.246 16.439);
-    --sidebar: oklch(0.205 0 0);
+    --sidebar: oklch(0.22 0.02 250);
     --sidebar-foreground: oklch(0.985 0 0);
     --sidebar-primary: oklch(0.488 0.243 264.376);
     --sidebar-primary-foreground: oklch(0.985 0 0);
-    --sidebar-accent: oklch(0.269 0 0);
+    --sidebar-accent: oklch(0.30 0.02 250);
     --sidebar-accent-foreground: oklch(0.985 0 0);
-    --sidebar-border: oklch(0.269 0 0);
+    --sidebar-border: oklch(0.30 0.02 250);
     --sidebar-ring: oklch(0.439 0 0);
   }
 }
@@ -623,15 +623,91 @@ picture {
   border-color: var(--brand-purple-300);
 }
 
-/* Avatar Circle - Purple */
-.avatar-purple {
-  border: 2px solid var(--brand-purple-500);
+/* Avatar Circle - Teal */
+.avatar-teal {
+  border: 2px solid var(--brand-teal);
 }
 
-.avatar-purple-fallback {
-  background-color: var(--brand-purple-600);
+.avatar-teal-fallback {
+  background-color: var(--brand-teal);
   color: white;
   border-radius: 9999px;
+}
+
+/* Force teal background for header avatar fallback */
+header [data-slot="avatar-fallback"],
+header .avatar-fallback,
+header [class*="AvatarFallback"] {
+  background-color: rgb(20, 184, 166) !important; /* teal-500 */
+}
+
+/* Ensure header avatar button is transparent and avatar is on top */
+header button[class*="rounded-full"][class*="h-10"][class*="w-10"],
+header button[class*="rounded-full"][class*="h-10"][class*="w-10"]:hover,
+header button[class*="rounded-full"][class*="h-10"][class*="w-10"]:focus,
+header button[class*="rounded-full"][class*="h-10"][class*="w-10"]:active {
+  background-color: transparent !important;
+  background: transparent !important;
+}
+
+/* Remove any purple/violet backgrounds from header avatar */
+header [class*="Avatar"],
+header [class*="Avatar"] *,
+header [data-radix-avatar-root],
+header [data-radix-avatar-image],
+header [data-radix-avatar-fallback] {
+  background-color: transparent !important;
+  background: transparent !important;
+}
+
+/* Force teal background only for fallback - strongest possible override */
+header [data-radix-avatar-fallback],
+header [class*="AvatarFallback"],
+header span[class*="AvatarFallback"],
+header div[class*="AvatarFallback"],
+header [role="img"][class*="AvatarFallback"],
+header button [data-radix-avatar-fallback],
+header button [class*="AvatarFallback"] {
+  position: relative !important;
+  z-index: 11 !important;
+  background-color: rgb(20, 184, 166) !important; /* teal-500 */
+  background: rgb(20, 184, 166) !important; /* teal-500 */
+  background-image: none !important;
+  background-size: auto !important;
+}
+
+/* Override any primary/violet/purple backgrounds - most specific selectors */
+header [data-radix-avatar-fallback][class*="bg-primary"],
+header [data-radix-avatar-fallback][class*="bg-violet"],
+header [data-radix-avatar-fallback][class*="bg-purple"],
+header [class*="AvatarFallback"][class*="bg-primary"],
+header [class*="AvatarFallback"][class*="bg-violet"],
+header [class*="AvatarFallback"][class*="bg-purple"],
+header button [data-radix-avatar-fallback][class*="bg-primary"],
+header button [class*="AvatarFallback"][class*="bg-primary"] {
+  background-color: rgb(20, 184, 166) !important; /* teal-500 */
+  background: rgb(20, 184, 166) !important; /* teal-500 */
+}
+
+/* Nuclear option - override everything that might be purple in header avatar area */
+header button[class*="rounded-full"] [data-radix-avatar-fallback],
+header button[class*="rounded-full"] [class*="AvatarFallback"],
+header button[class*="h-10"][class*="w-10"] [data-radix-avatar-fallback],
+header button[class*="h-10"][class*="w-10"] [class*="AvatarFallback"],
+header [data-header-avatar="true"],
+header .header-avatar-fallback,
+header [class*="header-avatar-fallback"] {
+  background-color: rgb(20, 184, 166) !important; /* teal-500 */
+  background: rgb(20, 184, 166) !important; /* teal-500 */
+  background-image: none !important;
+}
+
+/* Remove any purple/violet colors */
+header [class*="bg-purple"],
+header [class*="bg-violet"],
+header [class*="bg-primary"][class*="Avatar"] {
+  background-color: transparent !important;
+  background: transparent !important;
 }
 
 /* Badge - Purple */
@@ -692,6 +768,92 @@ picture {
 /* Checkmark in selected states */
 .checkmark-purple {
   color: var(--brand-purple-600);
+}
+
+/* Landing Page Styles - From landingpage/index.html */
+@layer components {
+  /* Global Layout */
+  .section-base {
+    @apply py-24 transition-colors duration-300 border-b border-slate-200 dark:border-white/5;
+  }
+  
+  /* Alternating Backgrounds System */
+  .bg-main {
+    @apply bg-white dark:bg-slate-900;
+  }
+  .bg-alt {
+    @apply bg-slate-50 dark:bg-slate-800;
+  }
+
+  /* Container System */
+  .container-base {
+    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+  }
+
+  /* Typography System */
+  .text-display {
+    @apply font-semibold text-slate-900 dark:text-white;
+  }
+  .text-body {
+    @apply font-sans text-slate-600 dark:text-slate-400;
+  }
+  .h1-hero {
+    @apply text-8xl md:text-[10rem] tracking-tight leading-tight font-semibold text-slate-900 dark:text-white mb-6;
+  }
+  .h2-section {
+    @apply text-3xl md:text-5xl font-semibold text-slate-900 dark:text-white mb-6;
+  }
+  
+  /* Component System */
+  .btn-primary {
+    @apply px-8 py-4 bg-teal-500 hover:bg-teal-600 text-white font-bold rounded-xl transition-all hover:scale-105 shadow-[0_0_20px_rgba(20,184,166,0.3)] flex items-center justify-center gap-2;
+    background-color: rgb(20 184 166) !important; /* Force teal-500 */
+  }
+  .btn-primary:hover {
+    background-color: rgb(13 148 136) !important; /* Force teal-600 */
+  }
+  .glass-card {
+    @apply bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border border-slate-200 dark:border-white/10;
+  }
+  .tag-pill {
+     @apply inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider;
+  }
+  .text-gradient {
+    @apply bg-gradient-to-r from-teal-500 to-blue-500 bg-clip-text text-transparent;
+  }
+  /* Language Switcher - Unified Style */
+  .language-switcher-trigger {
+    @apply flex h-9 w-[120px] items-center justify-between rounded-md border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-2 text-sm text-slate-700 dark:text-slate-300 ring-offset-white dark:ring-offset-slate-900 transition-all hover:border-teal-500 dark:hover:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50;
+  }
+  .language-switcher-content {
+    @apply relative z-50 min-w-[8rem] overflow-hidden rounded-md border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 shadow-lg;
+  }
+  .language-switcher-item {
+    @apply relative flex w-full cursor-default select-none items-center rounded-sm py-1.5 pl-8 pr-2 text-sm outline-none transition-colors focus:bg-teal-50 dark:focus:bg-teal-900/20 focus:text-teal-700 dark:focus:text-teal-300 data-[disabled]:pointer-events-none data-[disabled]:opacity-50;
+  }
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-track {
+    @apply bg-slate-800/50;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    @apply bg-slate-700 rounded-full hover:bg-slate-600;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}
+
+/* Brand Colors for Landing Page */
+:root {
+  --brand-teal: #14b8a6;
+  --brand-blue: #3b82f6;
 }
 
 /* Print Styles */

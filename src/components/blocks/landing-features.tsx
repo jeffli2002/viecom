@@ -115,7 +115,7 @@ export function LandingFeatures() {
             </div>
             <div className="absolute -top-6 -left-6 bg-white rounded-2xl p-4 shadow-xl border-2 border-slate-100">
               <div className="flex items-center gap-3">
-                <div className="size-12 rounded-xl bg-gradient-to-br from-fuchsia-600 to-purple-600 flex items-center justify-center">
+                <div className="size-12 rounded-xl bg-gradient-to-br from-fuchsia-600 to-blue-600 flex items-center justify-center">
                   <Wand2 className="size-6 text-white" />
                 </div>
                 <div>
@@ -174,7 +174,7 @@ export function LandingFeatures() {
             viewport={{ once: true }}
             className="space-y-6"
           >
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-purple-100 text-purple-700">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-teal-100 dark:bg-teal-900/30 text-slate-700 dark:text-slate-300">
               <Award className="size-4" />
               <span className="text-sm">{t('quality.badge')}</span>
             </div>
@@ -184,21 +184,21 @@ export function LandingFeatures() {
             <p className="text-lg text-slate-600 leading-relaxed">{t('quality.description')}</p>
             <ul className="space-y-4">
               <li className="flex items-start gap-3">
-                <CheckCircle2 className="size-6 text-purple-600 flex-shrink-0 mt-0.5" />
+                <CheckCircle2 className="size-6 text-teal-500 flex-shrink-0 mt-0.5" />
                 <div>
                   <span className="text-slate-900">{t('quality.benefit1.title')}</span>
                   <p className="text-slate-600">{t('quality.benefit1.desc')}</p>
                 </div>
               </li>
               <li className="flex items-start gap-3">
-                <CheckCircle2 className="size-6 text-purple-600 flex-shrink-0 mt-0.5" />
+                <CheckCircle2 className="size-6 text-teal-500 flex-shrink-0 mt-0.5" />
                 <div>
                   <span className="text-slate-900">{t('quality.benefit2.title')}</span>
                   <p className="text-slate-600">{t('quality.benefit2.desc')}</p>
                 </div>
               </li>
               <li className="flex items-start gap-3">
-                <CheckCircle2 className="size-6 text-purple-600 flex-shrink-0 mt-0.5" />
+                <CheckCircle2 className="size-6 text-teal-500 flex-shrink-0 mt-0.5" />
                 <div>
                   <span className="text-slate-900">{t('quality.benefit3.title')}</span>
                   <p className="text-slate-600">{t('quality.benefit3.desc')}</p>
@@ -213,7 +213,7 @@ export function LandingFeatures() {
             viewport={{ once: true }}
             className="relative"
           >
-            <div className="aspect-square rounded-3xl overflow-hidden border-2 border-purple-200 shadow-2xl group card-image-container">
+            <div className="aspect-square rounded-3xl overflow-hidden border-2 border-teal-200 dark:border-teal-800 shadow-2xl group card-image-container">
               <img
                 src="https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=800&q=80"
                 alt={t('quality.alt')}
@@ -222,7 +222,7 @@ export function LandingFeatures() {
             </div>
             <div className="absolute -bottom-6 -right-6 bg-white rounded-2xl p-4 shadow-xl border-2 border-slate-100">
               <div className="flex items-center gap-3">
-                <div className="size-12 rounded-xl bg-gradient-to-br from-purple-600 to-indigo-600 flex items-center justify-center">
+                <div className="size-12 rounded-xl bg-gradient-to-br from-teal-500 to-indigo-600 flex items-center justify-center">
                   <Award className="size-6 text-white" />
                 </div>
                 <div>

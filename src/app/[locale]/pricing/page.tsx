@@ -45,15 +45,15 @@ export default async function PricingPage() {
   });
 
   return (
-    <div className="container mx-auto px-4 py-12 max-w-7xl">
+    <div className="container-base py-24">
       <div className="mb-12 text-center">
-        <h1 className="mb-4 text-4xl font-bold text-gray-900">Simple, Transparent Pricing</h1>
-        <p className="text-lg text-gray-600 mb-6">
+        <h1 className="h2-section mb-4">Simple, Transparent Pricing</h1>
+        <p className="text-body text-lg mb-6">
           Choose the plan that fits your business needs. Upgrade or downgrade anytime.
         </p>
-        <div className="inline-flex items-center gap-2 bg-purple-50 px-4 py-2 rounded-full border border-purple-200">
-          <Sparkles className="h-4 w-4 text-purple-600" />
-          <span className="text-sm font-medium text-purple-900">
+        <div className="inline-flex items-center gap-2 bg-teal-50 dark:bg-teal-900/20 px-4 py-2 rounded-full border border-teal-200 dark:border-teal-800">
+          <Sparkles className="h-4 w-4 text-teal-500" />
+          <span className="text-sm font-medium text-slate-900 dark:text-white">
             All plans include daily check-in rewards and referral bonuses
           </span>
         </div>

@@ -157,11 +157,11 @@ export function BatchImageUploadLegacy() {
       <div className="space-y-6">
         <div>
           <h2 className="text-2xl font-bold mb-2">批量图片生成</h2>
-          <p className="text-gray-600">上传Excel/CSV文件，批量生成产品图片</p>
+          <p className="text-slate-600 dark:text-slate-400">上传Excel/CSV文件，批量生成产品图片</p>
         </div>
 
         {/* Generation Settings */}
-        <div className="border rounded-lg p-4 bg-gray-50 space-y-4">
+        <div className="border rounded-lg p-4 bg-slate-50 dark:bg-slate-900 space-y-4">
           <div className="grid grid-cols-2 gap-4">
             <div>
               <Label className="text-sm font-medium mb-2 block">生成模式</Label>
@@ -212,7 +212,7 @@ export function BatchImageUploadLegacy() {
         </div>
 
         {/* Template Download Section */}
-        <div className="border rounded-lg p-4 bg-gray-50">
+        <div className="border rounded-lg p-4 bg-slate-50 dark:bg-slate-900">
           <Label className="text-sm font-medium mb-3 block">下载模板</Label>
           <div className="flex gap-3">
             <Button
@@ -232,7 +232,7 @@ export function BatchImageUploadLegacy() {
               下载 CSV 模板
             </Button>
           </div>
-          <p className="text-xs text-gray-500 mt-2">
+          <p className="text-xs text-slate-500 dark:text-slate-400 mt-2">
             模板包含字段：prompt（必需）,
             baseImageUrl（可选，用于图生图，支持URL、base64或Excel中直接插入图片）, model（可选）,
             productSellingPoints（可选）
@@ -253,7 +253,7 @@ export function BatchImageUploadLegacy() {
               disabled={isUploading}
             />
             {file && (
-              <p className="text-sm text-gray-600 mt-2">
+              <p className="text-sm text-slate-600 dark:text-slate-400 mt-2">
                 已选择: {file.name} ({(file.size / 1024).toFixed(2)} KB)
               </p>
             )}
@@ -278,7 +278,7 @@ export function BatchImageUploadLegacy() {
         {!jobId && (
           <div className="border-t pt-4">
             <h3 className="font-medium mb-2">使用说明：</h3>
-            <ul className="text-sm text-gray-600 space-y-1 list-disc list-inside">
+            <ul className="text-sm text-slate-600 dark:text-slate-400 space-y-1 list-disc list-inside">
               <li>下载模板文件，填写生成提示词（prompt）</li>
               <li>
                 如果选择图生图模式，需要填写 baseImageUrl

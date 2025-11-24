@@ -69,7 +69,7 @@ export function CreditPackPurchaseButton({
       onClick={handlePurchase}
       disabled={isProcessing}
       className={`w-full ${
-        popular ? 'bg-purple-600 hover:bg-purple-700' : 'bg-gray-800 hover:bg-gray-900'
+        popular ? 'bg-teal-500 hover:bg-teal-600' : 'bg-gray-800 hover:bg-gray-900'
       }`}
       size="lg"
     >

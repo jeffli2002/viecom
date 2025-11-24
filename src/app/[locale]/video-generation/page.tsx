@@ -9,10 +9,10 @@ export default function VideoGenerationPage() {
   const t = useTranslations('videoGeneration');
 
   return (
-    <div className="container mx-auto py-8">
+    <div className="container-base py-12">
       <div className="mb-8 text-center">
-        <h1 className="mb-2 text-4xl font-bold">{t('title')}</h1>
-        <p className="text-gray-600">{t('subtitle')}</p>
+        <h1 className="h2-section mb-2">{t('title')}</h1>
+        <p className="text-body">{t('subtitle')}</p>
       </div>
       <Suspense
         fallback={

@@ -306,13 +306,13 @@ export function CheckinDropdown() {
           <div className="flex items-start justify-between">
             <div className="flex-1">
               <div className="flex items-center gap-2 mb-1">
-                <Calendar className="h-5 w-5 text-purple-600" />
-                <h3 className="text-lg font-bold text-gray-900">Daily Check-In</h3>
+                <Calendar className="h-5 w-5 text-teal-500" />
+                <h3 className="text-lg font-bold text-slate-900 dark:text-white">Daily Check-In</h3>
               </div>
-              <p className="text-xs text-gray-500">Check in daily to earn credits</p>
+              <p className="text-xs text-slate-500 dark:text-slate-400">Check in daily to earn credits</p>
             </div>
             {creditBalance && (
-              <Badge className="bg-gradient-to-r from-purple-500 to-pink-500 text-white border-0 px-3 py-1">
+              <Badge className="bg-gradient-to-r from-teal-500 to-blue-500 text-white border-0 px-3 py-1">
                 <Sparkles className="h-3 w-3 mr-1" />
                 {creditBalance.balance}
               </Badge>
@@ -320,11 +320,11 @@ export function CheckinDropdown() {
           </div>
 
           {/* Current Streak */}
-          <div className="bg-orange-50 border border-orange-200 rounded-lg p-3 flex items-center gap-3">
+          <div className="bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800 rounded-lg p-3 flex items-center gap-3">
             <Flame className="h-8 w-8 text-orange-500 flex-shrink-0" />
             <div className="flex-1">
-              <p className="text-xs text-gray-600 mb-0.5">Current Streak</p>
-              <p className="text-2xl font-bold text-gray-900">{consecutiveDays} Days</p>
+              <p className="text-xs text-slate-600 dark:text-slate-400 mb-0.5">Current Streak</p>
+              <p className="text-2xl font-bold text-slate-900 dark:text-white">{consecutiveDays} Days</p>
             </div>
           </div>
 
@@ -332,15 +332,15 @@ export function CheckinDropdown() {
           <div>
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center gap-1.5">
-                <Gift className="h-3.5 w-3.5 text-purple-600" />
-                <span className="text-xs font-medium text-gray-900">7-Day Bonus</span>
+                <Gift className="h-3.5 w-3.5 text-teal-500" />
+                <span className="text-xs font-medium text-slate-900 dark:text-white">7-Day Bonus</span>
               </div>
-              <span className="text-xs text-gray-500">
+              <span className="text-xs text-slate-500 dark:text-slate-400">
                 {progressDays}/{consecutiveDaysRequired} days
               </span>
             </div>
             <Progress value={progressPercentage} className="h-1.5 mb-1" />
-            <p className="text-xs text-gray-500">
+            <p className="text-xs text-slate-500 dark:text-slate-400">
               {progressDays >= consecutiveDaysRequired
                 ? '🎉 Bonus unlocked!'
                 : `Unlock +${weeklyBonusCredits} bonus credits`}
@@ -349,26 +349,26 @@ export function CheckinDropdown() {
 
           {/* Last 7 Days Calendar */}
           <div>
-            <p className="text-xs font-medium text-gray-900 mb-2">Last 7 Days</p>
-            <p className="text-xs text-gray-500 mb-3">Click today's date to check in</p>
+            <p className="text-xs font-medium text-slate-900 dark:text-white mb-2">Last 7 Days</p>
+            <p className="text-xs text-slate-500 dark:text-slate-400 mb-3">Click today's date to check in</p>
             <div className="grid grid-cols-7 gap-1.5">
               {last7Days.map((day) => {
                 const isClickable = day.isToday && !day.isCheckedIn && !isCheckingIn;
                 return (
                   <div key={day.date} className="flex flex-col items-center">
-                    <span className="text-xs text-gray-600 mb-1">{day.dayName}</span>
+                    <span className="text-xs text-slate-600 dark:text-slate-400 mb-1">{day.dayName}</span>
                     <button
                       type="button"
                       onClick={() => handleDateClick(day)}
                       disabled={!isClickable}
                       className={`w-8 h-8 rounded-full flex items-center justify-center border-2 text-xs transition-all ${
                         day.isCheckedIn
-                          ? 'bg-purple-500 border-purple-500 text-white cursor-default'
+                          ? 'bg-teal-500 border-teal-500 text-white cursor-default'
                           : day.isToday
                             ? isClickable
-                              ? 'border-purple-500 bg-purple-50 hover:bg-purple-100 hover:scale-110 cursor-pointer'
-                              : 'border-purple-500 cursor-default'
-                            : 'border-gray-200 cursor-default'
+                              ? 'border-teal-500 bg-teal-50 dark:bg-teal-900/20 hover:bg-teal-100 dark:hover:bg-teal-900/30 hover:scale-110 cursor-pointer'
+                              : 'border-teal-500 cursor-default'
+                            : 'border-slate-200 dark:border-slate-700 cursor-default'
                       }`}
                       title={
                         day.isToday
@@ -387,20 +387,20 @@ export function CheckinDropdown() {
           </div>
 
           {/* Reward Summary */}
-          <div className="grid grid-cols-2 gap-2 pt-2 border-t">
-            <div className="bg-purple-50 rounded-lg p-2 border border-purple-100">
+          <div className="grid grid-cols-2 gap-2 pt-2 border-t border-slate-200 dark:border-slate-700">
+            <div className="bg-teal-50 dark:bg-teal-900/20 rounded-lg p-2 border border-teal-100 dark:border-teal-800">
               <div className="flex items-center gap-1 mb-1">
-                <Sparkles className="h-3 w-3 text-purple-600" />
-                <span className="text-xs font-medium text-gray-700">Daily</span>
+                <Sparkles className="h-3 w-3 text-teal-500" />
+                <span className="text-xs font-medium text-slate-700 dark:text-slate-300">Daily</span>
               </div>
-              <p className="text-lg font-bold text-gray-900">+{dailyCredits}</p>
+              <p className="text-lg font-bold text-slate-900 dark:text-white">+{dailyCredits}</p>
             </div>
-            <div className="bg-pink-50 rounded-lg p-2 border border-pink-100">
+            <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-2 border border-blue-100 dark:border-blue-800">
               <div className="flex items-center gap-1 mb-1">
-                <Gift className="h-3 w-3 text-purple-600" />
-                <span className="text-xs font-medium text-gray-700">7-Day</span>
+                <Gift className="h-3 w-3 text-blue-500" />
+                <span className="text-xs font-medium text-slate-700 dark:text-slate-300">7-Day</span>
               </div>
-              <p className="text-lg font-bold text-gray-900">+{weeklyBonusCredits}</p>
+              <p className="text-lg font-bold text-slate-900 dark:text-white">+{weeklyBonusCredits}</p>
             </div>
           </div>
         </div>

@@ -7,7 +7,7 @@ export function LandingFooter() {
   const t = useTranslations('nav');
 
   return (
-    <footer className="border-t border-gray-200/50 bg-white dark:border-gray-800/50 dark:bg-gray-50">
+    <footer className="border-t border-slate-200 dark:border-slate-700/50 bg-white dark:border-gray-800/50 dark:bg-slate-50 dark:bg-slate-900">
       <div className="container py-16 md:py-20">
         <div className="grid grid-cols-1 gap-8 md:grid-cols-4">
           {/* Brand */}

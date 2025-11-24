@@ -23,10 +23,10 @@ export function HowItWorks() {
       icon: Wand2,
       title: t('step2Title'),
       description: t('step2Desc'),
-      color: 'from-purple-500 to-purple-600',
-      iconColor: 'text-purple-600',
-      bgColor: 'bg-purple-500/10',
-      borderColor: 'border-purple-200',
+      color: 'from-purple-500 to-blue-600',
+      iconColor: 'text-teal-500',
+      bgColor: 'bg-teal-500/10',
+      borderColor: 'border-teal-200 dark:border-teal-800',
       hoverBorderColor: 'hover:border-purple-400',
       hoverShadowColor: 'hover:shadow-purple-500/20',
     },
@@ -82,7 +82,7 @@ export function HowItWorks() {
                 </div>
 
                 {/* Title */}
-                <h3 className="text-xl font-semibold text-slate-900 mb-3 transition-colors group-hover:text-purple-600">
+                <h3 className="text-xl font-semibold text-slate-900 mb-3 transition-colors group-hover:text-teal-500">
                   {step.title}
                 </h3>
 
