@@ -6,7 +6,7 @@ import Link from 'next/link';
 export const metadata: Metadata = {
   title: 'Image to Video AI Free | Product Photos to Videos in 60 Seconds',
   description:
-    'Transform product images into engaging videos with AI. Upload photos, get professional videos instantly. Sora 2 models, 720p/1080p quality. Free trial with 30 credits.',
+    'Transform product images into engaging videos with AI. Upload photos, get professional videos instantly. Sora 2 models, 720p/1080p quality. Free trial with 30 credits sign-up bonus.',
   keywords: [
     'image to video',
     'image to video ai',
@@ -18,7 +18,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Image to Video AI Free | Product Photos to Videos',
     description:
-      'Transform product images into engaging videos with AI. Free trial with 30 credits.',
+      'Transform product images into engaging videos with AI. Free trial with 30 credits sign-up bonus.',
     type: 'website',
   },
 };
@@ -56,7 +56,7 @@ const features = [
 const pricingComparison = [
   {
     plan: 'Free',
-    credits: '30 credits',
+    credits: '30 credits (sign-up bonus, one-time)',
     videos: 'Up to 6 videos',
     price: '$0',
     features: ['720p quality', 'Sora 2 model', '1 video at a time', 'Watermark'],
@@ -208,7 +208,7 @@ export default function ImageToVideoAIPage() {
 
           <p className="text-xl text-slate-600 dark:text-slate-300 mb-8 leading-relaxed">
             Upload your product images and let AI create professional videos for e-commerce, social
-            media, and ads. No video editing skills required. Free trial with 30 credits.
+            media, and ads. No video editing skills required. Free trial with 30 credits sign-up bonus (one-time).
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">

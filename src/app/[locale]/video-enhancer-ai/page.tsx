@@ -59,7 +59,7 @@ const pricingTiers = [
   {
     name: 'Free Trial',
     price: '$0',
-    credits: '30 credits',
+    credits: '30 credits (sign-up bonus, one-time)',
     videos: '2-6 enhanced videos',
     features: [
       '720p to 1080p upscaling',
@@ -196,7 +196,7 @@ export default function VideoEnhancerAIPage() {
           <p className="text-xl text-slate-600 dark:text-slate-300 mb-8 leading-relaxed">
             Upscale video resolution, reduce noise, and improve clarity automatically. Perfect for
             e-commerce product videos, social media content, and marketing materials. Try free with
-            30 credits.
+            30 credits sign-up bonus (one-time).
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">

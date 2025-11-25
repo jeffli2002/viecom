@@ -647,6 +647,10 @@
     "q8": {
       "question": "What image generation models are available?",
       "answer": "We offer multiple AI models: Nano Banana (5 credits) for standard quality, Nano Banana Pro (30 credits) for premium quality with enhanced detail and realism, and various Flux models (5-10 credits) including Flux 1.1, Flux Kontext Pro/Max, and Stable Diffusion. Nano Banana Pro delivers superior results for professional e-commerce content with better brand consistency and higher resolution output."
+    },
+    "q9": {
+      "question": "What happens when I run out of credits?",
+      "answer": "You have several options: (1) Purchase one-time credit packs starting at $9.90 for 300 credits (packs never expire), (2) Upgrade to Pro/Pro+ for monthly credit allocations (500-900 credits/month), or (3) Earn credits daily through check-ins (2 credits/day), referrals (10 credits per referral), and social sharing (5 credits per share). Credit packs are perfect if you need extra credits without committing to a subscription."
     }
   },
   "brandAnalysis": {

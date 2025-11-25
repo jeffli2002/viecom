@@ -1,4 +1,6 @@
 import { Button } from '@/components/ui/button';
+import { creditsConfig } from '@/config/credits.config';
+import { paymentConfig } from '@/config/payment.config';
 import { ArrowRight, Calendar, Check, Gift, Sparkles, Users } from 'lucide-react';
 import type { Metadata } from 'next';
 import Link from 'next/link';
@@ -58,7 +60,8 @@ const earnMoreCredits = [
 ];
 
 const comparisonTable = [
-  { feature: 'Monthly Credits', free: '30', pro: '500', proPlus: '900' },
+  { feature: 'Sign-up Bonus', free: '30 credits (one-time)', pro: 'N/A', proPlus: 'N/A' },
+  { feature: 'Monthly Credits', free: '0', pro: '500', proPlus: '900' },
   { feature: 'Video Quality', free: '720p', pro: '720p/1080p', proPlus: '720p/1080p' },
   { feature: 'AI Models', free: 'Sora 2', pro: 'Sora 2 & Pro', proPlus: 'Sora 2 & Pro' },
   { feature: 'Concurrent Videos', free: '1', pro: '3', proPlus: '5' },
@@ -70,6 +73,11 @@ const comparisonTable = [
 ];
 
 export default function FreeAIVideoGeneratorPage() {
+  const dailyCheckinCredits = creditsConfig.rewards.checkin.dailyCredits;
+  const referralReward = creditsConfig.rewards.referral.creditsPerReferral;
+  const shareReward = creditsConfig.rewards.socialShare.creditsPerShare;
+  const cheapestPack = paymentConfig.creditPacks[0]; // First pack is usually the cheapest
+  
   const softwareSchema = {
     '@context': 'https://schema.org',
     '@type': 'SoftwareApplication',
@@ -167,7 +175,7 @@ export default function FreeAIVideoGeneratorPage() {
           </h1>
 
           <p className="text-xl text-slate-600 dark:text-slate-300 mb-8 leading-relaxed">
-            Start with 30 free credits. No credit card, no hidden fees, no time limits. Create
+            Start with 30 free credits sign-up bonus (one-time). No credit card, no hidden fees, no time limits. Create
             videos with Sora 2 AI models and earn more credits daily. Perfect for trying our
             platform risk-free.
           </p>
@@ -355,9 +363,7 @@ export default function FreeAIVideoGeneratorPage() {
                 What happens when I run out of credits?
               </h3>
               <p className="text-slate-600 dark:text-slate-300">
-                You can earn more credits daily (check-ins, referrals, shares) or upgrade to
-                Pro/Pro+ for monthly credit packages. No forced upgrades - stay free forever if you
-                prefer!
+                You have several options: (1) Purchase one-time credit packs starting at ${cheapestPack.price} for {cheapestPack.credits} credits (packs never expire), (2) Upgrade to Pro/Pro+ for monthly credit allocations (500-900 credits/month), or (3) Earn credits daily through check-ins ({dailyCheckinCredits} credits/day), referrals ({referralReward} credits per referral), and social sharing ({shareReward} credits per share). Credit packs are perfect if you need extra credits without committing to a subscription. No forced upgrades - stay free forever if you prefer!
               </p>
             </div>
           </div>

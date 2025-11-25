@@ -599,9 +599,12 @@ export default function DocsPage() {
 
             <div className="border-t border-gray-200 pt-6">
               <h3 className="font-semibold text-gray-900 dark:text-white mb-3">
-                How to Earn Free Credits?
+                How to Get More Credits?
               </h3>
-              <div className="grid md:grid-cols-3 gap-3">
+              <p className="text-sm text-gray-700 dark:text-slate-300 mb-4">
+                You have several options to get more credits:
+              </p>
+              <div className="grid md:grid-cols-2 gap-3 mb-4">
                 <div className="bg-green-50 dark:bg-green-900/20 rounded-lg p-3 border border-green-200 dark:border-green-800">
                   <div className="font-semibold text-green-900 dark:text-green-200 text-sm mb-1">
                     Daily Check-in
@@ -626,7 +629,22 @@ export default function DocsPage() {
                     +{creditsConfig.rewards.socialShare.creditsPerShare} credits per share
                   </div>
                 </div>
+                <div className="bg-purple-50 dark:bg-purple-900/20 rounded-lg p-3 border border-purple-200 dark:border-purple-800">
+                  <div className="font-semibold text-purple-900 dark:text-purple-200 text-sm mb-1">
+                    Purchase Credit Packs
+                  </div>
+                  <div className="text-xs text-purple-800 dark:text-purple-200">
+                    Starting at $9.90 for 300 credits (never expire)
+                  </div>
+                </div>
               </div>
+              <p className="text-xs text-gray-600 dark:text-slate-400">
+                💡 <strong>Tip:</strong> Credit packs are perfect if you need extra credits without committing to a subscription. Visit the{' '}
+                <Link href="/pricing" className="text-teal-500 hover:underline">
+                  Pricing page
+                </Link>{' '}
+                to purchase credit packs or upgrade to Pro/Pro+ for monthly allocations.
+              </p>
             </div>
 
             <div className="border-t border-gray-200 pt-6">
