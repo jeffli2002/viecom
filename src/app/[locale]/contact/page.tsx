@@ -102,7 +102,11 @@ export default function ContactPage() {
               What happens if I run out of credits?
             </h3>
             <p className="text-gray-700 dark:text-slate-300 text-sm">
-              You have several options: (1) Upgrade to a higher plan for more monthly credits, (2) Purchase one-time credit packs starting at $9.90 for 300 credits (packs never expire), or (3) Earn credits through daily check-ins ({dailyCheckinCredits} credits/day), referrals (10 credits per referral), and social sharing (5 credits per share). Credit packs are perfect if you need extra credits without committing to a subscription.
+              You have several options: (1) Upgrade to a higher plan for more monthly credits, (2)
+              Purchase one-time credit packs starting at $9.90 for 300 credits (packs never expire),
+              or (3) Earn credits through daily check-ins ({dailyCheckinCredits} credits/day),
+              referrals (10 credits per referral), and social sharing (5 credits per share). Credit
+              packs are perfect if you need extra credits without committing to a subscription.
             </p>
           </div>
 

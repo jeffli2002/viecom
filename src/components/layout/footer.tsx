@@ -80,9 +80,7 @@ export function Footer() {
 
           {/* Learn */}
           <div>
-            <h4 className="font-bold text-slate-900 dark:text-white mb-6">
-              Learn
-            </h4>
+            <h4 className="font-bold text-slate-900 dark:text-white mb-6">Learn</h4>
             <ul className="space-y-4 text-sm text-slate-600 dark:text-slate-400">
               <li>
                 <Link href="/image-to-video-ai" className="hover:text-teal-500 transition-colors">
@@ -90,7 +88,10 @@ export function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="/ai-video-generator-free" className="hover:text-teal-500 transition-colors">
+                <Link
+                  href="/ai-video-generator-free"
+                  className="hover:text-teal-500 transition-colors"
+                >
                   Free AI Video Generator
                 </Link>
               </li>

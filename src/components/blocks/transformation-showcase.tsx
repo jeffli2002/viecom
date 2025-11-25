@@ -91,6 +91,7 @@ export function TransformationShowcase() {
               const Icon = scenario.icon;
               return (
                 <button
+                  type="button"
                   key={scenario.id}
                   onClick={() => setActiveIndex(index)}
                   className={`px-5 py-2.5 rounded-full font-medium text-sm flex items-center gap-2 transition-all ${
@@ -109,6 +110,7 @@ export function TransformationShowcase() {
 
         <div className="relative">
           <button
+            type="button"
             onClick={handlePrev}
             className="absolute left-0 lg:-left-12 top-1/2 -translate-y-1/2 z-40 p-4 rounded-full glass-card shadow-xl text-slate-600 dark:text-slate-300 transition-all hover:scale-110 active:scale-95"
           >
@@ -116,6 +118,7 @@ export function TransformationShowcase() {
           </button>
 
           <button
+            type="button"
             onClick={handleNext}
             className="absolute right-0 lg:-right-12 top-1/2 -translate-y-1/2 z-40 p-4 rounded-full glass-card shadow-xl text-slate-600 dark:text-slate-300 transition-all hover:scale-110 active:scale-95"
           >

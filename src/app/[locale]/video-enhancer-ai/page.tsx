@@ -263,9 +263,7 @@ export default function VideoEnhancerAIPage() {
         </div>
 
         <div className="max-w-6xl mx-auto mb-20">
-          <h2 className="h2-section text-center mb-12">
-            Before & After Examples
-          </h2>
+          <h2 className="h2-section text-center mb-12">Before & After Examples</h2>
           <div className="bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 rounded-2xl p-8 md:p-12 border border-slate-200 dark:border-slate-700">
             <div className="grid md:grid-cols-2 gap-8 mb-8">
               <div>
@@ -297,9 +295,7 @@ export default function VideoEnhancerAIPage() {
         </div>
 
         <div className="max-w-6xl mx-auto mb-20">
-          <h2 className="h2-section text-center mb-12">
-            AI Enhancement Features
-          </h2>
+          <h2 className="h2-section text-center mb-12">AI Enhancement Features</h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
             {features.map((feature) => (
               <div
@@ -317,9 +313,7 @@ export default function VideoEnhancerAIPage() {
         </div>
 
         <div className="max-w-4xl mx-auto mb-20">
-          <h2 className="h2-section text-center mb-12">
-            Perfect For
-          </h2>
+          <h2 className="h2-section text-center mb-12">Perfect For</h2>
           <div className="grid md:grid-cols-2 gap-4">
             {useCases.map((useCase) => (
               <div key={useCase} className="flex items-start gap-3">
@@ -331,9 +325,7 @@ export default function VideoEnhancerAIPage() {
         </div>
 
         <div className="max-w-6xl mx-auto mb-20">
-          <h2 className="h2-section text-center mb-4">
-            Enhancement Pricing
-          </h2>
+          <h2 className="h2-section text-center mb-4">Enhancement Pricing</h2>
           <p className="text-center text-slate-600 dark:text-slate-400 mb-12">
             Try free, upgrade for unlimited enhancements
           </p>
@@ -391,9 +383,7 @@ export default function VideoEnhancerAIPage() {
         </div>
 
         <div className="max-w-3xl mx-auto mb-20">
-          <h2 className="h2-section text-center mb-12">
-            Frequently Asked Questions
-          </h2>
+          <h2 className="h2-section text-center mb-12">Frequently Asked Questions</h2>
           <div className="space-y-8">
             <div>
               <h3 className="text-xl font-semibold mb-3 text-slate-900 dark:text-white">

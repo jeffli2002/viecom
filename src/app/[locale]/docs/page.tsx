@@ -639,7 +639,8 @@ export default function DocsPage() {
                 </div>
               </div>
               <p className="text-xs text-gray-600 dark:text-slate-400">
-                💡 <strong>Tip:</strong> Credit packs are perfect if you need extra credits without committing to a subscription. Visit the{' '}
+                💡 <strong>Tip:</strong> Credit packs are perfect if you need extra credits without
+                committing to a subscription. Visit the{' '}
                 <Link href="/pricing" className="text-teal-500 hover:underline">
                   Pricing page
                 </Link>{' '}

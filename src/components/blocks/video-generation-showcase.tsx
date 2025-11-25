@@ -584,6 +584,7 @@ export function VideoGenerationShowcase() {
                 <div className="flex flex-wrap gap-2">
                   {categories.map((cat) => (
                     <button
+                      type="button"
                       key={cat}
                       onClick={() => handleCategoryChange(cat)}
                       className={`px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all border ${
@@ -647,6 +648,7 @@ export function VideoGenerationShowcase() {
 
               <div className="p-5 border-t border-slate-800 bg-slate-900 relative z-10 flex-shrink-0">
                 <button
+                  type="button"
                   onClick={handleGenerate}
                   disabled={isGenerating}
                   className={`w-full py-4 bg-gradient-to-r from-teal-500 to-blue-500 hover:from-teal-600 hover:to-blue-600 text-white font-bold rounded-xl shadow-[0_4px_20px_rgba(20,184,166,0.3)] flex items-center justify-center gap-2 transition-all active:scale-95 group border border-white/10 ${isGenerating ? 'opacity-75 cursor-wait' : ''}`}

@@ -110,7 +110,7 @@ export default function FreeAIVideoGeneratorPage() {
   const referralReward = creditsConfig.rewards.referral.creditsPerReferral;
   const shareReward = creditsConfig.rewards.socialShare.creditsPerShare;
   const cheapestPack = paymentConfig.creditPacks[0]; // First pack is usually the cheapest
-  
+
   const softwareSchema = {
     '@context': 'https://schema.org',
     '@type': 'SoftwareApplication',
@@ -208,17 +208,14 @@ export default function FreeAIVideoGeneratorPage() {
           </h1>
 
           <p className="text-xl text-slate-600 dark:text-slate-300 mb-8 leading-relaxed">
-            Start with 30 free credits sign-up bonus (one-time). No credit card, no hidden fees, no time limits. Create
-            videos with Sora 2 AI models and earn more credits daily. Perfect for trying our
-            platform risk-free.
+            Start with 30 free credits sign-up bonus (one-time). No credit card, no hidden fees, no
+            time limits. Create videos with Sora 2 AI models and earn more credits daily. Perfect
+            for trying our platform risk-free.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
             <Link href="/video-generation">
-              <Button
-                size="lg"
-                className="btn-primary text-lg px-8 py-6 group"
-              >
+              <Button size="lg" className="btn-primary text-lg px-8 py-6 group">
                 Start Creating Free Videos
                 <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
               </Button>
@@ -252,9 +249,7 @@ export default function FreeAIVideoGeneratorPage() {
 
         <div className="max-w-5xl mx-auto mb-20">
           <div className="bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 rounded-2xl p-8 md:p-12 border border-slate-200 dark:border-slate-700">
-            <h2 className="h2-section text-center mb-12">
-              What's Included for Free
-            </h2>
+            <h2 className="h2-section text-center mb-12">What's Included for Free</h2>
             <div className="grid md:grid-cols-2 gap-4">
               {freeFeatures.map((feature) => (
                 <div key={feature} className="flex items-start gap-3">
@@ -267,9 +262,7 @@ export default function FreeAIVideoGeneratorPage() {
         </div>
 
         <div className="max-w-6xl mx-auto mb-20">
-          <h2 className="h2-section text-center mb-4">
-            Earn More Free Credits
-          </h2>
+          <h2 className="h2-section text-center mb-4">Earn More Free Credits</h2>
           <p className="text-center text-slate-600 dark:text-slate-400 mb-12">
             Keep creating videos for free by earning credits every day
           </p>
@@ -293,9 +286,7 @@ export default function FreeAIVideoGeneratorPage() {
         </div>
 
         <div className="max-w-6xl mx-auto mb-20">
-          <h2 className="h2-section text-center mb-4">
-            Free vs Paid Plans Comparison
-          </h2>
+          <h2 className="h2-section text-center mb-4">Free vs Paid Plans Comparison</h2>
           <p className="text-center text-slate-600 dark:text-slate-400 mb-12">
             Start free, upgrade when you need more
           </p>
@@ -342,9 +333,7 @@ export default function FreeAIVideoGeneratorPage() {
         </div>
 
         <div className="max-w-3xl mx-auto mb-20">
-          <h2 className="h2-section text-center mb-12">
-            Frequently Asked Questions
-          </h2>
+          <h2 className="h2-section text-center mb-12">Frequently Asked Questions</h2>
           <div className="space-y-8">
             <div>
               <h3 className="text-xl font-semibold mb-3 text-slate-900 dark:text-white">
@@ -396,7 +385,13 @@ export default function FreeAIVideoGeneratorPage() {
                 What happens when I run out of credits?
               </h3>
               <p className="text-slate-600 dark:text-slate-300">
-                You have several options: (1) Purchase one-time credit packs starting at ${cheapestPack.price} for {cheapestPack.credits} credits (packs never expire), (2) Upgrade to Pro/Pro+ for monthly credit allocations (500-900 credits/month), or (3) Earn credits daily through check-ins ({dailyCheckinCredits} credits/day), referrals ({referralReward} credits per referral), and social sharing ({shareReward} credits per share). Credit packs are perfect if you need extra credits without committing to a subscription. No forced upgrades - stay free forever if you prefer!
+                You have several options: (1) Purchase one-time credit packs starting at $
+                {cheapestPack.price} for {cheapestPack.credits} credits (packs never expire), (2)
+                Upgrade to Pro/Pro+ for monthly credit allocations (500-900 credits/month), or (3)
+                Earn credits daily through check-ins ({dailyCheckinCredits} credits/day), referrals
+                ({referralReward} credits per referral), and social sharing ({shareReward} credits
+                per share). Credit packs are perfect if you need extra credits without committing to
+                a subscription. No forced upgrades - stay free forever if you prefer!
               </p>
             </div>
           </div>

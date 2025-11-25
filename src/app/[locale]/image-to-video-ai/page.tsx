@@ -241,7 +241,8 @@ export default function ImageToVideoAIPage() {
 
           <p className="text-xl text-slate-600 dark:text-slate-300 mb-8 leading-relaxed">
             Upload your product images and let AI create professional videos for e-commerce, social
-            media, and ads. No video editing skills required. Free trial with 30 credits sign-up bonus (one-time).
+            media, and ads. No video editing skills required. Free trial with 30 credits sign-up
+            bonus (one-time).
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
@@ -276,9 +277,7 @@ export default function ImageToVideoAIPage() {
 
         <div className="max-w-5xl mx-auto mb-20">
           <div className="bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 rounded-2xl p-8 md:p-12 border border-slate-200 dark:border-slate-700">
-            <h2 className="h2-section text-center mb-12">
-              How It Works
-            </h2>
+            <h2 className="h2-section text-center mb-12">How It Works</h2>
             <div className="grid md:grid-cols-3 gap-8">
               <div className="text-center">
                 <div className="w-16 h-16 bg-gradient-to-br from-teal-500 to-blue-500 rounded-full flex items-center justify-center mx-auto mb-4 text-white text-2xl font-bold">
@@ -318,9 +317,7 @@ export default function ImageToVideoAIPage() {
         </div>
 
         <div className="max-w-6xl mx-auto mb-20">
-          <h2 className="h2-section text-center mb-12">
-            Perfect For
-          </h2>
+          <h2 className="h2-section text-center mb-12">Perfect For</h2>
           <div className="grid md:grid-cols-3 gap-8">
             {useCases.map((useCase) => (
               <div
@@ -338,9 +335,7 @@ export default function ImageToVideoAIPage() {
         </div>
 
         <div className="max-w-4xl mx-auto mb-20">
-          <h2 className="h2-section text-center mb-12">
-            Features
-          </h2>
+          <h2 className="h2-section text-center mb-12">Features</h2>
           <div className="grid md:grid-cols-2 gap-4">
             {features.map((feature) => (
               <div key={feature} className="flex items-start gap-3">
@@ -352,9 +347,7 @@ export default function ImageToVideoAIPage() {
         </div>
 
         <div className="max-w-6xl mx-auto mb-20">
-          <h2 className="h2-section text-center mb-4">
-            Simple, Transparent Pricing
-          </h2>
+          <h2 className="h2-section text-center mb-4">Simple, Transparent Pricing</h2>
           <p className="text-center text-slate-600 dark:text-slate-400 mb-12">
             Choose the plan that fits your needs. Upgrade or downgrade anytime.
           </p>
@@ -412,9 +405,7 @@ export default function ImageToVideoAIPage() {
         </div>
 
         <div className="max-w-3xl mx-auto mb-20">
-          <h2 className="h2-section text-center mb-12">
-            Frequently Asked Questions
-          </h2>
+          <h2 className="h2-section text-center mb-12">Frequently Asked Questions</h2>
           <div className="space-y-8">
             <div>
               <h3 className="text-xl font-semibold mb-3 text-slate-900 dark:text-white">

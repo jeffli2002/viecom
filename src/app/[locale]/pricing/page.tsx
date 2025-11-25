@@ -146,8 +146,9 @@ export default async function PricingPage() {
               How much do credits cost?
             </h3>
             <p className="text-body">
-              Free plan: 30 credits sign-up bonus (one-time). Pro: 500 credits/month ($14.9). Pro+: 900 credits/month
-              ($24.9). Credits cost 5-130 per generation depending on model and settings.
+              Free plan: 30 credits sign-up bonus (one-time). Pro: 500 credits/month ($14.9). Pro+:
+              900 credits/month ($24.9). Credits cost 5-130 per generation depending on model and
+              settings.
             </p>
           </div>
           <div>

@@ -37,6 +37,7 @@ export function FAQ() {
               className={`border border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden transition-all duration-300 ${openIndex === index ? 'bg-white dark:bg-slate-900 shadow-md' : 'bg-slate-100 dark:bg-slate-900/50 hover:border-teal-500/30'}`}
             >
               <button
+                type="button"
                 onClick={() => setOpenIndex(openIndex === index ? null : index)}
                 className="w-full px-6 py-5 flex items-center justify-between text-left focus:outline-none"
               >

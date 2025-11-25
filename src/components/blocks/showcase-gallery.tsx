@@ -313,6 +313,7 @@ export function ShowcaseGallery() {
           onMouseLeave={handleMouseLeave}
         >
           <button
+            type="button"
             onClick={() => {
               setIsPaused(true);
               scroll('left');
@@ -324,6 +325,7 @@ export function ShowcaseGallery() {
             <ChevronLeft className="w-6 h-6" />
           </button>
           <button
+            type="button"
             onClick={() => {
               setIsPaused(true);
               scroll('right');
@@ -383,6 +385,7 @@ export function ShowcaseGallery() {
                 <div className="flex justify-center gap-2 mt-4">
                   {galleryItems.map((_, idx) => (
                     <button
+                      type="button"
                       key={idx}
                       onClick={() => scrollToItem(idx)}
                       className={`transition-all duration-300 rounded-full ${
