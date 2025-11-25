@@ -26,17 +26,17 @@ export default function ImageGenerationPage() {
         <ImageGenerator />
       </Suspense>
 
-      <div className="mt-12 bg-gradient-to-br from-purple-50 to-blue-50 dark:from-purple-900/20 dark:to-blue-900/20 rounded-xl p-8 border border-purple-200 dark:border-purple-800 text-center">
-        <h2 className="text-2xl font-bold mb-3 text-slate-900 dark:text-white">
+      <div className="mt-12 bg-gradient-to-br from-teal-50 to-blue-50 dark:from-teal-900/20 dark:to-blue-900/20 rounded-xl p-8 border border-teal-200 dark:border-teal-800 text-center">
+        <h2 className="h2-section mb-3 text-slate-900 dark:text-white">
           Turn These Images into Videos
         </h2>
-        <p className="text-slate-600 dark:text-slate-300 mb-6 max-w-2xl mx-auto">
+        <p className="text-body mb-6 max-w-2xl mx-auto">
           Once you've created your perfect product image, transform it into an engaging video with
           our AI video generator. Perfect for social media, ads, and e-commerce listings.
         </p>
         <div className="flex justify-center gap-4">
           <Link href="/image-to-video-ai">
-            <Button size="lg" className="group">
+            <Button size="lg" className="btn-primary group">
               Try Image to Video AI
               <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
             </Button>
