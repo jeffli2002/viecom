@@ -1371,22 +1371,22 @@ export function BatchGenerationFlow({ generationType }: BatchGenerationFlowProps
                       relative w-full rounded-xl border-2 border-dashed transition-all duration-300
                       ${
                         isDragging
-                          ? 'border-teal-500 bg-gradient-to-br from-teal-50 to-blue-50 scale-[1.02]'
-                          : 'border-teal-300 bg-gradient-to-br from-teal-50/50 to-blue-50/50 hover:border-teal-400 hover:from-teal-50 hover:to-blue-50'
+                          ? 'border-teal-500 dark:border-teal-600 bg-gradient-to-br from-teal-50 to-blue-50 dark:from-teal-900/20 dark:to-blue-900/20 scale-[1.02]'
+                          : 'border-teal-300 dark:border-teal-700 bg-gradient-to-br from-teal-50/50 to-blue-50/50 dark:from-teal-900/10 dark:to-blue-900/10 hover:border-teal-400 dark:hover:border-teal-600 hover:from-teal-50 dark:hover:from-teal-900/20 hover:to-blue-50 dark:hover:to-blue-900/20'
                       }
-                      ${file ? 'border-teal-500 bg-gradient-to-br from-teal-50 to-blue-50' : ''}
+                      ${file ? 'border-teal-500 dark:border-teal-600 bg-gradient-to-br from-teal-50 to-blue-50 dark:from-teal-900/20 dark:to-blue-900/20' : ''}
                     `}
                   >
                     <div className="p-8 text-center">
                       <Upload
-                        className={`mx-auto mb-3 h-12 w-12 ${isDragging || file ? 'text-teal-500' : 'text-teal-400'}`}
+                        className={`mx-auto mb-3 h-12 w-12 ${isDragging || file ? 'text-teal-500 dark:text-teal-400' : 'text-teal-400 dark:text-teal-500'}`}
                       />
                       {file ? (
                         <>
-                          <p className="text-sm font-medium text-teal-700 mb-1">
+                          <p className="text-sm font-medium text-teal-700 dark:text-teal-400 mb-1">
                             {t('fileSelected')}: {file.name}
                           </p>
-                          <p className="text-xs text-teal-600">
+                          <p className="text-xs text-teal-600 dark:text-teal-400">
                             {(file.size / 1024).toFixed(2)} KB
                             {isValidating && ` - ${t('validating')}`}
                           </p>
@@ -1411,10 +1411,10 @@ export function BatchGenerationFlow({ generationType }: BatchGenerationFlowProps
                         </>
                       ) : (
                         <>
-                          <p className="text-sm font-medium text-teal-700 mb-1">
+                          <p className="text-sm font-medium text-teal-700 dark:text-teal-400 mb-1">
                             {t('clickToUpload')}
                           </p>
-                          <p className="text-xs text-teal-600">{t('fileTypes')}</p>
+                          <p className="text-xs text-teal-600 dark:text-teal-400">{t('fileTypes')}</p>
                         </>
                       )}
                     </div>
