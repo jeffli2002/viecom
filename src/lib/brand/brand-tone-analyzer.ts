@@ -77,7 +77,7 @@ export async function analyzeBrandTone(
 1. 提取品牌调性（3-6个关键词，描述品牌个性）
 2. 提炼核心产品/服务特性与独特卖点
 3. 识别目标受众（列出关键人群分层/场景）
-4. 分析主色调与辅助色（可依据页面视觉或品牌识别）
+4. 分析主色调与辅助色（基于网站实际颜色、logo颜色和视觉识别。使用网站上的真实十六进制颜色代码，不要使用通用颜色。例如，苹果使用灰色/银色（#86868B, #F5F5F7），耐克使用黑色/红色（#000000, #E60012），星巴克使用绿色（#00704A）。返回网站上实际找到的颜色，除非网站确实使用了紫色/紫罗兰色，否则不要使用占位符颜色如紫色/紫罗兰色。）
 5. 总结视觉风格关键词（描述摄影视觉、构图、材质等）
 6. 输出品牌总结（2-3句，概括定位、价值、差异化）
 7. 推断受众画像信息（年龄区间、收入水平、关键人群分层）
@@ -109,7 +109,7 @@ export async function analyzeBrandTone(
 1. Extract brand tone (3-6 keywords describing personality)
 2. Identify core product/service features and value propositions
 3. Describe the target audience (list key segments or scenarios)
-4. Analyze the primary and secondary colors (based on visual identity or inferred palette)
+4. Analyze the primary and secondary colors (based on actual website colors, logo colors, and visual identity. Use real hex color codes from the website, not generic colors. For example, Apple uses grays/silvers (#86868B, #F5F5F7), Nike uses black/red (#000000, #E60012), Starbucks uses green (#00704A). Return actual colors found on the website, not placeholder colors like purple/violet unless they actually appear on the site.)
 5. Summarize visual style keywords (photography, composition, materials, etc.)
 6. Produce a concise 2-3 sentence brand summary highlighting positioning and differentiation
 7. Infer audience demographics (age range, income level, key audience segments)

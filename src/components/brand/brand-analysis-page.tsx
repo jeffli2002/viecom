@@ -247,23 +247,22 @@ export function BrandAnalysisPage() {
       return;
     }
 
-    const hasValidPrimary = getValidHexColor(result.colors?.primary) !== null;
-    const hasValidSecondary = Array.isArray(result.colors?.secondary)
-      ? result.colors.secondary.some((color) => getValidHexColor(color))
-      : false;
-
-    if (hasValidPrimary && hasValidSecondary) {
-      setLogoColor(null);
-      return;
-    }
-
+    // Always try to extract logo color as it's more accurate than AI-extracted colors
+    // Logo color will be used as fallback or override if AI colors are invalid/placeholder
     let isMounted = true;
     setIsLogoColorLoading(true);
 
     extractLogoDominantColor(result.website)
       .then((color) => {
         if (isMounted) {
-          setLogoColor(getValidHexColor(color));
+          const validColor = getValidHexColor(color);
+          // Only set logo color if it's valid and not a placeholder purple
+          const purpleColors = ['#9333EA', '#8B5CF6', '#A855F7', '#7C3AED', '#EC4899'];
+          if (validColor && !purpleColors.includes(validColor)) {
+            setLogoColor(validColor);
+          } else {
+            setLogoColor(null);
+          }
         }
       })
       .finally(() => {
@@ -296,7 +295,8 @@ export function BrandAnalysisPage() {
       ...new Set(validSecondary.filter((color) => color && color !== validPrimary)),
     ];
 
-    const basePrimary = validPrimary ?? logoColor ?? '#9333EA';
+    // Prioritize logo color over AI-extracted color, use neutral gray as last resort
+    const basePrimary = logoColor ?? validPrimary ?? '#6B7280';
     const accent =
       getValidHexColor(result.colors?.accent) ??
       (uniqueSecondary.length > 0 ? uniqueSecondary[0] : null) ??
@@ -434,7 +434,7 @@ export function BrandAnalysisPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-violet-50">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-teal-50">
       <div className="container mx-auto px-6 py-12 max-w-7xl">
         {/* Hero Section */}
         {!result && !isAnalyzing && (
@@ -515,7 +515,7 @@ export function BrandAnalysisPage() {
                         setUrl(example.url);
                         handleAnalyze(example.url);
                       }}
-                      className="p-4 rounded-xl border-2 border-slate-200 hover:border-violet-300 hover:bg-violet-50 transition-all text-left group"
+                      className="p-4 rounded-xl border-2 border-slate-200 hover:border-teal-300 hover:bg-teal-50 transition-all text-left group"
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
                     >
@@ -543,12 +543,12 @@ export function BrandAnalysisPage() {
                           />
                         </div>
                         <div className="flex-1">
-                          <div className="text-slate-900 group-hover:text-violet-900 font-medium">
+                          <div className="text-slate-900 group-hover:text-teal-900 font-medium">
                             {example.name}
                           </div>
                           <div className="text-xs text-slate-500">{example.url}</div>
                         </div>
-                        <ChevronRight className="size-5 text-slate-400 group-hover:text-violet-600" />
+                        <ChevronRight className="size-5 text-slate-400 group-hover:text-teal-600" />
                       </div>
                     </motion.button>
                   ))}
@@ -705,7 +705,7 @@ export function BrandAnalysisPage() {
                 <TabsList className="grid w-full grid-cols-5 h-auto p-2 bg-white border-2 border-slate-200 rounded-xl shadow-lg">
                   <TabsTrigger
                     value="overview"
-                    className="gap-2 py-3 px-4 rounded-lg data-[state=active]:bg-gradient-to-br data-[state=active]:from-violet-600 data-[state=active]:to-violet-700 data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:shadow-violet-500/50 transition-all hover:scale-105 data-[state=inactive]:hover:bg-slate-100"
+                    className="gap-2 py-3 px-4 rounded-lg data-[state=active]:bg-gradient-to-br data-[state=active]:from-teal-600 data-[state=active]:to-teal-700 data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:shadow-teal-500/50 transition-all hover:scale-105 data-[state=inactive]:hover:bg-slate-100"
                   >
                     <BarChart3 className="size-4" />
                     <span className="hidden md:inline font-semibold">{t('tabs.overview')}</span>
@@ -733,7 +733,7 @@ export function BrandAnalysisPage() {
                   </TabsTrigger>
                   <TabsTrigger
                     value="recommendations"
-                    className="gap-2 py-3 px-4 rounded-lg data-[state=active]:bg-gradient-to-br data-[state=active]:from-fuchsia-600 data-[state=active]:to-fuchsia-700 data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:shadow-fuchsia-500/50 transition-all hover:scale-105 data-[state=inactive]:hover:bg-slate-100"
+                    className="gap-2 py-3 px-4 rounded-lg data-[state=active]:bg-gradient-to-br data-[state=active]:from-teal-600 data-[state=active]:to-teal-700 data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:shadow-teal-500/50 transition-all hover:scale-105 data-[state=inactive]:hover:bg-slate-100"
                   >
                     <Lightbulb className="size-4" />
                     <span className="hidden md:inline font-semibold">
@@ -746,7 +746,7 @@ export function BrandAnalysisPage() {
                 <TabsContent value="overview" className="space-y-6 mt-6">
                   <div className="grid md:grid-cols-2 gap-6">
                     {/* Brand Tone */}
-                    <Card className="border-2 hover:border-violet-300 transition-colors">
+                    <Card className="border-2 hover:border-teal-300 transition-colors">
                       <CardHeader className="bg-gradient-to-r from-violet-50 to-transparent">
                         <CardTitle className="flex items-center gap-2">
                           <Zap className="size-5 text-violet-600" />
@@ -814,7 +814,7 @@ export function BrandAnalysisPage() {
                           <Badge
                             key={keyword}
                             variant="outline"
-                            className="text-lg py-2 px-4 border-2 hover:bg-fuchsia-50 hover:border-fuchsia-300 cursor-pointer transition-colors"
+                            className="text-lg py-2 px-4 border-2 hover:bg-teal-50 hover:border-teal-300 cursor-pointer transition-colors"
                             onClick={() => copyToClipboard(keyword)}
                           >
                             {keyword}
@@ -1156,7 +1156,7 @@ export function BrandAnalysisPage() {
                                       ${
                                         isSelected
                                           ? 'bg-violet-50 border-2 border-violet-500 shadow-md'
-                                          : 'bg-white/80 border border-violet-200 hover:border-violet-400 hover:shadow-sm'
+                                          : 'bg-white/80 border border-teal-200 hover:border-teal-400 hover:shadow-sm'
                                       }
                                     `}
                                     aria-pressed={isSelected}
@@ -1205,7 +1205,7 @@ export function BrandAnalysisPage() {
                                       ${
                                         isSelected
                                           ? 'bg-fuchsia-50 border-2 border-fuchsia-500 shadow-md'
-                                          : 'bg-white/80 border border-fuchsia-200 hover:border-fuchsia-400 hover:shadow-sm'
+                                          : 'bg-white/80 border border-teal-200 hover:border-teal-400 hover:shadow-sm'
                                       }
                                     `}
                                     aria-pressed={isSelected}
@@ -1240,7 +1240,7 @@ export function BrandAnalysisPage() {
                   )}
 
                   {/* CTA */}
-                  <Card className="border-2 border-violet-200 bg-gradient-to-br from-violet-600 to-fuchsia-600 text-white">
+                  <Card className="border-2 border-teal-200 bg-gradient-to-br from-teal-600 to-blue-600 text-white">
                     <CardContent className="p-8">
                       <div className="flex items-center justify-between">
                         <div className="space-y-2">
@@ -1290,7 +1290,7 @@ export function BrandAnalysisPage() {
                     className={`p-6 rounded-xl border-2 transition-all text-left ${
                       generationType === 'image'
                         ? 'border-violet-500 bg-violet-50 shadow-lg shadow-violet-500/30'
-                        : 'border-slate-200 bg-white hover:border-violet-300 hover:bg-violet-50/50'
+                        : 'border-slate-200 bg-white hover:border-teal-300 hover:bg-teal-50/50'
                     }`}
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
@@ -1318,7 +1318,7 @@ export function BrandAnalysisPage() {
                     className={`p-6 rounded-xl border-2 transition-all text-left ${
                       generationType === 'video'
                         ? 'border-violet-500 bg-violet-50 shadow-lg shadow-violet-500/30'
-                        : 'border-slate-200 bg-white hover:border-violet-300 hover:bg-violet-50/50'
+                        : 'border-slate-200 bg-white hover:border-teal-300 hover:bg-teal-50/50'
                     }`}
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
@@ -1355,7 +1355,7 @@ export function BrandAnalysisPage() {
                       className={`p-6 rounded-xl border-2 transition-all text-left ${
                         generationMode === 'single'
                           ? 'border-violet-500 bg-violet-50 shadow-lg shadow-violet-500/30'
-                          : 'border-slate-200 bg-white hover:border-violet-300 hover:bg-violet-50/50'
+                          : 'border-slate-200 bg-white hover:border-teal-300 hover:bg-teal-50/50'
                       }`}
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
@@ -1383,7 +1383,7 @@ export function BrandAnalysisPage() {
                       className={`p-6 rounded-xl border-2 transition-all text-left ${
                         generationMode === 'batch'
                           ? 'border-violet-500 bg-violet-50 shadow-lg shadow-violet-500/30'
-                          : 'border-slate-200 bg-white hover:border-violet-300 hover:bg-violet-50/50'
+                          : 'border-slate-200 bg-white hover:border-teal-300 hover:bg-teal-50/50'
                       }`}
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
@@ -1420,7 +1420,7 @@ export function BrandAnalysisPage() {
               <Button
                 onClick={handleConfirmGeneration}
                 disabled={!generationType || !generationMode}
-                className="bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-700 hover:to-fuchsia-700 text-white shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                className="bg-gradient-to-r from-teal-600 to-blue-600 hover:from-teal-700 hover:to-blue-700 text-white shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {t('generationDialog.confirm')}
                 <ChevronRight className="size-4 ml-2" />

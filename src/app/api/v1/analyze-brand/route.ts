@@ -74,11 +74,23 @@ function transformAnalysisResult(
         ? '专业、现代、创新'
         : 'Professional, Modern, Innovative';
 
-  const secondaryColors = colorPalette.slice(1, 4);
+  // Filter out invalid colors and common placeholder colors (purple/violet) unless they're actually in the palette
+  const validColors = colorPalette.filter((color) => {
+    if (!color || typeof color !== 'string') return false;
+    const normalized = color.trim().toUpperCase();
+    // Check if it's a valid hex color
+    if (!/^#[0-9A-F]{6}$/.test(normalized)) return false;
+    // Filter out common purple/violet placeholder colors unless they're explicitly in the first position
+    const purpleColors = ['#9333EA', '#8B5CF6', '#A855F7', '#7C3AED', '#EC4899'];
+    if (purpleColors.includes(normalized) && colorPalette.indexOf(color) > 0) return false;
+    return true;
+  });
+
+  const secondaryColors = validColors.slice(1, 4);
   const colors = {
-    primary: colorPalette[0] || '#3B82F6',
-    secondary: secondaryColors.length > 0 ? secondaryColors : ['#8B5CF6', '#EC4899', '#10B981'],
-    accent: colorPalette[4] || colorPalette[1] || undefined,
+    primary: validColors[0] || '#6B7280', // Use neutral gray instead of blue/purple
+    secondary: secondaryColors.length > 0 ? secondaryColors : ['#9CA3AF', '#D1D5DB', '#F3F4F6'], // Neutral grays instead of purple/pink
+    accent: validColors[4] || validColors[1] || undefined,
   };
 
   const demographics = analysis.audienceDemographics || {};
