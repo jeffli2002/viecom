@@ -576,7 +576,7 @@ export function BrandAnalysisPage() {
                   </div>
 
                   <div className="grid grid-cols-5 gap-3">
-                    {analysisSteps.map((step) => (
+                    {analysisSteps.map((step, index) => (
                       <div
                         key={step.label}
                         className={`
