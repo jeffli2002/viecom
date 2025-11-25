@@ -1,29 +1,62 @@
 import { Button } from '@/components/ui/button';
 import { creditsConfig } from '@/config/credits.config';
 import { paymentConfig } from '@/config/payment.config';
+import { buildLocaleCanonicalMetadata } from '@/lib/seo/metadata';
 import { ArrowRight, Calendar, Check, Gift, Sparkles, Users } from 'lucide-react';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 
-export const metadata: Metadata = {
-  title: 'Free AI Video Generator | 30 Credits, No Credit Card Required',
-  description:
-    'Create AI videos for free. Get 30 credits on signup, earn 2 credits daily, no credit card required. Sora 2 models, text-to-video, image-to-video. Start now!',
-  keywords: [
-    'free ai video generator',
-    'ai video generator free online',
-    'free video ai',
-    'no credit card ai video',
-    'free ai video maker',
-    'free sora 2',
-  ],
-  openGraph: {
-    title: 'Free AI Video Generator | 30 Credits, No Credit Card',
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const baseMetadata = buildLocaleCanonicalMetadata(locale, '/ai-video-generator-free');
+
+  if (locale === 'zh') {
+    return {
+      ...baseMetadata,
+      title: '免费AI视频生成器 | 送30积分，无需信用卡',
+      description:
+        '免费创建AI视频。注册送30积分，每日签到送2积分，无需信用卡。Sora 2模型，文字转视频，图片转视频。立即开始！',
+      keywords: [
+        '免费AI视频生成器',
+        'AI视频生成器免费在线',
+        '免费视频AI',
+        '无需信用卡AI视频',
+        '免费AI视频制作',
+        '免费Sora 2',
+      ],
+      openGraph: {
+        title: '免费AI视频生成器 | 送30积分，无需信用卡',
+        description: '免费创建AI视频。注册送30积分，每日签到送2积分，无需信用卡。',
+        type: 'website',
+      },
+    };
+  }
+
+  return {
+    ...baseMetadata,
+    title: 'Free AI Video Generator | 30 Credits, No Credit Card Required',
     description:
-      'Create AI videos for free. Get 30 credits on signup, earn 2 credits daily, no credit card required.',
-    type: 'website',
-  },
-};
+      'Create AI videos for free. Get 30 credits on signup, earn 2 credits daily, no credit card required. Sora 2 models, text-to-video, image-to-video. Start now!',
+    keywords: [
+      'free ai video generator',
+      'ai video generator free online',
+      'free video ai',
+      'no credit card ai video',
+      'free ai video maker',
+      'free sora 2',
+    ],
+    openGraph: {
+      title: 'Free AI Video Generator | 30 Credits, No Credit Card',
+      description:
+        'Create AI videos for free. Get 30 credits on signup, earn 2 credits daily, no credit card required.',
+      type: 'website',
+    },
+  };
+}
 
 const freeFeatures = [
   'No credit card required',

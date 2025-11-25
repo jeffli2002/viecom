@@ -1,27 +1,60 @@
 import { Button } from '@/components/ui/button';
+import { buildLocaleCanonicalMetadata } from '@/lib/seo/metadata';
 import { ArrowRight, Check, Clock, Sparkles, TrendingUp, Zap } from 'lucide-react';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 
-export const metadata: Metadata = {
-  title: 'Image to Video AI Free | Product Photos to Videos in 60 Seconds',
-  description:
-    'Transform product images into engaging videos with AI. Upload photos, get professional videos instantly. Sora 2 models, 720p/1080p quality. Free trial with 30 credits sign-up bonus.',
-  keywords: [
-    'image to video',
-    'image to video ai',
-    'image to video ai free',
-    'ai image to video generator',
-    'product photos to videos',
-    'e-commerce video ai',
-  ],
-  openGraph: {
-    title: 'Image to Video AI Free | Product Photos to Videos',
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const baseMetadata = buildLocaleCanonicalMetadata(locale, '/image-to-video-ai');
+
+  if (locale === 'zh') {
+    return {
+      ...baseMetadata,
+      title: '图片转视频AI工具免费 | 产品照片60秒变视频',
+      description:
+        '用AI将产品图片转换为吸引人的视频。上传照片，立即获得专业视频。Sora 2模型，720p/1080p质量。注册送30积分免费试用。',
+      keywords: [
+        '图片转视频',
+        '图片转视频AI',
+        '免费图片转视频',
+        'AI图片转视频生成器',
+        '产品照片转视频',
+        '电商视频AI',
+      ],
+      openGraph: {
+        title: '图片转视频AI工具免费 | 产品照片转视频',
+        description: '用AI将产品图片转换为吸引人的视频。注册送30积分免费试用。',
+        type: 'website',
+      },
+    };
+  }
+
+  return {
+    ...baseMetadata,
+    title: 'Image to Video AI Free | Product Photos to Videos in 60 Seconds',
     description:
-      'Transform product images into engaging videos with AI. Free trial with 30 credits sign-up bonus.',
-    type: 'website',
-  },
-};
+      'Transform product images into engaging videos with AI. Upload photos, get professional videos instantly. Sora 2 models, 720p/1080p quality. Free trial with 30 credits sign-up bonus.',
+    keywords: [
+      'image to video',
+      'image to video ai',
+      'image to video ai free',
+      'ai image to video generator',
+      'product photos to videos',
+      'e-commerce video ai',
+    ],
+    openGraph: {
+      title: 'Image to Video AI Free | Product Photos to Videos',
+      description:
+        'Transform product images into engaging videos with AI. Free trial with 30 credits sign-up bonus.',
+      type: 'website',
+    },
+  };
+}
 
 const useCases = [
   {

@@ -16,6 +16,35 @@ export async function generateMetadata({
   const { locale } = await params;
   const baseMetadata = buildLocaleCanonicalMetadata(locale, '/');
 
+  if (locale === 'zh') {
+    return {
+      ...baseMetadata,
+      title: 'AI视频生成器 | 电商产品照片秒变视频',
+      description:
+        '用AI将产品照片转换为吸引人的视频。注册送30积分免费试用。Sora 2模型，批量生成，720p视频几分钟完成。无需信用卡。',
+      keywords: [
+        'AI视频生成器',
+        '图片转视频',
+        '免费AI视频生成',
+        '产品视频生成',
+        '电商视频AI',
+        '批量视频生成',
+        'AI图像生成器',
+        'Sora 2视频',
+      ],
+      openGraph: {
+        title: 'AI视频生成器 | 电商产品照片秒变视频',
+        description: '用AI将产品照片转换为吸引人的视频。注册送30积分免费试用。',
+        type: 'website',
+      },
+      twitter: {
+        card: 'summary_large_image',
+        title: 'AI视频生成器 | 电商产品照片秒变视频',
+        description: '用AI将产品照片转换为吸引人的视频。注册送30积分免费试用。',
+      },
+    };
+  }
+
   return {
     ...baseMetadata,
     title: 'AI Video Generator for E-commerce | Image to Video in Seconds',

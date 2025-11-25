@@ -1,27 +1,60 @@
 import { Button } from '@/components/ui/button';
+import { buildLocaleCanonicalMetadata } from '@/lib/seo/metadata';
 import { ArrowRight, Check, Settings, Sparkles, TrendingUp, Zap } from 'lucide-react';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 
-export const metadata: Metadata = {
-  title: 'AI Video Enhancer | Upscale to 4K Quality Free Trial',
-  description:
-    'Enhance product video quality with AI. Upscale 720p to 1080p/4K, improve clarity, reduce noise. Nano Banana Pro model. Perfect for e-commerce. Try free!',
-  keywords: [
-    'video enhancer',
-    'video quality enhancer',
-    'ai video enhancer',
-    'video upscaler',
-    'upscale video quality',
-    'enhance video resolution',
-  ],
-  openGraph: {
-    title: 'AI Video Enhancer | Upscale Video Quality',
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const baseMetadata = buildLocaleCanonicalMetadata(locale, '/video-enhancer-ai');
+
+  if (locale === 'zh') {
+    return {
+      ...baseMetadata,
+      title: 'AI视频增强器 | 提升至4K画质免费试用',
+      description:
+        '用AI提升产品视频质量。720p升级到1080p/4K，提高清晰度，降低噪点。Nano Banana Pro模型。适合电商。免费试用！',
+      keywords: [
+        '视频增强器',
+        '视频质量增强',
+        'AI视频增强',
+        '视频超分辨率',
+        '提升视频质量',
+        '增强视频分辨率',
+      ],
+      openGraph: {
+        title: 'AI视频增强器 | 提升视频质量',
+        description: '用AI提升产品视频质量。720p升级到1080p/4K，提高清晰度，降低噪点。',
+        type: 'website',
+      },
+    };
+  }
+
+  return {
+    ...baseMetadata,
+    title: 'AI Video Enhancer | Upscale to 4K Quality Free Trial',
     description:
-      'Enhance product video quality with AI. Upscale 720p to 1080p/4K, improve clarity, reduce noise.',
-    type: 'website',
-  },
-};
+      'Enhance product video quality with AI. Upscale 720p to 1080p/4K, improve clarity, reduce noise. Nano Banana Pro model. Perfect for e-commerce. Try free!',
+    keywords: [
+      'video enhancer',
+      'video quality enhancer',
+      'ai video enhancer',
+      'video upscaler',
+      'upscale video quality',
+      'enhance video resolution',
+    ],
+    openGraph: {
+      title: 'AI Video Enhancer | Upscale Video Quality',
+      description:
+        'Enhance product video quality with AI. Upscale 720p to 1080p/4K, improve clarity, reduce noise.',
+      type: 'website',
+    },
+  };
+}
 
 const features = [
   {

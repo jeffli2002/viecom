@@ -11,7 +11,7 @@ try {
   metadataBase = new URL(FALLBACK_APP_URL);
 }
 
-export const DEFAULT_SEO_KEYWORDS: string[] = [
+export const DEFAULT_SEO_KEYWORDS_EN: string[] = [
   'ai video generator',
   'image to video ai',
   'free ai video generator',
@@ -40,6 +40,22 @@ export const DEFAULT_SEO_KEYWORDS: string[] = [
   'ecommerce video batch production',
   'automated product showcase videos',
   'AI merchandise content generator',
+];
+
+export const DEFAULT_SEO_KEYWORDS_ZH: string[] = [
+  'AI视频生成器',
+  '图片转视频AI',
+  '免费AI视频生成',
+  '图片转视频',
+  'AI视频编辑',
+  '视频增强器',
+  'AI图像生成器',
+  '产品视频生成',
+  '批量视频生成',
+  '电商视频AI',
+  'Viecom',
+  'AI电商工作室',
+  'AI电商内容',
   '批量图像生成工具',
   '批量AI图像生成器',
   '批量商品图片生成',
@@ -56,6 +72,8 @@ export const DEFAULT_SEO_KEYWORDS: string[] = [
   '自动化产品展示视频',
   'AI商品内容生成器',
 ];
+
+export const DEFAULT_SEO_KEYWORDS: string[] = DEFAULT_SEO_KEYWORDS_EN;
 
 export function getMetadataBase(): URL {
   return metadataBase;

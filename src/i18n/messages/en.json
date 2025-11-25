@@ -665,7 +665,119 @@
     "colorPalette": "Color Palette",
     "typography": "Typography",
     "brandVoiceDetected": "Brand Voice Detected",
-    "brandVoiceExample": "\"Professional, modern, and trustworthy with a focus on sustainability.\""
+    "brandVoiceExample": "\"Professional, modern, and trustworthy with a focus on sustainability.\"",
+    "hero": {
+      "title": "Analyze Your Brand",
+      "titleHighlight": "In Seconds",
+      "description": "Extract your brand's visual identity, tone, and style from any website. Get comprehensive brand insights to guide your AI content generation."
+    },
+    "input": {
+      "title": "Enter Website URL",
+      "description": "Paste your website URL below. We'll analyze your brand's colors, typography, tone, and visual style automatically.",
+      "urlLabel": "Website URL",
+      "startAnalysis": "Start Analysis",
+      "analyzing": "Analyzing...",
+      "quickExamples": "Quick Examples"
+    },
+    "steps": {
+      "connecting": "Connecting to website...",
+      "scraping": "Scraping website content...",
+      "extracting": "Extracting brand elements...",
+      "analyzing": "AI analyzing brand data...",
+      "generating": "Generating brand report..."
+    },
+    "result": {
+      "analyzed": "Brand Analyzed",
+      "completeness": "Analysis Completeness",
+      "productCategory": "Product Category",
+      "targetAge": "Target Age",
+      "incomeLevel": "Income Level",
+      "language": "Language"
+    },
+    "tabs": {
+      "overview": "Overview",
+      "visual": "Visual Style",
+      "audience": "Audience",
+      "content": "Content Strategy",
+      "recommendations": "Recommendations"
+    },
+    "overview": {
+      "brandTone": "Brand Tone & Voice",
+      "personality": "Brand Personality",
+      "competitiveAdvantage": "Competitive Advantages",
+      "styleKeywords": "Style Keywords"
+    },
+    "visual": {
+      "colorScheme": "Color Scheme",
+      "colorDescription": "Primary, secondary, and accent colors extracted from your brand",
+      "primaryColor": "Primary Color",
+      "primaryColorDesc": "Main brand color",
+      "primaryColorFetching": "Fetching from logo...",
+      "secondaryColors": "Secondary Colors",
+      "noSecondaryColors": "No secondary colors detected",
+      "accentColor": "Accent Color",
+      "noAccentColor": "No accent color detected",
+      "clickToCopy": "Click to copy color",
+      "photography": "Photography Style",
+      "layout": "Layout Style",
+      "typography": "Typography Style"
+    },
+    "audience": {
+      "profile": "Target Audience Profile",
+      "ageRange": "Age Range",
+      "income": "Income Level",
+      "preference": "Preferences",
+      "qualityFirst": "Quality-first consumers",
+      "segments": "Audience Segments"
+    },
+    "content": {
+      "themes": "Content Themes",
+      "socialTone": "Social Media Tone",
+      "defaultSocialTone": "Professional and engaging",
+      "marketingFocus": "Marketing Focus Areas"
+    },
+    "recommendations": {
+      "title": "AI Generation Recommendations",
+      "description": "Based on your brand analysis, here are recommended styles for your AI-generated content",
+      "imageStylesTitle": "Recommended Image Styles",
+      "videoStylesTitle": "Recommended Video Styles",
+      "selected": "Selected",
+      "clickToUse": "Click to use this style",
+      "ctaTitle": "Ready to Create?",
+      "ctaDescription": "Start generating images or videos with your brand style applied automatically",
+      "startCreation": "Start Creating"
+    },
+    "generationDialog": {
+      "title": "Choose Generation Type",
+      "description": "Select what you want to create with your brand style",
+      "selectType": "Select Content Type",
+      "image": "Image Generation",
+      "imageDesc": "Generate product images with your brand style",
+      "video": "Video Generation",
+      "videoDesc": "Create marketing videos with your brand style",
+      "selectMode": "Select Generation Mode",
+      "single": "Single Generation",
+      "singleDesc": "Generate one image or video at a time",
+      "batch": "Batch Generation",
+      "batchDesc": "Generate multiple items simultaneously",
+      "cancel": "Cancel",
+      "confirm": "Confirm & Start"
+    },
+    "errors": {
+      "loginRequired": "Please login to use brand analysis",
+      "urlRequired": "Please enter a website URL",
+      "invalidUrl": "Please enter a valid URL",
+      "analysisFailed": "Brand analysis failed. Please try again."
+    },
+    "success": {
+      "analysisComplete": "Brand analysis completed successfully!"
+    },
+    "actions": {
+      "copy": "Copy",
+      "copied": "Copied to clipboard",
+      "download": "Download",
+      "downloaded": "Downloaded successfully"
+    }
   },
   "transformationShowcase": {
     "badge": "Nano Banana Pro Capabilities",
