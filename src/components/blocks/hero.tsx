@@ -4,6 +4,7 @@ import { Link } from '@/i18n/navigation';
 import { useIsAuthenticated } from '@/store/auth-store';
 import { Play, Sparkles, Zap } from 'lucide-react';
 import { useTranslations } from 'next-intl';
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 
 const PLATFORMS = [
   {
@@ -36,11 +37,63 @@ const PLATFORMS = [
 export function Hero() {
   const t = useTranslations('hero');
   const isAuthenticated = useIsAuthenticated();
+  const [textColor, setTextColor] = useState('rgb(15 23 42)'); // Light mode default
+  const h1Ref = useRef<HTMLHeadingElement>(null);
+  const headingFontSize = '5rem';
 
   // Determine the link based on authentication status
   const ctaHref = isAuthenticated
     ? '/image-generation'
     : `/signup?callbackUrl=${encodeURIComponent('/image-generation')}`;
+
+  const updateHeadingColor = useCallback(() => {
+    const htmlElement = document.documentElement;
+    const hasDarkClass = htmlElement.classList.contains('dark');
+    const hasDarkTheme = htmlElement.getAttribute('data-theme') === 'dark';
+    const isDarkMode = hasDarkClass || hasDarkTheme;
+    const nextColor = isDarkMode ? 'rgb(255 255 255)' : 'rgb(15 23 42)';
+
+    setTextColor((prev) => (prev === nextColor ? prev : nextColor));
+  }, []);
+
+  // Initialize color based on dark mode before paint
+  useLayoutEffect(() => {
+    updateHeadingColor();
+  }, [updateHeadingColor]);
+
+  // React to theme toggles by observing the html element
+  useEffect(() => {
+    updateHeadingColor();
+
+    const observer = new MutationObserver(() => {
+      updateHeadingColor();
+    });
+
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['class', 'data-theme'],
+    });
+
+    return () => observer.disconnect();
+  }, [updateHeadingColor]);
+
+  // Clean up any legacy color classes once on mount
+  useEffect(() => {
+    if (!h1Ref.current) return;
+    const colorAffectingClasses = [
+      'text-white',
+      'text-slate-900',
+      'text-slate-50',
+      'text-slate-100',
+      'text-slate-800',
+      'text-slate-700',
+      'text-gray-900',
+      'text-gray-50',
+      'dark:text-white',
+      'dark:text-slate-900',
+    ];
+    colorAffectingClasses.forEach((cls) => h1Ref.current?.classList.remove(cls));
+  }, []);
 
   return (
     <header className="relative pt-32 pb-20 overflow-hidden bg-main border-b border-slate-200 dark:border-white/5">
@@ -55,7 +108,19 @@ export function Hero() {
           <span className="text-sm font-medium">{t('badge')}</span>
         </div>
 
-        <h1 className="h1-hero">
+        <h1 
+          ref={h1Ref}
+          style={{
+            fontSize: headingFontSize,
+            letterSpacing: '-0.025em',
+            lineHeight: '1.25',
+            fontWeight: 600,
+            color: textColor,
+            marginBottom: '1.5rem',
+            textAlign: 'center',
+            fontFamily: 'inherit',
+          }}
+        >
           {t('titleLine1')} <br />
           <span className="text-gradient">{t('titleLine2')}</span>
         </h1>
