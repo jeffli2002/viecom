@@ -1,6 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { creditsConfig } from '@/config/credits.config';
-import { Clock, Globe, Mail, MessageSquare } from 'lucide-react';
+import { Clock, Globe, Mail, MapPin, MessageSquare } from 'lucide-react';
 
 export default function ContactPage() {
   const dailyCheckinCredits = creditsConfig.rewards.checkin.dailyCredits;
@@ -77,6 +77,32 @@ export default function ContactPage() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Office Address */}
+      <Card className="mb-12">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <MapPin className="h-5 w-5 text-teal-500" />
+            Office Address
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div>
+            <p className="font-semibold text-gray-900 dark:text-white mb-2">Viecom Legal Department</p>
+            <p className="text-gray-700 dark:text-slate-300">
+              Datun Road, Chaoyang District
+              <br />
+              Beijing, China
+            </p>
+          </div>
+          <div className="pt-3 border-t border-gray-200 dark:border-slate-700">
+            <p className="font-semibold text-gray-900 dark:text-white mb-2">中文地址</p>
+            <p className="text-gray-700 dark:text-slate-300">
+              中国北京市朝阳区大屯路
+            </p>
+          </div>
+        </CardContent>
+      </Card>
 
       {/* FAQ Section */}
       <Card className="mb-12">
