@@ -156,9 +156,14 @@ export function PricingPlans({ plans, creditPacks }: PricingPlansProps) {
                         </div>
                         <span className="text-slate-600 dark:text-slate-400 text-sm">/mo</span>
                         {billingInterval === 'year' && (
-                          <Badge className="mt-1 bg-teal-500 text-white border-0 text-xs px-2">
-                            Save {savings?.percentage}%
-                          </Badge>
+                          <>
+                            <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
+                              ${displayPrice}/year
+                            </p>
+                            <Badge className="mt-2 bg-teal-500 text-white border-0 text-xs px-2">
+                              Save {savings?.percentage}%
+                            </Badge>
+                          </>
                         )}
                       </div>
                     </>
@@ -175,7 +180,7 @@ export function PricingPlans({ plans, creditPacks }: PricingPlansProps) {
                 <p className="text-sm text-body mt-2">{plan.description}</p>
               </CardHeader>
 
-              <CardContent className="flex flex-col h-full">
+              <CardContent className="flex flex-col h-full pt-0">
                 <ul className="space-y-3 flex-grow">
                   {plan.features.map((feature, idx) => {
                     let displayFeature = feature;
