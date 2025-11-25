@@ -31,6 +31,11 @@ export async function generateMetadata({
         '批量视频生成',
         'AI图像生成器',
         'Sora 2视频',
+        'nano banana',
+        'nano banana pro',
+        'free nano banana image',
+        'gemini 3',
+        'gemini 3 pro',
       ],
       openGraph: {
         title: 'AI视频生成器 | 电商产品照片秒变视频',
@@ -59,6 +64,11 @@ export async function generateMetadata({
       'batch video generation',
       'ai image generator',
       'sora 2 video',
+      'nano banana',
+      'nano banana pro',
+      'free nano banana image',
+      'gemini 3',
+      'gemini 3 pro',
     ],
     openGraph: {
       title: 'AI Video Generator for E-commerce | Image to Video in Seconds',

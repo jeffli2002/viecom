@@ -86,7 +86,7 @@ export function PricingPlans({ plans, creditPacks }: PricingPlansProps) {
           >
             Yearly
             {resolvedPlans.some((p) => p.yearlyPrice) && (
-              <Badge className="ml-2 bg-green-500 text-white border-0 text-xs px-2">Save 20%</Badge>
+              <Badge className="ml-2 bg-teal-500 text-white border-0 text-xs px-2">Save 20%</Badge>
             )}
           </Button>
         </div>
@@ -156,7 +156,7 @@ export function PricingPlans({ plans, creditPacks }: PricingPlansProps) {
                         </div>
                         <span className="text-slate-600 dark:text-slate-400 text-sm">/mo</span>
                         {billingInterval === 'year' && (
-                          <Badge className="mt-1 bg-green-500 text-white border-0 text-xs px-2">
+                          <Badge className="mt-1 bg-teal-500 text-white border-0 text-xs px-2">
                             Save {savings?.percentage}%
                           </Badge>
                         )}

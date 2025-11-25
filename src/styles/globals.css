@@ -797,9 +797,7 @@ header [class*="bg-primary"][class*="Avatar"] {
   .text-body {
     @apply font-sans text-slate-600 dark:text-slate-400;
   }
-  .h1-hero {
-    @apply text-8xl md:text-[10rem] tracking-tight leading-tight font-semibold text-slate-900 dark:text-white mb-6;
-  }
+  /* .h1-hero styles moved to component inline styles */
   .h2-section {
     @apply text-3xl md:text-5xl font-semibold text-slate-900 dark:text-white mb-6;
   }
@@ -905,3 +903,6 @@ header [class*="bg-primary"][class*="Avatar"] {
     page-break-after: avoid;
   }
 }
+
+/* .h1-hero styles moved to component inline styles */
+

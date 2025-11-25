@@ -434,7 +434,7 @@ export function BrandAnalysisPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-teal-50">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-teal-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
       <div className="container mx-auto px-6 py-12 max-w-7xl">
         {/* Hero Section */}
         {!result && !isAnalyzing && (
@@ -449,18 +449,18 @@ export function BrandAnalysisPage() {
                 {t('hero.titleHighlight')}
               </span>
             </h1>
-            <p className="text-xl text-slate-600 max-w-2xl mx-auto">{t('hero.description')}</p>
+            <p className="text-xl text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">{t('hero.description')}</p>
           </motion.div>
         )}
 
         {/* Input Section */}
-        <Card className="max-w-4xl mx-auto border-2 shadow-xl mb-12">
-          <CardHeader className="border-b bg-gradient-to-r from-teal-50 to-blue-50">
+        <Card className="max-w-4xl mx-auto border-2 shadow-xl mb-12 dark:border-slate-700">
+          <CardHeader className="border-b bg-gradient-to-r from-teal-50 to-blue-50 dark:from-slate-800 dark:to-slate-800 dark:border-slate-700">
             <CardTitle className="flex items-center gap-2">
-              <Globe className="size-6 text-teal-600" />
+              <Globe className="size-6 text-teal-600 dark:text-teal-400" />
               {t('input.title')}
             </CardTitle>
-            <CardDescription className="text-base">{t('input.description')}</CardDescription>
+            <CardDescription className="text-base dark:text-slate-400">{t('input.description')}</CardDescription>
           </CardHeader>
           <CardContent className="p-6 space-y-6">
             <div className="space-y-3">
@@ -506,7 +506,7 @@ export function BrandAnalysisPage() {
             {/* Quick Examples */}
             {!isAnalyzing && !result && (
               <div className="space-y-3">
-                <p className="text-sm text-slate-600">{t('input.quickExamples')}</p>
+                <p className="text-sm text-slate-600 dark:text-slate-400">{t('input.quickExamples')}</p>
                 <div className="grid grid-cols-3 gap-3">
                   {quickExamples.map((example) => (
                     <motion.button
@@ -515,12 +515,12 @@ export function BrandAnalysisPage() {
                         setUrl(example.url);
                         handleAnalyze(example.url);
                       }}
-                      className="p-4 rounded-xl border-2 border-slate-200 hover:border-teal-300 hover:bg-teal-50 transition-all text-left group"
+                      className="p-4 rounded-xl border-2 border-slate-200 dark:border-slate-700 hover:border-teal-300 dark:hover:border-teal-600 hover:bg-teal-50 dark:hover:bg-teal-900/20 transition-all text-left group bg-white dark:bg-slate-800"
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
                     >
                       <div className="flex items-center gap-3">
-                        <div className="flex-shrink-0 w-12 h-12 flex items-center justify-center bg-white rounded-lg border border-slate-200 p-2 overflow-hidden">
+                        <div className="flex-shrink-0 w-12 h-12 flex items-center justify-center bg-white dark:bg-slate-700 rounded-lg border border-slate-200 dark:border-slate-600 p-2 overflow-hidden">
                           <img
                             src={example.logo}
                             alt={`${example.name} logo`}
@@ -543,10 +543,10 @@ export function BrandAnalysisPage() {
                           />
                         </div>
                         <div className="flex-1">
-                          <div className="text-slate-900 group-hover:text-teal-900 font-medium">
+                          <div className="text-slate-900 dark:text-white group-hover:text-teal-900 dark:group-hover:text-teal-400 font-medium">
                             {example.name}
                           </div>
-                          <div className="text-xs text-slate-500">{example.url}</div>
+                          <div className="text-xs text-slate-500 dark:text-slate-400">{example.url}</div>
                         </div>
                         <ChevronRight className="size-5 text-slate-400 group-hover:text-teal-600" />
                       </div>
@@ -567,10 +567,10 @@ export function BrandAnalysisPage() {
                 >
                   <div className="space-y-3">
                     <div className="flex items-center justify-between">
-                      <span className="text-slate-900">
+                      <span className="text-slate-900 dark:text-white">
                         {t(`steps.${currentAnalysisStep.label}`)}
                       </span>
-                      <span className="text-teal-600">{currentAnalysisStep.progress}%</span>
+                      <span className="text-teal-600 dark:text-teal-400">{currentAnalysisStep.progress}%</span>
                     </div>
                     <Progress value={currentAnalysisStep.progress} className="h-3" />
                   </div>
@@ -583,21 +583,21 @@ export function BrandAnalysisPage() {
                           p-3 rounded-xl text-center transition-all
                           ${
                             index < safeAnalysisStepIndex
-                              ? 'bg-teal-100 border-2 border-teal-300'
+                              ? 'bg-teal-100 dark:bg-teal-900/30 border-2 border-teal-300 dark:border-teal-600'
                               : index === safeAnalysisStepIndex
-                                ? 'bg-teal-100 border-2 border-teal-300'
-                                : 'bg-slate-100 border-2 border-slate-200'
+                                ? 'bg-teal-100 dark:bg-teal-900/30 border-2 border-teal-300 dark:border-teal-600'
+                                : 'bg-slate-100 dark:bg-slate-800 border-2 border-slate-200 dark:border-slate-700'
                           }
                         `}
                       >
                         {index < safeAnalysisStepIndex ? (
-                          <CheckCircle2 className="size-6 mx-auto text-teal-600" />
+                          <CheckCircle2 className="size-6 mx-auto text-teal-600 dark:text-teal-400" />
                         ) : index === safeAnalysisStepIndex ? (
-                          <Loader2 className="size-6 mx-auto text-teal-600 animate-spin" />
+                          <Loader2 className="size-6 mx-auto text-teal-600 dark:text-teal-400 animate-spin" />
                         ) : (
-                          <div className="size-6 mx-auto rounded-full border-2 border-slate-400" />
+                          <div className="size-6 mx-auto rounded-full border-2 border-slate-400 dark:border-slate-600" />
                         )}
-                        <p className="text-xs mt-2 text-slate-600">{t(`steps.${step.label}`)}</p>
+                        <p className="text-xs mt-2 text-slate-600 dark:text-slate-400">{t(`steps.${step.label}`)}</p>
                       </div>
                     ))}
                   </div>
@@ -640,19 +640,19 @@ export function BrandAnalysisPage() {
                     <div className="space-y-2">
                       <div className="flex items-center gap-3">
                         <h2 className="h2-section">{result.brandName}</h2>
-                        <Badge className="gap-1 bg-teal-100 text-teal-700 border-teal-300">
+                        <Badge className="gap-1 bg-teal-100 dark:bg-teal-900/30 text-teal-700 dark:text-teal-400 border-teal-300 dark:border-teal-700">
                           <CheckCircle2 className="size-3" />
                           {t('result.analyzed')}
                         </Badge>
                       </div>
-                      <p className="text-lg text-slate-600">{result.metadata.description}</p>
-                      <div className="flex items-center gap-2 text-sm text-slate-500">
+                      <p className="text-lg text-slate-600 dark:text-slate-400">{result.metadata.description}</p>
+                      <div className="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400">
                         <Globe className="size-4" />
                         {result.website}
                       </div>
                     </div>
                     <div className="text-right">
-                      <div className="text-sm text-slate-600 mb-1">{t('result.completeness')}</div>
+                      <div className="text-sm text-slate-600 dark:text-slate-400 mb-1">{t('result.completeness')}</div>
                       <div className="text-3xl bg-gradient-to-r from-teal-600 to-blue-600 bg-clip-text text-transparent">
                         98%
                       </div>
@@ -660,10 +660,10 @@ export function BrandAnalysisPage() {
                   </div>
 
                   <div className="grid grid-cols-4 gap-4">
-                    <div className="p-4 rounded-xl bg-white/80 border border-teal-200">
+                    <div className="p-4 rounded-xl bg-white/80 dark:bg-slate-800/80 border border-teal-200 dark:border-teal-800">
                       <div className="flex items-center gap-2 mb-2">
-                        <Tag className="size-4 text-teal-600" />
-                        <span className="text-sm text-slate-600">
+                        <Tag className="size-4 text-teal-600 dark:text-teal-400" />
+                        <span className="text-sm text-slate-600 dark:text-slate-400">
                           {t('result.productCategory')}
                         </span>
                       </div>
@@ -675,26 +675,26 @@ export function BrandAnalysisPage() {
                         ))}
                       </div>
                     </div>
-                    <div className="p-4 rounded-xl bg-white/80 border border-teal-200">
+                    <div className="p-4 rounded-xl bg-white/80 dark:bg-slate-800/80 border border-teal-200 dark:border-teal-800">
                       <div className="flex items-center gap-2 mb-2">
-                        <Users className="size-4 text-teal-600" />
-                        <span className="text-sm text-slate-600">{t('result.targetAge')}</span>
+                        <Users className="size-4 text-teal-600 dark:text-teal-400" />
+                        <span className="text-sm text-slate-600 dark:text-slate-400">{t('result.targetAge')}</span>
                       </div>
-                      <div className="text-slate-900">{result.audienceAge || 'N/A'}</div>
+                      <div className="text-slate-900 dark:text-white">{result.audienceAge || 'N/A'}</div>
                     </div>
-                    <div className="p-4 rounded-xl bg-white/80 border border-teal-200">
+                    <div className="p-4 rounded-xl bg-white/80 dark:bg-slate-800/80 border border-teal-200 dark:border-teal-800">
                       <div className="flex items-center gap-2 mb-2">
-                        <TrendingUp className="size-4 text-teal-600" />
-                        <span className="text-sm text-slate-600">{t('result.incomeLevel')}</span>
+                        <TrendingUp className="size-4 text-teal-600 dark:text-teal-400" />
+                        <span className="text-sm text-slate-600 dark:text-slate-400">{t('result.incomeLevel')}</span>
                       </div>
-                      <div className="text-slate-900">{result.audienceIncome || 'N/A'}</div>
+                      <div className="text-slate-900 dark:text-white">{result.audienceIncome || 'N/A'}</div>
                     </div>
-                    <div className="p-4 rounded-xl bg-white/80 border border-teal-200">
+                    <div className="p-4 rounded-xl bg-white/80 dark:bg-slate-800/80 border border-teal-200 dark:border-teal-800">
                       <div className="flex items-center gap-2 mb-2">
-                        <Zap className="size-4 text-teal-600" />
-                        <span className="text-sm text-slate-600">{t('result.language')}</span>
+                        <Zap className="size-4 text-teal-600 dark:text-teal-400" />
+                        <span className="text-sm text-slate-600 dark:text-slate-400">{t('result.language')}</span>
                       </div>
-                      <div className="text-slate-900">{result.metadata.language}</div>
+                      <div className="text-slate-900 dark:text-white">{result.metadata.language}</div>
                     </div>
                   </div>
                 </CardContent>
