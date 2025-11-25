@@ -443,22 +443,21 @@ export function BrandAnalysisPage() {
             animate={{ opacity: 1, y: 0 }}
             className="text-center space-y-6 mb-12"
           >
-            <h2 className="text-4xl md:text-6xl text-slate-900 max-w-3xl mx-auto leading-tight">
-              {t('hero.title')}
-              <br />
-              <span className="bg-gradient-to-r from-violet-600 to-fuchsia-600 bg-clip-text text-transparent">
+            <h1 className="h1-hero text-center">
+              {t('hero.title')}{' '}
+              <span className="bg-gradient-to-r from-teal-600 to-blue-600 bg-clip-text text-transparent">
                 {t('hero.titleHighlight')}
               </span>
-            </h2>
+            </h1>
             <p className="text-xl text-slate-600 max-w-2xl mx-auto">{t('hero.description')}</p>
           </motion.div>
         )}
 
         {/* Input Section */}
         <Card className="max-w-4xl mx-auto border-2 shadow-xl mb-12">
-          <CardHeader className="border-b bg-gradient-to-r from-violet-50 to-fuchsia-50">
+          <CardHeader className="border-b bg-gradient-to-r from-teal-50 to-blue-50">
             <CardTitle className="flex items-center gap-2">
-              <Globe className="size-6 text-violet-600" />
+              <Globe className="size-6 text-teal-600" />
               {t('input.title')}
             </CardTitle>
             <CardDescription className="text-base">{t('input.description')}</CardDescription>
@@ -486,7 +485,7 @@ export function BrandAnalysisPage() {
                 <Button
                   onClick={() => handleAnalyze()}
                   disabled={isAnalyzing || !url}
-                  className="gap-2 h-12 px-8 bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-700 hover:to-fuchsia-700 shadow-lg shadow-violet-500/25"
+                  className="btn-primary gap-2 h-12 px-8"
                   size="lg"
                 >
                   {isAnalyzing ? (
@@ -640,7 +639,7 @@ export function BrandAnalysisPage() {
                   <div className="flex items-start justify-between mb-6">
                     <div className="space-y-2">
                       <div className="flex items-center gap-3">
-                        <h2 className="text-4xl text-slate-900">{result.brandName}</h2>
+                        <h2 className="h2-section">{result.brandName}</h2>
                         <Badge className="gap-1 bg-green-100 text-green-700 border-green-300">
                           <CheckCircle2 className="size-3" />
                           {t('result.analyzed')}
@@ -654,7 +653,7 @@ export function BrandAnalysisPage() {
                     </div>
                     <div className="text-right">
                       <div className="text-sm text-slate-600 mb-1">{t('result.completeness')}</div>
-                      <div className="text-3xl bg-gradient-to-r from-violet-600 to-fuchsia-600 bg-clip-text text-transparent">
+                      <div className="text-3xl bg-gradient-to-r from-teal-600 to-blue-600 bg-clip-text text-transparent">
                         98%
                       </div>
                     </div>
@@ -1250,7 +1249,7 @@ export function BrandAnalysisPage() {
                         </div>
                         <Button
                           size="lg"
-                          className="bg-white text-violet-600 hover:bg-slate-50 shadow-xl gap-2"
+                          className="btn-primary bg-white text-teal-600 hover:bg-slate-50 shadow-xl gap-2"
                           onClick={handleStartCreation}
                         >
                           <Sparkles className="size-5" />

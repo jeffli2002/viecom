@@ -665,7 +665,119 @@
     "colorPalette": "色彩方案",
     "typography": "字体",
     "brandVoiceDetected": "检测到品牌调性",
-    "brandVoiceExample": "\"专业、现代、值得信赖，专注于可持续发展。\""
+    "brandVoiceExample": "\"专业、现代、值得信赖，专注于可持续发展。\"",
+    "hero": {
+      "title": "秒速分析您的品牌",
+      "titleHighlight": "获取完整洞察",
+      "description": "从任何网站提取您的品牌视觉形象、调性和风格。获得全面的品牌洞察，指导您的 AI 内容生成。"
+    },
+    "input": {
+      "title": "输入网站 URL",
+      "description": "在下方粘贴您的网站 URL。我们将自动分析您品牌的颜色、字体、调性和视觉风格。",
+      "urlLabel": "网站 URL",
+      "startAnalysis": "开始分析",
+      "analyzing": "分析中...",
+      "quickExamples": "快速示例"
+    },
+    "steps": {
+      "connecting": "正在连接网站...",
+      "scraping": "抓取网站内容...",
+      "extracting": "提取品牌元素...",
+      "analyzing": "AI 分析品牌数据...",
+      "generating": "生成品牌报告..."
+    },
+    "result": {
+      "analyzed": "品牌已分析",
+      "completeness": "分析完整度",
+      "productCategory": "产品类别",
+      "targetAge": "目标年龄",
+      "incomeLevel": "收入水平",
+      "language": "语言"
+    },
+    "tabs": {
+      "overview": "概览",
+      "visual": "视觉风格",
+      "audience": "受众",
+      "content": "内容策略",
+      "recommendations": "推荐"
+    },
+    "overview": {
+      "brandTone": "品牌调性与声音",
+      "personality": "品牌个性",
+      "competitiveAdvantage": "竞争优势",
+      "styleKeywords": "风格关键词"
+    },
+    "visual": {
+      "colorScheme": "色彩方案",
+      "colorDescription": "从您的品牌中提取的主要、次要和强调色",
+      "primaryColor": "主色调",
+      "primaryColorDesc": "主要品牌颜色",
+      "primaryColorFetching": "正在从 logo 获取...",
+      "secondaryColors": "次要颜色",
+      "noSecondaryColors": "未检测到次要颜色",
+      "accentColor": "强调色",
+      "noAccentColor": "未检测到强调色",
+      "clickToCopy": "点击复制颜色",
+      "photography": "摄影风格",
+      "layout": "布局风格",
+      "typography": "字体风格"
+    },
+    "audience": {
+      "profile": "目标受众画像",
+      "ageRange": "年龄范围",
+      "income": "收入水平",
+      "preference": "偏好",
+      "qualityFirst": "注重质量的消费者",
+      "segments": "受众细分"
+    },
+    "content": {
+      "themes": "内容主题",
+      "socialTone": "社交媒体调性",
+      "defaultSocialTone": "专业且引人入胜",
+      "marketingFocus": "营销重点领域"
+    },
+    "recommendations": {
+      "title": "AI 生成推荐",
+      "description": "基于您的品牌分析，以下是为您的 AI 生成内容推荐的风格",
+      "imageStylesTitle": "推荐图片风格",
+      "videoStylesTitle": "推荐视频风格",
+      "selected": "已选择",
+      "clickToUse": "点击使用此风格",
+      "ctaTitle": "准备开始创作？",
+      "ctaDescription": "开始生成图片或视频，您的品牌风格将自动应用",
+      "startCreation": "开始创作"
+    },
+    "generationDialog": {
+      "title": "选择生成类型",
+      "description": "选择您想要使用品牌风格创建的内容",
+      "selectType": "选择内容类型",
+      "image": "图片生成",
+      "imageDesc": "使用您的品牌风格生成产品图片",
+      "video": "视频生成",
+      "videoDesc": "使用您的品牌风格创建营销视频",
+      "selectMode": "选择生成模式",
+      "single": "单个生成",
+      "singleDesc": "一次生成一张图片或一个视频",
+      "batch": "批量生成",
+      "batchDesc": "同时生成多个项目",
+      "cancel": "取消",
+      "confirm": "确认并开始"
+    },
+    "errors": {
+      "loginRequired": "请登录以使用品牌分析功能",
+      "urlRequired": "请输入网站 URL",
+      "invalidUrl": "请输入有效的 URL",
+      "analysisFailed": "品牌分析失败，请重试。"
+    },
+    "success": {
+      "analysisComplete": "品牌分析完成！"
+    },
+    "actions": {
+      "copy": "复制",
+      "copied": "已复制到剪贴板",
+      "download": "下载",
+      "downloaded": "下载成功"
+    }
   },
   "transformationShowcase": {
     "badge": "Nano Banana Pro 能力展示",
