@@ -570,7 +570,7 @@ export function BrandAnalysisPage() {
                       <span className="text-slate-900">
                         {t(`steps.${currentAnalysisStep.label}`)}
                       </span>
-                      <span className="text-violet-600">{currentAnalysisStep.progress}%</span>
+                      <span className="text-teal-600">{currentAnalysisStep.progress}%</span>
                     </div>
                     <Progress value={currentAnalysisStep.progress} className="h-3" />
                   </div>
@@ -583,17 +583,17 @@ export function BrandAnalysisPage() {
                           p-3 rounded-xl text-center transition-all
                           ${
                             index < safeAnalysisStepIndex
-                              ? 'bg-green-100 border-2 border-green-300'
+                              ? 'bg-teal-100 border-2 border-teal-300'
                               : index === safeAnalysisStepIndex
-                                ? 'bg-violet-100 border-2 border-violet-300'
+                                ? 'bg-teal-100 border-2 border-teal-300'
                                 : 'bg-slate-100 border-2 border-slate-200'
                           }
                         `}
                       >
                         {index < safeAnalysisStepIndex ? (
-                          <CheckCircle2 className="size-6 mx-auto text-green-600" />
+                          <CheckCircle2 className="size-6 mx-auto text-teal-600" />
                         ) : index === safeAnalysisStepIndex ? (
-                          <Loader2 className="size-6 mx-auto text-violet-600 animate-spin" />
+                          <Loader2 className="size-6 mx-auto text-teal-600 animate-spin" />
                         ) : (
                           <div className="size-6 mx-auto rounded-full border-2 border-slate-400" />
                         )}
@@ -634,13 +634,13 @@ export function BrandAnalysisPage() {
               </div>
 
               {/* Brand Header */}
-              <Card className="border-2 border-violet-200 bg-gradient-to-br from-white to-violet-50/30 shadow-xl">
+              <Card className="border-2 border-teal-200 bg-gradient-to-br from-white to-teal-50/30 shadow-xl">
                 <CardContent className="p-8">
                   <div className="flex items-start justify-between mb-6">
                     <div className="space-y-2">
                       <div className="flex items-center gap-3">
                         <h2 className="h2-section">{result.brandName}</h2>
-                        <Badge className="gap-1 bg-green-100 text-green-700 border-green-300">
+                        <Badge className="gap-1 bg-teal-100 text-teal-700 border-teal-300">
                           <CheckCircle2 className="size-3" />
                           {t('result.analyzed')}
                         </Badge>
@@ -660,9 +660,9 @@ export function BrandAnalysisPage() {
                   </div>
 
                   <div className="grid grid-cols-4 gap-4">
-                    <div className="p-4 rounded-xl bg-white/80 border border-violet-200">
+                    <div className="p-4 rounded-xl bg-white/80 border border-teal-200">
                       <div className="flex items-center gap-2 mb-2">
-                        <Tag className="size-4 text-violet-600" />
+                        <Tag className="size-4 text-teal-600" />
                         <span className="text-sm text-slate-600">
                           {t('result.productCategory')}
                         </span>
@@ -675,23 +675,23 @@ export function BrandAnalysisPage() {
                         ))}
                       </div>
                     </div>
-                    <div className="p-4 rounded-xl bg-white/80 border border-violet-200">
+                    <div className="p-4 rounded-xl bg-white/80 border border-teal-200">
                       <div className="flex items-center gap-2 mb-2">
-                        <Users className="size-4 text-fuchsia-600" />
+                        <Users className="size-4 text-teal-600" />
                         <span className="text-sm text-slate-600">{t('result.targetAge')}</span>
                       </div>
                       <div className="text-slate-900">{result.audienceAge || 'N/A'}</div>
                     </div>
-                    <div className="p-4 rounded-xl bg-white/80 border border-violet-200">
+                    <div className="p-4 rounded-xl bg-white/80 border border-teal-200">
                       <div className="flex items-center gap-2 mb-2">
-                        <TrendingUp className="size-4 text-green-600" />
+                        <TrendingUp className="size-4 text-teal-600" />
                         <span className="text-sm text-slate-600">{t('result.incomeLevel')}</span>
                       </div>
                       <div className="text-slate-900">{result.audienceIncome || 'N/A'}</div>
                     </div>
-                    <div className="p-4 rounded-xl bg-white/80 border border-violet-200">
+                    <div className="p-4 rounded-xl bg-white/80 border border-teal-200">
                       <div className="flex items-center gap-2 mb-2">
-                        <Zap className="size-4 text-amber-600" />
+                        <Zap className="size-4 text-teal-600" />
                         <span className="text-sm text-slate-600">{t('result.language')}</span>
                       </div>
                       <div className="text-slate-900">{result.metadata.language}</div>
@@ -747,9 +747,9 @@ export function BrandAnalysisPage() {
                   <div className="grid md:grid-cols-2 gap-6">
                     {/* Brand Tone */}
                     <Card className="border-2 hover:border-teal-300 transition-colors">
-                      <CardHeader className="bg-gradient-to-r from-violet-50 to-transparent">
+                      <CardHeader className="bg-gradient-to-r from-teal-50 to-transparent">
                         <CardTitle className="flex items-center gap-2">
-                          <Zap className="size-5 text-violet-600" />
+                          <Zap className="size-5 text-teal-600" />
                           {t('overview.brandTone')}
                         </CardTitle>
                       </CardHeader>
@@ -764,7 +764,7 @@ export function BrandAnalysisPage() {
                             {result.brandPersonality.map((trait) => (
                               <Badge
                                 key={trait}
-                                className="bg-violet-100 text-violet-800 border-violet-200"
+                                className="bg-teal-100 text-teal-800 border-teal-200"
                               >
                                 {trait}
                               </Badge>
@@ -776,10 +776,10 @@ export function BrandAnalysisPage() {
 
                     {/* Competitive Advantage */}
                     {result.competitiveAdvantage && result.competitiveAdvantage.length > 0 && (
-                      <Card className="border-2 hover:border-green-300 transition-colors">
-                        <CardHeader className="bg-gradient-to-r from-green-50 to-transparent">
+                      <Card className="border-2 hover:border-teal-300 transition-colors">
+                        <CardHeader className="bg-gradient-to-r from-teal-50 to-transparent">
                           <CardTitle className="flex items-center gap-2">
-                            <Award className="size-5 text-green-600" />
+                            <Award className="size-5 text-teal-600" />
                             {t('overview.competitiveAdvantage')}
                           </CardTitle>
                         </CardHeader>
@@ -788,9 +788,9 @@ export function BrandAnalysisPage() {
                             {result.competitiveAdvantage.map((advantage) => (
                               <div
                                 key={advantage}
-                                className="flex items-start gap-3 p-3 rounded-lg bg-green-50 border border-green-200"
+                                className="flex items-start gap-3 p-3 rounded-lg bg-teal-50 border border-teal-200"
                               >
-                                <Star className="size-5 text-green-600 flex-shrink-0 mt-0.5" />
+                                <Star className="size-5 text-teal-600 flex-shrink-0 mt-0.5" />
                                 <span className="text-slate-900">{advantage}</span>
                               </div>
                             ))}
@@ -802,9 +802,9 @@ export function BrandAnalysisPage() {
 
                   {/* Style Keywords */}
                   <Card className="border-2">
-                    <CardHeader className="bg-gradient-to-r from-fuchsia-50 to-transparent">
+                    <CardHeader className="bg-gradient-to-r from-teal-50 to-transparent">
                       <CardTitle className="flex items-center gap-2">
-                        <Tag className="size-5 text-fuchsia-600" />
+                        <Tag className="size-5 text-teal-600" />
                         {t('overview.styleKeywords')}
                       </CardTitle>
                     </CardHeader>
@@ -1015,7 +1015,7 @@ export function BrandAnalysisPage() {
                       <div className="grid md:grid-cols-3 gap-4">
                         <div className="p-4 rounded-xl bg-white border-2 border-slate-200">
                           <div className="flex items-center gap-2 mb-2">
-                            <Users className="size-5 text-violet-600" />
+                            <Users className="size-5 text-teal-600" />
                             <span className="text-sm text-slate-600">{t('audience.ageRange')}</span>
                           </div>
                           <div className="text-2xl text-slate-900">
@@ -1025,7 +1025,7 @@ export function BrandAnalysisPage() {
 
                         <div className="p-4 rounded-xl bg-white border-2 border-slate-200">
                           <div className="flex items-center gap-2 mb-2">
-                            <TrendingUp className="size-5 text-green-600" />
+                            <TrendingUp className="size-5 text-teal-600" />
                             <span className="text-sm text-slate-600">{t('audience.income')}</span>
                           </div>
                           <div className="text-2xl text-slate-900">
@@ -1035,7 +1035,7 @@ export function BrandAnalysisPage() {
 
                         <div className="p-4 rounded-xl bg-white border-2 border-slate-200">
                           <div className="flex items-center gap-2 mb-2">
-                            <Heart className="size-5 text-fuchsia-600" />
+                            <Heart className="size-5 text-teal-600" />
                             <span className="text-sm text-slate-600">
                               {t('audience.preference')}
                             </span>
@@ -1129,10 +1129,10 @@ export function BrandAnalysisPage() {
                 {/* Recommendations Tab */}
                 <TabsContent value="recommendations" className="space-y-6 mt-6">
                   {(hasImageRecommendations || hasVideoRecommendations) && result && (
-                    <Card className="border-2 border-violet-200">
-                      <CardHeader className="bg-gradient-to-r from-violet-50 to-fuchsia-50">
+                    <Card className="border-2 border-teal-200">
+                      <CardHeader className="bg-gradient-to-r from-teal-50 to-blue-50">
                         <CardTitle className="flex items-center gap-2">
-                          <Lightbulb className="size-5 text-violet-600" />
+                          <Lightbulb className="size-5 text-teal-600" />
                           {t('recommendations.title')}
                         </CardTitle>
                         <CardDescription>{t('recommendations.description')}</CardDescription>
@@ -1155,7 +1155,7 @@ export function BrandAnalysisPage() {
                                       p-4 rounded-xl cursor-pointer transition-all
                                       ${
                                         isSelected
-                                          ? 'bg-violet-50 border-2 border-violet-500 shadow-md'
+                                          ? 'bg-teal-50 border-2 border-teal-500 shadow-md'
                                           : 'bg-white/80 border border-teal-200 hover:border-teal-400 hover:shadow-sm'
                                       }
                                     `}
@@ -1163,18 +1163,18 @@ export function BrandAnalysisPage() {
                                   >
                                     <div className="flex items-center gap-2 mb-2">
                                       {isSelected ? (
-                                        <CheckCircle2 className="size-4 text-violet-600" />
+                                        <CheckCircle2 className="size-4 text-teal-600" />
                                       ) : (
-                                        <ImageIcon className="size-4 text-violet-600" />
+                                        <ImageIcon className="size-4 text-teal-600" />
                                       )}
                                       <span
-                                        className={`text-sm font-medium ${isSelected ? 'text-violet-700' : 'text-slate-900'}`}
+                                        className={`text-sm font-medium ${isSelected ? 'text-teal-700' : 'text-slate-900'}`}
                                       >
                                         {style}
                                       </span>
                                     </div>
                                     <div
-                                      className={`text-xs ${isSelected ? 'text-violet-600' : 'text-slate-600'}`}
+                                      className={`text-xs ${isSelected ? 'text-teal-600' : 'text-slate-600'}`}
                                     >
                                       {isSelected
                                         ? t('recommendations.selected') || '已选择'
@@ -1204,7 +1204,7 @@ export function BrandAnalysisPage() {
                                       p-4 rounded-xl cursor-pointer transition-all
                                       ${
                                         isSelected
-                                          ? 'bg-fuchsia-50 border-2 border-fuchsia-500 shadow-md'
+                                          ? 'bg-teal-50 border-2 border-teal-500 shadow-md'
                                           : 'bg-white/80 border border-teal-200 hover:border-teal-400 hover:shadow-sm'
                                       }
                                     `}
@@ -1212,18 +1212,18 @@ export function BrandAnalysisPage() {
                                   >
                                     <div className="flex items-center gap-2 mb-2">
                                       {isSelected ? (
-                                        <CheckCircle2 className="size-4 text-fuchsia-600" />
+                                        <CheckCircle2 className="size-4 text-teal-600" />
                                       ) : (
-                                        <Video className="size-4 text-fuchsia-600" />
+                                        <Video className="size-4 text-teal-600" />
                                       )}
                                       <span
-                                        className={`text-sm font-medium ${isSelected ? 'text-fuchsia-700' : 'text-slate-900'}`}
+                                        className={`text-sm font-medium ${isSelected ? 'text-teal-700' : 'text-slate-900'}`}
                                       >
                                         {style}
                                       </span>
                                     </div>
                                     <div
-                                      className={`text-xs ${isSelected ? 'text-fuchsia-600' : 'text-slate-600'}`}
+                                      className={`text-xs ${isSelected ? 'text-teal-600' : 'text-slate-600'}`}
                                     >
                                       {isSelected
                                         ? t('recommendations.selected') || '已选择'
