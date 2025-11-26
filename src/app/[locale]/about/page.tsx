@@ -159,7 +159,7 @@ export default function AboutPage() {
         </Card>
 
         {/* Contact CTA */}
-        <div className="bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 rounded-lg p-8 text-center">
+        <div className="bg-gradient-to-r from-teal-50 via-teal-100 to-white dark:from-teal-900/40 dark:via-teal-900/20 dark:to-slate-900 rounded-lg p-8 text-center border border-teal-100 dark:border-teal-900/40 shadow-lg">
           <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
             Get Started Today
           </h3>
@@ -175,7 +175,7 @@ export default function AboutPage() {
             </a>
             <a
               href="/contact"
-              className="inline-flex items-center justify-center px-6 py-3 border-2 border-purple-600 text-teal-500 font-semibold rounded-lg hover:bg-teal-50 dark:bg-teal-900/20 transition-colors"
+              className="inline-flex items-center justify-center px-6 py-3 border-2 border-teal-500 text-teal-600 font-semibold rounded-lg hover:bg-teal-50 dark:hover:bg-teal-900/30 transition-colors"
             >
               Contact Sales
             </a>
