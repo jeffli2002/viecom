@@ -520,7 +520,7 @@ export default function VideoGenerator() {
                     </div>
                   </TabsContent>
 
-                  <TabsContent value="image-to-video" className="mt-0 space-y-6">
+                  <TabsContent value="image-to-video" className="mt-6 space-y-6">
                     {/* Warning Notice - No People/Faces */}
                     <div className="rounded-lg border border-amber-200 bg-amber-50 p-4">
                       <div className="flex items-start gap-3">
