@@ -164,7 +164,7 @@ export default function ImageToVideoAIPage() {
         name: 'Is there a free trial?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'Yes! Get 30 free credits on signup (no credit card required). This allows you to generate up to 6 videos to test our platform.',
+          text: 'Yes! Get 30 free credits on signup (no credit card required). This allows you to generate up to 2 Sora 2 videos to test our platform.',
         },
       },
       {
@@ -431,7 +431,7 @@ export default function ImageToVideoAIPage() {
               </h3>
               <p className="text-slate-600 dark:text-slate-300">
                 Yes! Get 30 free credits on signup (no credit card required). This allows you to
-                generate up to 6 videos to test our platform.
+                generate up to 2 Sora 2 videos to test our platform.
               </p>
             </div>
             <div>

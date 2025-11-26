@@ -62,7 +62,7 @@ const freeFeatures = [
   'No credit card required',
   'No hidden fees or charges',
   'No time limits',
-  'No watermarks on first 30 credits',
+  'No watermarks on all images/videos',
   'Full access to Sora 2 models',
   'Text-to-video generation',
   'Image-to-video generation',
@@ -92,24 +92,47 @@ const earnMoreCredits = [
   },
 ];
 
-const comparisonTable = [
-  { feature: 'Sign-up Bonus', free: '30 credits (one-time)', pro: 'N/A', proPlus: 'N/A' },
-  { feature: 'Monthly Credits', free: '0', pro: '500', proPlus: '900' },
-  { feature: 'Video Quality', free: '720p', pro: '720p/1080p', proPlus: '720p/1080p' },
-  { feature: 'AI Models', free: 'Sora 2', pro: 'Sora 2 & Pro', proPlus: 'Sora 2 & Pro' },
-  { feature: 'Concurrent Videos', free: '1', pro: '3', proPlus: '5' },
-  { feature: 'Priority Processing', free: '\u2717', pro: '\u2717', proPlus: '\u2713' },
-  { feature: 'Batch Generation', free: '\u2713', pro: '\u2713', proPlus: '\u2713' },
-  { feature: 'Brand Analysis', free: '\u2713', pro: '\u2713', proPlus: '\u2713' },
-  { feature: 'Commercial Use', free: '\u2713', pro: '\u2713', proPlus: '\u2713' },
-  { feature: 'Monthly Price', free: '$0', pro: '$14.9', proPlus: '$24.9' },
-];
-
 export default function FreeAIVideoGeneratorPage() {
   const dailyCheckinCredits = creditsConfig.rewards.checkin.dailyCredits;
   const referralReward = creditsConfig.rewards.referral.creditsPerReferral;
   const shareReward = creditsConfig.rewards.socialShare.creditsPerShare;
   const cheapestPack = paymentConfig.creditPacks[0]; // First pack is usually the cheapest
+
+  // Get plan configurations
+  const freePlan = paymentConfig.plans.find((p) => p.id === 'free');
+  const proPlan = paymentConfig.plans.find((p) => p.id === 'pro');
+  const proPlusPlan = paymentConfig.plans.find((p) => p.id === 'proplus');
+
+  // Build comparison table dynamically from config
+  // All plans get the same sign-up bonus (30 credits)
+  const signupBonus = freePlan?.credits.onSignup || 30;
+  const comparisonTable = [
+    {
+      feature: 'Sign-up Bonus',
+      free: signupBonus ? `${signupBonus} credits (one-time)` : 'N/A',
+      pro: signupBonus ? `${signupBonus} credits (one-time)` : 'N/A',
+      proPlus: signupBonus ? `${signupBonus} credits (one-time)` : 'N/A',
+    },
+    {
+      feature: 'Monthly Credits',
+      free: String(freePlan?.credits.monthly || 0),
+      pro: String(proPlan?.credits.monthly || 0),
+      proPlus: String(proPlusPlan?.credits.monthly || 0),
+    },
+    { feature: 'Video Quality', free: '720p', pro: '720p/1080p', proPlus: '720p/1080p' },
+    { feature: 'AI Models', free: 'Sora 2', pro: 'Sora 2 & Pro', proPlus: 'Sora 2 & Pro' },
+    { feature: 'Concurrent Videos', free: '1', pro: '3', proPlus: '5' },
+    { feature: 'Priority Processing', free: '\u2717', pro: '\u2717', proPlus: '\u2713' },
+    { feature: 'Batch Generation', free: '\u2713', pro: '\u2713', proPlus: '\u2713' },
+    { feature: 'Brand Analysis', free: '\u2713', pro: '\u2713', proPlus: '\u2713' },
+    { feature: 'Commercial Use', free: '\u2713', pro: '\u2713', proPlus: '\u2713' },
+    {
+      feature: 'Monthly Price',
+      free: `$${freePlan?.price || 0}`,
+      pro: `$${proPlan?.price || 0}`,
+      proPlus: `$${proPlusPlan?.price || 0}`,
+    },
+  ];
 
   const softwareSchema = {
     '@context': 'https://schema.org',
@@ -163,7 +186,7 @@ export default function FreeAIVideoGeneratorPage() {
         name: 'Are there watermarks on free videos?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'Videos created with your initial 30 signup credits have no watermarks. Additional free credits from daily check-ins may include a small watermark.',
+          text: 'No, all images and videos generated on our platform have no watermarks, regardless of whether you use free credits or paid credits. All content is watermark-free.',
         },
       },
       {
@@ -367,8 +390,8 @@ export default function FreeAIVideoGeneratorPage() {
                 Are there watermarks on free videos?
               </h3>
               <p className="text-slate-600 dark:text-slate-300">
-                Videos created with your initial 30 signup credits have no watermarks. Additional
-                free credits from daily check-ins may include a small watermark.
+                No, all images and videos generated on our platform have no watermarks, regardless of
+                whether you use free credits or paid credits. All content is watermark-free.
               </p>
             </div>
             <div>

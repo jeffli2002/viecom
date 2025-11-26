@@ -272,7 +272,7 @@ export const paymentConfig: PaymentConfig = {
       credits: 10000,
       price: 270,
       originalPrice: 300,
-      discount: '20% OFF',
+      discount: '10% OFF',
       stripePriceId: process.env.NEXT_PUBLIC_STRIPE_PRICE_PACK_10000 || 'price_pack_10000',
       creemProductKey: process.env.NEXT_PUBLIC_CREEM_PRICE_PACK_10000 || '',
       badge: 'Best Value',
