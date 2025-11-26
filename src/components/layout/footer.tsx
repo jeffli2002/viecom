@@ -75,6 +75,16 @@ export function Footer() {
                   {t('batchVideoGeneration')}
                 </Link>
               </li>
+              <li>
+                <Link href="/brand-analysis" className="hover:text-teal-500 transition-colors">
+                  {t('brandAnalysis')}
+                </Link>
+              </li>
+              <li>
+                <Link href="/assets" className="hover:text-teal-500 transition-colors">
+                  {t('assets')}
+                </Link>
+              </li>
             </ul>
           </div>
 
@@ -98,11 +108,6 @@ export function Footer() {
               <li>
                 <Link href="/video-enhancer-ai" className="hover:text-teal-500 transition-colors">
                   Video Enhancer
-                </Link>
-              </li>
-              <li>
-                <Link href="/assets" className="hover:text-teal-500 transition-colors">
-                  {t('assets')}
                 </Link>
               </li>
               <li>
