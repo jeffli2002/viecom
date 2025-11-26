@@ -17,9 +17,11 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
+import { getBatchConfig } from '@/config/batch.config';
 import { creditsConfig } from '@/config/credits.config';
 import { IMAGE_STYLES, VIDEO_STYLES } from '@/config/styles.config';
 import { useUpgradePrompt } from '@/hooks/use-upgrade-prompt';
+import { useSubscription } from '@/hooks/use-subscription';
 import { useAuthStore } from '@/store/auth-store';
 import {
   AlertCircle,
@@ -136,8 +138,51 @@ export function BatchGenerationFlow({ generationType }: BatchGenerationFlowProps
   } | null>(null);
   const { showUpgradePrompt, openUpgradePrompt, closeUpgradePrompt } = useUpgradePrompt();
   const { isAuthenticated } = useAuthStore();
+  const { planId: subscriptionPlanId, loading: subscriptionLoading } = useSubscription();
   const progressIntervalsRef = useRef<Map<number, NodeJS.Timeout[]>>(new Map());
   const [userCredits, setUserCredits] = useState<number>(0);
+  const normalizedPlan: 'free' | 'pro' | 'proplus' = subscriptionPlanId || 'free';
+  const { userFacing: planConfig } = getBatchConfig(normalizedPlan);
+  const translate = (
+    key: Parameters<typeof t>[0],
+    fallback: string,
+    values?: Record<string, unknown>
+  ) => {
+    try {
+      return t(key as any, values);
+    } catch (error) {
+      console.warn(`[batch-generation][i18n] missing key ${String(key)}:`, error);
+      return fallback;
+    }
+  };
+  const planLabelMap: Record<'free' | 'pro' | 'proplus', string> = {
+    free: translate('planLabelFree', 'Free Plan'),
+    pro: translate('planLabelPro', 'Pro Plan'),
+    proplus: translate('planLabelProplus', 'Pro+ Plan'),
+  };
+  const planDisplayName = planLabelMap[normalizedPlan];
+  const nextPlan =
+    normalizedPlan === 'free' ? 'pro' : normalizedPlan === 'pro' ? 'proplus' : null;
+  const planLimitsDescription = subscriptionLoading
+    ? translate('planLimitLoading', 'Loading plan limits...')
+    : translate(
+        'planLimitDescription',
+        `${planDisplayName} supports up to ${planConfig.batchSize} rows per batch with ${planConfig.concurrency} concurrent outputs.`,
+        {
+          plan: planDisplayName,
+          batchSize: planConfig.batchSize,
+          concurrency: planConfig.concurrency,
+        }
+      );
+  const upgradeFallback = nextPlan
+    ? `Need more scale? Upgrade to ${planLabelMap[nextPlan]} for larger batches.`
+    : 'You already have the highest concurrency tier.';
+  const upgradeMessage = nextPlan
+    ? translate('planLimitUpgradeHint', upgradeFallback, { plan: planLabelMap[nextPlan] })
+    : translate('planLimitMaxed', upgradeFallback);
+  const planLimitHeadingLabel = translate('planLimitHeading', 'Plan throughput limits');
+  const planLimitBatchLabel = translate('planLimitBatchSize', 'Rows per batch');
+  const planLimitConcurrencyLabel = translate('planLimitConcurrency', 'Concurrent outputs');
 
   // Calculate dynamic video credit cost based on model, duration, and quality
   const getVideoCreditCost = () => {
@@ -1024,6 +1069,42 @@ export function BatchGenerationFlow({ generationType }: BatchGenerationFlowProps
                 <p className="text-slate-600 dark:text-slate-400">
                   {generationType === 'image' ? t('subtitleImage') : t('subtitleVideo')}
                 </p>
+              </div>
+
+              <div className="border rounded-lg p-4 bg-white/80 dark:bg-slate-900/60 shadow-inner space-y-3">
+                <div className="flex items-center justify-between gap-4 flex-wrap">
+                  <div>
+                    <p className="text-xs uppercase tracking-wide text-slate-500 dark:text-slate-400">
+                      {planLimitHeadingLabel}
+                    </p>
+                    <div className="flex items-center gap-2 mt-2">
+                      <Badge variant="outline" className="text-xs">
+                        {planDisplayName}
+                      </Badge>
+                      {subscriptionLoading && <Loader2 className="h-4 w-4 animate-spin text-slate-400" />}
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-6">
+                    <div className="text-center">
+                      <p className="text-2xl font-bold text-slate-900 dark:text-white">
+                        {planConfig.batchSize}
+                      </p>
+                      <p className="text-xs uppercase tracking-wide text-slate-500 dark:text-slate-400">
+                        {planLimitBatchLabel}
+                      </p>
+                    </div>
+                    <div className="text-center">
+                      <p className="text-2xl font-bold text-slate-900 dark:text-white">
+                        {planConfig.concurrency}
+                      </p>
+                      <p className="text-xs uppercase tracking-wide text-slate-500 dark:text-slate-400">
+                        {planLimitConcurrencyLabel}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+                <p className="text-sm text-slate-600 dark:text-slate-300">{planLimitsDescription}</p>
+                <p className="text-xs text-slate-500 dark:text-slate-400">{upgradeMessage}</p>
               </div>
 
               {/* Generation Settings */}
