@@ -45,7 +45,7 @@ export default function RefundPolicyPage() {
         <Card>
           <CardContent className="pt-6 space-y-4">
             <p className="text-sm text-gray-500 dark:text-slate-400">
-              Last updated: November 12, 2024
+              Last updated: November 12, 2025
             </p>
 
             <p>
