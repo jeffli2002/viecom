@@ -279,6 +279,33 @@ export default function PrivacyPage() {
             </div>
           </CardContent>
         </Card>
+
+        <Card>
+          <CardContent className="pt-6 space-y-4">
+            <h2 className="text-2xl font-semibold text-gray-900 dark:text-white">
+              12. Independence Disclaimer
+            </h2>
+
+            <p>
+              Viecom uses third-party AI models (such as Google's Gemini, OpenAI's models, and other
+              AI service providers) to power our content generation services. These AI models are
+              provided by their respective owners and are subject to their own terms and conditions.
+            </p>
+
+            <p>
+              Viecom is an independent service provider and our platform, features, and services are
+              our own proprietary products. We are not affiliated with, endorsed by, or sponsored by
+              these AI model providers. Our product design, user interface, workflow automation, brand
+              analysis features, batch processing capabilities, and overall service experience are
+              developed and owned by Viecom.
+            </p>
+
+            <p>
+              Any references to third-party AI models or services are for identification purposes only
+              and do not imply any partnership, endorsement, or association with those entities.
+            </p>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );

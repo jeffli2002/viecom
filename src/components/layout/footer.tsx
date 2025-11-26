@@ -158,8 +158,15 @@ export function Footer() {
           </div>
         </div>
 
-        <div className="pt-8 border-t border-slate-200 dark:border-white/5 flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-slate-500 dark:text-slate-500">
-          <p>© {new Date().getFullYear()} Viecom. All rights reserved.</p>
+        <div className="pt-8 border-t border-slate-200 dark:border-white/5 space-y-4">
+          <div className="flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-slate-500 dark:text-slate-500">
+            <p>© {new Date().getFullYear()} Viecom. All rights reserved.</p>
+          </div>
+          <div className="pt-4 border-t border-slate-200 dark:border-white/5">
+            <p className="text-xs text-slate-400 dark:text-slate-500 leading-relaxed">
+              {t('independenceDisclaimer')}
+            </p>
+          </div>
         </div>
       </div>
     </footer>
