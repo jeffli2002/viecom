@@ -193,37 +193,24 @@ export default function ContactPage() {
           <p className="text-gray-700 dark:text-slate-300 mb-4">
             Follow us on social media for updates, tips, and inspiration:
           </p>
-          <div className="flex gap-4">
+          <div className="flex gap-4 flex-wrap">
             <a
-              href="https://twitter.com/viecom"
+              href="https://twitter.com/jeffli2002"
               target="_blank"
               rel="noopener noreferrer"
               className="text-teal-500 hover:text-slate-700 dark:text-slate-300 font-medium"
             >
-              Twitter
+              Twitter @jeffli2002
             </a>
-            <a
-              href="https://linkedin.com/company/viecom"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-teal-500 hover:text-slate-700 dark:text-slate-300 font-medium"
-            >
-              LinkedIn
-            </a>
-            <a
-              href="https://discord.gg/viecom"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-teal-500 hover:text-slate-700 dark:text-slate-300 font-medium"
-            >
-              Discord Community
+            <a href="mailto:support@viecom.pro" className="text-teal-500 hover:text-slate-700 dark:text-slate-300 font-medium">
+              support@viecom.pro
             </a>
           </div>
         </CardContent>
       </Card>
 
       {/* CTA */}
-      <div className="mt-12 bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 rounded-lg p-8 text-center">
+      <div className="mt-12 bg-gradient-to-r from-teal-50 via-teal-100 to-white dark:from-teal-900/40 dark:via-teal-900/20 dark:to-slate-900 rounded-lg p-8 text-center border border-teal-100 dark:border-teal-900/40 shadow-lg">
         <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
           Ready to Get Started?
         </h3>
