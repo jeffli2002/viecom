@@ -1,6 +1,7 @@
 import { paymentConfig } from '@/config/payment.config';
 import { auth } from '@/lib/auth/auth';
 import { creditService } from '@/lib/credits';
+import { sendWelcomeEmail } from '@/lib/email';
 import { quotaService } from '@/lib/quota/quota-service';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
@@ -85,6 +86,15 @@ export async function POST(request: NextRequest) {
         });
         signupCreditsGranted = signupCredits;
         console.log(`✅ Granted ${signupCredits} signup bonus credits to ${session.user.email}`);
+
+        // Send welcome email
+        try {
+          await sendWelcomeEmail(session.user.email, session.user.name || 'User');
+          console.log(`✅ Welcome email sent to ${session.user.email}`);
+        } catch (emailError) {
+          console.error('Failed to send welcome email:', emailError);
+          // Don't throw - email failure shouldn't block the response
+        }
       }
     } else if (alreadyReceivedBonus) {
       console.log(`⚠️ Signup bonus already granted to ${session.user.email}, skipping`);

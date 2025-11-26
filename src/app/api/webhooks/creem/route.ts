@@ -2,6 +2,14 @@
 import { randomUUID } from 'node:crypto';
 import { paymentConfig } from '@/config/payment.config';
 import { env } from '@/env';
+import {
+  sendCreditPackPurchaseEmail,
+  sendSubscriptionCancelledEmail,
+  sendSubscriptionCreatedEmail,
+  sendSubscriptionDowngradedEmail,
+  sendSubscriptionUpgradedEmail,
+} from '@/lib/email';
+import { getUserInfo } from '@/lib/email/user-helper';
 import { creemService } from '@/lib/creem/creem-service';
 import { enforceSingleCreemSubscription } from '@/lib/creem/enforce-single-subscription';
 import {
@@ -266,7 +274,7 @@ export async function POST(request: NextRequest) {
 }
 
 async function handleCreditPackPurchase(data: CreemWebhookData) {
-  const { userId, credits, productName, checkoutId, orderId, productId } = data;
+  const { userId, credits, productName, checkoutId, orderId, productId, amount } = data;
 
   console.log('[Creem Webhook] handleCreditPackPurchase called with:', {
     userId,
@@ -436,6 +444,29 @@ async function handleCreditPackPurchase(data: CreemWebhookData) {
       );
     }
 
+    // Send credit pack purchase email
+    try {
+      const userInfo = await getUserInfo(userId);
+      if (userInfo) {
+        // Find credit pack by credits amount
+        const creditPack = paymentConfig.creditPacks.find((pack) => pack.credits === credits);
+        const packName = creditPack?.name || productName || `${credits} Credits`;
+        const packPrice = creditPack?.price || data.amount || 0;
+        
+        await sendCreditPackPurchaseEmail(
+          userInfo.email,
+          userInfo.name,
+          packName,
+          credits,
+          packPrice
+        );
+        console.log(`[Creem Webhook] Credit pack purchase email sent to ${userInfo.email}`);
+      }
+    } catch (emailError) {
+      console.error('[Creem Webhook] Failed to send credit pack purchase email:', emailError);
+      // Don't throw - email failure shouldn't block webhook processing
+    }
+
     console.log(
       `[Creem Webhook] Successfully processed credit pack purchase for user ${userId}: ${credits} credits`
     );
@@ -532,6 +563,30 @@ async function handleCheckoutComplete(data: CreemWebhookData) {
         // Grant credits immediately for non-trial subscriptions
         if (normalizedStatus !== 'trialing') {
           await grantSubscriptionCredits(userId, planId, subscriptionId, resolvedInterval, false);
+          
+          // Send subscription created email
+          try {
+            const userInfo = await getUserInfo(userId);
+            if (userInfo) {
+              const plan = paymentConfig.plans.find((p) => p.id === planId);
+              const planName = plan?.name || planId;
+              const planPrice = resolvedInterval === 'year' && plan?.yearlyPrice ? plan.yearlyPrice : plan?.price || 0;
+              const credits = getCreditsForPlan(planId, resolvedInterval).amount;
+              
+              await sendSubscriptionCreatedEmail(
+                userInfo.email,
+                userInfo.name,
+                planName,
+                planPrice,
+                resolvedInterval,
+                credits
+              );
+              console.log(`[Creem Webhook] Subscription created email sent to ${userInfo.email}`);
+            }
+          } catch (emailError) {
+            console.error('[Creem Webhook] Failed to send subscription created email:', emailError);
+            // Don't throw - email failure shouldn't block webhook processing
+          }
         } else {
           console.log(
             '[Creem Webhook] Trial subscription - credits will be granted after trial ends'
@@ -704,6 +759,30 @@ async function handleSubscriptionCreated(data: CreemWebhookData) {
       // Only grant credits if not in trial or if trial just ended
       if (planId && userId && normalizedStatus !== 'trialing') {
         await grantSubscriptionCredits(userId, planId, subscriptionId, resolvedInterval, false);
+        
+        // Send subscription created email
+        try {
+          const userInfo = await getUserInfo(userId);
+          if (userInfo) {
+            const plan = paymentConfig.plans.find((p) => p.id === planId);
+            const planName = plan?.name || planId;
+            const planPrice = resolvedInterval === 'year' && plan?.yearlyPrice ? plan.yearlyPrice : plan?.price || 0;
+            const credits = getCreditsForPlan(planId, resolvedInterval).amount;
+            
+            await sendSubscriptionCreatedEmail(
+              userInfo.email,
+              userInfo.name,
+              planName,
+              planPrice,
+              resolvedInterval,
+              credits
+            );
+            console.log(`[Creem Webhook] Subscription created email sent to ${userInfo.email}`);
+          }
+        } catch (emailError) {
+          console.error('[Creem Webhook] Failed to send subscription created email:', emailError);
+          // Don't throw - email failure shouldn't block webhook processing
+        }
       } else if (normalizedStatus === 'trialing') {
         console.log(
           '[Creem Webhook] Trial subscription created - credits will be granted after trial ends'
@@ -878,6 +957,34 @@ async function handleSubscriptionUpdate(data: CreemWebhookData) {
               scheduledPeriodEnd: nextPeriodEnd,
               scheduledAt: new Date(),
             });
+
+            // Send upgrade email
+            try {
+              const userInfo = await getUserInfo(actualUserId);
+              if (userInfo) {
+                const oldPlan = paymentConfig.plans.find((p) => p.id === oldPlanId);
+                const newPlan = paymentConfig.plans.find((p) => p.id === newPlanId);
+                const oldPlanName = oldPlan?.name || oldPlanId;
+                const newPlanName = newPlan?.name || newPlanId;
+                const newPlanPrice = newInterval === 'year' && newPlan?.yearlyPrice ? newPlan.yearlyPrice : newPlan?.price || 0;
+                const newCredits = newCreditInfo.amount;
+                
+                await sendSubscriptionUpgradedEmail(
+                  userInfo.email,
+                  userInfo.name,
+                  oldPlanName,
+                  newPlanName,
+                  newPlanPrice,
+                  newInterval,
+                  newCredits,
+                  estimatedEffectiveDate
+                );
+                console.log(`[Creem Webhook] Upgrade email sent to ${userInfo.email}`);
+              }
+            } catch (emailError) {
+              console.error('[Creem Webhook] Failed to send upgrade email:', emailError);
+              // Don't throw - email failure shouldn't block webhook processing
+            }
           } else if (isDowngrade) {
             // 降级：设置 scheduled 字段，延迟生效
             const currentPeriodEnd = targetSubscription.periodEnd;
@@ -911,6 +1018,34 @@ async function handleSubscriptionUpdate(data: CreemWebhookData) {
               scheduledAt: new Date(),
               cancelAtPeriodEnd: false, // 降级不是取消
             });
+
+            // Send downgrade email
+            try {
+              const userInfo = await getUserInfo(actualUserId);
+              if (userInfo) {
+                const oldPlan = paymentConfig.plans.find((p) => p.id === oldPlanId);
+                const newPlan = paymentConfig.plans.find((p) => p.id === newPlanId);
+                const oldPlanName = oldPlan?.name || oldPlanId;
+                const newPlanName = newPlan?.name || newPlanId;
+                const newPlanPrice = newInterval === 'year' && newPlan?.yearlyPrice ? newPlan.yearlyPrice : newPlan?.price || 0;
+                const newCredits = newCreditInfo.amount;
+                
+                await sendSubscriptionDowngradedEmail(
+                  userInfo.email,
+                  userInfo.name,
+                  oldPlanName,
+                  newPlanName,
+                  newPlanPrice,
+                  newInterval,
+                  newCredits,
+                  estimatedEffectiveDate
+                );
+                console.log(`[Creem Webhook] Downgrade email sent to ${userInfo.email}`);
+              }
+            } catch (emailError) {
+              console.error('[Creem Webhook] Failed to send downgrade email:', emailError);
+              // Don't throw - email failure shouldn't block webhook processing
+            }
           }
         } else {
           console.log('[Creem Webhook] No credit adjustment needed (same credit amount)');
@@ -1122,6 +1257,34 @@ async function handleSubscriptionUpdate(data: CreemWebhookData) {
             scheduledPeriodEnd: null,
             scheduledAt: null,
           });
+
+          // Send upgrade email when scheduled upgrade takes effect
+          try {
+            const userInfo = await getUserInfo(actualUserId);
+            if (userInfo) {
+              const oldPlan = paymentConfig.plans.find((p) => p.id === oldPlanId);
+              const newPlan = paymentConfig.plans.find((p) => p.id === scheduledPlanId);
+              const oldPlanName = oldPlan?.name || oldPlanId;
+              const newPlanName = newPlan?.name || scheduledPlanId;
+              const newPlanPrice = scheduledInterval === 'year' && newPlan?.yearlyPrice ? newPlan.yearlyPrice : newPlan?.price || 0;
+              const newCredits = getCreditsForPlan(scheduledPlanId, scheduledInterval).amount;
+              
+              await sendSubscriptionUpgradedEmail(
+                userInfo.email,
+                userInfo.name,
+                oldPlanName,
+                newPlanName,
+                newPlanPrice,
+                scheduledInterval,
+                newCredits,
+                scheduledPeriodStart || new Date()
+              );
+              console.log(`[Creem Webhook] Scheduled upgrade email sent to ${userInfo.email}`);
+            }
+          } catch (emailError) {
+            console.error('[Creem Webhook] Failed to send scheduled upgrade email:', emailError);
+            // Don't throw - email failure shouldn't block webhook processing
+          }
         } else {
           await paymentRepository.update(targetSubscription.id, {
             status: newStatus,
@@ -1154,7 +1317,7 @@ async function handleSubscriptionUpdate(data: CreemWebhookData) {
 }
 
 async function handleSubscriptionDeleted(data: CreemWebhookData) {
-  const { customerId } = data;
+  const { customerId, userId, currentPeriodEnd } = data;
 
   try {
     const subscriptions = await paymentRepository.findByCustomerId(customerId);
@@ -1163,10 +1326,39 @@ async function handleSubscriptionDeleted(data: CreemWebhookData) {
       return;
     }
 
+    const actualUserId = userId || subscriptions[0]?.userId;
+    if (!actualUserId) {
+      console.error('[Creem Webhook] Could not find userId for cancelled subscription');
+      return;
+    }
+
     for (const subscription of subscriptions) {
       await paymentRepository.update(subscription.id, {
         status: 'canceled',
       });
+
+      // Send cancellation email
+      try {
+        const userInfo = await getUserInfo(actualUserId);
+        if (userInfo) {
+          const plan = paymentConfig.plans.find((p) => p.id === subscription.priceId);
+          const planName = plan?.name || subscription.priceId || 'Subscription';
+          const cancelDate = new Date();
+          const accessUntilDate = subscription.periodEnd || currentPeriodEnd ? new Date(currentPeriodEnd || subscription.periodEnd) : cancelDate;
+          
+          await sendSubscriptionCancelledEmail(
+            userInfo.email,
+            userInfo.name,
+            planName,
+            cancelDate,
+            accessUntilDate
+          );
+          console.log(`[Creem Webhook] Cancellation email sent to ${userInfo.email}`);
+        }
+      } catch (emailError) {
+        console.error('[Creem Webhook] Failed to send cancellation email:', emailError);
+        // Don't throw - email failure shouldn't block webhook processing
+      }
     }
 
     console.log(`[Creem Webhook] Marked subscription as cancelled for customer ${customerId}`);
