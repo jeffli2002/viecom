@@ -33,21 +33,21 @@ export default function ContactPage() {
               </a>
             </div>
             <div>
-              <p className="text-sm text-gray-600 mb-1">Sales & Enterprise</p>
+              <p className="text-sm text-gray-600 dark:text-slate-400 mb-1">Sales & Enterprise</p>
               <a
-                href="mailto:sales@viecom.pro"
+                href="mailto:support@viecom.pro"
                 className="text-teal-500 hover:underline font-medium"
               >
-                sales@viecom.pro
+                support@viecom.pro
               </a>
             </div>
             <div>
-              <p className="text-sm text-gray-600 mb-1">Technical Support</p>
+              <p className="text-sm text-gray-600 dark:text-slate-400 mb-1">Technical Support</p>
               <a
-                href="mailto:tech@viecom.pro"
+                href="mailto:support@viecom.pro"
                 className="text-teal-500 hover:underline font-medium"
               >
-                tech@viecom.pro
+                support@viecom.pro
               </a>
             </div>
           </CardContent>

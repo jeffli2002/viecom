@@ -334,8 +334,8 @@ export default function TermsPage() {
               <p>For questions about these Terms of Service, contact us at:</p>
               <p>
                 <strong>Email:</strong>{' '}
-                <a href="mailto:legal@viecom.pro" className="text-teal-500 hover:underline">
-                  legal@viecom.pro
+                <a href="mailto:support@viecom.pro" className="text-teal-500 hover:underline">
+                  support@viecom.pro
                 </a>
               </p>
               <p>
