@@ -143,8 +143,8 @@ export class KIEAPIService {
       );
     }
 
-    // For I2I, image_urls is required
-    if (isI2I && !params.imageUrl) {
+    // For I2I, we require either the legacy single URL or the newer array input
+    if (isI2I && !params.imageUrl && !(params.imageUrls && params.imageUrls.length > 0)) {
       throw new Error('Image URL is required for image-to-image generation');
     }
 
