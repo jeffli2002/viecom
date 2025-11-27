@@ -429,29 +429,19 @@ function LandingShowcaseConfigurator() {
     void fetchLandingSubmissions();
   }, [fetchEntries, fetchLandingSubmissions]);
 
-  const prepareUpload = async (uploadFile: File) => {
-    const response = await fetch('/api/admin/uploads/prepare', {
+  const uploadFileDirectly = async (uploadFile: File) => {
+    const formData = new FormData();
+    formData.append('file', uploadFile);
+    formData.append('fileName', uploadFile.name);
+    formData.append('contentType', uploadFile.type || 'application/octet-stream');
+
+    const response = await fetch('/api/admin/uploads/direct', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        fileName: uploadFile.name,
-        contentType: uploadFile.type || 'application/octet-stream',
-        fileSize: uploadFile.size,
-      }),
+      body: formData,
     });
     const data = await response.json().catch(() => ({}));
-    if (!response.ok || !data?.uploadUrl || !data?.publicUrl) {
-      throw new Error(data?.error || 'Failed to prepare upload');
-    }
-    const uploadResponse = await fetch(data.uploadUrl, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': uploadFile.type || 'application/octet-stream',
-      },
-      body: uploadFile,
-    });
-    if (!uploadResponse.ok) {
-      throw new Error('Upload failed. Please try again.');
+    if (!response.ok || !data?.publicUrl) {
+      throw new Error(data?.error || 'Upload failed. Please try again.');
     }
     return data.publicUrl as string;
   };
@@ -502,7 +492,7 @@ function LandingShowcaseConfigurator() {
     try {
       let imageUrl = form.imageUrl.trim();
       if (file) {
-        imageUrl = await prepareUpload(file);
+        imageUrl = await uploadFileDirectly(file);
       }
       if (!imageUrl) {
         throw new Error('Image is required');
