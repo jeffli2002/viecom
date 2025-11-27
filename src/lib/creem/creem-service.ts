@@ -1,6 +1,7 @@
 // @ts-nocheck
 import crypto from 'node:crypto';
 import { env } from '@/env';
+import { paymentConfig } from '@/config/payment.config';
 
 const getCreemTestMode = () => {
   // Auto-detect from API key prefix
@@ -1035,8 +1036,11 @@ class CreemPaymentService {
       const orderAmount = (order as { amount_paid?: number } | undefined)?.amount_paid;
 
       // Extract credit amount from product name (e.g., "1000 credits")
+      const configPack = paymentConfig.creditPacks.find(
+        (pack) => pack.creemProductKey && pack.creemProductKey === productId
+      );
       const creditMatch = productName?.match(/(\d+)\s*credits/i);
-      const credits = creditMatch ? Number.parseInt(creditMatch[1], 10) : undefined;
+      const credits = configPack?.credits ?? (creditMatch ? Number.parseInt(creditMatch[1], 10) : undefined);
 
       console.log('[Creem Service] Parsed credit pack purchase:', {
         productId,
