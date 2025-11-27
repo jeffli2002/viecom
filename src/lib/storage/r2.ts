@@ -50,6 +50,32 @@ export class R2StorageService {
   }
 
   /**
+   * Create a presigned upload URL so clients can upload directly to R2.
+   */
+  async createDirectUploadUrl(
+    fileName: string,
+    contentType: string,
+    options?: { folder?: string; expiresIn?: number }
+  ): Promise<{ key: string; uploadUrl: string; publicUrl: string }> {
+    const folderPath = options?.folder ? `${options.folder}/` : '';
+    const sanitizedName = fileName.replace(/[^a-zA-Z0-9._-]/g, '_');
+    const key = `${folderPath}${randomUUID()}-${sanitizedName}`;
+
+    const command = new PutObjectCommand({
+      Bucket: this.bucketName,
+      Key: key,
+      ContentType: contentType,
+    });
+
+    const uploadUrl = await getSignedUrl(s3Client, command, {
+      expiresIn: options?.expiresIn ?? 15 * 60, // 15 minutes default
+    });
+
+    const publicUrl = `${env.R2_PUBLIC_URL}/${key}`;
+    return { key, uploadUrl, publicUrl };
+  }
+
+  /**
    * Get signed URL for file access
    */
   async getSignedUrl(key: string, expiresIn = 3600): Promise<string> {

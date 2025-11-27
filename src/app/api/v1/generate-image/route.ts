@@ -1,5 +1,6 @@
 import { randomUUID } from 'node:crypto';
 import { creditsConfig, getModelCost } from '@/config/credits.config';
+import { MAX_SOURCE_IMAGES } from '@/config/image-upload.config';
 import { auth } from '@/lib/auth/auth';
 import { creditService } from '@/lib/credits';
 import { getQuotaUsageByService, updateQuotaUsage } from '@/lib/quota/quota-service';
@@ -14,8 +15,6 @@ export const fetchCache = 'force-no-store';
 export const maxDuration = 300;
 
 type KieApiService = Awaited<ReturnType<typeof import('@/lib/kie/kie-api')['getKieApiService']>>;
-
-const MAX_SOURCE_IMAGES = 3;
 
 const MODEL_ENDPOINTS: Record<string, string> = {
   'flux-1.1': 'https://api.bfl.ai/v1/flux-pro-1.1',

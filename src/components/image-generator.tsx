@@ -25,6 +25,11 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
 import { creditsConfig } from '@/config/credits.config';
 import { IMAGE_STYLES, getImageStyle } from '@/config/styles.config';
+import {
+  ALLOWED_SOURCE_IMAGE_MIME_TYPES,
+  MAX_SOURCE_IMAGE_FILE_SIZE_BYTES,
+  MAX_SOURCE_IMAGES,
+} from '@/config/image-upload.config';
 import { SHARE_REWARD_CONFIG, type ShareRewardKey } from '@/config/share.config';
 import { useGenerationProgress } from '@/hooks/use-generation-progress';
 import { useUpgradePrompt } from '@/hooks/use-upgrade-prompt';
@@ -64,7 +69,14 @@ interface GenerationResult {
 }
 
 type GenerationMode = 'text-to-image' | 'image-to-image';
-type SourceImage = { name: string; dataUrl: string };
+type SourceImage = {
+  id: string;
+  name: string;
+  dataUrl: string;
+  remoteUrl?: string;
+  isUploading?: boolean;
+  error?: string;
+};
 
 const createClientRequestId = () => {
   if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
@@ -73,9 +85,32 @@ const createClientRequestId = () => {
   return `img-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
 };
 
-const MAX_SOURCE_IMAGES = 3;
-const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/jpg'];
-const MAX_IMAGE_FILE_SIZE = 10 * 1024 * 1024;
+const createSourceImageId = () => {
+  if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+    return crypto.randomUUID();
+  }
+  return `src-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+};
+
+const formatBytesToMb = (bytes: number) => (bytes / (1024 * 1024)).toFixed(1);
+const MAX_SOURCE_IMAGE_SIZE_LABEL = `${formatBytesToMb(MAX_SOURCE_IMAGE_FILE_SIZE_BYTES)} MB`;
+const SOURCE_IMAGE_ACCEPT = ALLOWED_SOURCE_IMAGE_MIME_TYPES.join(',');
+const ALLOWED_SOURCE_IMAGE_TYPE_SET = new Set<string>(ALLOWED_SOURCE_IMAGE_MIME_TYPES);
+
+const parseJsonResponse = async <T,>(response: Response): Promise<{
+  data: T | null;
+  rawText: string;
+}> => {
+  const rawText = await response.text();
+  if (!rawText) {
+    return { data: null, rawText: '' };
+  }
+  try {
+    return { data: JSON.parse(rawText) as T, rawText };
+  } catch {
+    return { data: null, rawText };
+  }
+};
 
 const isRecoverableNetworkError = (message: string | undefined) => {
   if (!message) {
@@ -213,7 +248,7 @@ export default function ImageGenerator() {
       if (!response.ok) {
         return null;
       }
-      const data: {
+      const parsed = await parseJsonResponse<{
         imageUrl?: string;
         previewUrl?: string;
         model?: string;
@@ -222,9 +257,10 @@ export default function ImageGenerator() {
         assetId?: string;
         clientRequestId?: string;
         creditsUsed?: number;
-      } = await response.json();
+      }>(response);
+      const data = parsed.data;
 
-      if (!data.imageUrl) {
+      if (!data?.imageUrl) {
         return null;
       }
 
@@ -261,64 +297,200 @@ export default function ImageGenerator() {
     }
   };
 
+  const updateSourceImage = (imageId: string, updater: (image: SourceImage) => SourceImage) => {
+    setSourceImages((prev) =>
+      prev.map((image) => (image.id === imageId ? updater(image) : image))
+    );
+  };
+
+  const readSourceImagePreview = (file: File, imageId: string) => {
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      if (typeof reader.result === 'string') {
+        updateSourceImage(imageId, (image) => ({
+          ...image,
+          dataUrl: reader.result as string,
+        }));
+      }
+    };
+    reader.onerror = () => {
+      console.error('Failed to read source image:', reader.error);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const prepareDirectUpload = async (
+    file: File
+  ): Promise<{ uploadUrl: string; publicUrl: string; key: string }> => {
+    const response = await fetch('/api/v1/uploads/prepare', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        fileName: file.name || 'source-image',
+        contentType: file.type || 'application/octet-stream',
+        fileSize: file.size,
+        purpose: 'image-source',
+      }),
+    });
+
+    const parsed = await parseJsonResponse<{
+      uploadUrl?: string;
+      publicUrl?: string;
+      key?: string;
+      error?: string;
+      maxFileSize?: number;
+    }>(response);
+    const data = parsed.data;
+
+    if (!response.ok || !data?.uploadUrl || !data?.publicUrl || !data?.key) {
+      const fallback =
+        response.status === 413
+          ? 'The upload request body was too large. Please retry with a smaller image.'
+          : `Failed to prepare upload (status ${response.status}). Please try again later.`;
+      const message =
+        data?.error ||
+        (parsed.rawText && parsed.rawText.length < 400 ? parsed.rawText : fallback) ||
+        fallback;
+      throw new Error(message);
+    }
+
+    return {
+      uploadUrl: data.uploadUrl,
+      publicUrl: data.publicUrl,
+      key: data.key,
+    };
+  };
+
+  const uploadViaDirectUrl = async (file: File): Promise<string> => {
+    const prepared = await prepareDirectUpload(file);
+    const uploadResponse = await fetch(prepared.uploadUrl, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': file.type || 'application/octet-stream',
+      },
+      body: file,
+    });
+
+    if (!uploadResponse.ok) {
+      throw new Error(
+        `Upload failed with status ${uploadResponse.status}. Please try again later.`
+      );
+    }
+
+    return prepared.publicUrl;
+  };
+
+  const uploadViaProxy = async (file: File): Promise<string> => {
+    const formData = new FormData();
+    formData.append('file', file, file.name || 'source-image');
+    formData.append('fileName', file.name || 'source-image');
+    formData.append('contentType', file.type || 'application/octet-stream');
+    formData.append('purpose', 'image-source');
+
+    const response = await fetch('/api/v1/uploads/direct', {
+      method: 'POST',
+      body: formData,
+    });
+
+    const parsed = await parseJsonResponse<{
+      publicUrl?: string;
+      error?: string;
+    }>(response);
+    const data = parsed.data;
+
+    if (!response.ok || !data?.publicUrl) {
+      const fallback =
+        response.status === 413
+          ? 'Image upload exceeded the server limit. Please try a smaller file.'
+          : `Upload failed (status ${response.status}). Please try again later.`;
+      const message =
+        data?.error ||
+        (parsed.rawText && parsed.rawText.length < 400 ? parsed.rawText : fallback) ||
+        fallback;
+      throw new Error(message);
+    }
+
+    return data.publicUrl;
+  };
+
+  const uploadSourceImage = async (file: File, imageId: string) => {
+    try {
+      const remoteUrl = await uploadViaDirectUrl(file);
+      updateSourceImage(imageId, (image) => ({
+        ...image,
+        remoteUrl,
+        isUploading: false,
+        error: undefined,
+      }));
+      return;
+    } catch (directError) {
+      console.warn('Direct R2 upload failed, falling back to proxy route:', directError);
+    }
+
+    try {
+      const remoteUrl = await uploadViaProxy(file);
+      updateSourceImage(imageId, (image) => ({
+        ...image,
+        remoteUrl,
+        isUploading: false,
+        error: undefined,
+      }));
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : 'Failed to upload image. Please try again.';
+      console.error('Source image upload failed:', error);
+      updateSourceImage(imageId, (image) => ({
+        ...image,
+        isUploading: false,
+        error: message,
+      }));
+      toast.error(message);
+    }
+  };
+
   const addSourceImages = (files: File[]) => {
     if (files.length === 0) return;
 
     const remainingSlots = MAX_SOURCE_IMAGES - sourceImages.length;
     if (remainingSlots <= 0) {
-      alert(`You can upload up to ${MAX_SOURCE_IMAGES} images for image-to-image mode.`);
+      toast.error(`You can upload up to ${MAX_SOURCE_IMAGES} images for image-to-image mode.`);
       return;
     }
 
+    const filesToProcess = files.slice(0, remainingSlots);
     const validFiles: File[] = [];
-    let rejectedType = false;
-    let rejectedSize = false;
 
-    for (const file of files) {
-      if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
-        rejectedType = true;
+    for (const file of filesToProcess) {
+      if (!file.type || !ALLOWED_SOURCE_IMAGE_TYPE_SET.has(file.type)) {
+        toast.error('Only JPEG, PNG, or WebP images can be used as references.');
         continue;
       }
-      if (file.size > MAX_IMAGE_FILE_SIZE) {
-        rejectedSize = true;
+      if (file.size > MAX_SOURCE_IMAGE_FILE_SIZE_BYTES) {
+        toast.error(`Each image must be under ${MAX_SOURCE_IMAGE_SIZE_LABEL}.`);
         continue;
       }
       validFiles.push(file);
-      if (validFiles.length >= remainingSlots) {
-        break;
-      }
-    }
-
-    if (rejectedType) {
-      alert('Some files were skipped because only JPEG, PNG, or WebP formats are supported.');
-    }
-    if (rejectedSize) {
-      alert('Some files were skipped because they exceed the 10MB size limit.');
     }
 
     if (validFiles.length === 0) {
       return;
     }
 
-    validFiles.forEach((file) => {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        if (typeof reader.result === 'string') {
-          setSourceImages((prev) => {
-            if (prev.length >= MAX_SOURCE_IMAGES) {
-              return prev;
-            }
-            return [
-              ...prev,
-              { name: file.name || `image-${prev.length + 1}`, dataUrl: reader.result as string },
-            ];
-          });
-        }
-      };
-      reader.onerror = () => {
-        console.error('Failed to read source image:', reader.error);
-      };
-      reader.readAsDataURL(file);
+    const newEntries = validFiles.map((file, index) => ({
+      id: createSourceImageId(),
+      name: file.name || `image-${sourceImages.length + index + 1}`,
+      dataUrl: '',
+      remoteUrl: undefined,
+      isUploading: true,
+      error: undefined,
+    }));
+
+    setSourceImages((prev) => [...prev, ...newEntries]);
+
+    newEntries.forEach((entry, idx) => {
+      const file = validFiles[idx];
+      readSourceImagePreview(file, entry.id);
+      void uploadSourceImage(file, entry.id);
     });
   };
 
@@ -332,8 +504,8 @@ export default function ImageGenerator() {
     }
   };
 
-  const handleRemoveImage = (index: number) => {
-    setSourceImages((prev) => prev.filter((_, i) => i !== index));
+  const handleRemoveImage = (imageId: string) => {
+    setSourceImages((prev) => prev.filter((image) => image.id !== imageId));
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
@@ -413,9 +585,23 @@ export default function ImageGenerator() {
       return;
     }
 
-    if (mode === 'image-to-image' && sourceImages.length === 0) {
-      alert('Please upload an image for image-to-image generation');
-      return;
+    if (mode === 'image-to-image') {
+      if (sourceImages.length === 0) {
+        toast.error('Please upload at least one reference image.');
+        return;
+      }
+
+      const uploadingImage = sourceImages.find((image) => image.isUploading);
+      if (uploadingImage) {
+        toast.error('Please wait for your images to finish uploading before generating.');
+        return;
+      }
+
+      const invalidImage = sourceImages.find((image) => image.error || !image.remoteUrl);
+      if (invalidImage) {
+        toast.error('One of your images failed to upload. Please fix it or remove the image.');
+        return;
+      }
     }
 
     const requestId = createClientRequestId();
@@ -471,23 +657,16 @@ export default function ImageGenerator() {
       };
 
       if (mode === 'image-to-image' && sourceImages.length > 0) {
-        requestBody.images = sourceImages.slice(0, MAX_SOURCE_IMAGES).map((image) => image.dataUrl);
+        const remoteSources = sourceImages
+          .slice(0, MAX_SOURCE_IMAGES)
+          .map((image) => image.remoteUrl)
+          .filter((url): url is string => Boolean(url));
+        if (remoteSources.length > 0) {
+          requestBody.images = remoteSources;
+        }
       }
 
       let response: Response;
-      let data: {
-        imageUrl?: string;
-        previewUrl?: string;
-        model?: string;
-        error?: string;
-        details?: string;
-        taskId?: string;
-        status?: string;
-        clientRequestId?: string;
-        assetId?: string | null;
-        creditsUsed?: number;
-      };
-
       // Create AbortController with 6 minute timeout (5 min generation + 1 min buffer)
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 6 * 60 * 1000);
@@ -520,31 +699,48 @@ export default function ImageGenerator() {
         );
       }
 
-      try {
-        data = await response.json();
-      } catch (parseError) {
-        console.error('Response parse error:', parseError);
-        throw new Error(`Server returned invalid response (${response.status}). Please try again.`);
-      }
+      const parsedResponse = await parseJsonResponse<{
+        imageUrl?: string;
+        previewUrl?: string;
+        model?: string;
+        error?: string;
+        details?: string;
+        taskId?: string;
+        status?: string;
+        clientRequestId?: string;
+        assetId?: string | null;
+        creditsUsed?: number;
+      }>(response);
+      const data = parsedResponse.data;
 
       advanceProgress(75, t('progressFinalizing'));
 
       if (!response.ok) {
         if (response.status === 429 || response.status === 402) {
           openUpgradePrompt();
-          throw new Error(data.error || 'Image generation limit reached');
+          throw new Error(data?.error || 'Image generation limit reached');
         }
 
-        const errorMessage = data.error || data.details || 'Failed to generate image';
+        const fallbackMessage =
+          response.status === 413
+            ? 'The request payload is too large. Please reduce input size or try again later.'
+            : `Request failed with status ${response.status}`;
+        const errorMessage =
+          data?.error ||
+          data?.details ||
+          (parsedResponse.rawText && parsedResponse.rawText.length < 400
+            ? parsedResponse.rawText
+            : fallbackMessage);
         console.error('Image generation API error:', {
           status: response.status,
-          error: data.error,
-          details: data.details,
+          error: data?.error,
+          details: data?.details,
+          raw: parsedResponse.rawText?.slice(0, 200),
         });
         throw new Error(errorMessage);
       }
 
-      if (!data.imageUrl) {
+      if (!data?.imageUrl) {
         throw new Error('No image URL in response');
       }
 
@@ -910,37 +1106,54 @@ export default function ImageGenerator() {
                     </button>
                   ) : (
                     <div className="grid gap-4 sm:grid-cols-2">
-                      {sourceImages.map((image, idx) => (
-                        <div
-                          key={image.dataUrl || image.name || `source-image-${idx}`}
-                          className="relative w-full"
-                        >
-                          <button
-                            type="button"
-                            className="w-full overflow-hidden rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-teal-500"
-                            onClick={() =>
-                              setLightboxImage({
-                                url: image.dataUrl,
-                                alt: image.name || `Source image ${idx + 1}`,
-                              })
-                            }
-                          >
-                            <img
-                              src={image.dataUrl}
-                              alt={`Source ${idx + 1}`}
-                              className="w-full max-h-96 object-contain"
-                            />
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => handleRemoveImage(idx)}
-                            className="absolute top-2 right-2 rounded-full bg-red-500 p-2 text-white transition-colors hover:bg-red-600"
-                            aria-label={t('removeSourceImage')}
-                          >
-                            <X className="h-4 w-4" />
-                          </button>
-                        </div>
-                      ))}
+                      {sourceImages.map((image, idx) => {
+                        const previewSrc = image.dataUrl || image.remoteUrl || '';
+                        return (
+                          <div key={image.id} className="relative w-full">
+                            <button
+                              type="button"
+                              className="group w-full overflow-hidden rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-teal-500"
+                              onClick={() => {
+                                if (!previewSrc) return;
+                                setLightboxImage({
+                                  url: previewSrc,
+                                  alt: image.name || `Source image ${idx + 1}`,
+                                });
+                              }}
+                              disabled={!previewSrc}
+                            >
+                              {previewSrc ? (
+                                <img
+                                  src={previewSrc}
+                                  alt={`Source ${idx + 1}`}
+                                  className="w-full max-h-96 object-contain"
+                                />
+                              ) : (
+                                <div className="flex h-48 w-full items-center justify-center bg-slate-100 text-sm text-slate-500">
+                                  Preparing preview...
+                                </div>
+                              )}
+                            </button>
+                            {image.isUploading && (
+                              <div className="absolute inset-0 flex flex-col items-center justify-center rounded-xl bg-black/50 text-white">
+                                <Loader2 className="mb-2 h-6 w-6 animate-spin" />
+                                <span className="text-xs">Uploading...</span>
+                              </div>
+                            )}
+                            <button
+                              type="button"
+                              onClick={() => handleRemoveImage(image.id)}
+                              className="absolute top-2 right-2 rounded-full bg-red-500 p-2 text-white transition-colors hover:bg-red-600"
+                              aria-label={t('removeSourceImage')}
+                            >
+                              <X className="h-4 w-4" />
+                            </button>
+                            {image.error && (
+                              <p className="mt-2 text-xs text-red-500">{image.error}</p>
+                            )}
+                          </div>
+                        );
+                      })}
                       {sourceImages.length < MAX_SOURCE_IMAGES && (
                         <button
                           type="button"
@@ -971,7 +1184,7 @@ export default function ImageGenerator() {
                 <input
                   ref={fileInputRef}
                   type="file"
-                  accept="image/jpeg,image/png,image/webp,image/jpg"
+                  accept={SOURCE_IMAGE_ACCEPT}
                   multiple
                   onChange={handleImageSelect}
                   className="hidden"
