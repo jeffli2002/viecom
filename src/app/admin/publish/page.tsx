@@ -370,6 +370,15 @@ function LandingShowcaseConfigurator() {
     ctaUrl: '',
     imageUrl: '',
   });
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!file && form.imageUrl) {
+      setPreviewUrl(form.imageUrl);
+    } else if (!file && !form.imageUrl) {
+      setPreviewUrl(null);
+    }
+  }, [file, form.imageUrl]);
 
   const handleAdminUnauthorized = useCallback(() => {
     window.location.href = '/admin/login';
@@ -454,6 +463,13 @@ function LandingShowcaseConfigurator() {
     const selected = files[0];
     setFile(selected);
     setForm((prev) => ({ ...prev, imageUrl: '' }));
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      if (typeof reader.result === 'string') {
+        setPreviewUrl(reader.result);
+      }
+    };
+    reader.readAsDataURL(selected);
   };
 
   const handleDrop = (event: React.DragEvent<HTMLDivElement>) => {
@@ -519,6 +535,7 @@ function LandingShowcaseConfigurator() {
         imageUrl: '',
       });
       setFile(null);
+      setPreviewUrl(null);
       setIsModalOpen(false);
       await fetchEntries();
       await fetchLandingSubmissions();
@@ -696,11 +713,7 @@ function LandingShowcaseConfigurator() {
       )}
 
       {isModalOpen && (
-        <dialog
-          open
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4"
-          onClose={() => setIsModalOpen(false)}
-        >
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
           <div className="w-full max-w-lg rounded-2xl bg-white p-6 shadow-xl space-y-4 text-slate-700">
             <h3 className="text-xl font-semibold">Add Landing Showcase</h3>
             <div className="space-y-2">
@@ -763,10 +776,14 @@ function LandingShowcaseConfigurator() {
                   </button>
                 </p>
                 <p className="text-xs text-slate-400 mt-1">PNG, JPG up to 10MB</p>
-                {file && (
-                  <p className="mt-2 text-xs text-slate-500">
-                    Selected: <span className="font-medium">{file.name}</span>
-                  </p>
+                {(file || previewUrl || form.imageUrl) && (
+                  <div className="mt-4 w-full overflow-hidden rounded-lg border border-slate-200 bg-white">
+                    {previewUrl ? (
+                      <img src={previewUrl} alt="Preview" className="w-full object-cover" />
+                    ) : form.imageUrl ? (
+                      <img src={form.imageUrl} alt="Preview" className="w-full object-cover" />
+                    ) : null}
+                  </div>
                 )}
                 <input
                   id="landing-upload-input"
@@ -800,7 +817,7 @@ function LandingShowcaseConfigurator() {
               </button>
             </div>
           </div>
-        </dialog>
+        </div>
       )}
     </section>
   );
