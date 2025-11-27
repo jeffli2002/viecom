@@ -187,7 +187,13 @@ export function ShowcaseGallery() {
             title: item.title || 'Showcase Item',
             filename: item.filename,
           }));
-          setGalleryItems(parsedItems);
+          const merged: GalleryItem[] = [...DEFAULT_ITEMS];
+          for (const item of parsedItems) {
+            if (!merged.some((existing) => existing.id === item.id)) {
+              merged.push(item);
+            }
+          }
+          setGalleryItems(merged);
         } else {
           console.warn('No showcase items found, using default items');
           setGalleryItems(DEFAULT_ITEMS);
