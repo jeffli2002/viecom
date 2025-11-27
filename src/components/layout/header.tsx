@@ -213,10 +213,7 @@ export function Header() {
                     className="relative h-10 w-10 rounded-full p-0 !bg-transparent hover:!bg-transparent dark:!bg-transparent dark:hover:!bg-transparent focus:!bg-transparent active:!bg-transparent"
                     style={{ backgroundColor: 'transparent' }}
                   >
-                    <Avatar
-                      className="h-10 w-10 border-2 border-teal-500 z-10 relative !bg-transparent"
-                      style={{ backgroundColor: 'transparent' }}
-                    >
+                    <Avatar className="h-10 w-10 avatar-teal z-10 relative bg-transparent">
                       <AvatarImage
                         src={user.image || ''}
                         alt={user.name || ''}
@@ -224,7 +221,7 @@ export function Header() {
                         style={{ backgroundColor: 'transparent' }}
                       />
                       <AvatarFallback
-                        className="text-white rounded-full header-avatar-fallback"
+                        className="text-white rounded-full avatar-teal-fallback header-avatar-fallback"
                         data-header-avatar="true"
                       >
                         {user.name?.charAt(0).toUpperCase() || <User className="h-4 w-4" />}
