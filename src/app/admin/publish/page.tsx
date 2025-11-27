@@ -1,6 +1,7 @@
 'use client';
 
 import { SHOWCASE_CATEGORIES } from '@/config/showcase.config';
+import { Upload } from 'lucide-react';
 import Image from 'next/image';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { toast } from 'sonner';
@@ -360,6 +361,7 @@ function LandingShowcaseConfigurator() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [file, setFile] = useState<File | null>(null);
+  const [isDragging, setIsDragging] = useState(false);
   const [form, setForm] = useState({
     title: '',
     subtitle: '',
@@ -419,6 +421,36 @@ function LandingShowcaseConfigurator() {
       throw new Error('Upload failed. Please try again.');
     }
     return data.publicUrl as string;
+  };
+
+  const handleFileSelect = (files: FileList | null) => {
+    if (!files || files.length === 0) {
+      return;
+    }
+    const selected = files[0];
+    setFile(selected);
+    setForm((prev) => ({ ...prev, imageUrl: '' }));
+  };
+
+  const handleDrop = (event: React.DragEvent<HTMLDivElement>) => {
+    event.preventDefault();
+    event.stopPropagation();
+    setIsDragging(false);
+    if (event.dataTransfer?.files?.length) {
+      handleFileSelect(event.dataTransfer.files);
+    }
+  };
+
+  const handleDragOver = (event: React.DragEvent<HTMLDivElement>) => {
+    event.preventDefault();
+    event.stopPropagation();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = (event: React.DragEvent<HTMLDivElement>) => {
+    event.preventDefault();
+    event.stopPropagation();
+    setIsDragging(false);
   };
 
   const handleCreateEntry = async () => {
@@ -649,14 +681,40 @@ function LandingShowcaseConfigurator() {
             </div>
             <div className="space-y-2">
               <label className="text-sm font-medium">Upload Image</label>
-              <input
-                type="file"
-                accept="image/*"
-                onChange={(e) => setFile(e.target.files?.[0] ?? null)}
-              />
-              <p className="text-xs text-slate-500">
-                Or provide an image URL:
-              </p>
+              <div
+                onDrop={handleDrop}
+                onDragOver={handleDragOver}
+                onDragLeave={handleDragLeave}
+                className={`flex flex-col items-center justify-center rounded-xl border-2 border-dashed px-4 py-8 text-center ${
+                  isDragging ? 'border-teal-500 bg-teal-50' : 'border-slate-200 bg-slate-50'
+                }`}
+              >
+                <Upload className="h-10 w-10 text-slate-400" />
+                <p className="mt-3 text-sm text-slate-600">
+                  Drag & drop an image, or{' '}
+                  <button
+                    type="button"
+                    className="text-teal-500 underline"
+                    onClick={() => document.getElementById('landing-upload-input')?.click()}
+                  >
+                    browse files
+                  </button>
+                </p>
+                <p className="text-xs text-slate-400 mt-1">PNG, JPG up to 10MB</p>
+                {file && (
+                  <p className="mt-2 text-xs text-slate-500">
+                    Selected: <span className="font-medium">{file.name}</span>
+                  </p>
+                )}
+                <input
+                  id="landing-upload-input"
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={(e) => handleFileSelect(e.target.files)}
+                />
+              </div>
+              <p className="text-xs text-slate-500">Or provide an image URL:</p>
               <input
                 className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm"
                 value={form.imageUrl}
