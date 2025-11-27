@@ -764,19 +764,7 @@ function LandingShowcaseConfigurator() {
                   isDragging ? 'border-teal-500 bg-teal-50' : 'border-slate-200 bg-slate-50'
                 }`}
               >
-                <Upload className="h-10 w-10 text-slate-400" />
-                <p className="mt-3 text-sm text-slate-600">
-                  Drag & drop an image, or{' '}
-                  <button
-                    type="button"
-                    className="text-teal-500 underline"
-                    onClick={() => document.getElementById('landing-upload-input')?.click()}
-                  >
-                    browse files
-                  </button>
-                </p>
-                <p className="text-xs text-slate-400 mt-1">PNG, JPG up to 10MB</p>
-                {(file || previewUrl || form.imageUrl) && (
+                {previewUrl || form.imageUrl ? (
                   <div className="mt-4 w-full overflow-hidden rounded-lg border border-slate-200 bg-white">
                     {previewUrl ? (
                       <img
@@ -792,6 +780,21 @@ function LandingShowcaseConfigurator() {
                       />
                     ) : null}
                   </div>
+                ) : (
+                  <>
+                    <Upload className="h-10 w-10 text-slate-400" />
+                    <p className="mt-3 text-sm text-slate-600">
+                      Drag & drop an image, or{' '}
+                      <button
+                        type="button"
+                        className="text-teal-500 underline"
+                        onClick={() => document.getElementById('landing-upload-input')?.click()}
+                      >
+                        browse files
+                      </button>
+                    </p>
+                    <p className="text-xs text-slate-400 mt-1">PNG, JPG up to 10MB</p>
+                  </>
                 )}
                 <input
                   id="landing-upload-input"
