@@ -158,7 +158,9 @@ function AssetsPageContent() {
           <p className="text-muted-foreground">{t('subtitle')}</p>
         </div>
         <Link href="/image-generation">
-          <Button>{t('generateNew')}</Button>
+          <Button className="bg-teal-500 text-white hover:bg-teal-600 shadow shadow-teal-500/30">
+            {t('generateNew')}
+          </Button>
         </Link>
       </div>
 
@@ -197,7 +199,9 @@ function AssetsPageContent() {
             {searchQuery ? t('noAssetsSearch') : t('noAssetsDesc')}
           </p>
           <Link href="/image-generation">
-            <Button>{t('startGenerating')}</Button>
+            <Button className="bg-teal-500 text-white hover:bg-teal-600 shadow shadow-teal-500/30">
+              {t('startGenerating')}
+            </Button>
           </Link>
         </Card>
       ) : (
