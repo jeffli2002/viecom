@@ -47,6 +47,9 @@ export default function AdminPublishPage() {
   const [formState, setFormState] = useState<Record<string, SubmissionFormState>>({});
   const [statusFilter, setStatusFilter] = useState<string>('pending');
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const redirectToLogin = () => {
+    window.location.href = '/admin/login';
+  };
 
   const fetchSubmissions = useCallback(async () => {
     setIsLoading(true);
@@ -54,6 +57,10 @@ export default function AdminPublishPage() {
       const response = await fetch(`/api/admin/publish/submissions?status=${statusFilter}`, {
         cache: 'no-store',
       });
+      if (response.status === 401) {
+        redirectToLogin();
+        return;
+      }
       if (!response.ok) {
         throw new Error('Failed to load submissions');
       }
@@ -361,10 +368,18 @@ function LandingShowcaseConfigurator() {
     imageUrl: '',
   });
 
+  const handleAdminUnauthorized = useCallback(() => {
+    window.location.href = '/admin/login';
+  }, []);
+
   const fetchEntries = useCallback(async () => {
     setIsLoading(true);
     try {
       const response = await fetch('/api/admin/landing-showcase', { cache: 'no-store' });
+      if (response.status === 401) {
+        handleAdminUnauthorized();
+        return;
+      }
       const data = await response.json();
       setEntries(Array.isArray(data.entries) ? data.entries : []);
     } catch (error) {
@@ -373,7 +388,7 @@ function LandingShowcaseConfigurator() {
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [handleAdminUnauthorized]);
 
   useEffect(() => {
     void fetchEntries();
@@ -431,6 +446,10 @@ function LandingShowcaseConfigurator() {
           ctaUrl: form.ctaUrl.trim() || null,
         }),
       });
+      if (response.status === 401) {
+        handleAdminUnauthorized();
+        return;
+      }
       if (!response.ok) {
         const data = await response.json().catch(() => ({}));
         throw new Error(data?.error || 'Failed to create entry');
@@ -462,6 +481,10 @@ function LandingShowcaseConfigurator() {
       const response = await fetch(`/api/admin/landing-showcase/${entryId}`, {
         method: 'DELETE',
       });
+      if (response.status === 401) {
+        handleAdminUnauthorized();
+        return;
+      }
       if (!response.ok) {
         throw new Error('Failed to remove entry');
       }
@@ -480,11 +503,15 @@ function LandingShowcaseConfigurator() {
     updated.splice(to, 0, moved);
     setEntries(updated);
     try {
-      await fetch('/api/admin/landing-showcase/reorder', {
+      const response = await fetch('/api/admin/landing-showcase/reorder', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ ids: updated.map((entry) => entry.id) }),
       });
+      if (response.status === 401) {
+        handleAdminUnauthorized();
+        return;
+      }
     } catch (error) {
       console.error(error);
       toast.error('Failed to reorder entries');
