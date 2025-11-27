@@ -25,6 +25,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
 import { creditsConfig } from '@/config/credits.config';
 import { IMAGE_STYLES, getImageStyle } from '@/config/styles.config';
+import { SHARE_REWARD_CONFIG, type ShareRewardKey } from '@/config/share.config';
 import { useGenerationProgress } from '@/hooks/use-generation-progress';
 import { useUpgradePrompt } from '@/hooks/use-upgrade-prompt';
 import type { BrandToneAnalysis } from '@/lib/brand/brand-tone-analyzer';
@@ -105,7 +106,6 @@ export default function ImageGenerator() {
   const [shareStatus, setShareStatus] = useState<'idle' | 'pending' | 'awarded' | 'error'>('idle');
   const [shareMessage, setShareMessage] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const shareReferenceRef = useRef<string | null>(null);
   const publishUrl = 'https://viecom.pro/publish';
   const activeRequestIdRef = useRef<string | null>(null);
   const [lightboxImage, setLightboxImage] = useState<{ url: string; alt: string } | null>(null);
@@ -186,7 +186,6 @@ export default function ImageGenerator() {
     void imageReference;
     setShareStatus('idle');
     setShareMessage(null);
-    shareReferenceRef.current = null;
   }, [imageReference]);
 
   useEffect(() => {
@@ -606,15 +605,15 @@ export default function ImageGenerator() {
       } else {
         window.prompt(t('shareCopyFallback'), result.imageUrl);
       }
-      if (successMessage) {
-        toast.success(successMessage);
-      } else {
-        toast.success(t('shareCopySuccess'));
-      }
+      toast.success(successMessage || t('shareCopySuccess'));
+      setShareStatus('idle');
+      setShareMessage(successMessage || t('shareCopySuccess'));
       return true;
     } catch (error) {
       console.error('Clipboard copy failed:', error);
       toast.error(t('shareCopyFailed'));
+      setShareStatus('error');
+      setShareMessage(t('shareCopyFailed'));
       window.prompt(t('shareCopyFallback'), result.imageUrl);
       return false;
     }
@@ -627,21 +626,16 @@ export default function ImageGenerator() {
     if (!result?.imageUrl) return;
 
     if (action === 'copy') {
-      const copied = await copyShareLink();
-      if (copied) {
-        await awardShareReward();
-      }
+      await copyShareLink();
       return;
     }
 
     if (action === 'publish') {
-      const copied = await copyShareLink();
+      await copyShareLink();
       const publishTarget = `${publishUrl}?asset=${encodeURIComponent(result.imageUrl)}`;
       window.open(publishTarget, '_blank', 'noopener,noreferrer');
       toast.success(t('sharePublishToast'));
-      if (copied) {
-        await awardShareReward();
-      }
+      await awardShareReward('publishViecom');
       return;
     }
 
@@ -662,7 +656,7 @@ export default function ImageGenerator() {
         window.open(platform.openUrl, '_blank', 'noopener,noreferrer');
       }
       toast.success(t('shareSocialToast', { platform: platform.label }));
-      await awardShareReward();
+      await awardShareReward('socialShare', { platformId });
     }
   };
 
@@ -686,39 +680,40 @@ export default function ImageGenerator() {
     }
   };
 
-  const awardShareReward = async () => {
-    if (!result?.imageUrl) return;
+  const awardShareReward = async (
+    rewardKey: ShareRewardKey,
+    metadata?: { platformId?: SharePlatformId }
+  ) => {
+    const reward = SHARE_REWARD_CONFIG[rewardKey];
+    if (!result?.imageUrl || !reward || reward.credits <= 0) {
+      return;
+    }
     if (!isAuthenticated) {
       setShareStatus('error');
       setShareMessage(t('shareLoginRequired'));
       return;
     }
     if (shareStatus === 'pending') return;
-    if (shareStatus === 'awarded') {
-      setShareMessage(t('shareAlreadyRewarded'));
-      return;
-    }
 
     setShareStatus('pending');
 
     try {
-      const referenceId =
-        shareReferenceRef.current ||
-        `image_share_${
-          typeof globalThis.crypto?.randomUUID === 'function'
-            ? globalThis.crypto.randomUUID()
-            : Date.now()
-        }`;
-      shareReferenceRef.current = referenceId;
+      const referenceId = `${reward.referencePrefix}_${
+        typeof globalThis.crypto?.randomUUID === 'function'
+          ? globalThis.crypto.randomUUID()
+          : Date.now()
+      }`;
 
       const response = await fetch('/api/rewards/share', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          platform: 'other',
+          platform: reward.platform,
           shareUrl: result.imageUrl,
-          assetId: null,
+          assetId: result.assetId ?? null,
           referenceId,
+          rewardType: rewardKey,
+          targetPlatform: metadata?.platformId || null,
         }),
       });
 
@@ -735,11 +730,13 @@ export default function ImageGenerator() {
       }
 
       setShareStatus('awarded');
-      setShareMessage(t('shareRewarded'));
+      setShareMessage(t('shareRewardedAmount', { credits: reward.credits }));
+      toast.success(t('shareRewardedAmount', { credits: reward.credits }));
     } catch (error) {
       console.error('Share reward error:', error);
       setShareStatus('error');
       setShareMessage(error instanceof Error ? error.message : t('shareRewardFailed'));
+      toast.error(error instanceof Error ? error.message : t('shareRewardFailed'));
     }
   };
 

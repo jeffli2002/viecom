@@ -25,6 +25,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
 import { creditsConfig } from '@/config/credits.config';
 import { VIDEO_STYLES, getVideoStyle } from '@/config/styles.config';
+import { SHARE_REWARD_CONFIG, type ShareRewardKey } from '@/config/share.config';
 import { useGenerationProgress } from '@/hooks/use-generation-progress';
 import { useUpgradePrompt } from '@/hooks/use-upgrade-prompt';
 import type { BrandToneAnalysis } from '@/lib/brand/brand-tone-analyzer';
@@ -414,6 +415,56 @@ export default function VideoGenerator() {
     }
   };
 
+  const awardShareReward = async (
+    rewardKey: ShareRewardKey,
+    metadata?: { platformId?: SharePlatformId }
+  ) => {
+    const reward = SHARE_REWARD_CONFIG[rewardKey];
+    if (!result?.videoUrl || !reward || reward.credits <= 0) {
+      return;
+    }
+    if (!isAuthenticated) {
+      toast.error(t('shareLoginRequired'));
+      return;
+    }
+
+    try {
+      const referenceId = `${reward.referencePrefix}_${
+        typeof globalThis.crypto?.randomUUID === 'function'
+          ? globalThis.crypto.randomUUID()
+          : Date.now()
+      }`;
+      const response = await fetch('/api/rewards/share', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          platform: reward.platform,
+          shareUrl: result.videoUrl,
+          assetId: null,
+          referenceId,
+          rewardType: rewardKey,
+          targetPlatform: metadata?.platformId || null,
+        }),
+      });
+
+      const data = await response.json().catch(() => ({}));
+
+      if (response.status === 401) {
+        toast.error(t('shareLoginRequired'));
+        return;
+      }
+
+      if (!response.ok) {
+        throw new Error(data?.error || data?.message || t('shareRewardFailed'));
+      }
+
+      toast.success(t('shareRewardedAmount', { credits: reward.credits }));
+    } catch (error) {
+      console.error('Share reward error:', error);
+      toast.error(error instanceof Error ? error.message : t('shareRewardFailed'));
+    }
+  };
+
   const handleShareAction = async (
     action: 'copy' | 'social' | 'publish',
     platformId?: SharePlatformId
@@ -430,6 +481,7 @@ export default function VideoGenerator() {
       const publishTarget = `${publishUrl}?asset=${encodeURIComponent(result.videoUrl)}`;
       window.open(publishTarget, '_blank', 'noopener,noreferrer');
       toast.success(t('sharePublishToast'));
+      await awardShareReward('publishViecom');
       return;
     }
 
@@ -449,6 +501,7 @@ export default function VideoGenerator() {
         window.open(platform.openUrl, '_blank', 'noopener,noreferrer');
       }
       toast.success(t('shareSocialToast', { platform: platform.label }));
+      await awardShareReward('socialShare', { platformId });
     }
   };
 
