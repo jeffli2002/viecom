@@ -64,6 +64,7 @@ export const env = createEnv({
     NEXT_PUBLIC_CREEM_PRICE_PACK_2000: z.string().optional(),
     NEXT_PUBLIC_CREEM_PRICE_PACK_5000: z.string().optional(),
     NEXT_PUBLIC_CREEM_PRICE_PACK_10000: z.string().optional(),
+    NEXT_PUBLIC_CREEM_PRICE_PACK_300: z.string().optional(),
   },
 
   /**
@@ -109,6 +110,7 @@ export const env = createEnv({
     NEXT_PUBLIC_CREEM_PRICE_PACK_2000: process.env.NEXT_PUBLIC_CREEM_PRICE_PACK_2000,
     NEXT_PUBLIC_CREEM_PRICE_PACK_5000: process.env.NEXT_PUBLIC_CREEM_PRICE_PACK_5000,
     NEXT_PUBLIC_CREEM_PRICE_PACK_10000: process.env.NEXT_PUBLIC_CREEM_PRICE_PACK_10000,
+    NEXT_PUBLIC_CREEM_PRICE_PACK_300: process.env.NEXT_PUBLIC_CREEM_PRICE_PACK_300,
   },
   /**
    * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation. This is especially
