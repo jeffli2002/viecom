@@ -7,6 +7,14 @@ import { GenerationProgressBar } from '@/components/ui/generation-progress';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import {
   Select,
   SelectContent,
   SelectItem,
@@ -20,11 +28,15 @@ import { VIDEO_STYLES, getVideoStyle } from '@/config/styles.config';
 import { useGenerationProgress } from '@/hooks/use-generation-progress';
 import { useUpgradePrompt } from '@/hooks/use-upgrade-prompt';
 import type { BrandToneAnalysis } from '@/lib/brand/brand-tone-analyzer';
+import { buildSharePlatforms } from '@/lib/share/share-platforms';
+import type { SharePlatformId } from '@/lib/share/share-platforms';
 import { useAuthStore } from '@/store/auth-store';
 import {
   AlertCircle,
   Download,
   Eraser,
+  Globe,
+  Link2,
   Loader2,
   Share2,
   Sparkles,
@@ -35,6 +47,7 @@ import {
 import { useTranslations } from 'next-intl';
 import { useSearchParams } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
+import { toast } from 'sonner';
 
 interface GenerationResult {
   videoUrl: string;
@@ -75,6 +88,18 @@ export default function VideoGenerator() {
     completeProgress,
     failProgress,
   } = useGenerationProgress();
+  const publishUrl = 'https://viecom.pro/publish';
+  const defaultShareText = t('shareDefaultText');
+  const sharePlatforms = buildSharePlatforms(
+    {
+      x: t('sharePlatformX'),
+      facebook: t('sharePlatformFacebook'),
+      youtube: t('sharePlatformYouTube'),
+      instagram: t('sharePlatformInstagram'),
+      tiktok: t('sharePlatformTikTok'),
+    },
+    defaultShareText
+  );
 
   // Brand analysis data (loaded from sessionStorage, no UI)
   const [brandAnalysis, setBrandAnalysis] = useState<BrandToneAnalysis | null>(null);
@@ -369,6 +394,64 @@ export default function VideoGenerator() {
     return videoUrl;
   };
 
+  const copyVideoLink = async (successMessage?: string) => {
+    if (!result?.videoUrl) {
+      return false;
+    }
+    try {
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(result.videoUrl);
+      } else {
+        window.prompt(t('shareCopyFallback'), result.videoUrl);
+      }
+      toast.success(successMessage || t('shareCopySuccess'));
+      return true;
+    } catch (error) {
+      console.error('Clipboard copy failed:', error);
+      toast.error(t('shareCopyFailed'));
+      window.prompt(t('shareCopyFallback'), result.videoUrl);
+      return false;
+    }
+  };
+
+  const handleShareAction = async (
+    action: 'copy' | 'social' | 'publish',
+    platformId?: SharePlatformId
+  ) => {
+    if (!result?.videoUrl) return;
+
+    if (action === 'copy') {
+      await copyVideoLink();
+      return;
+    }
+
+    if (action === 'publish') {
+      await copyVideoLink();
+      const publishTarget = `${publishUrl}?asset=${encodeURIComponent(result.videoUrl)}`;
+      window.open(publishTarget, '_blank', 'noopener,noreferrer');
+      toast.success(t('sharePublishToast'));
+      return;
+    }
+
+    if (action === 'social' && platformId) {
+      const platform = sharePlatforms.find((item) => item.id === platformId);
+      if (!platform) return;
+      const encodedUrl = encodeURIComponent(result.videoUrl);
+      if (platform.requiresCopy) {
+        const copied = await copyVideoLink(
+          t('shareCopyReminder', { platform: platform.label })
+        );
+        if (!copied) return;
+      }
+      if (platform.buildUrl) {
+        window.open(platform.buildUrl(encodedUrl), '_blank', 'noopener,noreferrer');
+      } else if (platform.openUrl) {
+        window.open(platform.openUrl, '_blank', 'noopener,noreferrer');
+      }
+      toast.success(t('shareSocialToast', { platform: platform.label }));
+    }
+  };
+
   const handleDownload = async (videoUrl: string) => {
     try {
       const downloadUrl = getDownloadUrl(videoUrl);
@@ -385,16 +468,6 @@ export default function VideoGenerator() {
     } catch (error) {
       console.error('Download failed:', error);
       window.open(getDownloadUrl(videoUrl), '_blank');
-    }
-  };
-
-  const handleShare = async () => {
-    if (!result?.videoUrl) return;
-    try {
-      await navigator.clipboard.writeText(result.videoUrl);
-      alert('Video URL copied to clipboard!');
-    } catch (error) {
-      console.error('Share failed:', error);
     }
   };
 
@@ -932,14 +1005,40 @@ export default function VideoGenerator() {
                       <Download className="mr-2 h-4 w-4" />
                       {t('download')}
                     </Button>
-                    <Button
-                      onClick={handleShare}
-                      variant="outline"
-                      className="border-slate-200 dark:border-slate-700 font-light"
-                    >
-                      <Share2 className="mr-2 h-4 w-4" />
-                      {t('share')}
-                    </Button>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button
+                          variant="outline"
+                          className="border-slate-200 dark:border-slate-700 font-light"
+                        >
+                          <Share2 className="mr-2 h-4 w-4" />
+                          {t('share')}
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end" className="w-64">
+                        <DropdownMenuLabel>{t('shareOptions')}</DropdownMenuLabel>
+                        <DropdownMenuItem onClick={() => void handleShareAction('copy')}>
+                          <Link2 className="mr-2 h-4 w-4" />
+                          {t('shareCopyLink')}
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuLabel>{t('shareSocialLabel')}</DropdownMenuLabel>
+                        {sharePlatforms.map((platform) => (
+                          <DropdownMenuItem
+                            key={platform.id}
+                            onClick={() => void handleShareAction('social', platform.id)}
+                          >
+                            <platform.icon className="mr-2 h-4 w-4" />
+                            {platform.label}
+                          </DropdownMenuItem>
+                        ))}
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem onClick={() => void handleShareAction('publish')}>
+                          <Globe className="mr-2 h-4 w-4" />
+                          {t('sharePublishOnViecom')}
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   </div>
                 </div>
               )}

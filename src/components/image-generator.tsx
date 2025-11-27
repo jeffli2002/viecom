@@ -7,6 +7,14 @@ import { GenerationProgressBar } from '@/components/ui/generation-progress';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import {
   Select,
   SelectContent,
   SelectItem,
@@ -20,13 +28,17 @@ import { IMAGE_STYLES, getImageStyle } from '@/config/styles.config';
 import { useGenerationProgress } from '@/hooks/use-generation-progress';
 import { useUpgradePrompt } from '@/hooks/use-upgrade-prompt';
 import type { BrandToneAnalysis } from '@/lib/brand/brand-tone-analyzer';
+import { buildSharePlatforms } from '@/lib/share/share-platforms';
+import type { SharePlatformId } from '@/lib/share/share-platforms';
 import { useAuthStore } from '@/store/auth-store';
 import {
   AlertCircle,
   Copy,
   Download,
   Eraser,
+  Globe,
   Image as ImageIcon,
+  Link2,
   Loader2,
   Share2,
   Sparkles,
@@ -94,6 +106,7 @@ export default function ImageGenerator() {
   const [shareMessage, setShareMessage] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const shareReferenceRef = useRef<string | null>(null);
+  const publishUrl = 'https://viecom.pro/publish';
   const activeRequestIdRef = useRef<string | null>(null);
   const [lightboxImage, setLightboxImage] = useState<{ url: string; alt: string } | null>(null);
   const promptTextareaRef = useRef<HTMLTextAreaElement | null>(null);
@@ -105,6 +118,17 @@ export default function ImageGenerator() {
     completeProgress,
     failProgress,
   } = useGenerationProgress();
+  const defaultShareText = t('shareDefaultText');
+  const sharePlatforms = buildSharePlatforms(
+    {
+      x: t('sharePlatformX'),
+      facebook: t('sharePlatformFacebook'),
+      youtube: t('sharePlatformYouTube'),
+      instagram: t('sharePlatformInstagram'),
+      tiktok: t('sharePlatformTikTok'),
+    },
+    defaultShareText
+  );
 
   // Brand analysis data (loaded from sessionStorage, no UI)
   const [brandAnalysis, setBrandAnalysis] = useState<BrandToneAnalysis | null>(null);
@@ -572,6 +596,76 @@ export default function ImageGenerator() {
     return imageUrl;
   };
 
+  const copyShareLink = async (successMessage?: string) => {
+    if (!result?.imageUrl) {
+      return false;
+    }
+    try {
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(result.imageUrl);
+      } else {
+        window.prompt(t('shareCopyFallback'), result.imageUrl);
+      }
+      if (successMessage) {
+        toast.success(successMessage);
+      } else {
+        toast.success(t('shareCopySuccess'));
+      }
+      return true;
+    } catch (error) {
+      console.error('Clipboard copy failed:', error);
+      toast.error(t('shareCopyFailed'));
+      window.prompt(t('shareCopyFallback'), result.imageUrl);
+      return false;
+    }
+  };
+
+  const handleShareAction = async (
+    action: 'copy' | 'social' | 'publish',
+    platformId?: SharePlatformId
+  ) => {
+    if (!result?.imageUrl) return;
+
+    if (action === 'copy') {
+      const copied = await copyShareLink();
+      if (copied) {
+        await awardShareReward();
+      }
+      return;
+    }
+
+    if (action === 'publish') {
+      const copied = await copyShareLink();
+      const publishTarget = `${publishUrl}?asset=${encodeURIComponent(result.imageUrl)}`;
+      window.open(publishTarget, '_blank', 'noopener,noreferrer');
+      toast.success(t('sharePublishToast'));
+      if (copied) {
+        await awardShareReward();
+      }
+      return;
+    }
+
+    if (action === 'social' && platformId) {
+      const platform = sharePlatforms.find((item) => item.id === platformId);
+      if (!platform) return;
+      const encodedUrl = encodeURIComponent(result.imageUrl);
+      if (platform.requiresCopy) {
+        const copied = await copyShareLink(
+          t('shareCopyReminder', { platform: platform.label })
+        );
+        if (!copied) return;
+      }
+      if (platform.buildUrl) {
+        const destination = platform.buildUrl(encodedUrl);
+        window.open(destination, '_blank', 'noopener,noreferrer');
+      } else if (platform.openUrl) {
+        window.open(platform.openUrl, '_blank', 'noopener,noreferrer');
+      }
+      toast.success(t('shareSocialToast', { platform: platform.label }));
+      await awardShareReward();
+    }
+  };
+
   const handleDownload = async (imageUrl: string, fallbackUrl?: string) => {
     try {
       const downloadUrl = getDownloadUrl(imageUrl, fallbackUrl);
@@ -646,39 +740,6 @@ export default function ImageGenerator() {
       console.error('Share reward error:', error);
       setShareStatus('error');
       setShareMessage(error instanceof Error ? error.message : t('shareRewardFailed'));
-    }
-  };
-
-  const handleShare = async () => {
-    if (!result?.imageUrl) return;
-
-    const sharePayload = {
-      title: 'AI Generated Image',
-      text: 'Check out this AI-generated image!',
-      url: result.imageUrl,
-    };
-
-    if (navigator.share) {
-      try {
-        await navigator.share(sharePayload);
-        await awardShareReward();
-      } catch (error) {
-        if (error instanceof DOMException && error.name === 'AbortError') {
-          return;
-        }
-        console.error('Share failed:', error);
-      }
-    } else if (navigator.clipboard) {
-      try {
-        await navigator.clipboard.writeText(result.imageUrl);
-        alert(t('shareCopied'));
-        await awardShareReward();
-      } catch (error) {
-        console.error('Clipboard copy failed:', error);
-      }
-    } else {
-      window.prompt(t('shareCopyFallback'), result.imageUrl);
-      await awardShareReward();
     }
   };
 
@@ -1184,14 +1245,37 @@ export default function ImageGenerator() {
                       <Download className="mr-2 h-4 w-4" />
                       {t('download')}
                     </Button>
-                    <Button
-                      onClick={handleShare}
-                      variant="outline"
-                      className="border-gray-200 font-light"
-                    >
-                      <Share2 className="mr-2 h-4 w-4" />
-                      {t('share')}
-                    </Button>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="outline" className="border-gray-200 font-light">
+                          <Share2 className="mr-2 h-4 w-4" />
+                          {t('share')}
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end" className="w-64">
+                        <DropdownMenuLabel>{t('shareOptions')}</DropdownMenuLabel>
+                        <DropdownMenuItem onClick={() => void handleShareAction('copy')}>
+                          <Link2 className="mr-2 h-4 w-4" />
+                          {t('shareCopyLink')}
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuLabel>{t('shareSocialLabel')}</DropdownMenuLabel>
+                        {sharePlatforms.map((platform) => (
+                          <DropdownMenuItem
+                            key={platform.id}
+                            onClick={() => void handleShareAction('social', platform.id)}
+                          >
+                            <platform.icon className="mr-2 h-4 w-4" />
+                            {platform.label}
+                          </DropdownMenuItem>
+                        ))}
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem onClick={() => void handleShareAction('publish')}>
+                          <Globe className="mr-2 h-4 w-4" />
+                          {t('sharePublishOnViecom')}
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   </div>
                   {shareMessage && (
                     <p
