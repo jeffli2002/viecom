@@ -362,6 +362,7 @@ function LandingShowcaseConfigurator() {
   const [isSaving, setIsSaving] = useState(false);
   const [file, setFile] = useState<File | null>(null);
   const [isDragging, setIsDragging] = useState(false);
+  const [landingSubmissions, setLandingSubmissions] = useState<SubmissionResponse[]>([]);
   const [form, setForm] = useState({
     title: '',
     subtitle: '',
@@ -392,9 +393,32 @@ function LandingShowcaseConfigurator() {
     }
   }, [handleAdminUnauthorized]);
 
+  const fetchLandingSubmissions = useCallback(async () => {
+    try {
+      const response = await fetch('/api/admin/publish/submissions?status=approved', {
+        cache: 'no-store',
+      });
+      if (response.status === 401) {
+        handleAdminUnauthorized();
+        return;
+      }
+      const data = await response.json();
+      if (Array.isArray(data.submissions)) {
+        const landingOnly = data.submissions.filter(
+          (submission: SubmissionResponse) => submission.publishToLanding
+        );
+        setLandingSubmissions(landingOnly);
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error('Failed to load landing page submissions');
+    }
+  }, [handleAdminUnauthorized]);
+
   useEffect(() => {
     void fetchEntries();
-  }, [fetchEntries]);
+    void fetchLandingSubmissions();
+  }, [fetchEntries, fetchLandingSubmissions]);
 
   const prepareUpload = async (uploadFile: File) => {
     const response = await fetch('/api/admin/uploads/prepare', {
@@ -497,6 +521,7 @@ function LandingShowcaseConfigurator() {
       setFile(null);
       setIsModalOpen(false);
       await fetchEntries();
+      await fetchLandingSubmissions();
     } catch (error) {
       console.error(error);
       toast.error(error instanceof Error ? error.message : 'Failed to create entry');
@@ -630,6 +655,43 @@ function LandingShowcaseConfigurator() {
               </div>
             </div>
           ))}
+        </div>
+      )}
+
+      {landingSubmissions.length > 0 && (
+        <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-xs uppercase tracking-widest text-slate-400">Live submissions</p>
+              <h3 className="text-lg font-semibold text-slate-900">User-generated landing slots</h3>
+            </div>
+            <button
+              type="button"
+              className="text-sm text-teal-500 hover:underline"
+              onClick={fetchLandingSubmissions}
+            >
+              Refresh list
+            </button>
+          </div>
+          <div className="mt-4 space-y-3">
+            {landingSubmissions.map((submission) => (
+              <div
+                key={submission.id}
+                className="flex items-center justify-between rounded-lg border border-slate-200 bg-white p-3 text-sm"
+              >
+                <div>
+                  <p className="font-semibold text-slate-900">{submission.title || 'Untitled'}</p>
+                  <p className="text-xs text-slate-500">
+                    {submission.user?.email || 'Unknown'} •{' '}
+                    {new Date(submission.approvedAt ?? submission.createdAt).toLocaleString()}
+                  </p>
+                </div>
+                <span className="rounded-full border border-teal-200 px-3 py-1 text-xs text-teal-600">
+                  Landing slot
+                </span>
+              </div>
+            ))}
+          </div>
         </div>
       )}
 
