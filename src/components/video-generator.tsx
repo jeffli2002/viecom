@@ -1027,33 +1027,35 @@ export default function VideoGenerator() {
               )}
 
               {isGenerating && (
-                <div className="flex aspect-video flex-col items-center justify-center rounded-xl bg-slate-100 dark:bg-slate-800 p-6 text-center">
-                  <Loader2 className="mb-4 h-12 w-12 animate-spin text-teal-500" />
-                  <p className="font-medium text-slate-700 dark:text-slate-300">
-                    {progressMessage || t('generatingVideo')}
-                  </p>
-                  <div className="mt-4 w-full max-w-md space-y-2">
-                    <GenerationProgressBar value={progressValue} />
-                    <p className="text-xs font-medium text-slate-500 dark:text-slate-400">
-                      {Math.round(progressValue)}%
+                <>
+                  <div className="flex aspect-video flex-col items-center justify-center rounded-xl bg-slate-100 dark:bg-slate-800 p-6 text-center">
+                    <Loader2 className="mb-4 h-12 w-12 animate-spin text-teal-500" />
+                    <p className="font-medium text-slate-700 dark:text-slate-300">
+                      {progressMessage || t('generatingVideo')}
+                    </p>
+                    <div className="mt-4 w-full max-w-md space-y-2">
+                      <GenerationProgressBar value={progressValue} />
+                      <p className="text-xs font-medium text-slate-500 dark:text-slate-400">
+                        {Math.round(progressValue)}%
+                      </p>
+                    </div>
+                    <p className="mt-3 font-light text-slate-500 dark:text-slate-400 text-sm">
+                      {t('generatingTakeMinutes')}
                     </p>
                   </div>
-                  <p className="mt-3 font-light text-slate-500 dark:text-slate-400 text-sm">
-                    {t('generatingTakeMinutes')}
-                  </p>
-                </div>
-                {awaitingPublishConfirmation && (
-                  <div className="rounded-lg border border-teal-200 bg-teal-50 dark:border-teal-800 dark:bg-teal-900/20 p-4 flex flex-col gap-3 text-sm text-slate-700 dark:text-slate-200">
-                    <p>{t('sharePublishPending', { credits: SHARE_REWARD_CONFIG.publishViecom.credits })}</p>
-                    <Button
-                      size="sm"
-                      onClick={handleConfirmPublish}
-                      className="self-center bg-teal-500 hover:bg-teal-600 text-white"
-                    >
-                      {t('shareConfirmPublish')}
-                    </Button>
-                  </div>
-                )}
+                  {awaitingPublishConfirmation && (
+                    <div className="rounded-lg border border-teal-200 bg-teal-50 dark:border-teal-800 dark:bg-teal-900/20 p-4 flex flex-col gap-3 text-sm text-slate-700 dark:text-slate-200">
+                      <p>{t('sharePublishPending', { credits: SHARE_REWARD_CONFIG.publishViecom.credits })}</p>
+                      <Button
+                        size="sm"
+                        onClick={handleConfirmPublish}
+                        className="self-center bg-teal-500 hover:bg-teal-600 text-white"
+                      >
+                        {t('shareConfirmPublish')}
+                      </Button>
+                    </div>
+                  )}
+                </>
               )}
 
               {result?.error && (
