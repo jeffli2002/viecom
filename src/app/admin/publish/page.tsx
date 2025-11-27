@@ -1,7 +1,7 @@
 'use client';
 
 import { SHOWCASE_CATEGORIES } from '@/config/showcase.config';
-import { Upload } from 'lucide-react';
+import { Upload, X } from 'lucide-react';
 import Image from 'next/image';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { toast } from 'sonner';
@@ -583,6 +583,67 @@ function LandingShowcaseConfigurator() {
     }
   };
 
+  const handleLandingSubmissionRemove = async (submissionId: string) => {
+    try {
+      const response = await fetch('/api/admin/publish/submissions/landing', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ submissionId, publishToLanding: false }),
+      });
+      if (response.status === 401) {
+        handleAdminUnauthorized();
+        return;
+      }
+      if (!response.ok) {
+        throw new Error('Failed to remove landing submission');
+      }
+      toast.success('Removed from landing showcase');
+      await fetchLandingSubmissions();
+    } catch (error) {
+      console.error(error);
+      toast.error('Failed to remove landing submission');
+    }
+  };
+
+  const handleLandingSubmissionToggle = async (submissionId: string) => {
+    try {
+      const response = await fetch('/api/admin/publish/submissions/landing', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ submissionId, publishToLanding: true }),
+      });
+      if (response.status === 401) {
+        handleAdminUnauthorized();
+        return;
+      }
+      if (!response.ok) {
+        throw new Error('Failed to add landing submission');
+      }
+      toast.success('Added to landing showcase');
+      await fetchLandingSubmissions();
+    } catch (error) {
+      console.error(error);
+      toast.error('Failed to add landing submission');
+    }
+  };
+
+  const combinedLandingItems = [
+    ...entries.map((entry) => ({
+      id: entry.id,
+      title: entry.title,
+      previewUrl: entry.imageUrl,
+      type: 'admin' as const,
+      data: entry,
+    })),
+    ...landingSubmissions.map((submission) => ({
+      id: submission.id,
+      title: submission.title || 'User submission',
+      previewUrl: submission.previewUrl ?? submission.assetUrl,
+      type: 'submission' as const,
+      data: submission,
+    })),
+  ];
+
   return (
     <section className="rounded-2xl border border-slate-200 bg-white p-6 space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-4">
@@ -602,105 +663,64 @@ function LandingShowcaseConfigurator() {
           Add Showcase Entry
         </button>
       </div>
-      {isLoading ? (
-        <div className="rounded-xl border border-dashed border-slate-200 p-6 text-center text-slate-500">
-          Loading showcase entries...
-        </div>
-      ) : entries.length === 0 ? (
-        <div className="rounded-xl border border-dashed border-slate-200 p-6 text-center text-slate-500">
-          No custom entries yet.
-        </div>
-      ) : (
-        <div className="space-y-4">
-          {entries.map((entry, index) => (
-            <div
-              key={entry.id}
-              className="flex flex-col gap-4 rounded-xl border border-slate-200 p-4 md:flex-row md:items-center"
-            >
-              <div className="flex items-center gap-4">
-                <div className="h-24 w-20 overflow-hidden rounded-lg border border-slate-100 bg-slate-50">
-                  <Image
-                    src={entry.imageUrl}
-                    alt={entry.title}
-                    width={160}
-                    height={120}
-                    className="h-full w-full object-cover"
-                  />
+      <div className="rounded-xl border border-dashed border-slate-200 p-4">
+        {isLoading ? (
+          <p className="text-center text-sm text-slate-500">Loading showcase entries...</p>
+        ) : combinedLandingItems.length === 0 ? (
+          <p className="text-center text-sm text-slate-500">No landing entries yet.</p>
+        ) : (
+          <div className="flex flex-wrap gap-4">
+            {combinedLandingItems.map((item, index) => {
+              const isSubmission = item.type === 'submission';
+              const previewUrl = item.previewUrl;
+              const isVideo =
+                previewUrl?.match(/\\.mp4$|\\.webm$|\\.mov$/i) ||
+                (isSubmission &&
+                  (item.data as SubmissionResponse).assetUrl.match(/\\.mp4$|\\.webm$|\\.mov$/i));
+              return (
+                <div
+                  key={`${item.type}-${item.id}`}
+                  className="relative flex h-40 w-32 flex-col overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm"
+                  draggable={!isSubmission}
+                  onDragStart={() => {
+                    if (!isSubmission) {
+                      handleReorder(index, index);
+                    }
+                  }}
+                >
+                  <button
+                    type="button"
+                    onClick={() =>
+                      isSubmission ? handleLandingSubmissionRemove(item.id) : handleDelete(item.id)
+                    }
+                    className="absolute right-1 top-1 z-10 rounded-full bg-black/60 p-1 text-white"
+                    aria-label="Remove entry"
+                  >
+                    <X className="h-3 w-3" />
+                  </button>
+                  <div className="h-28 w-full bg-slate-100">
+                    {isVideo ? (
+                      <video
+                        src={previewUrl}
+                        className="h-full w-full object-cover"
+                        muted
+                        playsInline
+                        loop
+                        autoPlay
+                      />
+                    ) : (
+                      <img src={previewUrl} alt={item.title} className="h-full w-full object-cover" />
+                    )}
+                  </div>
+                  <div className="flex-1 px-2 py-1 text-center text-xs font-semibold text-slate-700">
+                    {item.title}
+                  </div>
                 </div>
-                <div>
-                  <p className="text-xs text-slate-400">Slot #{index + 1}</p>
-                  <h3 className="text-lg font-semibold">{entry.title}</h3>
-                  <p className="text-xs text-slate-500">
-                    {entry.category
-                      ? SHOWCASE_CATEGORIES.find((c) => c.id === entry.category)?.label ||
-                        'Showcase'
-                      : 'Showcase'}
-                  </p>
-                </div>
-              </div>
-              <div className="flex flex-wrap items-center gap-3 md:ml-auto">
-                <button
-                  className="rounded-full border border-slate-200 px-4 py-1 text-sm"
-                  onClick={() => handleReorder(index, index - 1)}
-                  disabled={index === 0}
-                >
-                  Move Up
-                </button>
-                <button
-                  className="rounded-full border border-slate-200 px-4 py-1 text-sm"
-                  onClick={() => handleReorder(index, index + 1)}
-                  disabled={index === entries.length - 1}
-                >
-                  Move Down
-                </button>
-                <button
-                  className="rounded-full border border-red-200 px-4 py-1 text-sm text-red-600"
-                  onClick={() => handleDelete(entry.id)}
-                >
-                  Remove
-                </button>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
-
-      {landingSubmissions.length > 0 && (
-        <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-xs uppercase tracking-widest text-slate-400">Live submissions</p>
-              <h3 className="text-lg font-semibold text-slate-900">User-generated landing slots</h3>
-            </div>
-            <button
-              type="button"
-              className="text-sm text-teal-500 hover:underline"
-              onClick={fetchLandingSubmissions}
-            >
-              Refresh list
-            </button>
+              );
+            })}
           </div>
-          <div className="mt-4 space-y-3">
-            {landingSubmissions.map((submission) => (
-              <div
-                key={submission.id}
-                className="flex items-center justify-between rounded-lg border border-slate-200 bg-white p-3 text-sm"
-              >
-                <div>
-                  <p className="font-semibold text-slate-900">{submission.title || 'Untitled'}</p>
-                  <p className="text-xs text-slate-500">
-                    {submission.user?.email || 'Unknown'} •{' '}
-                    {new Date(submission.approvedAt ?? submission.createdAt).toLocaleString()}
-                  </p>
-                </div>
-                <span className="rounded-full border border-teal-200 px-3 py-1 text-xs text-teal-600">
-                  Landing slot
-                </span>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
+        )}
+      </div>
 
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
