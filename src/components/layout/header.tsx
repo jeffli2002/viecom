@@ -226,12 +226,6 @@ export function Header() {
                       <AvatarFallback
                         className="text-white rounded-full header-avatar-fallback"
                         data-header-avatar="true"
-                        style={{
-                          backgroundColor: 'rgb(20, 184, 166)',
-                          background: 'rgb(20, 184, 166)',
-                          backgroundImage: 'none',
-                          backgroundSize: 'auto',
-                        }}
                       >
                         {user.name?.charAt(0).toUpperCase() || <User className="h-4 w-4" />}
                       </AvatarFallback>
