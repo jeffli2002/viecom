@@ -30,6 +30,11 @@ const config: NextConfig = {
         hostname: '**.r2.cloudflarestorage.com',
         pathname: '/**',
       },
+      {
+        protocol: 'https',
+        hostname: '**.r2.dev',
+        pathname: '/**',
+      },
     ],
   },
   experimental: {
