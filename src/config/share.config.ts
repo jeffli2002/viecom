@@ -14,12 +14,12 @@ export const SHARE_REWARD_CONFIG: Record<ShareRewardKey, ShareRewardConfigItem> 
   },
   publishViecom: {
     credits: 2,
-    platform: 'viecom_publish',
+    platform: 'other',
     referencePrefix: 'publish_viecom',
   },
   socialShare: {
     credits: 5,
-    platform: 'social_share',
+    platform: 'other',
     referencePrefix: 'social_share',
   },
 };

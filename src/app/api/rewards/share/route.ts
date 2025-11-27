@@ -1,5 +1,5 @@
 import { randomUUID } from 'node:crypto';
-import { creditsConfig } from '@/config/credits.config';
+import { SHARE_REWARD_CONFIG, type ShareRewardKey } from '@/config/share.config';
 import { auth } from '@/lib/auth/auth';
 import { creditService } from '@/lib/credits';
 import { db } from '@/server/db';
@@ -18,10 +18,26 @@ export async function POST(request: NextRequest) {
     }
 
     const userId = session.user.id;
-    const { platform, assetId, shareUrl, referenceId } = await request.json();
+    const { platform, assetId, shareUrl, referenceId, rewardType, targetPlatform } =
+      await request.json();
+
+    if (!rewardType || typeof rewardType !== 'string') {
+      return NextResponse.json({ success: false, error: 'rewardType is required' }, { status: 400 });
+    }
+
+    const reward = SHARE_REWARD_CONFIG[rewardType as ShareRewardKey];
+    if (!reward) {
+      return NextResponse.json(
+        { success: false, error: `Invalid reward type: ${rewardType}` },
+        { status: 400 }
+      );
+    }
 
     if (!platform || typeof platform !== 'string') {
-      return NextResponse.json({ success: false, error: 'Platform is required' }, { status: 400 });
+      return NextResponse.json(
+        { success: false, error: 'Platform value is required' },
+        { status: 400 }
+      );
     }
 
     // Validate platform
@@ -61,7 +77,17 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    const creditsToAward = creditsConfig.rewards.socialShare.creditsPerShare;
+    const creditsToAward = reward.credits;
+    if (creditsToAward <= 0) {
+      return NextResponse.json({
+        success: true,
+        data: {
+          shareId: null,
+          platform,
+          creditsEarned: 0,
+        },
+      });
+    }
 
     // Create share record and award credits in a transaction
     const result = await db.transaction(async (tx) => {
@@ -84,13 +110,18 @@ export async function POST(request: NextRequest) {
         userId,
         amount: creditsToAward,
         source: 'social_share',
-        description: `Social media share on ${platform}`,
+        description:
+          rewardType === 'publishViecom'
+            ? 'Publish on Viecom.pro'
+            : `Social share (${targetPlatform || platform})`,
         referenceId: `social_share_${shareId}`,
         metadata: {
           platform,
+          targetPlatform: targetPlatform || null,
           assetId,
           shareUrl,
           referenceId: shareReferenceId,
+          rewardType,
         },
       });
 
@@ -98,6 +129,7 @@ export async function POST(request: NextRequest) {
         shareId,
         platform,
         creditsEarned: creditsToAward,
+        rewardType,
       };
     });
 

@@ -30,7 +30,7 @@ import { useGenerationProgress } from '@/hooks/use-generation-progress';
 import { useUpgradePrompt } from '@/hooks/use-upgrade-prompt';
 import type { BrandToneAnalysis } from '@/lib/brand/brand-tone-analyzer';
 import { buildSharePlatforms } from '@/lib/share/share-platforms';
-import type { SharePlatformId } from '@/lib/share/share-platforms';
+import type { SharePlatform, SharePlatformId } from '@/lib/share/share-platforms';
 import { useAuthStore } from '@/store/auth-store';
 import {
   AlertCircle,
@@ -635,7 +635,9 @@ export default function ImageGenerator() {
       const publishTarget = `${publishUrl}?asset=${encodeURIComponent(result.imageUrl)}`;
       window.open(publishTarget, '_blank', 'noopener,noreferrer');
       toast.success(t('sharePublishToast'));
-      await awardShareReward('publishViecom');
+      await awardShareReward('publishViecom', {
+        platformValue: SHARE_REWARD_CONFIG.publishViecom.platform,
+      });
       return;
     }
 
@@ -656,7 +658,10 @@ export default function ImageGenerator() {
         window.open(platform.openUrl, '_blank', 'noopener,noreferrer');
       }
       toast.success(t('shareSocialToast', { platform: platform.label }));
-      await awardShareReward('socialShare', { platformId });
+      await awardShareReward('socialShare', {
+        platformId,
+        platformValue: platform.platformValue,
+      });
     }
   };
 
@@ -682,7 +687,7 @@ export default function ImageGenerator() {
 
   const awardShareReward = async (
     rewardKey: ShareRewardKey,
-    metadata?: { platformId?: SharePlatformId }
+    metadata?: { platformId?: SharePlatformId; platformValue?: SharePlatform['platformValue'] }
   ) => {
     const reward = SHARE_REWARD_CONFIG[rewardKey];
     if (!result?.imageUrl || !reward || reward.credits <= 0) {
@@ -703,12 +708,13 @@ export default function ImageGenerator() {
           ? globalThis.crypto.randomUUID()
           : Date.now()
       }`;
+      const platformValue = metadata?.platformValue || reward.platform;
 
       const response = await fetch('/api/rewards/share', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          platform: reward.platform,
+          platform: platformValue,
           shareUrl: result.imageUrl,
           assetId: result.assetId ?? null,
           referenceId,
