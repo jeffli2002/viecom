@@ -562,16 +562,18 @@ function LandingShowcaseConfigurator() {
   };
 
   const handleReorder = async (from: number, to: number) => {
-    if (to < 0 || to >= entries.length) return;
-    const updated = [...entries];
-    const [moved] = updated.splice(from, 1);
-    updated.splice(to, 0, moved);
-    setEntries(updated);
+    if (to < 0 || to >= entries.length || from === to) {
+      return;
+    }
+    const updatedEntries = [...entries];
+    const [moved] = updatedEntries.splice(from, 1);
+    updatedEntries.splice(to, 0, moved);
+    setEntries(updatedEntries);
     try {
       const response = await fetch('/api/admin/landing-showcase/reorder', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ids: updated.map((entry) => entry.id) }),
+        body: JSON.stringify({ ids: updatedEntries.map((entry) => entry.id) }),
       });
       if (response.status === 401) {
         handleAdminUnauthorized();
