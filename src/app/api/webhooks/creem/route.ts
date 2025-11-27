@@ -108,6 +108,7 @@ interface CreemWebhookData {
   credits?: number;
   productName?: string;
   productId?: string;
+  currency?: string;
   [key: string]: unknown;
 }
 
@@ -274,7 +275,7 @@ export async function POST(request: NextRequest) {
 }
 
 async function handleCreditPackPurchase(data: CreemWebhookData) {
-  const { userId, credits, productName, checkoutId, orderId, productId, amount } = data;
+  const { userId, credits, productName, checkoutId, orderId, productId, amount, currency } = data;
 
   console.log('[Creem Webhook] handleCreditPackPurchase called with:', {
     userId,
@@ -371,6 +372,23 @@ async function handleCreditPackPurchase(data: CreemWebhookData) {
       .where(eq(userCredits.userId, userId))
       .limit(1);
 
+    const creditPack = paymentConfig.creditPacks.find(
+      (pack) => pack.creemProductKey === productId || pack.credits === credits
+    );
+    const rawAmount = typeof amount === 'number' ? amount : creditPack?.price ?? 0;
+    const normalizedAmount = rawAmount > 100 ? rawAmount / 100 : rawAmount;
+    const metadataPayload = {
+      provider: 'creem',
+      checkoutId,
+      orderId,
+      productId,
+      productName,
+      credits,
+      amount: normalizedAmount,
+      currency: currency || 'USD',
+      creemEventId: data.eventId,
+    };
+
     if (!userCredit) {
       // Create credit account with purchased credits
       const now = new Date();
@@ -394,14 +412,7 @@ async function handleCreditPackPurchase(data: CreemWebhookData) {
         source: 'purchase',
         description: `Credit pack purchase: ${productName || `${credits} credits`}`,
         referenceId,
-        metadata: JSON.stringify({
-          provider: 'creem',
-          checkoutId,
-          orderId,
-          productName,
-          credits,
-          creemEventId: data.eventId,
-        }),
+        metadata: JSON.stringify(metadataPayload),
       });
 
       console.log(
@@ -429,14 +440,7 @@ async function handleCreditPackPurchase(data: CreemWebhookData) {
         source: 'purchase',
         description: `Credit pack purchase: ${productName || `${credits} credits`}`,
         referenceId,
-        metadata: JSON.stringify({
-          provider: 'creem',
-          checkoutId,
-          orderId,
-          productName,
-          credits,
-          creemEventId: data.eventId,
-        }),
+        metadata: JSON.stringify(metadataPayload),
       });
 
       console.log(
@@ -449,9 +453,8 @@ async function handleCreditPackPurchase(data: CreemWebhookData) {
       const userInfo = await getUserInfo(userId);
       if (userInfo) {
         // Find credit pack by credits amount
-        const creditPack = paymentConfig.creditPacks.find((pack) => pack.credits === credits);
         const packName = creditPack?.name || productName || `${credits} Credits`;
-        const packPrice = creditPack?.price || data.amount || 0;
+        const packPrice = normalizedAmount || creditPack?.price || 0;
         
         await sendCreditPackPurchaseEmail(
           userInfo.email,

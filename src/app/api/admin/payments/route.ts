@@ -1,8 +1,41 @@
+import { paymentConfig } from '@/config/payment.config';
 import { requireAdmin } from '@/lib/admin/auth';
 import { db } from '@/server/db';
-import { payment, user } from '@/server/db/schema';
+import { creditTransactions, payment, user } from '@/server/db/schema';
 import { desc, eq, gte, sql } from 'drizzle-orm';
 import { NextResponse } from 'next/server';
+
+const parsePurchaseMetadata = (metadata: string | null) => {
+  if (!metadata) {
+    return { amount: 0, currency: 'USD', provider: 'unknown', credits: 0, productName: '' };
+  }
+  try {
+    const parsed = JSON.parse(metadata) as Record<string, unknown>;
+    const productId = typeof parsed.productId === 'string' ? parsed.productId : undefined;
+    const creditsValue =
+      typeof parsed.credits === 'number'
+        ? parsed.credits
+        : Number(parsed.credits) || undefined;
+    const pack =
+      paymentConfig.creditPacks.find((pack) => pack.creemProductKey === productId) ||
+      (typeof creditsValue === 'number'
+        ? paymentConfig.creditPacks.find((pack) => pack.credits === creditsValue)
+        : undefined);
+    const rawAmount = Number(parsed.amount);
+    const amount =
+      Number.isFinite(rawAmount) && rawAmount > 0 ? rawAmount : pack?.price ?? 0;
+    return {
+      amount,
+      currency: typeof parsed.currency === 'string' ? parsed.currency : 'USD',
+      provider: typeof parsed.provider === 'string' ? parsed.provider : 'unknown',
+      credits: creditsValue ?? pack?.credits ?? 0,
+      productName: typeof parsed.productName === 'string' ? parsed.productName : pack?.name || '',
+    };
+  } catch (error) {
+    console.error('Failed to parse purchase metadata:', error);
+    return { amount: 0, currency: 'USD', provider: 'unknown', credits: 0, productName: '' };
+  }
+};
 
 export async function GET(request: Request) {
   try {
@@ -19,11 +52,8 @@ export async function GET(request: Request) {
     // Note: payment table doesn't have amount/currency columns yet
     // TODO: Add amount and currency columns to payment schema
 
-    // Get payment count
     const paymentCount = await db
-      .select({
-        count: sql<number>`count(*)`,
-      })
+      .select({ count: sql<number>`count(*)` })
       .from(payment)
       .where(gte(payment.createdAt, startDate));
 
@@ -47,25 +77,98 @@ export async function GET(request: Request) {
       .orderBy(desc(payment.createdAt))
       .limit(100);
 
-    // Calculate revenue from subscription plans (temporary solution)
-    // This is approximate based on plan types in payments
-    const revenueEstimate = recentPayments.length * 14.9; // Average plan price
+    const creditPackRows = await db
+      .select({
+        id: creditTransactions.id,
+        userId: creditTransactions.userId,
+        userEmail: user.email,
+        metadata: creditTransactions.metadata,
+        createdAt: creditTransactions.createdAt,
+      })
+      .from(creditTransactions)
+      .leftJoin(user, eq(user.id, creditTransactions.userId))
+      .where(
+        and(eq(creditTransactions.source, 'purchase'), gte(creditTransactions.createdAt, startDate))
+      )
+      .orderBy(desc(creditTransactions.createdAt))
+      .limit(100);
+
+    const creditPackPayments = creditPackRows.map((row) => {
+      const parsed = parsePurchaseMetadata(row.metadata);
+      return {
+        id: row.id,
+        userEmail: row.userEmail || 'Unknown',
+        amount: parsed.amount,
+        currency: parsed.currency,
+        status: 'completed',
+        createdAt: row.createdAt,
+        provider: parsed.provider,
+        type: 'credit_pack' as const,
+        credits: parsed.credits,
+        description: parsed.productName || `${parsed.credits} credits`,
+      };
+    });
+
+    const allCreditPackRows = await db
+      .select({ metadata: creditTransactions.metadata })
+      .from(creditTransactions)
+      .where(eq(creditTransactions.source, 'purchase'));
+
+    const totalRevenue = allCreditPackRows.reduce(
+      (sum, row) => sum + parsePurchaseMetadata(row.metadata).amount,
+      0
+    );
+
+    const revenueInRange = creditPackPayments.reduce((sum, item) => sum + item.amount, 0);
+
+    const recentSubscriptionPayments = recentPayments.map((p) => ({
+      ...p,
+      amount: 0,
+      currency: 'usd',
+      provider: p.provider || 'unknown',
+      type: 'subscription' as const,
+      credits: null,
+      description: p.priceId || p.interval || 'Subscription',
+    }));
+
+    const combinedRecentPayments = [...creditPackPayments, ...recentSubscriptionPayments].sort(
+      (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    );
+
+    const transactionsCount = creditPackPayments.length;
+    const averageTransaction =
+      transactionsCount > 0 ? revenueInRange / transactionsCount : 0;
+
+    const trendMap = new Map<
+      string,
+      {
+        date: string;
+        amount: number;
+        count: number;
+      }
+    >();
+
+    creditPackPayments.forEach((payment) => {
+      const dateKey = new Date(payment.createdAt).toISOString().split('T')[0];
+      const entry = trendMap.get(dateKey) ?? { date: dateKey, amount: 0, count: 0 };
+      entry.amount += payment.amount;
+      entry.count += 1;
+      trendMap.set(dateKey, entry);
+    });
+
+    const trend = Array.from(trendMap.values()).sort((a, b) =>
+      a.date.localeCompare(b.date)
+    );
 
     const response = NextResponse.json({
       summary: {
-        totalRevenue: 0, // TODO: Calculate from subscription plans or add amount column
-        paymentCount: Number(paymentCount[0]?.count) || 0,
-        avgPayment: 0, // TODO: Calculate when amount column is added
-        revenueInRange: revenueEstimate,
-        transactionCount: recentPayments.length,
-        averageTransaction: recentPayments.length > 0 ? revenueEstimate / recentPayments.length : 0,
+        totalRevenue,
+        revenueInRange,
+        transactionCount: transactionsCount,
+        averageTransaction,
       },
-      trend: [], // TODO: Calculate from subscription plans
-      recentPayments: recentPayments.map((p) => ({
-        ...p,
-        amount: 0, // TODO: Calculate from priceId or add amount column
-        currency: 'usd',
-      })),
+      trend,
+      recentPayments: combinedRecentPayments,
     });
 
     // Prevent caching of admin data

@@ -1033,14 +1033,25 @@ class CreemPaymentService {
       const productName =
         checkoutProduct?.name ||
         (typeof orderProduct === 'object' ? (orderProduct as { name?: string })?.name : undefined);
-      const orderAmount = (order as { amount_paid?: number } | undefined)?.amount_paid;
+      const orderAmountRaw = (order as { amount_paid?: number } | undefined)?.amount_paid;
+      const orderCurrency =
+        (order as { currency?: string } | undefined)?.currency ||
+        (checkoutProduct as { currency?: string } | undefined)?.currency ||
+        'USD';
 
       // Extract credit amount from product name (e.g., "1000 credits")
-      const configPack = paymentConfig.creditPacks.find(
-        (pack) => pack.creemProductKey && pack.creemProductKey === productId
-      );
       const creditMatch = productName?.match(/(\d+)\s*credits/i);
-      const credits = configPack?.credits ?? (creditMatch ? Number.parseInt(creditMatch[1], 10) : undefined);
+      const inferredCredits = creditMatch ? Number.parseInt(creditMatch[1], 10) : undefined;
+      const configPack =
+        paymentConfig.creditPacks.find((pack) => pack.creemProductKey === productId) ??
+        paymentConfig.creditPacks.find(
+          (pack) => typeof inferredCredits === 'number' && pack.credits === inferredCredits
+        );
+      const credits = configPack?.credits ?? inferredCredits;
+      const normalizedAmount =
+        typeof orderAmountRaw === 'number'
+          ? orderAmountRaw >= 100 ? orderAmountRaw / 100 : orderAmountRaw
+          : undefined;
 
       console.log('[Creem Service] Parsed credit pack purchase:', {
         productId,
@@ -1077,7 +1088,8 @@ class CreemPaymentService {
         productId: productId as string | undefined,
         productName: productName as string | undefined,
         credits: credits,
-        amount: orderAmount as number | undefined,
+        amount: (normalizedAmount ?? configPack?.price) as number | undefined,
+        currency: orderCurrency,
         checkoutId: (checkout as { id?: string }).id as string | undefined,
         orderId: (order as { id?: string } | undefined)?.id as string | undefined,
       };

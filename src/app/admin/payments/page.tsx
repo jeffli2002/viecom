@@ -223,8 +223,10 @@ export default function AdminPaymentsPage() {
                 <tr className="text-left text-sm text-gray-500 border-b">
                   <th className="py-3 px-4">Date</th>
                   <th className="py-3 px-4">User Email</th>
+                  <th className="py-3 px-4">Type</th>
                   <th className="py-3 px-4">Amount</th>
                   <th className="py-3 px-4">Currency</th>
+                  <th className="py-3 px-4">Credits</th>
                   <th className="py-3 px-4">Status</th>
                   <th className="py-3 px-4">Provider</th>
                 </tr>
@@ -236,22 +238,22 @@ export default function AdminPaymentsPage() {
                       {new Date(payment.createdAt).toLocaleString()}
                     </td>
                     <td className="py-3 px-4 text-sm">{payment.userEmail}</td>
-                    <td className="py-3 px-4 text-sm font-medium">${payment.amount}</td>
+                    <td className="py-3 px-4 text-sm capitalize">
+                      {payment.type.replace('_', ' ')}
+                    </td>
+                    <td className="py-3 px-4 text-sm font-medium">
+                      ${payment.amount.toFixed(2)}
+                    </td>
                     <td className="py-3 px-4 text-sm">{payment.currency}</td>
+                    <td className="py-3 px-4 text-sm">
+                      {payment.credits ? `${payment.credits.toLocaleString()} credits` : '--'}
+                    </td>
                     <td className="py-3 px-4">
-                      <span
-                        className={`px-2 py-1 rounded text-xs font-medium ${
-                          payment.status === 'succeeded'
-                            ? 'bg-green-100 text-green-700'
-                            : payment.status === 'pending'
-                              ? 'bg-amber-100 text-amber-700'
-                              : 'bg-red-100 text-red-700'
-                        }`}
-                      >
+                      <span className="px-2 py-1 rounded text-xs font-medium bg-green-100 text-green-700">
                         {payment.status}
                       </span>
                     </td>
-                    <td className="py-3 px-4 text-sm">{payment.provider}</td>
+                    <td className="py-3 px-4 text-sm uppercase">{payment.provider}</td>
                   </tr>
                 ))}
               </tbody>

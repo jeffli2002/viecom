@@ -1,3 +1,4 @@
+import { paymentConfig } from '@/config/payment.config';
 import { requireAdmin } from '@/lib/admin/auth';
 import { db } from '@/server/db';
 import {
@@ -9,6 +10,37 @@ import {
 } from '@/server/db/schema';
 import { and, eq, gte, sql } from 'drizzle-orm';
 import { NextResponse } from 'next/server';
+
+const parsePurchaseMetadata = (metadata: string | null) => {
+  if (!metadata) {
+    return { amount: 0, currency: 'USD', provider: 'unknown', credits: 0 };
+  }
+  try {
+    const parsed = JSON.parse(metadata) as Record<string, unknown>;
+    const productId = typeof parsed.productId === 'string' ? parsed.productId : undefined;
+    const creditsValue =
+      typeof parsed.credits === 'number'
+        ? parsed.credits
+        : Number(parsed.credits) || undefined;
+    const pack =
+      paymentConfig.creditPacks.find((pack) => pack.creemProductKey === productId) ||
+      (typeof creditsValue === 'number'
+        ? paymentConfig.creditPacks.find((pack) => pack.credits === creditsValue)
+        : undefined);
+    const rawAmount = Number(parsed.amount);
+    const amount =
+      Number.isFinite(rawAmount) && rawAmount > 0 ? rawAmount : pack?.price ?? 0;
+    return {
+      amount,
+      currency: typeof parsed.currency === 'string' ? parsed.currency : 'USD',
+      provider: typeof parsed.provider === 'string' ? parsed.provider : 'unknown',
+      credits: creditsValue ?? pack?.credits ?? 0,
+    };
+  } catch (error) {
+    console.error('Failed to parse purchase metadata:', error);
+    return { amount: 0, currency: 'USD', provider: 'unknown', credits: 0 };
+  }
+};
 
 export async function GET(request: Request) {
   try {
@@ -47,7 +79,29 @@ export async function GET(request: Request) {
     // Get today's revenue
     // Note: payment table doesn't have amount column yet
     // TODO: Add amount column to payment table or calculate from subscription plans
-    const todayRevenue = [{ total: 0 }];
+    const purchaseRowsInRange = await db
+      .select({
+        metadata: creditTransactions.metadata,
+        createdAt: creditTransactions.createdAt,
+      })
+      .from(creditTransactions)
+      .where(
+        and(eq(creditTransactions.source, 'purchase'), gte(creditTransactions.createdAt, startDate))
+      );
+
+    const todayPurchaseRows = await db
+      .select({ metadata: creditTransactions.metadata })
+      .from(creditTransactions)
+      .where(and(eq(creditTransactions.source, 'purchase'), gte(creditTransactions.createdAt, today)));
+
+    const revenueInRange = purchaseRowsInRange.reduce(
+      (sum, row) => sum + parsePurchaseMetadata(row.metadata).amount,
+      0
+    );
+    const todayRevenueTotal = todayPurchaseRows.reduce(
+      (sum, row) => sum + parsePurchaseMetadata(row.metadata).amount,
+      0
+    );
 
     // Get today's credits consumed from generated assets
     const todayImageCreditsResult = await db
@@ -103,7 +157,7 @@ export async function GET(request: Request) {
         todayRegistrations: Number(todayRegistrations[0]?.count) || 0,
         registrationsInRange: Number(registrationsInRange[0]?.count) || 0,
         activeSubscriptions: Number(activeSubscriptions[0]?.count) || 0,
-        todayRevenue: Number(todayRevenue[0]?.total) || 0,
+        todayRevenue: todayRevenueTotal,
         todayImageCredits: Number(todayImageCredits[0]?.total) || 0,
         todayVideoCredits: Number(todayVideoCredits[0]?.total) || 0,
       },
