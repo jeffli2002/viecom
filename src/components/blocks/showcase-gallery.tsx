@@ -173,11 +173,21 @@ export function ShowcaseGallery() {
     async function loadShowcaseItems() {
       try {
         setIsLoading(true);
-        const response = await fetch('/api/v1/showcase');
+        const response = await fetch('/api/v1/showcase?placement=landing', {
+          cache: 'no-store',
+        });
         const data = await response.json();
 
-        if (data.success && data.items && data.items.length > 0) {
-          setGalleryItems(data.items);
+        if (data.success && Array.isArray(data.items) && data.items.length > 0) {
+          const parsedItems: GalleryItem[] = data.items.map((item: any) => ({
+            id: item.id,
+            type: item.type === 'video' ? 'video' : 'image',
+            url: item.url,
+            category: item.category || 'Showcase',
+            title: item.title || 'Showcase Item',
+            filename: item.filename,
+          }));
+          setGalleryItems(parsedItems);
         } else {
           console.warn('No showcase items found, using default items');
           setGalleryItems(DEFAULT_ITEMS);

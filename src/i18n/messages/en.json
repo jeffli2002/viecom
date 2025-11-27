@@ -211,7 +211,7 @@
     "shareSocialToast": "Opening {{platform}}...",
     "sharePublishOnViecom": "Publish on Viecom.pro",
     "sharePublishToast": "Publishing flow opened in a new tab.",
-    "sharePublishPending": "Complete your publish on Viecom.pro, then confirm to collect +{{credits}} credits.",
+    "sharePublishPending": "Complete your publish on Viecom.pro, then confirm to collect +{credits} credits.",
     "shareConfirmPublish": "Confirm Publishing",
     "shareRewardedAmount": "Thanks for sharing! +{{credits}} credits added.",
     "shareRewardFailed": "We couldn't add credits for this share. Please try again later.",

@@ -1,6 +1,6 @@
 'use client';
 
-import { CreditCard, DollarSign, LayoutDashboard, Settings, Users, Zap } from 'lucide-react';
+import { CreditCard, DollarSign, LayoutDashboard, Settings, Sparkles, Users, Zap } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
@@ -29,6 +29,11 @@ const menuItems = [
     name: 'Credits (积分)',
     href: '/admin/credits',
     icon: Zap,
+  },
+  {
+    name: 'Publish Audit',
+    href: '/admin/publish',
+    icon: Sparkles,
   },
   {
     name: 'Settings',

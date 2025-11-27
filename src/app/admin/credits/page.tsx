@@ -57,7 +57,8 @@ export default function AdminCreditsPage() {
     try {
       // Add cache-busting timestamp to prevent stale data
       const timestamp = new Date().getTime();
-      const response = await fetch(`/api/admin/credits/summary?range=${range}&_t=${timestamp}`, {
+      const timezoneOffset = new Date().getTimezoneOffset();
+      const response = await fetch(`/api/admin/credits/summary?range=${range}&tzOffset=${timezoneOffset}&_t=${timestamp}`, {
         cache: 'no-store',
       });
       if (response.ok) {

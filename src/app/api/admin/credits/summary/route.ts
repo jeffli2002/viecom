@@ -4,6 +4,20 @@ import { creditTransactions, generatedAsset, user, userCredits } from '@/server/
 import { sql } from 'drizzle-orm';
 import { NextResponse } from 'next/server';
 
+function getTimezoneAwareStartDate(range: string, tzOffsetMinutes: number): Date {
+  const offsetMs = tzOffsetMinutes * 60 * 1000;
+  const now = Date.now();
+  const localNow = new Date(now - offsetMs);
+  localNow.setUTCHours(0, 0, 0, 0);
+
+  if (range !== 'today') {
+    const daysAgo = range === '7d' ? 7 : range === '30d' ? 30 : 90;
+    localNow.setUTCDate(localNow.getUTCDate() - daysAgo);
+  }
+
+  return new Date(localNow.getTime() + offsetMs);
+}
+
 export async function GET(request: Request) {
   try {
     // Verify admin
@@ -11,14 +25,9 @@ export async function GET(request: Request) {
 
     const { searchParams } = new URL(request.url);
     const range = searchParams.get('range') || 'today';
-
-    const startDate = new Date();
-    if (range === 'today') {
-      startDate.setHours(0, 0, 0, 0);
-    } else {
-      const daysAgo = range === '7d' ? 7 : range === '30d' ? 30 : 90;
-      startDate.setDate(startDate.getDate() - daysAgo);
-    }
+    const tzOffsetInput = Number.parseInt(searchParams.get('tzOffset') || '0', 10);
+    const tzOffsetMinutes = Number.isFinite(tzOffsetInput) ? tzOffsetInput : 0;
+    const startDate = getTimezoneAwareStartDate(range, tzOffsetMinutes);
 
     // Credits summary derived from actual spend transactions, grouped by feature metadata
     const summaryStats = await db.execute(sql`

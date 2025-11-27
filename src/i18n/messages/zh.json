@@ -211,7 +211,7 @@
     "shareSocialToast": "正在打开 {{platform}}...",
     "sharePublishOnViecom": "发布到 Viecom.pro",
     "sharePublishToast": "已在新标签页打开发布流程。",
-    "sharePublishPending": "完成 Viecom.pro 的发布流程后，点击下方按钮领取 {{credits}} 积分。",
+    "sharePublishPending": "完成 Viecom.pro 的发布流程后，点击下方按钮领取 {credits} 积分。",
     "shareConfirmPublish": "确认已发布",
     "shareRewarded": "感谢分享！积分已到账。",
     "shareRewardedAmount": "感谢分享！已获得 {{credits}} 积分。",

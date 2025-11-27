@@ -141,8 +141,8 @@ export default function ImageGenerator() {
   const [shareStatus, setShareStatus] = useState<'idle' | 'pending' | 'awarded' | 'error'>('idle');
   const [shareMessage, setShareMessage] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const publishUrl = 'https://viecom.pro/publish';
-  const [awaitingPublishConfirmation, setAwaitingPublishConfirmation] = useState(false);
+  const [isPublishModalOpen, setIsPublishModalOpen] = useState(false);
+  // ...
   const activeRequestIdRef = useRef<string | null>(null);
   const [lightboxImage, setLightboxImage] = useState<{ url: string; alt: string } | null>(null);
   const promptTextareaRef = useRef<HTMLTextAreaElement | null>(null);
@@ -222,7 +222,7 @@ export default function ImageGenerator() {
     void imageReference;
     setShareStatus('idle');
     setShareMessage(null);
-    setAwaitingPublishConfirmation(false);
+    setIsPublishModalOpen(false);
   }, [imageReference]);
 
   useEffect(() => {
@@ -817,6 +817,34 @@ export default function ImageGenerator() {
     }
   };
 
+  const submitPublishEntry = async () => {
+    if (!result?.imageUrl) {
+      throw new Error('No image available to publish.');
+    }
+    const response = await fetch('/api/v1/publish/submissions', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        assetUrl: result.imageUrl,
+        previewUrl: result.previewUrl ?? result.imageUrl,
+        assetId: result.assetId ?? null,
+        prompt: prompt,
+        title: prompt.trim().slice(0, 120),
+        assetType: 'image',
+        metadata: {
+          model: result.model,
+          requestId: result.requestId,
+        },
+      }),
+    });
+
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok) {
+      throw new Error(data?.error || 'Unable to submit for publishing. Please try again.');
+    }
+    return data.submission;
+  };
+
   const handleShareAction = async (
     action: 'copy' | 'social' | 'publish',
     platformId?: SharePlatformId
@@ -829,11 +857,7 @@ export default function ImageGenerator() {
     }
 
     if (action === 'publish') {
-      await copyShareLink();
-      const publishTarget = `${publishUrl}?asset=${encodeURIComponent(result.imageUrl)}`;
-      window.open(publishTarget, '_blank', 'noopener,noreferrer');
-      toast.success(t('sharePublishToast'));
-      setAwaitingPublishConfirmation(true);
+      setIsPublishModalOpen(true);
       setShareMessage(null);
       setShareStatus('idle');
       return;
@@ -864,10 +888,27 @@ export default function ImageGenerator() {
   };
 
   const handleConfirmPublish = async () => {
+    if (!result?.imageUrl) {
+      toast.error('Generate an asset before confirming publish.');
+      return;
+    }
+    try {
+      await submitPublishEntry();
+      await copyShareLink(t('sharePublishToast'));
+    } catch (error) {
+      console.error('Publish confirmation failed:', error);
+      const message =
+        error instanceof Error ? error.message : 'Failed to submit your publish confirmation.';
+      toast.error(message);
+      setShareStatus('error');
+      setShareMessage(message);
+      return;
+    }
+
     await awardShareReward('publishViecom', {
       platformValue: SHARE_REWARD_CONFIG.publishViecom.platform,
     });
-    setAwaitingPublishConfirmation(false);
+    setIsPublishModalOpen(false);
   };
 
   const handleDownload = async (imageUrl: string, fallbackUrl?: string) => {
@@ -955,7 +996,8 @@ export default function ImageGenerator() {
     prompt.trim().length > 0 && (mode === 'text-to-image' || sourceImages.length > 0);
 
   return (
-    <div className="mx-auto max-w-7xl">
+    <div className="px-4 py-8 lg:px-8">
+      <div className="mx-auto max-w-7xl">
       <Tabs value={mode} onValueChange={(v) => setMode(v as GenerationMode)} className="w-full">
         <TabsList className="mx-auto mb-8 grid w-full max-w-md grid-cols-2 bg-transparent gap-3 p-0">
           <TabsTrigger
@@ -1502,14 +1544,6 @@ export default function ImageGenerator() {
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </div>
-                  {awaitingPublishConfirmation && (
-                    <div className="rounded-lg border border-teal-200 bg-teal-50 dark:border-teal-800 dark:bg-teal-900/20 p-4 flex flex-col gap-3 text-sm text-slate-700 dark:text-slate-200">
-                      <p>{t('sharePublishPending', { credits: SHARE_REWARD_CONFIG.publishViecom.credits })}</p>
-                      <Button size="sm" onClick={handleConfirmPublish} className="self-center bg-teal-500 hover:bg-teal-600 text-white">
-                        {t('shareConfirmPublish')}
-                      </Button>
-                    </div>
-                  )}
                   {shareMessage && (
                     <p
                       className={`text-center text-xs ${
@@ -1549,40 +1583,76 @@ export default function ImageGenerator() {
 
       {lightboxImage && (
         <dialog
-          open
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-6"
-          onClick={() => setLightboxImage(null)}
-          onKeyDown={(e) => {
-            if (e.key === 'Escape') {
-              setLightboxImage(null);
-            }
-          }}
-        >
-          <div
-            className="relative max-h-full max-w-5xl"
-            onClick={(event) => event.stopPropagation()}
+            open
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-6"
+            onClick={() => setLightboxImage(null)}
             onKeyDown={(e) => {
               if (e.key === 'Escape') {
-                e.stopPropagation();
+                setLightboxImage(null);
               }
             }}
           >
-            <button
-              type="button"
-              className="absolute right-4 top-4 rounded-full bg-black/70 p-2 text-white hover:bg-black"
-              aria-label="Close preview"
-              onClick={() => setLightboxImage(null)}
+            <div
+              className="relative max-h-full max-w-5xl"
+              onClick={(event) => event.stopPropagation()}
+              onKeyDown={(e) => {
+                if (e.key === 'Escape') {
+                  e.stopPropagation();
+                }
+              }}
             >
-              <X className="h-5 w-5" />
-            </button>
-            <img
-              src={lightboxImage.url}
-              alt={lightboxImage.alt}
-              className="max-h-[80vh] w-full rounded-lg object-contain"
-            />
-          </div>
-        </dialog>
-      )}
+              <button
+                type="button"
+                className="absolute right-4 top-4 rounded-full bg-black/70 p-2 text-white hover:bg-black"
+                aria-label="Close preview"
+                onClick={() => setLightboxImage(null)}
+              >
+                <X className="h-5 w-5" />
+              </button>
+              <img
+                src={lightboxImage.url}
+                alt={lightboxImage.alt}
+                className="max-h-[80vh] w-full rounded-lg object-contain"
+              />
+            </div>
+          </dialog>
+        )}
+        {isPublishModalOpen && (
+          <dialog
+            open
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4"
+            onClose={() => setIsPublishModalOpen(false)}
+          >
+            <div className="max-w-lg rounded-2xl bg-white p-6 shadow-xl space-y-4 text-slate-700">
+              <h2 className="text-xl font-semibold text-slate-900">
+                Publish Guidelines
+              </h2>
+              <ul className="list-disc space-y-2 pl-5 text-sm">
+                <li>All content must comply with Viecom policies and local regulations.</li>
+                <li>No adult, hateful, infringing, or misleading material is allowed.</li>
+                <li>Our audit team reviews each submission before it appears publicly.</li>
+                <li>Approved assets will be showcased and eligible for reward credits.</li>
+                <li>We reserve the right to remove content that violates any policy.</li>
+              </ul>
+              <div className="flex flex-wrap gap-3">
+                <Button
+                  onClick={handleConfirmPublish}
+                  className="bg-teal-500 hover:bg-teal-600 text-white flex-1"
+                >
+                  I Understand & Submit
+                </Button>
+                <Button
+                  variant="outline"
+                  className="flex-1 border-slate-200"
+                  onClick={() => setIsPublishModalOpen(false)}
+                >
+                  Cancel
+                </Button>
+              </div>
+            </div>
+          </dialog>
+        )}
+      </div>
     </div>
   );
 }

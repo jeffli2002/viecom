@@ -209,6 +209,39 @@ export const userQuotaUsage = pgTable(
   })
 );
 
+export const publishSubmissions = pgTable('publish_submissions', {
+  id: text('id').primaryKey(),
+  userId: text('user_id')
+    .notNull()
+    .references(() => user.id, { onDelete: 'cascade' }),
+  assetId: text('asset_id'),
+  assetUrl: text('asset_url').notNull(),
+  previewUrl: text('preview_url'),
+  assetType: text('asset_type').notNull().default('image'),
+  title: text('title'),
+  prompt: text('prompt'),
+  category: text('category'),
+  status: text('status', { enum: ['pending', 'approved', 'rejected'] })
+    .notNull()
+    .default('pending'),
+  publishToLanding: boolean('publish_to_landing').notNull().default(false),
+  publishToShowcase: boolean('publish_to_showcase').notNull().default(false),
+  tags: jsonb('tags').$type<string[] | null>(),
+  metadata: jsonb('metadata').$type<Record<string, unknown> | null>(),
+  adminNotes: text('admin_notes'),
+  rejectionReason: text('rejection_reason'),
+  reviewedBy: text('reviewed_by'),
+  reviewedAt: timestamp('reviewed_at'),
+  approvedAt: timestamp('approved_at'),
+  rejectedAt: timestamp('rejected_at'),
+  createdAt: timestamp('created_at')
+    .$defaultFn(() => new Date())
+    .notNull(),
+  updatedAt: timestamp('updated_at')
+    .$defaultFn(() => new Date())
+    .notNull(),
+});
+
 // Brand Tone Profile (Optional feature)
 export const brandToneProfile = pgTable('brand_tone_profile', {
   id: text('id').primaryKey(),
