@@ -205,16 +205,26 @@ export default function AdminPublishPage() {
           return (
             <div
               key={submission.id}
-              className="grid gap-6 rounded-2xl border border-slate-200 bg-white p-6 lg:grid-cols-[280px,1fr]"
+              className="grid gap-6 rounded-2xl border border-slate-200 bg-white p-6 lg:grid-cols-[220px,1fr]"
             >
-              <div className="overflow-hidden rounded-xl border border-slate-100 bg-slate-50">
-                <Image
-                  src={submission.previewUrl ?? submission.assetUrl}
-                  alt={submission.title ?? 'Submission asset'}
-                  width={600}
-                  height={800}
-                  className="h-full w-full object-cover"
-                />
+              <div className="flex flex-col gap-3">
+                <div className="overflow-hidden rounded-xl border border-slate-100 bg-slate-50">
+                  <Image
+                    src={submission.previewUrl ?? submission.assetUrl}
+                    alt={submission.title ?? 'Submission asset'}
+                    width={320}
+                    height={400}
+                    className="h-full w-full object-cover"
+                  />
+                </div>
+                <a
+                  href={submission.assetUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-xs text-center text-teal-500 hover:underline"
+                >
+                  Open full asset
+                </a>
               </div>
               <div className="flex flex-col gap-4">
                 <div>
