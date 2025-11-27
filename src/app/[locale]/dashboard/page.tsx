@@ -175,7 +175,7 @@ function DashboardPageContent() {
         }
       }
 
-      // 订阅信息由 useSubscription 统一提供
+      // Subscription info is provided by useSubscription hook
     } catch (error) {
       console.error('Failed to fetch dashboard data:', error);
     } finally {
@@ -263,7 +263,7 @@ function DashboardPageContent() {
         </div>
         <Button variant="outline" size="sm" onClick={handleRefresh} disabled={isRefreshing}>
           <RefreshCw className={`mr-2 h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`} />
-          刷新
+          {t('refresh')}
         </Button>
       </div>
 
@@ -271,15 +271,11 @@ function DashboardPageContent() {
         <Alert className="border-teal-300 dark:border-teal-800 bg-gradient-to-r from-teal-50 to-blue-50 dark:from-teal-900/20 dark:to-blue-900/20 shadow-lg">
           <AlertTitle className="flex items-center gap-2 text-lg font-bold text-slate-900 dark:text-white">
             <TrendingUp className="h-5 w-5 text-teal-500" />
-            {locale === 'zh'
-              ? `套餐升级已排程：${scheduledPlanDetails.planName}`
-              : `Plan Upgrade Scheduled: ${scheduledPlanDetails.planName}`}
+            {t('planUpgradeScheduled', { planName: scheduledPlanDetails.planName })}
           </AlertTitle>
           <AlertDescription className="mt-2 text-base text-slate-800 dark:text-slate-200">
             <p className="font-semibold mb-2">
-              {locale === 'zh'
-                ? `您的订阅将在以下日期升级为 ${scheduledPlanDetails.planName}：`
-                : `Your subscription will upgrade to ${scheduledPlanDetails.planName} on:`}
+              {t('upgradeScheduledDesc', { planName: scheduledPlanDetails.planName })}
             </p>
             <p className="mb-3">
               <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-md bg-teal-100 dark:bg-teal-900/30 text-slate-900 dark:text-white font-bold text-lg">
@@ -289,36 +285,29 @@ function DashboardPageContent() {
             </p>
             <div className="space-y-1 text-sm">
               <p>
-                {locale === 'zh' ? '• 计费周期：' : '• Billing cycle: '}
+                • {t('billingCycle')}
                 <span className="font-medium">
-                  {scheduledPlanDetails.interval === 'year'
-                    ? locale === 'zh'
-                      ? '年付'
-                      : 'Yearly'
-                    : locale === 'zh'
-                      ? '月付'
-                      : 'Monthly'}
+                  {scheduledPlanDetails.interval === 'year' ? t('yearly') : t('monthly')}
                 </span>
               </p>
               <p>
-                {locale === 'zh' ? '• 费用：' : '• Price: '}
+                • {t('price')}
                 <span className="font-medium">
                   {scheduledPlanDetails.price
                     ? `$${scheduledPlanDetails.price.toFixed(2)}`
-                    : locale === 'zh'
-                      ? '官方标准价'
-                      : 'Standard rate'}
+                    : t('standardRate')}
                 </span>
               </p>
               <p>
-                {locale === 'zh' ? '• 每月积分：' : '• Credits per cycle: '}
+                • {t('creditsPerCycle')}
                 <span className="font-medium">{scheduledPlanDetails.credits}</span>
               </p>
             </div>
             <p className="mt-3 pt-3 border-t border-teal-200 dark:border-teal-800 text-sm">
-              {locale === 'zh'
-                ? `当前 ${planId === 'proplus' ? 'Pro+' : planId === 'pro' ? 'Pro' : 'Free'} 套餐将在此日期之前保持有效。`
-                : `Your current ${planId === 'proplus' ? 'Pro+' : planId === 'pro' ? 'Pro' : 'Free'} plan remains active until then.`}
+              {t('currentPlanRemains', {
+                planName:
+                  planId === 'proplus' ? 'Pro+' : planId === 'pro' ? 'Pro' : 'Free',
+              })}
             </p>
           </AlertDescription>
         </Alert>
@@ -365,37 +354,39 @@ function DashboardPageContent() {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="font-medium text-sm">可用积分</CardTitle>
+            <CardTitle className="font-medium text-sm">{t('availableCredits')}</CardTitle>
             <Coins className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="font-bold text-2xl">{creditBalance?.availableBalance ?? 0}</div>
             <p className="text-muted-foreground text-xs">
-              ~{Math.floor((creditBalance?.availableBalance ?? 0) / imageCredits)} 张图片 或{' '}
-              {Math.floor((creditBalance?.availableBalance ?? 0) / videoCredits)} 个视频
+              {t('creditsEstimate', {
+                images: Math.floor((creditBalance?.availableBalance ?? 0) / imageCredits),
+                videos: Math.floor((creditBalance?.availableBalance ?? 0) / videoCredits),
+              })}
             </p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="font-medium text-sm">总获得</CardTitle>
+            <CardTitle className="font-medium text-sm">{t('totalEarned')}</CardTitle>
             <TrendingUp className="h-4 w-4 text-green-500" />
           </CardHeader>
           <CardContent>
             <div className="font-bold text-2xl">{creditBalance?.totalEarned ?? 0}</div>
-            <p className="text-muted-foreground text-xs">累计获得</p>
+            <p className="text-muted-foreground text-xs">{t('cumulativeEarned')}</p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="font-medium text-sm">总花费</CardTitle>
+            <CardTitle className="font-medium text-sm">{t('totalSpent')}</CardTitle>
             <TrendingDown className="h-4 w-4 text-red-500" />
           </CardHeader>
           <CardContent>
             <div className="font-bold text-2xl">{creditBalance?.totalSpent ?? 0}</div>
-            <p className="text-muted-foreground text-xs">累计花费</p>
+            <p className="text-muted-foreground text-xs">{t('cumulativeSpent')}</p>
           </CardContent>
         </Card>
       </div>
@@ -409,13 +400,13 @@ function DashboardPageContent() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-base">
                   <ImageIcon className="h-5 w-5 text-teal-500" />
-                  图片生成 (每日)
+                  {t('imageGenerationDaily')}
                 </CardTitle>
-                <CardDescription>今日生成限制</CardDescription>
+                <CardDescription>{t('dailyLimit')}</CardDescription>
               </CardHeader>
               <CardContent className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <span className="text-muted-foreground text-sm">已使用</span>
+                  <span className="text-muted-foreground text-sm">{t('used')}</span>
                   <span className="font-medium text-sm">
                     {quotaUsage.imageGeneration.daily.used || 0} /{' '}
                     {quotaUsage.imageGeneration.daily.isUnlimited
@@ -440,13 +431,13 @@ function DashboardPageContent() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-base">
                   <Video className="h-5 w-5 text-blue-500" />
-                  视频生成 (每日)
+                  {t('videoGenerationDaily')}
                 </CardTitle>
-                <CardDescription>今日生成限制</CardDescription>
+                <CardDescription>{t('dailyLimit')}</CardDescription>
               </CardHeader>
               <CardContent className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <span className="text-muted-foreground text-sm">已使用</span>
+                  <span className="text-muted-foreground text-sm">{t('used')}</span>
                   <span className="font-medium text-sm">
                     {quotaUsage.videoGeneration.daily.used || 0} /{' '}
                     {quotaUsage.videoGeneration.daily.isUnlimited
@@ -471,13 +462,13 @@ function DashboardPageContent() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-base">
                   <Video className="h-5 w-5 text-teal-500" />
-                  视频生成 (每月)
+                  {t('videoGenerationMonthly')}
                 </CardTitle>
-                <CardDescription>本月生成限制</CardDescription>
+                <CardDescription>{t('monthlyLimit')}</CardDescription>
               </CardHeader>
               <CardContent className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <span className="text-muted-foreground text-sm">已使用</span>
+                  <span className="text-muted-foreground text-sm">{t('used')}</span>
                   <span className="font-medium text-sm">
                     {quotaUsage.videoGeneration.monthly.used || 0} /{' '}
                     {quotaUsage.videoGeneration.monthly.isUnlimited
@@ -504,13 +495,13 @@ function DashboardPageContent() {
           <div>
             <CardTitle className="flex items-center gap-2">
               <Calendar className="h-5 w-5" />
-              积分交易历史
+              {t('transactionHistory')}
             </CardTitle>
-            <CardDescription>您的最近积分活动</CardDescription>
+            <CardDescription>{t('recentActivityDesc')}</CardDescription>
           </div>
           <Link href="/credits/history">
             <Button variant="outline" size="sm">
-              查看全部
+              {t('viewAll')}
             </Button>
           </Link>
         </CardHeader>
@@ -518,7 +509,7 @@ function DashboardPageContent() {
           {transactions.length === 0 ? (
             <div className="py-8 text-center text-muted-foreground">
               <History className="mx-auto mb-2 h-8 w-8" />
-              <p>暂无交易记录</p>
+              <p>{t('noTransactions')}</p>
             </div>
           ) : (
             <div className="space-y-3">
@@ -546,7 +537,7 @@ function DashboardPageContent() {
                       {transaction.amount}
                     </p>
                     <p className="text-muted-foreground text-xs">
-                      余额: {transaction.balanceAfter}
+                      {t('balance', { balance: transaction.balanceAfter })}
                     </p>
                   </div>
                 </div>
@@ -576,12 +567,12 @@ function DashboardPageContent() {
             </Link>
             <Link href="/batch-image-generation">
               <Button variant="outline" className="w-full" size="sm">
-                批量生图
+                {t('batchImageGeneration')}
               </Button>
             </Link>
             <Link href="/batch-video-generation">
               <Button variant="outline" className="w-full" size="sm">
-                批量生视频
+                {t('batchVideoGeneration')}
               </Button>
             </Link>
           </div>
