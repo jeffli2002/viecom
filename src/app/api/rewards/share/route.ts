@@ -89,23 +89,21 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    // Create share record and award credits in a transaction
-    const result = await db.transaction(async (tx) => {
-      const shareId = randomUUID();
-      const shareReferenceId = referenceId || `share_${userId}_${Date.now()}`;
+    const shareId = randomUUID();
+    const shareReferenceId = referenceId || `share_${userId}_${Date.now()}`;
 
-      // Create share record
-      await tx.insert(socialShares).values({
-        id: shareId,
-        userId,
-        assetId: assetId || null,
-        platform,
-        shareUrl: shareUrl || null,
-        creditsEarned: creditsToAward,
-        referenceId: shareReferenceId,
-      });
+    // Create share record first; if credit awarding fails we remove the record.
+    await db.insert(socialShares).values({
+      id: shareId,
+      userId,
+      assetId: assetId || null,
+      platform,
+      shareUrl: shareUrl || null,
+      creditsEarned: creditsToAward,
+      referenceId: shareReferenceId,
+    });
 
-      // Award credits
+    try {
       await creditService.earnCredits({
         userId,
         amount: creditsToAward,
@@ -124,14 +122,20 @@ export async function POST(request: NextRequest) {
           rewardType,
         },
       });
+    } catch (creditError) {
+      // Cleanup share record if credit award fails to keep data consistent.
+      await db
+        .delete(socialShares)
+        .where(eq(socialShares.id, shareId));
+      throw creditError;
+    }
 
-      return {
-        shareId,
-        platform,
-        creditsEarned: creditsToAward,
-        rewardType,
-      };
-    });
+    const result = {
+      shareId,
+      platform,
+      creditsEarned: creditsToAward,
+      rewardType,
+    };
 
     return NextResponse.json({
       success: true,
