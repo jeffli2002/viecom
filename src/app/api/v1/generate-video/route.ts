@@ -326,7 +326,10 @@ export async function POST(request: NextRequest) {
         try {
           await r2StorageService.deleteFile(r2Result.key);
         } catch (cleanupError) {
-          console.error('Failed to clean up video asset after credit charge failure:', cleanupError);
+          console.error(
+            'Failed to clean up video asset after credit charge failure:',
+            cleanupError
+          );
         }
         const isInsufficient =
           error instanceof Error && error.message.includes('Insufficient credits');

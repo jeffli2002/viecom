@@ -108,7 +108,7 @@ export function Hero() {
           <span className="text-sm font-medium">{t('badge')}</span>
         </div>
 
-        <h1 
+        <h1
           ref={h1Ref}
           style={{
             fontSize: headingFontSize,

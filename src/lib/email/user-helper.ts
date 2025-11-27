@@ -8,7 +8,7 @@ import { eq } from 'drizzle-orm';
 export async function getUserInfo(userId: string): Promise<{ email: string; name: string } | null> {
   try {
     const [userRecord] = await db.select().from(user).where(eq(user.id, userId)).limit(1);
-    
+
     if (!userRecord) {
       return null;
     }
@@ -22,5 +22,3 @@ export async function getUserInfo(userId: string): Promise<{ email: string; name
     return null;
   }
 }
-
-

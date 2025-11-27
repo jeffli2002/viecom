@@ -1,10 +1,10 @@
 import { resolve } from 'node:path';
-import { config } from 'dotenv';
-import { drizzle } from 'drizzle-orm/node-postgres';
-import { Pool } from 'pg';
 import { admins } from '@/server/db/schema';
 import bcrypt from 'bcryptjs';
+import { config } from 'dotenv';
 import { eq } from 'drizzle-orm';
+import { drizzle } from 'drizzle-orm/node-postgres';
+import { Pool } from 'pg';
 
 // Load .env.local file before importing env-dependent modules
 config({ path: resolve(process.cwd(), '.env.local') });

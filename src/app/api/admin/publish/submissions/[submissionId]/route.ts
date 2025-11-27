@@ -1,9 +1,9 @@
-import { requireAdmin } from '@/lib/admin/auth';
 import { SHOWCASE_CATEGORIES } from '@/config/showcase.config';
+import { requireAdmin } from '@/lib/admin/auth';
 import { db } from '@/server/db';
 import { publishSubmissions } from '@/server/db/schema';
 import { eq, sql } from 'drizzle-orm';
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 
 export const dynamic = 'force-dynamic';
 export const fetchCache = 'force-no-store';
@@ -28,14 +28,8 @@ export async function PATCH(
     }
 
     const body = await request.json();
-    const {
-      status,
-      publishToLanding,
-      publishToShowcase,
-      category,
-      adminNotes,
-      rejectionReason,
-    } = body ?? {};
+    const { status, publishToLanding, publishToShowcase, category, adminNotes, rejectionReason } =
+      body ?? {};
 
     if (status !== 'approved' && status !== 'rejected') {
       return NextResponse.json({ error: 'Invalid status update' }, { status: 400 });

@@ -3,9 +3,6 @@
 import UpgradePrompt from '@/components/auth/UpgradePrompt';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { GenerationProgressBar } from '@/components/ui/generation-progress';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -14,6 +11,9 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { GenerationProgressBar } from '@/components/ui/generation-progress';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import {
   Select,
   SelectContent,
@@ -24,8 +24,8 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
 import { creditsConfig } from '@/config/credits.config';
-import { VIDEO_STYLES, getVideoStyle } from '@/config/styles.config';
 import { SHARE_REWARD_CONFIG, type ShareRewardKey } from '@/config/share.config';
+import { VIDEO_STYLES, getVideoStyle } from '@/config/styles.config';
 import { useGenerationProgress } from '@/hooks/use-generation-progress';
 import { useUpgradePrompt } from '@/hooks/use-upgrade-prompt';
 import type { BrandToneAnalysis } from '@/lib/brand/brand-tone-analyzer';
@@ -496,9 +496,7 @@ export default function VideoGenerator() {
       if (!platform) return;
       const encodedUrl = encodeURIComponent(result.videoUrl);
       if (platform.requiresCopy) {
-        const copied = await copyVideoLink(
-          t('shareCopyReminder', { platform: platform.label })
-        );
+        const copied = await copyVideoLink(t('shareCopyReminder', { platform: platform.label }));
         if (!copied) return;
       }
       if (platform.buildUrl) {
@@ -1045,7 +1043,11 @@ export default function VideoGenerator() {
                   </div>
                   {awaitingPublishConfirmation && (
                     <div className="rounded-lg border border-teal-200 bg-teal-50 dark:border-teal-800 dark:bg-teal-900/20 p-4 flex flex-col gap-3 text-sm text-slate-700 dark:text-slate-200">
-                      <p>{t('sharePublishPending', { credits: SHARE_REWARD_CONFIG.publishViecom.credits })}</p>
+                      <p>
+                        {t('sharePublishPending', {
+                          credits: SHARE_REWARD_CONFIG.publishViecom.credits,
+                        })}
+                      </p>
                       <Button
                         size="sm"
                         onClick={handleConfirmPublish}

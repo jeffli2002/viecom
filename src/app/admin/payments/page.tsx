@@ -241,9 +241,7 @@ export default function AdminPaymentsPage() {
                     <td className="py-3 px-4 text-sm capitalize">
                       {payment.type.replace('_', ' ')}
                     </td>
-                    <td className="py-3 px-4 text-sm font-medium">
-                      ${payment.amount.toFixed(2)}
-                    </td>
+                    <td className="py-3 px-4 text-sm font-medium">${payment.amount.toFixed(2)}</td>
                     <td className="py-3 px-4 text-sm">{payment.currency}</td>
                     <td className="py-3 px-4 text-sm">
                       {payment.credits ? `${payment.credits.toLocaleString()} credits` : '--'}

@@ -7,7 +7,14 @@ export interface SharePlatform {
   id: SharePlatformId;
   label: string;
   icon: LucideIcon;
-  platformValue: 'twitter' | 'facebook' | 'instagram' | 'linkedin' | 'pinterest' | 'tiktok' | 'other';
+  platformValue:
+    | 'twitter'
+    | 'facebook'
+    | 'instagram'
+    | 'linkedin'
+    | 'pinterest'
+    | 'tiktok'
+    | 'other';
   buildUrl?: (encodedUrl: string) => string;
   openUrl?: string;
   requiresCopy?: boolean;

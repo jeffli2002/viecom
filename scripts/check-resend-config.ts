@@ -1,6 +1,6 @@
 /**
  * Check Resend Configuration and Webhook Setup
- * 
+ *
  * Usage: pnpm tsx scripts/check-resend-config.ts
  */
 
@@ -13,7 +13,9 @@ console.log('📋 Environment Variables:');
 console.log(`  RESEND_API_KEY: ${env.RESEND_API_KEY ? '✅ Set' : '❌ Missing'}`);
 console.log(`  RESEND_FROM_EMAIL: ${env.RESEND_FROM_EMAIL || '❌ Missing'}`);
 console.log(`  RESEND_FORWARD_TO_EMAIL: ${env.RESEND_FORWARD_TO_EMAIL || '❌ Missing'}`);
-console.log(`  RESEND_WEBHOOK_SECRET: ${env.RESEND_WEBHOOK_SECRET ? '✅ Set (optional)' : '⚠️  Not set (optional)'}`);
+console.log(
+  `  RESEND_WEBHOOK_SECRET: ${env.RESEND_WEBHOOK_SECRET ? '✅ Set (optional)' : '⚠️  Not set (optional)'}`
+);
 console.log(`  NEXT_PUBLIC_APP_URL: ${process.env.NEXT_PUBLIC_APP_URL || '❌ Missing'}\n`);
 
 // Check webhook endpoint
@@ -73,5 +75,3 @@ console.log('   - Check Vercel logs for webhook requests');
 console.log('   - Check Resend Dashboard > Webhooks for delivery status');
 console.log('   - Verify MX record is active and has lowest priority');
 console.log('   - Ensure webhook URL is publicly accessible (not localhost)');
-
-

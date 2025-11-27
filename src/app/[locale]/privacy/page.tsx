@@ -295,14 +295,15 @@ export default function PrivacyPage() {
             <p>
               Viecom is an independent service provider and our platform, features, and services are
               our own proprietary products. We are not affiliated with, endorsed by, or sponsored by
-              these AI model providers. Our product design, user interface, workflow automation, brand
-              analysis features, batch processing capabilities, and overall service experience are
-              developed and owned by Viecom.
+              these AI model providers. Our product design, user interface, workflow automation,
+              brand analysis features, batch processing capabilities, and overall service experience
+              are developed and owned by Viecom.
             </p>
 
             <p>
-              Any references to third-party AI models or services are for identification purposes only
-              and do not imply any partnership, endorsement, or association with those entities.
+              Any references to third-party AI models or services are for identification purposes
+              only and do not imply any partnership, endorsement, or association with those
+              entities.
             </p>
           </CardContent>
         </Card>

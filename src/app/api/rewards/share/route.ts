@@ -22,7 +22,10 @@ export async function POST(request: NextRequest) {
       await request.json();
 
     if (!rewardType || typeof rewardType !== 'string') {
-      return NextResponse.json({ success: false, error: 'rewardType is required' }, { status: 400 });
+      return NextResponse.json(
+        { success: false, error: 'rewardType is required' },
+        { status: 400 }
+      );
     }
 
     const reward = SHARE_REWARD_CONFIG[rewardType as ShareRewardKey];
@@ -124,9 +127,7 @@ export async function POST(request: NextRequest) {
       });
     } catch (creditError) {
       // Cleanup share record if credit award fails to keep data consistent.
-      await db
-        .delete(socialShares)
-        .where(eq(socialShares.id, shareId));
+      await db.delete(socialShares).where(eq(socialShares.id, shareId));
       throw creditError;
     }
 

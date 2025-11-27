@@ -66,9 +66,7 @@ export default function AdminPublishPage() {
         throw new Error('Failed to load submissions');
       }
       const data = await response.json();
-      const entries: SubmissionResponse[] = Array.isArray(data.submissions)
-        ? data.submissions
-        : [];
+      const entries: SubmissionResponse[] = Array.isArray(data.submissions) ? data.submissions : [];
       setSubmissions(entries);
       const defaults: Record<string, SubmissionFormState> = {};
       entries.forEach((item) => {
@@ -92,10 +90,7 @@ export default function AdminPublishPage() {
     void fetchSubmissions();
   }, [fetchSubmissions]);
 
-  const handleFormChange = (
-    submissionId: string,
-    updates: Partial<SubmissionFormState>
-  ) => {
+  const handleFormChange = (submissionId: string, updates: Partial<SubmissionFormState>) => {
     setFormState((prev) => ({
       ...prev,
       [submissionId]: {
@@ -129,9 +124,7 @@ export default function AdminPublishPage() {
           const err = await response.json().catch(() => ({}));
           throw new Error(err?.error || 'Request failed');
         }
-        toast.success(
-          decision === 'approved' ? 'Submission approved' : 'Submission rejected'
-        );
+        toast.success(decision === 'approved' ? 'Submission approved' : 'Submission rejected');
         await fetchSubmissions();
       } catch (error) {
         console.error(error);
@@ -154,9 +147,7 @@ export default function AdminPublishPage() {
   };
 
   const handleReject = (submission: SubmissionResponse) => {
-    const reason = window
-      .prompt('Provide a rejection reason for the creator:')
-      ?.trim();
+    const reason = window.prompt('Provide a rejection reason for the creator:')?.trim();
     sendDecision(submission.id, 'rejected', {
       ...formState[submission.id],
       rejectionReason: reason || 'Not approved for showcase.',
@@ -254,10 +245,7 @@ export default function AdminPublishPage() {
                       {submission.user?.email || 'Unknown'}
                     </span>
                   </p>
-                  <p>
-                    Created at{' '}
-                    {new Date(submission.createdAt).toLocaleString()}
-                  </p>
+                  <p>Created at {new Date(submission.createdAt).toLocaleString()}</p>
                 </div>
                 <div className="grid gap-4 md:grid-cols-2">
                   <label className="flex items-center gap-3 rounded-lg border border-slate-200 p-3 text-sm">
@@ -307,9 +295,7 @@ export default function AdminPublishPage() {
                     <input
                       className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm"
                       value={form.notes}
-                      onChange={(e) =>
-                        handleFormChange(submission.id, { notes: e.target.value })
-                      }
+                      onChange={(e) => handleFormChange(submission.id, { notes: e.target.value })}
                       placeholder="Optional notes for audit log"
                     />
                   </div>
@@ -651,9 +637,7 @@ function LandingShowcaseConfigurator() {
     <section className="rounded-2xl border border-slate-200 bg-white p-6 space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
-          <p className="text-sm uppercase tracking-widest text-teal-500">
-            Landing Page Showcase
-          </p>
+          <p className="text-sm uppercase tracking-widest text-teal-500">Landing Page Showcase</p>
           <h2 className="text-2xl font-bold text-slate-900">Featured slots</h2>
           <p className="text-sm text-slate-500">
             Upload custom creatives, reorder highlights, and control visibility.
@@ -681,9 +665,7 @@ function LandingShowcaseConfigurator() {
                 (isSubmission &&
                   (item.data as SubmissionResponse).assetUrl.match(/\\.mp4$|\\.webm$|\\.mov$/i));
               const adminIndex =
-                item.type === 'admin'
-                  ? entries.findIndex((entry) => entry.id === item.id)
-                  : -1;
+                item.type === 'admin' ? entries.findIndex((entry) => entry.id === item.id) : -1;
               const isDraggable = !isSubmission && adminIndex >= 0;
               return (
                 <div
@@ -732,7 +714,11 @@ function LandingShowcaseConfigurator() {
                         autoPlay
                       />
                     ) : (
-                      <img src={previewUrl} alt={item.title} className="h-full w-full object-cover" />
+                      <img
+                        src={previewUrl}
+                        alt={item.title}
+                        className="h-full w-full object-cover"
+                      />
                     )}
                   </div>
                   <div className="flex-1 px-2 py-1 text-center text-xs font-semibold text-slate-700">
@@ -800,17 +786,9 @@ function LandingShowcaseConfigurator() {
                 {previewUrl || form.imageUrl ? (
                   <div className="mt-4 w-full overflow-hidden rounded-lg border border-slate-200 bg-white">
                     {previewUrl ? (
-                      <img
-                        src={previewUrl}
-                        alt="Preview"
-                        className="h-48 w-full object-cover"
-                      />
+                      <img src={previewUrl} alt="Preview" className="h-48 w-full object-cover" />
                     ) : form.imageUrl ? (
-                      <img
-                        src={form.imageUrl}
-                        alt="Preview"
-                        className="h-48 w-full object-cover"
-                      />
+                      <img src={form.imageUrl} alt="Preview" className="h-48 w-full object-cover" />
                     ) : null}
                   </div>
                 ) : (

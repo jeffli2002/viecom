@@ -13,17 +13,14 @@ const parsePurchaseMetadata = (metadata: string | null) => {
     const parsed = JSON.parse(metadata) as Record<string, unknown>;
     const productId = typeof parsed.productId === 'string' ? parsed.productId : undefined;
     const creditsValue =
-      typeof parsed.credits === 'number'
-        ? parsed.credits
-        : Number(parsed.credits) || undefined;
+      typeof parsed.credits === 'number' ? parsed.credits : Number(parsed.credits) || undefined;
     const pack =
       paymentConfig.creditPacks.find((pack) => pack.creemProductKey === productId) ||
       (typeof creditsValue === 'number'
         ? paymentConfig.creditPacks.find((pack) => pack.credits === creditsValue)
         : undefined);
     const rawAmount = Number(parsed.amount);
-    const amount =
-      Number.isFinite(rawAmount) && rawAmount > 0 ? rawAmount : pack?.price ?? 0;
+    const amount = Number.isFinite(rawAmount) && rawAmount > 0 ? rawAmount : (pack?.price ?? 0);
     return {
       amount,
       currency: typeof parsed.currency === 'string' ? parsed.currency : 'USD',
@@ -136,8 +133,7 @@ export async function GET(request: Request) {
     );
 
     const transactionsCount = creditPackPayments.length;
-    const averageTransaction =
-      transactionsCount > 0 ? revenueInRange / transactionsCount : 0;
+    const averageTransaction = transactionsCount > 0 ? revenueInRange / transactionsCount : 0;
 
     const trendMap = new Map<
       string,
@@ -156,9 +152,7 @@ export async function GET(request: Request) {
       trendMap.set(dateKey, entry);
     });
 
-    const trend = Array.from(trendMap.values()).sort((a, b) =>
-      a.date.localeCompare(b.date)
-    );
+    const trend = Array.from(trendMap.values()).sort((a, b) => a.date.localeCompare(b.date));
 
     const response = NextResponse.json({
       summary: {

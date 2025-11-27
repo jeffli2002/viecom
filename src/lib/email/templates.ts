@@ -1,5 +1,5 @@
-import { paymentConfig } from '@/config/payment.config';
 import { creditsConfig } from '@/config/credits.config';
+import { paymentConfig } from '@/config/payment.config';
 
 const APP_NAME = 'Viecom';
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://www.viecom.pro';
@@ -39,14 +39,17 @@ function baseTemplate(content: string, footerText?: string): string {
           <!-- Footer -->
           <tr>
             <td style="padding: 20px; text-align: center; border-top: 1px solid #e5e7eb; color: #6b7280; font-size: 14px;">
-              ${footerText || `
+              ${
+                footerText ||
+                `
                 <p style="margin: 0 0 10px 0;">
                   Need help? Contact us at <a href="mailto:${SUPPORT_EMAIL}" style="color: #14b8a6; text-decoration: none;">${SUPPORT_EMAIL}</a>
                 </p>
                 <p style="margin: 0;">
                   © ${new Date().getFullYear()} ${APP_NAME}. All rights reserved.
                 </p>
-              `}
+              `
+              }
             </td>
           </tr>
         </table>
@@ -182,7 +185,8 @@ export function getSubscriptionUpgradedEmailTemplate(
   effectiveDate: Date
 ): string {
   const billingPeriod = interval === 'year' ? 'year' : 'month';
-  const displayPrice = interval === 'year' ? (newPlanPrice / 12).toFixed(2) : newPlanPrice.toFixed(2);
+  const displayPrice =
+    interval === 'year' ? (newPlanPrice / 12).toFixed(2) : newPlanPrice.toFixed(2);
 
   const content = `
     <h2 style="color: #111827; margin: 0 0 20px 0; font-size: 24px;">Subscription Upgraded! ⬆️</h2>
@@ -245,7 +249,8 @@ export function getSubscriptionDowngradedEmailTemplate(
   effectiveDate: Date
 ): string {
   const billingPeriod = interval === 'year' ? 'year' : 'month';
-  const displayPrice = interval === 'year' ? (newPlanPrice / 12).toFixed(2) : newPlanPrice.toFixed(2);
+  const displayPrice =
+    interval === 'year' ? (newPlanPrice / 12).toFixed(2) : newPlanPrice.toFixed(2);
 
   const content = `
     <h2 style="color: #111827; margin: 0 0 20px 0; font-size: 24px;">Subscription Changed ⬇️</h2>
@@ -404,5 +409,3 @@ export function getCreditPackPurchaseEmailTemplate(
 
   return baseTemplate(content);
 }
-
-

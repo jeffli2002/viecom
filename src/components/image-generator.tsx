@@ -3,9 +3,6 @@
 import UpgradePrompt from '@/components/auth/UpgradePrompt';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { GenerationProgressBar } from '@/components/ui/generation-progress';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -14,6 +11,9 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { GenerationProgressBar } from '@/components/ui/generation-progress';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import {
   Select,
   SelectContent,
@@ -24,13 +24,13 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
 import { creditsConfig } from '@/config/credits.config';
-import { IMAGE_STYLES, getImageStyle } from '@/config/styles.config';
 import {
   ALLOWED_SOURCE_IMAGE_MIME_TYPES,
-  MAX_SOURCE_IMAGE_FILE_SIZE_BYTES,
   MAX_SOURCE_IMAGES,
+  MAX_SOURCE_IMAGE_FILE_SIZE_BYTES,
 } from '@/config/image-upload.config';
 import { SHARE_REWARD_CONFIG, type ShareRewardKey } from '@/config/share.config';
+import { IMAGE_STYLES, getImageStyle } from '@/config/styles.config';
 import { useGenerationProgress } from '@/hooks/use-generation-progress';
 import { useUpgradePrompt } from '@/hooks/use-upgrade-prompt';
 import type { BrandToneAnalysis } from '@/lib/brand/brand-tone-analyzer';
@@ -97,7 +97,9 @@ const MAX_SOURCE_IMAGE_SIZE_LABEL = `${formatBytesToMb(MAX_SOURCE_IMAGE_FILE_SIZ
 const SOURCE_IMAGE_ACCEPT = ALLOWED_SOURCE_IMAGE_MIME_TYPES.join(',');
 const ALLOWED_SOURCE_IMAGE_TYPE_SET = new Set<string>(ALLOWED_SOURCE_IMAGE_MIME_TYPES);
 
-const parseJsonResponse = async <T,>(response: Response): Promise<{
+const parseJsonResponse = async <T,>(
+  response: Response
+): Promise<{
   data: T | null;
   rawText: string;
 }> => {
@@ -298,9 +300,7 @@ export default function ImageGenerator() {
   };
 
   const updateSourceImage = (imageId: string, updater: (image: SourceImage) => SourceImage) => {
-    setSourceImages((prev) =>
-      prev.map((image) => (image.id === imageId ? updater(image) : image))
-    );
+    setSourceImages((prev) => prev.map((image) => (image.id === imageId ? updater(image) : image)));
   };
 
   const readSourceImagePreview = (file: File, imageId: string) => {
@@ -868,9 +868,7 @@ export default function ImageGenerator() {
       if (!platform) return;
       const encodedUrl = encodeURIComponent(result.imageUrl);
       if (platform.requiresCopy) {
-        const copied = await copyShareLink(
-          t('shareCopyReminder', { platform: platform.label })
-        );
+        const copied = await copyShareLink(t('shareCopyReminder', { platform: platform.label }));
         if (!copied) return;
       }
       if (platform.buildUrl) {
@@ -998,591 +996,597 @@ export default function ImageGenerator() {
   return (
     <div className="px-4 py-8 lg:px-8">
       <div className="mx-auto max-w-7xl">
-      <Tabs value={mode} onValueChange={(v) => setMode(v as GenerationMode)} className="w-full">
-        <TabsList className="mx-auto mb-8 grid w-full max-w-md grid-cols-2 bg-transparent gap-3 p-0">
-          <TabsTrigger
-            value="text-to-image"
-            className="font-medium data-[state=active]:bg-teal-500 data-[state=active]:text-white data-[state=inactive]:border-2 data-[state=inactive]:border-slate-300 dark:data-[state=inactive]:border-slate-700 data-[state=inactive]:rounded-full data-[state=inactive]:bg-white dark:data-[state=inactive]:bg-slate-900 data-[state=inactive]:text-slate-700 dark:data-[state=inactive]:text-slate-300 rounded-full py-3 transition-all"
-          >
-            <Sparkles className="mr-2 h-4 w-4" />
-            {t('modeTextToImage')}
-          </TabsTrigger>
-          <TabsTrigger
-            value="image-to-image"
-            className="font-medium data-[state=active]:bg-teal-500 data-[state=active]:text-white data-[state=inactive]:border-2 data-[state=inactive]:border-slate-300 dark:data-[state=inactive]:border-slate-700 data-[state=inactive]:rounded-full data-[state=inactive]:bg-white dark:data-[state=inactive]:bg-slate-900 data-[state=inactive]:text-slate-700 dark:data-[state=inactive]:text-slate-300 rounded-full py-3 transition-all"
-          >
-            <ImageIcon className="mr-2 h-4 w-4" />
-            {t('modeImageToImage')}
-          </TabsTrigger>
-        </TabsList>
+        <Tabs value={mode} onValueChange={(v) => setMode(v as GenerationMode)} className="w-full">
+          <TabsList className="mx-auto mb-8 grid w-full max-w-md grid-cols-2 bg-transparent gap-3 p-0">
+            <TabsTrigger
+              value="text-to-image"
+              className="font-medium data-[state=active]:bg-teal-500 data-[state=active]:text-white data-[state=inactive]:border-2 data-[state=inactive]:border-slate-300 dark:data-[state=inactive]:border-slate-700 data-[state=inactive]:rounded-full data-[state=inactive]:bg-white dark:data-[state=inactive]:bg-slate-900 data-[state=inactive]:text-slate-700 dark:data-[state=inactive]:text-slate-300 rounded-full py-3 transition-all"
+            >
+              <Sparkles className="mr-2 h-4 w-4" />
+              {t('modeTextToImage')}
+            </TabsTrigger>
+            <TabsTrigger
+              value="image-to-image"
+              className="font-medium data-[state=active]:bg-teal-500 data-[state=active]:text-white data-[state=inactive]:border-2 data-[state=inactive]:border-slate-300 dark:data-[state=inactive]:border-slate-700 data-[state=inactive]:rounded-full data-[state=inactive]:bg-white dark:data-[state=inactive]:bg-slate-900 data-[state=inactive]:text-slate-700 dark:data-[state=inactive]:text-slate-300 rounded-full py-3 transition-all"
+            >
+              <ImageIcon className="mr-2 h-4 w-4" />
+              {t('modeImageToImage')}
+            </TabsTrigger>
+          </TabsList>
 
-        <div className="grid gap-8 lg:grid-cols-2">
-          <div className="space-y-6">
-            <TabsContent value="text-to-image" className="mt-0 space-y-6">
-              {brandAnalysis && (
-                <div className="rounded-lg border border-teal-200 dark:border-teal-800 bg-teal-50 dark:bg-teal-900/20 p-3">
-                  <div className="flex items-center gap-2">
-                    <Sparkles className="h-4 w-4 text-teal-500" />
-                    <span className="text-sm font-medium text-slate-900 dark:text-white">
-                      Brand context will be automatically applied to your generation
-                    </span>
-                  </div>
-                  <p className="mt-1 text-xs text-slate-700 dark:text-slate-300">
-                    Style: {brandAnalysis.styleKeywords.slice(0, 3).join(', ')}
-                    {brandAnalysis.styleKeywords.length > 3 && '...'}
-                  </p>
-                </div>
-              )}
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <Label className="font-light text-gray-700 text-sm">
-                    {t('imageDescription')}
-                  </Label>
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    className="h-7 text-xs text-teal-500 hover:text-slate-700 dark:text-slate-300"
-                    onClick={handleClearPrompt}
-                  >
-                    <Eraser className="mr-1 h-3.5 w-3.5" />
-                    {t('clearPrompt')}
-                  </Button>
-                </div>
-                <div className="relative">
-                  <Textarea
-                    placeholder={textDefaultPrompt}
-                    value={prompt}
-                    onChange={(e) => setPrompt(e.target.value.slice(0, maxPromptLength))}
-                    rows={8}
-                    ref={promptTextareaRef}
-                    className="resize-none border-gray-200 pr-24 pb-12 font-light focus:border-teal-500 focus:ring-teal-500/20"
-                  />
-                  <Button
-                    onClick={handleEnhancePrompt}
-                    disabled={isEnhancing || !prompt.trim()}
-                    size="sm"
-                    variant="outline"
-                    className="absolute right-2 bottom-2 inline-flex items-center gap-2 rounded-lg border-2 border-teal-500 bg-teal-50 dark:bg-teal-900/20 px-3 py-1.5 font-medium text-slate-700 dark:text-slate-300 text-sm shadow-sm transition-all duration-300 hover:bg-teal-100 dark:bg-teal-900/30"
-                  >
-                    {isEnhancing ? (
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                    ) : (
-                      <Sparkles className="h-4 w-4" />
-                    )}
-                    {isEnhancing ? t('enhancing') : t('enhance')}
-                  </Button>
-                </div>
-                <div className="text-right font-light text-gray-400 text-xs">
-                  {prompt.length} / {maxPromptLength}
-                </div>
-                {enhancedPrompt && (
-                  <div className="mt-4 rounded-xl border border-teal-200 dark:border-teal-800 bg-teal-50 dark:bg-teal-900/20 p-4 shadow-sm">
-                    <div className="mb-2 flex items-center justify-between">
-                      <h4 className="flex items-center gap-2 font-semibold text-slate-700 dark:text-slate-300 text-sm">
-                        <Sparkles className="h-4 w-4" />
-                        {t('enhancedPrompt')}
-                      </h4>
-                      <div className="flex items-center gap-1">
-                        <Button
-                          onClick={handleCopyEnhancedPrompt}
-                          size="sm"
-                          variant="ghost"
-                          className="h-6 w-6 p-0 text-gray-600 hover:text-slate-700 dark:text-slate-300"
-                          title={t('copyAll') || 'Copy all'}
-                        >
-                          <Copy className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          onClick={() => setEnhancedPrompt('')}
-                          size="sm"
-                          variant="ghost"
-                          className="h-6 w-6 p-0 text-gray-600"
-                        >
-                          <X className="h-4 w-4" />
-                        </Button>
-                      </div>
+          <div className="grid gap-8 lg:grid-cols-2">
+            <div className="space-y-6">
+              <TabsContent value="text-to-image" className="mt-0 space-y-6">
+                {brandAnalysis && (
+                  <div className="rounded-lg border border-teal-200 dark:border-teal-800 bg-teal-50 dark:bg-teal-900/20 p-3">
+                    <div className="flex items-center gap-2">
+                      <Sparkles className="h-4 w-4 text-teal-500" />
+                      <span className="text-sm font-medium text-slate-900 dark:text-white">
+                        Brand context will be automatically applied to your generation
+                      </span>
                     </div>
-                    <Textarea
-                      value={enhancedPrompt}
-                      onChange={(e) => setEnhancedPrompt(e.target.value.slice(0, maxPromptLength))}
-                      className="resize-none border border-teal-200 dark:border-teal-800 bg-white text-sm"
-                      rows={5}
-                    />
-                    <p className="mt-1 text-right text-teal-500 text-xs">
-                      {enhancedPrompt.length} / {maxPromptLength}
+                    <p className="mt-1 text-xs text-slate-700 dark:text-slate-300">
+                      Style: {brandAnalysis.styleKeywords.slice(0, 3).join(', ')}
+                      {brandAnalysis.styleKeywords.length > 3 && '...'}
                     </p>
                   </div>
                 )}
-              </div>
-            </TabsContent>
-
-            <TabsContent value="image-to-image" className="mt-0 space-y-6">
-              <div className="space-y-2">
-                <Label className="font-light text-gray-700 text-sm">
-                  {t('sourceImage')}{' '}
-                  <span className="text-gray-400">(up to {MAX_SOURCE_IMAGES})</span>
-                </Label>
-
-                <div
-                  className="rounded-xl border border-dashed border-gray-300 p-4 transition-colors hover:border-teal-500"
-                  onDragOver={handleDragOver}
-                  onDrop={handleDrop}
-                >
-                  {sourceImages.length === 0 ? (
-                    <button
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <Label className="font-light text-gray-700 text-sm">
+                      {t('imageDescription')}
+                    </Label>
+                    <Button
                       type="button"
-                      className="hover-card cursor-pointer rounded-xl border border-dashed border-gray-300 p-8 text-center transition-colors hover:border-teal-500 w-full"
-                      onClick={triggerFileInput}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter' || e.key === ' ') {
-                          e.preventDefault();
-                          triggerFileInput();
-                        }
-                      }}
+                      variant="ghost"
+                      size="sm"
+                      className="h-7 text-xs text-teal-500 hover:text-slate-700 dark:text-slate-300"
+                      onClick={handleClearPrompt}
                     >
-                      <Upload className="mx-auto mb-3 h-12 w-12 text-gray-400" />
-                      <p className="mb-1 font-light text-gray-600 text-sm">{t('clickToUpload')}</p>
-                      <p className="font-light text-gray-400 text-xs">{t('imageFormatDesc')}</p>
-                      <p className="mt-2 text-xs text-gray-400">{t('dragDropUpload')}</p>
-                    </button>
-                  ) : (
-                    <div className="grid gap-4 sm:grid-cols-2">
-                      {sourceImages.map((image, idx) => {
-                        const previewSrc = image.dataUrl || image.remoteUrl || '';
-                        return (
-                          <div key={image.id} className="relative w-full">
-                            <button
-                              type="button"
-                              className="group w-full overflow-hidden rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-teal-500"
-                              onClick={() => {
-                                if (!previewSrc) return;
-                                setLightboxImage({
-                                  url: previewSrc,
-                                  alt: image.name || `Source image ${idx + 1}`,
-                                });
-                              }}
-                              disabled={!previewSrc}
-                            >
-                              {previewSrc ? (
-                                <img
-                                  src={previewSrc}
-                                  alt={`Source ${idx + 1}`}
-                                  className="w-full max-h-96 object-contain"
-                                />
-                              ) : (
-                                <div className="flex h-48 w-full items-center justify-center bg-slate-100 text-sm text-slate-500">
-                                  Preparing preview...
+                      <Eraser className="mr-1 h-3.5 w-3.5" />
+                      {t('clearPrompt')}
+                    </Button>
+                  </div>
+                  <div className="relative">
+                    <Textarea
+                      placeholder={textDefaultPrompt}
+                      value={prompt}
+                      onChange={(e) => setPrompt(e.target.value.slice(0, maxPromptLength))}
+                      rows={8}
+                      ref={promptTextareaRef}
+                      className="resize-none border-gray-200 pr-24 pb-12 font-light focus:border-teal-500 focus:ring-teal-500/20"
+                    />
+                    <Button
+                      onClick={handleEnhancePrompt}
+                      disabled={isEnhancing || !prompt.trim()}
+                      size="sm"
+                      variant="outline"
+                      className="absolute right-2 bottom-2 inline-flex items-center gap-2 rounded-lg border-2 border-teal-500 bg-teal-50 dark:bg-teal-900/20 px-3 py-1.5 font-medium text-slate-700 dark:text-slate-300 text-sm shadow-sm transition-all duration-300 hover:bg-teal-100 dark:bg-teal-900/30"
+                    >
+                      {isEnhancing ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      ) : (
+                        <Sparkles className="h-4 w-4" />
+                      )}
+                      {isEnhancing ? t('enhancing') : t('enhance')}
+                    </Button>
+                  </div>
+                  <div className="text-right font-light text-gray-400 text-xs">
+                    {prompt.length} / {maxPromptLength}
+                  </div>
+                  {enhancedPrompt && (
+                    <div className="mt-4 rounded-xl border border-teal-200 dark:border-teal-800 bg-teal-50 dark:bg-teal-900/20 p-4 shadow-sm">
+                      <div className="mb-2 flex items-center justify-between">
+                        <h4 className="flex items-center gap-2 font-semibold text-slate-700 dark:text-slate-300 text-sm">
+                          <Sparkles className="h-4 w-4" />
+                          {t('enhancedPrompt')}
+                        </h4>
+                        <div className="flex items-center gap-1">
+                          <Button
+                            onClick={handleCopyEnhancedPrompt}
+                            size="sm"
+                            variant="ghost"
+                            className="h-6 w-6 p-0 text-gray-600 hover:text-slate-700 dark:text-slate-300"
+                            title={t('copyAll') || 'Copy all'}
+                          >
+                            <Copy className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            onClick={() => setEnhancedPrompt('')}
+                            size="sm"
+                            variant="ghost"
+                            className="h-6 w-6 p-0 text-gray-600"
+                          >
+                            <X className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </div>
+                      <Textarea
+                        value={enhancedPrompt}
+                        onChange={(e) =>
+                          setEnhancedPrompt(e.target.value.slice(0, maxPromptLength))
+                        }
+                        className="resize-none border border-teal-200 dark:border-teal-800 bg-white text-sm"
+                        rows={5}
+                      />
+                      <p className="mt-1 text-right text-teal-500 text-xs">
+                        {enhancedPrompt.length} / {maxPromptLength}
+                      </p>
+                    </div>
+                  )}
+                </div>
+              </TabsContent>
+
+              <TabsContent value="image-to-image" className="mt-0 space-y-6">
+                <div className="space-y-2">
+                  <Label className="font-light text-gray-700 text-sm">
+                    {t('sourceImage')}{' '}
+                    <span className="text-gray-400">(up to {MAX_SOURCE_IMAGES})</span>
+                  </Label>
+
+                  <div
+                    className="rounded-xl border border-dashed border-gray-300 p-4 transition-colors hover:border-teal-500"
+                    onDragOver={handleDragOver}
+                    onDrop={handleDrop}
+                  >
+                    {sourceImages.length === 0 ? (
+                      <button
+                        type="button"
+                        className="hover-card cursor-pointer rounded-xl border border-dashed border-gray-300 p-8 text-center transition-colors hover:border-teal-500 w-full"
+                        onClick={triggerFileInput}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
+                            triggerFileInput();
+                          }
+                        }}
+                      >
+                        <Upload className="mx-auto mb-3 h-12 w-12 text-gray-400" />
+                        <p className="mb-1 font-light text-gray-600 text-sm">
+                          {t('clickToUpload')}
+                        </p>
+                        <p className="font-light text-gray-400 text-xs">{t('imageFormatDesc')}</p>
+                        <p className="mt-2 text-xs text-gray-400">{t('dragDropUpload')}</p>
+                      </button>
+                    ) : (
+                      <div className="grid gap-4 sm:grid-cols-2">
+                        {sourceImages.map((image, idx) => {
+                          const previewSrc = image.dataUrl || image.remoteUrl || '';
+                          return (
+                            <div key={image.id} className="relative w-full">
+                              <button
+                                type="button"
+                                className="group w-full overflow-hidden rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-teal-500"
+                                onClick={() => {
+                                  if (!previewSrc) return;
+                                  setLightboxImage({
+                                    url: previewSrc,
+                                    alt: image.name || `Source image ${idx + 1}`,
+                                  });
+                                }}
+                                disabled={!previewSrc}
+                              >
+                                {previewSrc ? (
+                                  <img
+                                    src={previewSrc}
+                                    alt={`Source ${idx + 1}`}
+                                    className="w-full max-h-96 object-contain"
+                                  />
+                                ) : (
+                                  <div className="flex h-48 w-full items-center justify-center bg-slate-100 text-sm text-slate-500">
+                                    Preparing preview...
+                                  </div>
+                                )}
+                              </button>
+                              {image.isUploading && (
+                                <div className="absolute inset-0 flex flex-col items-center justify-center rounded-xl bg-black/50 text-white">
+                                  <Loader2 className="mb-2 h-6 w-6 animate-spin" />
+                                  <span className="text-xs">Uploading...</span>
                                 </div>
                               )}
-                            </button>
-                            {image.isUploading && (
-                              <div className="absolute inset-0 flex flex-col items-center justify-center rounded-xl bg-black/50 text-white">
-                                <Loader2 className="mb-2 h-6 w-6 animate-spin" />
-                                <span className="text-xs">Uploading...</span>
-                              </div>
-                            )}
-                            <button
-                              type="button"
-                              onClick={() => handleRemoveImage(image.id)}
-                              className="absolute top-2 right-2 rounded-full bg-red-500 p-2 text-white transition-colors hover:bg-red-600"
-                              aria-label={t('removeSourceImage')}
-                            >
-                              <X className="h-4 w-4" />
-                            </button>
-                            {image.error && (
-                              <p className="mt-2 text-xs text-red-500">{image.error}</p>
-                            )}
-                          </div>
-                        );
-                      })}
-                      {sourceImages.length < MAX_SOURCE_IMAGES && (
-                        <button
-                          type="button"
-                          onClick={triggerFileInput}
-                          className="flex min-h-48 w-full flex-col items-center justify-center rounded-xl border border-dashed border-gray-300 text-gray-500 transition-colors hover:border-teal-500 hover:text-teal-500"
-                        >
-                          <Upload className="mb-2 h-8 w-8" />
-                          <span className="text-sm font-medium">{t('addAnotherImage')}</span>
-                        </button>
+                              <button
+                                type="button"
+                                onClick={() => handleRemoveImage(image.id)}
+                                className="absolute top-2 right-2 rounded-full bg-red-500 p-2 text-white transition-colors hover:bg-red-600"
+                                aria-label={t('removeSourceImage')}
+                              >
+                                <X className="h-4 w-4" />
+                              </button>
+                              {image.error && (
+                                <p className="mt-2 text-xs text-red-500">{image.error}</p>
+                              )}
+                            </div>
+                          );
+                        })}
+                        {sourceImages.length < MAX_SOURCE_IMAGES && (
+                          <button
+                            type="button"
+                            onClick={triggerFileInput}
+                            className="flex min-h-48 w-full flex-col items-center justify-center rounded-xl border border-dashed border-gray-300 text-gray-500 transition-colors hover:border-teal-500 hover:text-teal-500"
+                          >
+                            <Upload className="mb-2 h-8 w-8" />
+                            <span className="text-sm font-medium">{t('addAnotherImage')}</span>
+                          </button>
+                        )}
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="flex items-center justify-between text-xs text-gray-500">
+                    <span>
+                      {t('imagesSelected', { count: sourceImages.length, max: MAX_SOURCE_IMAGES })}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={triggerFileInput}
+                      className="text-teal-500 font-medium hover:underline"
+                    >
+                      {t('uploadImages')}
+                    </button>
+                  </div>
+
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept={SOURCE_IMAGE_ACCEPT}
+                    multiple
+                    onChange={handleImageSelect}
+                    className="hidden"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <Label className="font-light text-gray-700 text-sm">
+                      {t('transformationPrompt')} <span className="text-red-500">*</span>
+                    </Label>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      className="h-7 text-xs text-teal-500 hover:text-slate-700 dark:text-slate-300"
+                      onClick={handleClearPrompt}
+                    >
+                      <Eraser className="mr-1 h-3.5 w-3.5" />
+                      {t('clearPrompt')}
+                    </Button>
+                  </div>
+                  <div className="relative">
+                    <Textarea
+                      placeholder={imageDefaultPrompt}
+                      value={prompt}
+                      onChange={(e) => setPrompt(e.target.value.slice(0, maxPromptLength))}
+                      rows={4}
+                      className="resize-none border-gray-200 pr-24 pb-12 font-light focus:border-teal-500 focus:ring-teal-500/20"
+                      ref={promptTextareaRef}
+                    />
+                    <Button
+                      onClick={handleEnhancePrompt}
+                      disabled={isEnhancing || !prompt.trim()}
+                      size="sm"
+                      variant="outline"
+                      className="absolute right-2 bottom-2 inline-flex items-center gap-2 rounded-lg border-2 border-teal-500 bg-teal-50 dark:bg-teal-900/20 px-3 py-1.5 font-medium text-slate-700 dark:text-slate-300 text-sm shadow-sm transition-all duration-300 hover:bg-teal-100 dark:bg-teal-900/30"
+                    >
+                      {isEnhancing ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      ) : (
+                        <Sparkles className="h-4 w-4" />
                       )}
+                      {isEnhancing ? t('enhancing') : t('enhance')}
+                    </Button>
+                  </div>
+                  <div className="text-right font-light text-gray-400 text-xs">
+                    {prompt.length} / {maxPromptLength}
+                  </div>
+                  {enhancedPrompt && (
+                    <div className="mt-4 rounded-xl border border-teal-200 dark:border-teal-800 bg-teal-50 dark:bg-teal-900/20 p-4 shadow-sm">
+                      <div className="mb-2 flex items-center justify-between">
+                        <h4 className="flex items-center gap-2 font-semibold text-slate-700 dark:text-slate-300 text-sm">
+                          <Sparkles className="h-4 w-4" />
+                          {t('enhancedPrompt')}
+                        </h4>
+                        <div className="flex items-center gap-1">
+                          <Button
+                            onClick={handleCopyEnhancedPrompt}
+                            size="sm"
+                            variant="ghost"
+                            className="h-6 w-6 p-0 text-gray-600 hover:text-slate-700 dark:text-slate-300"
+                            title={t('copyAll') || 'Copy all'}
+                          >
+                            <Copy className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            onClick={() => setEnhancedPrompt('')}
+                            size="sm"
+                            variant="ghost"
+                            className="h-6 w-6 p-0 text-gray-600"
+                          >
+                            <X className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </div>
+                      <Textarea
+                        value={enhancedPrompt}
+                        onChange={(e) =>
+                          setEnhancedPrompt(e.target.value.slice(0, maxPromptLength))
+                        }
+                        className="resize-none border border-teal-200 dark:border-teal-800 bg-white text-sm"
+                        rows={5}
+                      />
+                      <p className="mt-1 text-right text-teal-500 text-xs">
+                        {enhancedPrompt.length} / {maxPromptLength}
+                      </p>
                     </div>
                   )}
                 </div>
+              </TabsContent>
 
-                <div className="flex items-center justify-between text-xs text-gray-500">
-                  <span>
-                    {t('imagesSelected', { count: sourceImages.length, max: MAX_SOURCE_IMAGES })}
-                  </span>
-                  <button
-                    type="button"
-                    onClick={triggerFileInput}
-                    className="text-teal-500 font-medium hover:underline"
-                  >
-                    {t('uploadImages')}
-                  </button>
+              <div className="space-y-2">
+                <Label className="font-light text-gray-700 text-sm">{t('imageStyle')}</Label>
+                <Select value={imageStyle} onValueChange={setImageStyle}>
+                  <SelectTrigger className="border-gray-200 font-light">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {IMAGE_STYLES.map((style) => (
+                      <SelectItem key={style.id} value={style.id} title={style.description}>
+                        {t(`imageStyles.${style.id}`)}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label className="font-light text-gray-700 text-sm">{t('model')}</Label>
+                  <Select value={model} onValueChange={setModel}>
+                    <SelectTrigger className="border-gray-200 font-light">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="nano-banana">
+                        Nano Banana - {creditsConfig.consumption.imageGeneration['nano-banana']}{' '}
+                        credits
+                      </SelectItem>
+                      <SelectItem value="nano-banana-pro">
+                        Nano Banana Pro -{' '}
+                        {creditsConfig.consumption.imageGeneration['nano-banana-pro']} credits
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
 
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  accept={SOURCE_IMAGE_ACCEPT}
-                  multiple
-                  onChange={handleImageSelect}
-                  className="hidden"
-                />
+                <div className="space-y-2">
+                  <Label className="font-light text-gray-700 text-sm">{t('aspectRatio')}</Label>
+                  <Select value={aspectRatio} onValueChange={setAspectRatio}>
+                    <SelectTrigger className="border-gray-200 font-light">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="1:1">{t('aspectRatioSquare')}</SelectItem>
+                      <SelectItem value="16:9">{t('aspectRatioLandscape')}</SelectItem>
+                      <SelectItem value="9:16">{t('aspectRatioPortrait')}</SelectItem>
+                      <SelectItem value="4:3">{t('aspectRatioStandard')}</SelectItem>
+                      <SelectItem value="3:2">{t('aspectRatioPhoto')}</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
 
               <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <Label className="font-light text-gray-700 text-sm">
-                    {t('transformationPrompt')} <span className="text-red-500">*</span>
-                  </Label>
-                  <Button
+                <Label className="font-light text-gray-700 text-sm">{t('outputFormat')}</Label>
+                <div className="grid grid-cols-2 gap-3">
+                  <button
                     type="button"
-                    variant="ghost"
-                    size="sm"
-                    className="h-7 text-xs text-teal-500 hover:text-slate-700 dark:text-slate-300"
-                    onClick={handleClearPrompt}
+                    onClick={() => setOutputFormat('PNG')}
+                    className={`flex items-center justify-center rounded-lg border-2 py-3 px-4 text-sm font-medium transition-all ${
+                      outputFormat === 'PNG'
+                        ? 'border-teal-500 bg-teal-50 dark:bg-teal-900/20 text-slate-700 dark:text-slate-300'
+                        : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-gray-700 hover:border-teal-500'
+                    }`}
                   >
-                    <Eraser className="mr-1 h-3.5 w-3.5" />
-                    {t('clearPrompt')}
-                  </Button>
-                </div>
-                <div className="relative">
-                  <Textarea
-                    placeholder={imageDefaultPrompt}
-                    value={prompt}
-                    onChange={(e) => setPrompt(e.target.value.slice(0, maxPromptLength))}
-                    rows={4}
-                    className="resize-none border-gray-200 pr-24 pb-12 font-light focus:border-teal-500 focus:ring-teal-500/20"
-                    ref={promptTextareaRef}
-                  />
-                  <Button
-                    onClick={handleEnhancePrompt}
-                    disabled={isEnhancing || !prompt.trim()}
-                    size="sm"
-                    variant="outline"
-                    className="absolute right-2 bottom-2 inline-flex items-center gap-2 rounded-lg border-2 border-teal-500 bg-teal-50 dark:bg-teal-900/20 px-3 py-1.5 font-medium text-slate-700 dark:text-slate-300 text-sm shadow-sm transition-all duration-300 hover:bg-teal-100 dark:bg-teal-900/30"
-                  >
-                    {isEnhancing ? (
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                    ) : (
-                      <Sparkles className="h-4 w-4" />
+                    <span>PNG</span>
+                    {outputFormat === 'PNG' && (
+                      <svg
+                        className="ml-2 h-4 w-4"
+                        fill="currentColor"
+                        viewBox="0 0 20 20"
+                        role="img"
+                        aria-label="Selected format"
+                      >
+                        <title>Selected format</title>
+                        <path
+                          fillRule="evenodd"
+                          d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
                     )}
-                    {isEnhancing ? t('enhancing') : t('enhance')}
-                  </Button>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setOutputFormat('JPEG')}
+                    className={`flex items-center justify-center rounded-lg border-2 py-3 px-4 text-sm font-medium transition-all ${
+                      outputFormat === 'JPEG'
+                        ? 'border-teal-500 bg-teal-50 dark:bg-teal-900/20 text-slate-700 dark:text-slate-300'
+                        : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-gray-700 hover:border-teal-500'
+                    }`}
+                  >
+                    <span>JPEG</span>
+                    {outputFormat === 'JPEG' && (
+                      <svg
+                        className="ml-2 h-4 w-4"
+                        fill="currentColor"
+                        viewBox="0 0 20 20"
+                        role="img"
+                        aria-label="Selected format"
+                      >
+                        <title>Selected format</title>
+                        <path
+                          fillRule="evenodd"
+                          d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                    )}
+                  </button>
                 </div>
-                <div className="text-right font-light text-gray-400 text-xs">
-                  {prompt.length} / {maxPromptLength}
-                </div>
-                {enhancedPrompt && (
-                  <div className="mt-4 rounded-xl border border-teal-200 dark:border-teal-800 bg-teal-50 dark:bg-teal-900/20 p-4 shadow-sm">
-                    <div className="mb-2 flex items-center justify-between">
-                      <h4 className="flex items-center gap-2 font-semibold text-slate-700 dark:text-slate-300 text-sm">
-                        <Sparkles className="h-4 w-4" />
-                        {t('enhancedPrompt')}
-                      </h4>
-                      <div className="flex items-center gap-1">
-                        <Button
-                          onClick={handleCopyEnhancedPrompt}
-                          size="sm"
-                          variant="ghost"
-                          className="h-6 w-6 p-0 text-gray-600 hover:text-slate-700 dark:text-slate-300"
-                          title={t('copyAll') || 'Copy all'}
-                        >
-                          <Copy className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          onClick={() => setEnhancedPrompt('')}
-                          size="sm"
-                          variant="ghost"
-                          className="h-6 w-6 p-0 text-gray-600"
-                        >
-                          <X className="h-4 w-4" />
-                        </Button>
-                      </div>
+              </div>
+
+              <Button
+                onClick={handleGenerate}
+                disabled={isGenerating || !canGenerate}
+                className="w-full btn-primary"
+                size="lg"
+              >
+                {isGenerating ? (
+                  <>
+                    <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                    {t('generating')}
+                  </>
+                ) : (
+                  <>
+                    <ImageIcon className="mr-2 h-5 w-5" />
+                    {t('generateImage')}
+                  </>
+                )}
+              </Button>
+            </div>
+
+            <div className="lg:sticky lg:top-24 lg:h-fit">
+              <Card className="p-6">
+                {!result && !isGenerating && (
+                  <div className="flex aspect-square items-center justify-center rounded-xl bg-slate-100 dark:bg-slate-800">
+                    <div className="space-y-3 text-center">
+                      <ImageIcon className="mx-auto h-16 w-16 text-slate-400 dark:text-slate-500" />
+                      <p className="font-light text-slate-500 dark:text-slate-400 text-sm">
+                        {t('imageWillAppearHere')}
+                      </p>
                     </div>
-                    <Textarea
-                      value={enhancedPrompt}
-                      onChange={(e) => setEnhancedPrompt(e.target.value.slice(0, maxPromptLength))}
-                      className="resize-none border border-teal-200 dark:border-teal-800 bg-white text-sm"
-                      rows={5}
-                    />
-                    <p className="mt-1 text-right text-teal-500 text-xs">
-                      {enhancedPrompt.length} / {maxPromptLength}
+                  </div>
+                )}
+
+                {isGenerating && (
+                  <div className="flex aspect-square flex-col items-center justify-center rounded-xl bg-slate-100 dark:bg-slate-800 p-6 text-center">
+                    <Loader2 className="mb-4 h-12 w-12 animate-spin text-teal-500" />
+                    <p className="font-medium text-slate-700 dark:text-slate-300">
+                      {progressMessage || t('generatingImage')}
+                    </p>
+                    <div className="mt-4 w-full max-w-xs space-y-2">
+                      <GenerationProgressBar value={progressValue} />
+                      <p className="text-xs font-medium text-slate-500 dark:text-slate-400">
+                        {Math.round(progressValue)}%
+                      </p>
+                    </div>
+                    <p className="mt-3 font-light text-slate-500 dark:text-slate-400 text-xs">
+                      {t('generatingTakeMoments')}
                     </p>
                   </div>
                 )}
-              </div>
-            </TabsContent>
 
-            <div className="space-y-2">
-              <Label className="font-light text-gray-700 text-sm">{t('imageStyle')}</Label>
-              <Select value={imageStyle} onValueChange={setImageStyle}>
-                <SelectTrigger className="border-gray-200 font-light">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {IMAGE_STYLES.map((style) => (
-                    <SelectItem key={style.id} value={style.id} title={style.description}>
-                      {t(`imageStyles.${style.id}`)}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label className="font-light text-gray-700 text-sm">{t('model')}</Label>
-                <Select value={model} onValueChange={setModel}>
-                  <SelectTrigger className="border-gray-200 font-light">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="nano-banana">
-                      Nano Banana - {creditsConfig.consumption.imageGeneration['nano-banana']}{' '}
-                      credits
-                    </SelectItem>
-                    <SelectItem value="nano-banana-pro">
-                      Nano Banana Pro -{' '}
-                      {creditsConfig.consumption.imageGeneration['nano-banana-pro']} credits
-                    </SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="space-y-2">
-                <Label className="font-light text-gray-700 text-sm">{t('aspectRatio')}</Label>
-                <Select value={aspectRatio} onValueChange={setAspectRatio}>
-                  <SelectTrigger className="border-gray-200 font-light">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="1:1">{t('aspectRatioSquare')}</SelectItem>
-                    <SelectItem value="16:9">{t('aspectRatioLandscape')}</SelectItem>
-                    <SelectItem value="9:16">{t('aspectRatioPortrait')}</SelectItem>
-                    <SelectItem value="4:3">{t('aspectRatioStandard')}</SelectItem>
-                    <SelectItem value="3:2">{t('aspectRatioPhoto')}</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <Label className="font-light text-gray-700 text-sm">{t('outputFormat')}</Label>
-              <div className="grid grid-cols-2 gap-3">
-                <button
-                  type="button"
-                  onClick={() => setOutputFormat('PNG')}
-                  className={`flex items-center justify-center rounded-lg border-2 py-3 px-4 text-sm font-medium transition-all ${
-                    outputFormat === 'PNG'
-                      ? 'border-teal-500 bg-teal-50 dark:bg-teal-900/20 text-slate-700 dark:text-slate-300'
-                      : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-gray-700 hover:border-teal-500'
-                  }`}
-                >
-                  <span>PNG</span>
-                  {outputFormat === 'PNG' && (
-                    <svg
-                      className="ml-2 h-4 w-4"
-                      fill="currentColor"
-                      viewBox="0 0 20 20"
-                      role="img"
-                      aria-label="Selected format"
+                {result && !result.error && (result.previewUrl || result.imageUrl) && (
+                  <div className="space-y-4">
+                    <button
+                      type="button"
+                      className="w-full overflow-hidden rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500"
+                      onClick={() =>
+                        setLightboxImage({
+                          url: result.previewUrl ?? result.imageUrl,
+                          alt: 'Generated image preview',
+                        })
+                      }
                     >
-                      <title>Selected format</title>
-                      <path
-                        fillRule="evenodd"
-                        d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                        clipRule="evenodd"
+                      <img
+                        src={result.previewUrl ?? result.imageUrl}
+                        alt="Generated"
+                        className="w-full rounded-xl"
                       />
-                    </svg>
-                  )}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setOutputFormat('JPEG')}
-                  className={`flex items-center justify-center rounded-lg border-2 py-3 px-4 text-sm font-medium transition-all ${
-                    outputFormat === 'JPEG'
-                      ? 'border-teal-500 bg-teal-50 dark:bg-teal-900/20 text-slate-700 dark:text-slate-300'
-                      : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-gray-700 hover:border-teal-500'
-                  }`}
-                >
-                  <span>JPEG</span>
-                  {outputFormat === 'JPEG' && (
-                    <svg
-                      className="ml-2 h-4 w-4"
-                      fill="currentColor"
-                      viewBox="0 0 20 20"
-                      role="img"
-                      aria-label="Selected format"
-                    >
-                      <title>Selected format</title>
-                      <path
-                        fillRule="evenodd"
-                        d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                        clipRule="evenodd"
-                      />
-                    </svg>
-                  )}
-                </button>
-              </div>
-            </div>
-
-            <Button
-              onClick={handleGenerate}
-              disabled={isGenerating || !canGenerate}
-              className="w-full btn-primary"
-              size="lg"
-            >
-              {isGenerating ? (
-                <>
-                  <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                  {t('generating')}
-                </>
-              ) : (
-                <>
-                  <ImageIcon className="mr-2 h-5 w-5" />
-                  {t('generateImage')}
-                </>
-              )}
-            </Button>
-          </div>
-
-          <div className="lg:sticky lg:top-24 lg:h-fit">
-            <Card className="p-6">
-              {!result && !isGenerating && (
-                <div className="flex aspect-square items-center justify-center rounded-xl bg-slate-100 dark:bg-slate-800">
-                  <div className="space-y-3 text-center">
-                    <ImageIcon className="mx-auto h-16 w-16 text-slate-400 dark:text-slate-500" />
-                    <p className="font-light text-slate-500 dark:text-slate-400 text-sm">
-                      {t('imageWillAppearHere')}
-                    </p>
-                  </div>
-                </div>
-              )}
-
-              {isGenerating && (
-                <div className="flex aspect-square flex-col items-center justify-center rounded-xl bg-slate-100 dark:bg-slate-800 p-6 text-center">
-                  <Loader2 className="mb-4 h-12 w-12 animate-spin text-teal-500" />
-                  <p className="font-medium text-slate-700 dark:text-slate-300">
-                    {progressMessage || t('generatingImage')}
-                  </p>
-                  <div className="mt-4 w-full max-w-xs space-y-2">
-                    <GenerationProgressBar value={progressValue} />
-                    <p className="text-xs font-medium text-slate-500 dark:text-slate-400">
-                      {Math.round(progressValue)}%
-                    </p>
-                  </div>
-                  <p className="mt-3 font-light text-slate-500 dark:text-slate-400 text-xs">
-                    {t('generatingTakeMoments')}
-                  </p>
-                </div>
-              )}
-
-              {result && !result.error && (result.previewUrl || result.imageUrl) && (
-                <div className="space-y-4">
-                  <button
-                    type="button"
-                    className="w-full overflow-hidden rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500"
-                    onClick={() =>
-                      setLightboxImage({
-                        url: result.previewUrl ?? result.imageUrl,
-                        alt: 'Generated image preview',
-                      })
-                    }
-                  >
-                    <img
-                      src={result.previewUrl ?? result.imageUrl}
-                      alt="Generated"
-                      className="w-full rounded-xl"
-                    />
-                  </button>
-                  <div className="grid grid-cols-2 gap-3">
-                    <Button
-                      onClick={() => {
-                        const primaryUrl = result.imageUrl || result.previewUrl;
-                        if (!primaryUrl) return;
-                        handleDownload(primaryUrl, result.previewUrl ?? result.imageUrl);
-                      }}
-                      variant="outline"
-                      className="border-gray-200 font-light"
-                    >
-                      <Download className="mr-2 h-4 w-4" />
-                      {t('download')}
-                    </Button>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="outline" className="border-gray-200 font-light">
-                          <Share2 className="mr-2 h-4 w-4" />
-                          {t('share')}
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end" className="w-64">
-                        <DropdownMenuLabel>{t('shareOptions')}</DropdownMenuLabel>
-                        <DropdownMenuItem onClick={() => void handleShareAction('copy')}>
-                          <Link2 className="mr-2 h-4 w-4" />
-                          {t('shareCopyLink')}
-                        </DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuLabel>{t('shareSocialLabel')}</DropdownMenuLabel>
-                        {sharePlatforms.map((platform) => (
-                          <DropdownMenuItem
-                            key={platform.id}
-                            onClick={() => void handleShareAction('social', platform.id)}
-                          >
-                            <platform.icon className="mr-2 h-4 w-4" />
-                            {platform.label}
+                    </button>
+                    <div className="grid grid-cols-2 gap-3">
+                      <Button
+                        onClick={() => {
+                          const primaryUrl = result.imageUrl || result.previewUrl;
+                          if (!primaryUrl) return;
+                          handleDownload(primaryUrl, result.previewUrl ?? result.imageUrl);
+                        }}
+                        variant="outline"
+                        className="border-gray-200 font-light"
+                      >
+                        <Download className="mr-2 h-4 w-4" />
+                        {t('download')}
+                      </Button>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="outline" className="border-gray-200 font-light">
+                            <Share2 className="mr-2 h-4 w-4" />
+                            {t('share')}
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="w-64">
+                          <DropdownMenuLabel>{t('shareOptions')}</DropdownMenuLabel>
+                          <DropdownMenuItem onClick={() => void handleShareAction('copy')}>
+                            <Link2 className="mr-2 h-4 w-4" />
+                            {t('shareCopyLink')}
                           </DropdownMenuItem>
-                        ))}
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem onClick={() => void handleShareAction('publish')}>
-                          <Globe className="mr-2 h-4 w-4" />
-                          {t('sharePublishOnViecom')}
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuLabel>{t('shareSocialLabel')}</DropdownMenuLabel>
+                          {sharePlatforms.map((platform) => (
+                            <DropdownMenuItem
+                              key={platform.id}
+                              onClick={() => void handleShareAction('social', platform.id)}
+                            >
+                              <platform.icon className="mr-2 h-4 w-4" />
+                              {platform.label}
+                            </DropdownMenuItem>
+                          ))}
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem onClick={() => void handleShareAction('publish')}>
+                            <Globe className="mr-2 h-4 w-4" />
+                            {t('sharePublishOnViecom')}
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </div>
+                    {shareMessage && (
+                      <p
+                        className={`text-center text-xs ${
+                          shareStatus === 'error' ? 'text-red-600' : 'text-green-600'
+                        }`}
+                      >
+                        {shareMessage}
+                      </p>
+                    )}
                   </div>
-                  {shareMessage && (
-                    <p
-                      className={`text-center text-xs ${
-                        shareStatus === 'error' ? 'text-red-600' : 'text-green-600'
-                      }`}
-                    >
-                      {shareMessage}
-                    </p>
-                  )}
-                </div>
-              )}
+                )}
 
-              {result?.error && (
-                <div className="flex items-center gap-3 rounded-xl border border-red-200 bg-red-50 p-4">
-                  <AlertCircle className="h-5 w-5 flex-shrink-0 text-red-500" />
-                  <div>
-                    <p className="font-light text-red-700">Generation Failed</p>
-                    <p className="font-light text-red-600 text-sm">{result.error}</p>
+                {result?.error && (
+                  <div className="flex items-center gap-3 rounded-xl border border-red-200 bg-red-50 p-4">
+                    <AlertCircle className="h-5 w-5 flex-shrink-0 text-red-500" />
+                    <div>
+                      <p className="font-light text-red-700">Generation Failed</p>
+                      <p className="font-light text-red-600 text-sm">{result.error}</p>
+                    </div>
                   </div>
-                </div>
-              )}
-            </Card>
+                )}
+              </Card>
+            </div>
           </div>
-        </div>
-      </Tabs>
+        </Tabs>
 
-      {showUpgradePrompt && (
-        <UpgradePrompt
-          onClose={closeUpgradePrompt}
-          creditsUsed={0}
-          creditsLimit={0}
-          type="credits"
-          isAuthenticated={!!user}
-          limitType="daily"
-        />
-      )}
+        {showUpgradePrompt && (
+          <UpgradePrompt
+            onClose={closeUpgradePrompt}
+            creditsUsed={0}
+            creditsLimit={0}
+            type="credits"
+            isAuthenticated={!!user}
+            limitType="daily"
+          />
+        )}
 
-      {lightboxImage && (
-        <dialog
+        {lightboxImage && (
+          <dialog
             open
             className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-6"
             onClick={() => setLightboxImage(null)}
@@ -1624,9 +1628,7 @@ export default function ImageGenerator() {
             onClose={() => setIsPublishModalOpen(false)}
           >
             <div className="max-w-lg rounded-2xl bg-white p-6 shadow-xl space-y-4 text-slate-700">
-              <h2 className="text-xl font-semibold text-slate-900">
-                Publish Guidelines
-              </h2>
+              <h2 className="text-xl font-semibold text-slate-900">Publish Guidelines</h2>
               <ul className="list-disc space-y-2 pl-5 text-sm">
                 <li>All content must comply with Viecom policies and local regulations.</li>
                 <li>No adult, hateful, infringing, or misleading material is allowed.</li>

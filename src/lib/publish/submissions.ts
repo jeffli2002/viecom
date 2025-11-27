@@ -20,27 +20,18 @@ type CreateSubmissionInput = {
 
 export async function createPublishSubmission(input: CreateSubmissionInput) {
   const now = new Date();
-  const {
-    userId,
-    assetUrl,
-    previewUrl,
-    assetId,
-    prompt,
-    assetType,
-    title,
-    category,
-    metadata,
-  } = input;
+  const { userId, assetUrl, previewUrl, assetId, prompt, assetType, title, category, metadata } =
+    input;
 
-  const normalizedTitle =
-    title?.trim() ||
-    prompt?.trim()?.slice(0, 120) ||
-    'Untitled Showcase';
+  const normalizedTitle = title?.trim() || prompt?.trim()?.slice(0, 120) || 'Untitled Showcase';
 
   const existing =
     assetId && assetId.length > 0
       ? await db.query.publishSubmissions.findFirst({
-          where: and(eq(publishSubmissions.userId, userId), eq(publishSubmissions.assetId, assetId)),
+          where: and(
+            eq(publishSubmissions.userId, userId),
+            eq(publishSubmissions.assetId, assetId)
+          ),
         })
       : null;
 

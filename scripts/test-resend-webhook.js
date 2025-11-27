@@ -1,12 +1,12 @@
 /**
  * Simple test script for Resend webhook endpoint
- * 
+ *
  * Usage: node scripts/test-resend-webhook.js
- * 
+ *
  * Make sure the dev server is running first: pnpm dev
  */
 
-const webhookUrl = process.env.NEXT_PUBLIC_APP_URL 
+const webhookUrl = process.env.NEXT_PUBLIC_APP_URL
   ? `${process.env.NEXT_PUBLIC_APP_URL}/api/webhooks/resend`
   : 'http://localhost:3000/api/webhooks/resend';
 
@@ -65,5 +65,3 @@ fetch(webhookUrl, {
     console.error('   3. Environment variables are set correctly');
     process.exit(1);
   });
-
-

@@ -4,7 +4,7 @@ import { requireAdmin } from '@/lib/admin/auth';
 import { db } from '@/server/db';
 import { landingShowcaseEntries } from '@/server/db/schema';
 import { desc, eq, sql } from 'drizzle-orm';
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 
 export const dynamic = 'force-dynamic';
 export const fetchCache = 'force-no-store';

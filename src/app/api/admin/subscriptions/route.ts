@@ -13,17 +13,14 @@ const parsePurchaseMetadata = (metadata: string | null) => {
     const parsed = JSON.parse(metadata) as Record<string, unknown>;
     const productId = typeof parsed.productId === 'string' ? parsed.productId : undefined;
     const creditsValue =
-      typeof parsed.credits === 'number'
-        ? parsed.credits
-        : Number(parsed.credits) || undefined;
+      typeof parsed.credits === 'number' ? parsed.credits : Number(parsed.credits) || undefined;
     const pack =
       paymentConfig.creditPacks.find((pack) => pack.creemProductKey === productId) ||
       (typeof creditsValue === 'number'
         ? paymentConfig.creditPacks.find((pack) => pack.credits === creditsValue)
         : undefined);
     const rawAmount = Number(parsed.amount);
-    const amount =
-      Number.isFinite(rawAmount) && rawAmount > 0 ? rawAmount : pack?.price ?? 0;
+    const amount = Number.isFinite(rawAmount) && rawAmount > 0 ? rawAmount : (pack?.price ?? 0);
     return {
       amount,
       currency: typeof parsed.currency === 'string' ? parsed.currency : 'USD',

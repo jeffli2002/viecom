@@ -46,7 +46,9 @@ describe('KIEAPIService.generateImage', () => {
 
   it('sends text-to-image payloads with the T2I model', async () => {
     const service = new KIEAPIService();
-    await expect(service.generateImage({ prompt: 'hello world' })).resolves.toEqual(successResponse);
+    await expect(service.generateImage({ prompt: 'hello world' })).resolves.toEqual(
+      successResponse
+    );
 
     expect(mockFetch).toHaveBeenCalledTimes(1);
     const [, requestInit] = mockFetch.mock.calls[0];

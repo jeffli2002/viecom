@@ -1,9 +1,9 @@
-import { requireAdmin } from '@/lib/admin/auth';
 import { SHOWCASE_CATEGORIES } from '@/config/showcase.config';
+import { requireAdmin } from '@/lib/admin/auth';
 import { db } from '@/server/db';
 import { publishSubmissions, user } from '@/server/db/schema';
 import { and, desc, eq } from 'drizzle-orm';
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 
 export const dynamic = 'force-dynamic';
 export const fetchCache = 'force-no-store';
@@ -20,7 +20,8 @@ export async function GET(request: NextRequest) {
 
     const allowedStatuses = ['pending', 'approved', 'rejected'] as const;
     const filters =
-      statusParam === 'all' || !allowedStatuses.includes(statusParam as (typeof allowedStatuses)[number])
+      statusParam === 'all' ||
+      !allowedStatuses.includes(statusParam as (typeof allowedStatuses)[number])
         ? []
         : [eq(publishSubmissions.status, statusParam as (typeof allowedStatuses)[number])];
 

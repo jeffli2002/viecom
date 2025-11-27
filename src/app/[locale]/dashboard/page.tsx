@@ -108,7 +108,6 @@ const formatDateDisplay = (value?: string | null) => {
 
 function DashboardPageContent() {
   const t = useTranslations('dashboard');
-  const locale = useLocale();
   const { isAuthenticated, user, isLoading: authLoading } = useAuthStore();
   const router = useRouter();
   const [creditBalance, setCreditBalance] = useState<CreditBalance | null>(null);
@@ -305,8 +304,7 @@ function DashboardPageContent() {
             </div>
             <p className="mt-3 pt-3 border-t border-teal-200 dark:border-teal-800 text-sm">
               {t('currentPlanRemains', {
-                planName:
-                  planId === 'proplus' ? 'Pro+' : planId === 'pro' ? 'Pro' : 'Free',
+                planName: planId === 'proplus' ? 'Pro+' : planId === 'pro' ? 'Pro' : 'Free',
               })}
             </p>
           </AlertDescription>

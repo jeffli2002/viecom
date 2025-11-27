@@ -3,15 +3,12 @@ import { requireAdmin } from '@/lib/admin/auth';
 import { db } from '@/server/db';
 import { landingShowcaseEntries } from '@/server/db/schema';
 import { eq } from 'drizzle-orm';
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 
 export const dynamic = 'force-dynamic';
 export const fetchCache = 'force-no-store';
 
-export async function PATCH(
-  request: NextRequest,
-  { params }: { params: { entryId: string } }
-) {
+export async function PATCH(request: NextRequest, { params }: { params: { entryId: string } }) {
   try {
     await requireAdmin();
     const body = await request.json();
@@ -56,10 +53,7 @@ export async function PATCH(
   }
 }
 
-export async function DELETE(
-  request: NextRequest,
-  { params }: { params: { entryId: string } }
-) {
+export async function DELETE(request: NextRequest, { params }: { params: { entryId: string } }) {
   try {
     await requireAdmin();
     await db.delete(landingShowcaseEntries).where(eq(landingShowcaseEntries.id, params.entryId));

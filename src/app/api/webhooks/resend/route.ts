@@ -1,14 +1,14 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { env } from '@/env';
 import crypto from 'crypto';
+import { env } from '@/env';
+import { type NextRequest, NextResponse } from 'next/server';
 import { Resend } from 'resend';
 
 /**
  * Resend Webhook Handler for receiving emails
- * 
+ *
  * This endpoint receives email events from Resend when emails are sent to
  * addresses on your verified domain (e.g., support@viecom.pro)
- * 
+ *
  * Webhook URL: https://yourdomain.com/api/webhooks/resend
  * Event type: email.received
  */
@@ -41,19 +41,12 @@ interface ResendEmailReceivedEvent {
  * Verify Resend webhook signature
  * See: https://resend.com/docs/dashboard/webhooks/verify-webhooks-requests
  */
-function verifyWebhookSignature(
-  payload: string,
-  signature: string,
-  secret: string
-): boolean {
+function verifyWebhookSignature(payload: string, signature: string, secret: string): boolean {
   try {
     const hmac = crypto.createHmac('sha256', secret);
     hmac.update(payload);
     const expectedSignature = hmac.digest('hex');
-    return crypto.timingSafeEqual(
-      Buffer.from(signature),
-      Buffer.from(expectedSignature)
-    );
+    return crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(expectedSignature));
   } catch (error) {
     console.error('[Resend Webhook] Signature verification error:', error);
     return false;
@@ -62,7 +55,7 @@ function verifyWebhookSignature(
 
 export async function POST(request: NextRequest) {
   const requestId = `req-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-  
+
   try {
     console.log('[Resend Webhook] Incoming request', {
       requestId,
@@ -77,23 +70,16 @@ export async function POST(request: NextRequest) {
 
     const body = await request.text();
     const signature = request.headers.get('resend-signature');
-    
+
     console.log('[Resend Webhook] Request body length:', body.length, { requestId });
 
     // Verify webhook signature if RESEND_WEBHOOK_SECRET is set
     if (env.RESEND_WEBHOOK_SECRET && signature) {
-      const isValid = verifyWebhookSignature(
-        body,
-        signature,
-        env.RESEND_WEBHOOK_SECRET
-      );
+      const isValid = verifyWebhookSignature(body, signature, env.RESEND_WEBHOOK_SECRET);
 
       if (!isValid) {
         console.error('[Resend Webhook] Invalid signature');
-        return NextResponse.json(
-          { error: 'Invalid signature' },
-          { status: 401 }
-        );
+        return NextResponse.json({ error: 'Invalid signature' }, { status: 401 });
       }
     } else if (env.RESEND_WEBHOOK_SECRET && !signature) {
       console.warn('[Resend Webhook] Missing signature header');
@@ -124,10 +110,7 @@ export async function POST(request: NextRequest) {
     // Forward email to configured forwarding address
     if (!env.RESEND_API_KEY) {
       console.error('[Resend Webhook] RESEND_API_KEY not configured');
-      return NextResponse.json(
-        { error: 'RESEND_API_KEY not configured' },
-        { status: 500 }
-      );
+      return NextResponse.json({ error: 'RESEND_API_KEY not configured' }, { status: 500 });
     }
 
     if (!env.RESEND_FORWARD_TO_EMAIL) {
@@ -174,7 +157,7 @@ export async function POST(request: NextRequest) {
       }
 
       // Retrieve attachments if any
-      let attachments: Array<{
+      const attachments: Array<{
         filename: string;
         content: string;
         content_type?: string;
@@ -196,7 +179,7 @@ export async function POST(request: NextRequest) {
           if (attachmentsResponse.ok) {
             const attachmentsData = await attachmentsResponse.json();
             const attachmentList = attachmentsData.data?.data || attachmentsData.data || [];
-            
+
             // Download and encode attachments in base64
             for (const attachment of attachmentList) {
               try {
@@ -208,21 +191,15 @@ export async function POST(request: NextRequest) {
                   content_type: attachment.content_type,
                 });
               } catch (attachmentError) {
-                console.error(
-                  '[Resend Webhook] Failed to download attachment',
-                  {
-                    attachment_id: attachment.id,
-                    error: attachmentError,
-                  }
-                );
+                console.error('[Resend Webhook] Failed to download attachment', {
+                  attachment_id: attachment.id,
+                  error: attachmentError,
+                });
               }
             }
           }
         } catch (attachmentsError) {
-          console.error(
-            '[Resend Webhook] Failed to retrieve attachments',
-            attachmentsError
-          );
+          console.error('[Resend Webhook] Failed to retrieve attachments', attachmentsError);
           // Continue forwarding even if attachments fail
         }
       }
@@ -233,8 +210,10 @@ export async function POST(request: NextRequest) {
       const forwardTo = env.RESEND_FORWARD_TO_EMAIL;
 
       // Create forwarded email body
-      const emailContent = email.html || email.text?.replace(/\n/g, '<br>') || 'Email content not available';
-      const emailTextContent = email.text || email.html?.replace(/<[^>]*>/g, '') || 'Email content not available';
+      const emailContent =
+        email.html || email.text?.replace(/\n/g, '<br>') || 'Email content not available';
+      const emailTextContent =
+        email.text || email.html?.replace(/<[^>]*>/g, '') || 'Email content not available';
 
       const forwardedHtml = `
         <div style="border-left: 3px solid #14b8a6; padding-left: 15px; margin-bottom: 20px;">
@@ -297,10 +276,7 @@ ${emailTextContent}
     }
   } catch (error) {
     console.error('[Resend Webhook] Error processing webhook:', error);
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
 
@@ -312,4 +288,3 @@ export async function GET() {
     event_type: 'email.received',
   });
 }
-

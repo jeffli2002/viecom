@@ -90,7 +90,9 @@ export default function ContactPage() {
         </CardHeader>
         <CardContent className="space-y-4">
           <div>
-            <p className="font-semibold text-gray-900 dark:text-white mb-2">Viecom Legal Department</p>
+            <p className="font-semibold text-gray-900 dark:text-white mb-2">
+              Viecom Legal Department
+            </p>
             <p className="text-gray-700 dark:text-slate-300">
               Datun Road, Chaoyang District
               <br />
@@ -99,9 +101,7 @@ export default function ContactPage() {
           </div>
           <div className="pt-3 border-t border-gray-200 dark:border-slate-700">
             <p className="font-semibold text-gray-900 dark:text-white mb-2">中文地址</p>
-            <p className="text-gray-700 dark:text-slate-300">
-              中国北京市朝阳区大屯路
-            </p>
+            <p className="text-gray-700 dark:text-slate-300">中国北京市朝阳区大屯路</p>
           </div>
         </CardContent>
       </Card>
@@ -134,8 +134,8 @@ export default function ContactPage() {
               Purchase one-time credit packs starting at $9.90 for 300 credits (packs never expire),
               or (3) Earn credits through daily check-ins ({dailyCheckinCredits} credits/day),
               referrals ({referralCredits} credits per referral), and social sharing (
-              {socialShareCredits} credits per share). Credit
-              packs are perfect if you need extra credits without committing to a subscription.
+              {socialShareCredits} credits per share). Credit packs are perfect if you need extra
+              credits without committing to a subscription.
             </p>
           </div>
 
@@ -205,7 +205,10 @@ export default function ContactPage() {
             >
               Twitter @jeffli2002
             </a>
-            <a href="mailto:support@viecom.pro" className="text-teal-500 hover:text-slate-700 dark:text-slate-300 font-medium">
+            <a
+              href="mailto:support@viecom.pro"
+              className="text-teal-500 hover:text-slate-700 dark:text-slate-300 font-medium"
+            >
               support@viecom.pro
             </a>
           </div>

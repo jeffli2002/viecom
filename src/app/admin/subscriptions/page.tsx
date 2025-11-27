@@ -124,7 +124,7 @@ export default function AdminSubscriptionsPage() {
             </SelectContent>
           </Select>
           <Button
-            onClick={() => downloadCSV('subscriptions.csv', data.recentSubscriptions)}
+            onClick={() => downloadCSV('subscriptions.csv', data.recentSubscriptions || [])}
             variant="outline"
           >
             <Download className="mr-2 h-4 w-4" />
@@ -147,53 +147,53 @@ export default function AdminSubscriptionsPage() {
               </div>
             </div>
           </CardContent>
-      </Card>
+        </Card>
 
-      {/* Credit Pack Purchases */}
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between">
-          <CardTitle>Recent Credit Pack Purchases</CardTitle>
-          <Button
-            onClick={() => downloadCSV('credit-packs.csv', data.creditPackPurchases)}
-            variant="outline"
-          >
-            <Download className="mr-2 h-4 w-4" />
-            Export Credit Packs
-          </Button>
-        </CardHeader>
-        <CardContent>
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr className="text-left text-sm text-gray-500 border-b">
-                  <th className="py-3 px-4">Date</th>
-                  <th className="py-3 px-4">User Email</th>
-                  <th className="py-3 px-4">Product</th>
-                  <th className="py-3 px-4">Credits</th>
-                  <th className="py-3 px-4">Amount</th>
-                  <th className="py-3 px-4">Currency</th>
-                </tr>
-              </thead>
-              <tbody>
-                {data.creditPackPurchases.map((purchase) => (
-                  <tr key={purchase.id} className="border-b">
-                    <td className="py-3 px-4 text-sm">
-                      {new Date(purchase.createdAt).toLocaleString()}
-                    </td>
-                    <td className="py-3 px-4 text-sm">{purchase.userEmail}</td>
-                    <td className="py-3 px-4 text-sm">{purchase.productName}</td>
-                    <td className="py-3 px-4 text-sm">{purchase.credits}</td>
-                    <td className="py-3 px-4 text-sm font-medium">
-                      ${purchase.amount.toFixed(2)}
-                    </td>
-                    <td className="py-3 px-4 text-sm">{purchase.currency}</td>
+        {/* Credit Pack Purchases */}
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between">
+            <CardTitle>Recent Credit Pack Purchases</CardTitle>
+            <Button
+              onClick={() => downloadCSV('credit-packs.csv', data.creditPackPurchases || [])}
+              variant="outline"
+            >
+              <Download className="mr-2 h-4 w-4" />
+              Export Credit Packs
+            </Button>
+          </CardHeader>
+          <CardContent>
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead>
+                  <tr className="text-left text-sm text-gray-500 border-b">
+                    <th className="py-3 px-4">Date</th>
+                    <th className="py-3 px-4">User Email</th>
+                    <th className="py-3 px-4">Product</th>
+                    <th className="py-3 px-4">Credits</th>
+                    <th className="py-3 px-4">Amount</th>
+                    <th className="py-3 px-4">Currency</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </CardContent>
-      </Card>
+                </thead>
+                <tbody>
+                  {(data.creditPackPurchases || []).map((purchase) => (
+                    <tr key={purchase.id} className="border-b">
+                      <td className="py-3 px-4 text-sm">
+                        {new Date(purchase.createdAt).toLocaleString()}
+                      </td>
+                      <td className="py-3 px-4 text-sm">{purchase.userEmail}</td>
+                      <td className="py-3 px-4 text-sm">{purchase.productName}</td>
+                      <td className="py-3 px-4 text-sm">{purchase.credits}</td>
+                      <td className="py-3 px-4 text-sm font-medium">
+                        ${purchase.amount.toFixed(2)}
+                      </td>
+                      <td className="py-3 px-4 text-sm">{purchase.currency}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </CardContent>
+        </Card>
 
         <Card>
           <CardContent className="pt-6">
@@ -269,7 +269,7 @@ export default function AdminSubscriptionsPage() {
                 </tr>
               </thead>
               <tbody>
-                {data.recentSubscriptions.map((sub) => (
+                {(data.recentSubscriptions || []).map((sub) => (
                   <tr key={sub.id} className="border-b hover:bg-slate-50 dark:bg-slate-900">
                     <td className="py-3 px-4 text-sm">{sub.userEmail}</td>
                     <td className="py-3 px-4">

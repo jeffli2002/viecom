@@ -41,7 +41,11 @@ export async function POST(request: Request) {
         ? declaredContentType
         : blob.type || 'application/octet-stream';
 
-    if (!ALLOWED_SOURCE_IMAGE_MIME_TYPES.includes(contentType as (typeof ALLOWED_SOURCE_IMAGE_MIME_TYPES)[number])) {
+    if (
+      !ALLOWED_SOURCE_IMAGE_MIME_TYPES.includes(
+        contentType as (typeof ALLOWED_SOURCE_IMAGE_MIME_TYPES)[number]
+      )
+    ) {
       return NextResponse.json(
         { error: `Unsupported file type ${contentType}. Only JPEG, PNG, or WebP are allowed.` },
         { status: 400 }
@@ -50,7 +54,9 @@ export async function POST(request: Request) {
 
     if (blob.size <= 0 || blob.size > MAX_SOURCE_IMAGE_FILE_SIZE_BYTES) {
       return NextResponse.json(
-        { error: `File size must be between 1 byte and ${MAX_SOURCE_IMAGE_FILE_SIZE_BYTES} bytes.` },
+        {
+          error: `File size must be between 1 byte and ${MAX_SOURCE_IMAGE_FILE_SIZE_BYTES} bytes.`,
+        },
         { status: 400 }
       );
     }
@@ -77,9 +83,6 @@ export async function POST(request: Request) {
     });
   } catch (error) {
     console.error('Direct upload proxy failed:', error);
-    return NextResponse.json(
-      { error: 'Upload failed. Please try again later.' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Upload failed. Please try again later.' }, { status: 500 });
   }
 }

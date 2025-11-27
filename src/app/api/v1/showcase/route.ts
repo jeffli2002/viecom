@@ -5,7 +5,7 @@ import { getShowcaseCategoryLabel } from '@/config/showcase.config';
 import { db } from '@/server/db';
 import { landingShowcaseEntries, publishSubmissions } from '@/server/db/schema';
 import { and, asc, desc, eq } from 'drizzle-orm';
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 
 export const dynamic = 'force-dynamic';
 export const fetchCache = 'force-no-store';
@@ -35,9 +35,7 @@ async function loadLocalShowcaseItems(limit: number) {
   try {
     const dir = join(process.cwd(), 'public', 'showcase');
     const files = await readdir(dir);
-    const media = files.filter((file) =>
-      file.match(/\.(jpg|jpeg|png|gif|webp|mp4|webm|mov)$/i)
-    );
+    const media = files.filter((file) => file.match(/\.(jpg|jpeg|png|gif|webp|mp4|webm|mov)$/i));
     return media.slice(0, limit).map((filename) => ({
       id: `local-${generateItemId(filename)}`,
       type: getFileType(filename),
@@ -120,7 +118,7 @@ export async function GET(request: NextRequest) {
 
     const localItems = await loadLocalShowcaseItems(limit || 20);
     const seen = new Set<string>();
-    const pushUnique = (arr: typeof adminItems, source: typeof adminItems[number]) => {
+    const pushUnique = (arr: typeof adminItems, source: (typeof adminItems)[number]) => {
       if (seen.has(source.id)) return;
       seen.add(source.id);
       arr.push(source);
@@ -135,9 +133,6 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ success: true, placement, items: combined });
   } catch (error) {
     console.error('Failed to load showcase items:', error);
-    return NextResponse.json(
-      { success: true, placement: 'showcase', items: [] },
-      { status: 200 }
-    );
+    return NextResponse.json({ success: true, placement: 'showcase', items: [] }, { status: 200 });
   }
 }

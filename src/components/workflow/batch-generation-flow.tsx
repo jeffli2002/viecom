@@ -20,8 +20,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { getBatchConfig } from '@/config/batch.config';
 import { creditsConfig } from '@/config/credits.config';
 import { IMAGE_STYLES, VIDEO_STYLES } from '@/config/styles.config';
-import { useUpgradePrompt } from '@/hooks/use-upgrade-prompt';
 import { useSubscription } from '@/hooks/use-subscription';
+import { useUpgradePrompt } from '@/hooks/use-upgrade-prompt';
 import { useAuthStore } from '@/store/auth-store';
 import {
   AlertCircle,
@@ -161,8 +161,7 @@ export function BatchGenerationFlow({ generationType }: BatchGenerationFlowProps
     proplus: translate('planLabelProplus', 'Pro+ Plan'),
   };
   const planDisplayName = planLabelMap[normalizedPlan];
-  const nextPlan =
-    normalizedPlan === 'free' ? 'pro' : normalizedPlan === 'pro' ? 'proplus' : null;
+  const nextPlan = normalizedPlan === 'free' ? 'pro' : normalizedPlan === 'pro' ? 'proplus' : null;
   const planLimitsDescription = subscriptionLoading
     ? translate('planLimitLoading', 'Loading plan limits...')
     : translate(
@@ -1081,7 +1080,9 @@ export function BatchGenerationFlow({ generationType }: BatchGenerationFlowProps
                       <Badge variant="outline" className="text-xs">
                         {planDisplayName}
                       </Badge>
-                      {subscriptionLoading && <Loader2 className="h-4 w-4 animate-spin text-slate-400" />}
+                      {subscriptionLoading && (
+                        <Loader2 className="h-4 w-4 animate-spin text-slate-400" />
+                      )}
                     </div>
                   </div>
                   <div className="flex items-center gap-6">
@@ -1103,7 +1104,9 @@ export function BatchGenerationFlow({ generationType }: BatchGenerationFlowProps
                     </div>
                   </div>
                 </div>
-                <p className="text-sm text-slate-600 dark:text-slate-300">{planLimitsDescription}</p>
+                <p className="text-sm text-slate-600 dark:text-slate-300">
+                  {planLimitsDescription}
+                </p>
                 <p className="text-xs text-slate-500 dark:text-slate-400">{upgradeMessage}</p>
               </div>
 
@@ -1495,7 +1498,9 @@ export function BatchGenerationFlow({ generationType }: BatchGenerationFlowProps
                           <p className="text-sm font-medium text-teal-700 dark:text-teal-400 mb-1">
                             {t('clickToUpload')}
                           </p>
-                          <p className="text-xs text-teal-600 dark:text-teal-400">{t('fileTypes')}</p>
+                          <p className="text-xs text-teal-600 dark:text-teal-400">
+                            {t('fileTypes')}
+                          </p>
                         </>
                       )}
                     </div>

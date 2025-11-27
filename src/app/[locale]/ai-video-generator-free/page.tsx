@@ -390,8 +390,8 @@ export default function FreeAIVideoGeneratorPage() {
                 Are there watermarks on free videos?
               </h3>
               <p className="text-slate-600 dark:text-slate-300">
-                No, all images and videos generated on our platform have no watermarks, regardless of
-                whether you use free credits or paid credits. All content is watermark-free.
+                No, all images and videos generated on our platform have no watermarks, regardless
+                of whether you use free credits or paid credits. All content is watermark-free.
               </p>
             </div>
             <div>

@@ -1,7 +1,7 @@
 // @ts-nocheck
 import crypto from 'node:crypto';
-import { env } from '@/env';
 import { paymentConfig } from '@/config/payment.config';
+import { env } from '@/env';
 
 const getCreemTestMode = () => {
   // Auto-detect from API key prefix
@@ -1050,7 +1050,9 @@ class CreemPaymentService {
       const credits = configPack?.credits ?? inferredCredits;
       const normalizedAmount =
         typeof orderAmountRaw === 'number'
-          ? orderAmountRaw >= 100 ? orderAmountRaw / 100 : orderAmountRaw
+          ? orderAmountRaw >= 100
+            ? orderAmountRaw / 100
+            : orderAmountRaw
           : undefined;
 
       console.log('[Creem Service] Parsed credit pack purchase:', {

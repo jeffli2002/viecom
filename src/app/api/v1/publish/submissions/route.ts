@@ -1,6 +1,6 @@
 import { auth } from '@/lib/auth/auth';
 import { createPublishSubmission } from '@/lib/publish/submissions';
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 
 export const dynamic = 'force-dynamic';
 export const fetchCache = 'force-no-store';
@@ -13,7 +13,8 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { assetUrl, previewUrl, assetId, prompt, title, category, assetType, metadata } = body ?? {};
+    const { assetUrl, previewUrl, assetId, prompt, title, category, assetType, metadata } =
+      body ?? {};
 
     if (!assetUrl || typeof assetUrl !== 'string') {
       return NextResponse.json({ error: 'Asset URL is required' }, { status: 400 });

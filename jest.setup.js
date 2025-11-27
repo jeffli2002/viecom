@@ -82,4 +82,3 @@ if (typeof globalThis.Request === 'undefined') {
     }
   }
 }
-

@@ -1,6 +1,14 @@
 'use client';
 
-import { CreditCard, DollarSign, LayoutDashboard, Settings, Sparkles, Users, Zap } from 'lucide-react';
+import {
+  CreditCard,
+  DollarSign,
+  LayoutDashboard,
+  Settings,
+  Sparkles,
+  Users,
+  Zap,
+} from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 

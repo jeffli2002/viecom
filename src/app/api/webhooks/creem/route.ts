@@ -2,14 +2,6 @@
 import { randomUUID } from 'node:crypto';
 import { paymentConfig } from '@/config/payment.config';
 import { env } from '@/env';
-import {
-  sendCreditPackPurchaseEmail,
-  sendSubscriptionCancelledEmail,
-  sendSubscriptionCreatedEmail,
-  sendSubscriptionDowngradedEmail,
-  sendSubscriptionUpgradedEmail,
-} from '@/lib/email';
-import { getUserInfo } from '@/lib/email/user-helper';
 import { creemService } from '@/lib/creem/creem-service';
 import { enforceSingleCreemSubscription } from '@/lib/creem/enforce-single-subscription';
 import {
@@ -21,6 +13,14 @@ import {
 } from '@/lib/creem/plan-utils';
 import { normalizeCreemStatus } from '@/lib/creem/status-utils';
 import { grantSubscriptionCredits } from '@/lib/creem/subscription-credits';
+import {
+  sendCreditPackPurchaseEmail,
+  sendSubscriptionCancelledEmail,
+  sendSubscriptionCreatedEmail,
+  sendSubscriptionDowngradedEmail,
+  sendSubscriptionUpgradedEmail,
+} from '@/lib/email';
+import { getUserInfo } from '@/lib/email/user-helper';
 import { db } from '@/server/db';
 import { paymentRepository } from '@/server/db/repositories/payment-repository';
 import { creditTransactions, userCredits } from '@/server/db/schema';
@@ -375,7 +375,7 @@ async function handleCreditPackPurchase(data: CreemWebhookData) {
     const creditPack = paymentConfig.creditPacks.find(
       (pack) => pack.creemProductKey === productId || pack.credits === credits
     );
-    const rawAmount = typeof amount === 'number' ? amount : creditPack?.price ?? 0;
+    const rawAmount = typeof amount === 'number' ? amount : (creditPack?.price ?? 0);
     const normalizedAmount = rawAmount > 100 ? rawAmount / 100 : rawAmount;
     const metadataPayload = {
       provider: 'creem',
@@ -455,7 +455,7 @@ async function handleCreditPackPurchase(data: CreemWebhookData) {
         // Find credit pack by credits amount
         const packName = creditPack?.name || productName || `${credits} Credits`;
         const packPrice = normalizedAmount || creditPack?.price || 0;
-        
+
         await sendCreditPackPurchaseEmail(
           userInfo.email,
           userInfo.name,
@@ -566,16 +566,19 @@ async function handleCheckoutComplete(data: CreemWebhookData) {
         // Grant credits immediately for non-trial subscriptions
         if (normalizedStatus !== 'trialing') {
           await grantSubscriptionCredits(userId, planId, subscriptionId, resolvedInterval, false);
-          
+
           // Send subscription created email
           try {
             const userInfo = await getUserInfo(userId);
             if (userInfo) {
               const plan = paymentConfig.plans.find((p) => p.id === planId);
               const planName = plan?.name || planId;
-              const planPrice = resolvedInterval === 'year' && plan?.yearlyPrice ? plan.yearlyPrice : plan?.price || 0;
+              const planPrice =
+                resolvedInterval === 'year' && plan?.yearlyPrice
+                  ? plan.yearlyPrice
+                  : plan?.price || 0;
               const credits = getCreditsForPlan(planId, resolvedInterval).amount;
-              
+
               await sendSubscriptionCreatedEmail(
                 userInfo.email,
                 userInfo.name,
@@ -762,16 +765,19 @@ async function handleSubscriptionCreated(data: CreemWebhookData) {
       // Only grant credits if not in trial or if trial just ended
       if (planId && userId && normalizedStatus !== 'trialing') {
         await grantSubscriptionCredits(userId, planId, subscriptionId, resolvedInterval, false);
-        
+
         // Send subscription created email
         try {
           const userInfo = await getUserInfo(userId);
           if (userInfo) {
             const plan = paymentConfig.plans.find((p) => p.id === planId);
             const planName = plan?.name || planId;
-            const planPrice = resolvedInterval === 'year' && plan?.yearlyPrice ? plan.yearlyPrice : plan?.price || 0;
+            const planPrice =
+              resolvedInterval === 'year' && plan?.yearlyPrice
+                ? plan.yearlyPrice
+                : plan?.price || 0;
             const credits = getCreditsForPlan(planId, resolvedInterval).amount;
-            
+
             await sendSubscriptionCreatedEmail(
               userInfo.email,
               userInfo.name,
@@ -969,9 +975,12 @@ async function handleSubscriptionUpdate(data: CreemWebhookData) {
                 const newPlan = paymentConfig.plans.find((p) => p.id === newPlanId);
                 const oldPlanName = oldPlan?.name || oldPlanId;
                 const newPlanName = newPlan?.name || newPlanId;
-                const newPlanPrice = newInterval === 'year' && newPlan?.yearlyPrice ? newPlan.yearlyPrice : newPlan?.price || 0;
+                const newPlanPrice =
+                  newInterval === 'year' && newPlan?.yearlyPrice
+                    ? newPlan.yearlyPrice
+                    : newPlan?.price || 0;
                 const newCredits = newCreditInfo.amount;
-                
+
                 await sendSubscriptionUpgradedEmail(
                   userInfo.email,
                   userInfo.name,
@@ -1030,9 +1039,12 @@ async function handleSubscriptionUpdate(data: CreemWebhookData) {
                 const newPlan = paymentConfig.plans.find((p) => p.id === newPlanId);
                 const oldPlanName = oldPlan?.name || oldPlanId;
                 const newPlanName = newPlan?.name || newPlanId;
-                const newPlanPrice = newInterval === 'year' && newPlan?.yearlyPrice ? newPlan.yearlyPrice : newPlan?.price || 0;
+                const newPlanPrice =
+                  newInterval === 'year' && newPlan?.yearlyPrice
+                    ? newPlan.yearlyPrice
+                    : newPlan?.price || 0;
                 const newCredits = newCreditInfo.amount;
-                
+
                 await sendSubscriptionDowngradedEmail(
                   userInfo.email,
                   userInfo.name,
@@ -1269,9 +1281,12 @@ async function handleSubscriptionUpdate(data: CreemWebhookData) {
               const newPlan = paymentConfig.plans.find((p) => p.id === scheduledPlanId);
               const oldPlanName = oldPlan?.name || oldPlanId;
               const newPlanName = newPlan?.name || scheduledPlanId;
-              const newPlanPrice = scheduledInterval === 'year' && newPlan?.yearlyPrice ? newPlan.yearlyPrice : newPlan?.price || 0;
+              const newPlanPrice =
+                scheduledInterval === 'year' && newPlan?.yearlyPrice
+                  ? newPlan.yearlyPrice
+                  : newPlan?.price || 0;
               const newCredits = getCreditsForPlan(scheduledPlanId, scheduledInterval).amount;
-              
+
               await sendSubscriptionUpgradedEmail(
                 userInfo.email,
                 userInfo.name,
@@ -1347,8 +1362,11 @@ async function handleSubscriptionDeleted(data: CreemWebhookData) {
           const plan = paymentConfig.plans.find((p) => p.id === subscription.priceId);
           const planName = plan?.name || subscription.priceId || 'Subscription';
           const cancelDate = new Date();
-          const accessUntilDate = subscription.periodEnd || currentPeriodEnd ? new Date(currentPeriodEnd || subscription.periodEnd) : cancelDate;
-          
+          const accessUntilDate =
+            subscription.periodEnd || currentPeriodEnd
+              ? new Date(currentPeriodEnd || subscription.periodEnd)
+              : cancelDate;
+
           await sendSubscriptionCancelledEmail(
             userInfo.email,
             userInfo.name,

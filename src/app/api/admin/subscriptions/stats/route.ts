@@ -104,7 +104,8 @@ export async function GET(request: Request) {
     const response = NextResponse.json({
       planCounts: planCountsMap,
       statusCounts: statusCountsMap,
-      recentSubscriptions,
+      recentSubscriptions: recentSubscriptions || [],
+      creditPackPurchases: [], // TODO: Implement credit pack purchases query
     });
 
     // Prevent caching of admin data
