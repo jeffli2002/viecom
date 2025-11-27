@@ -1,0 +1,55 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1762690026851,
+      "tag": "0000_little_puff_adder",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1762690100000,
+      "tag": "0001_add_reward_tables",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1762943139593,
+      "tag": "0002_glamorous_the_watchers",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1763540745752,
+      "tag": "0003_lethal_menace",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1763796501466,
+      "tag": "0004_credit_pack_purchase_source",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1764246066360,
+      "tag": "0005_premium_centennial",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1764251853877,
+      "tag": "0006_round_terror",
+      "breakpoints": true
+    }
+  ]
+}
