@@ -1,8 +1,8 @@
 import { randomUUID } from 'node:crypto';
 import { LANDING_SHOWCASE_LIMIT } from '@/config/showcase.config';
 import { db } from '@/server/db';
-import { publishSubmissions } from '@/server/db/schema';
-import { and, desc, eq } from 'drizzle-orm';
+import { landingShowcaseEntries, publishSubmissions } from '@/server/db/schema';
+import { and, asc, desc, eq } from 'drizzle-orm';
 
 export type PublishSubmissionRecord = typeof publishSubmissions.$inferSelect;
 
@@ -110,7 +110,18 @@ export async function getApprovedShowcaseEntries(options: {
         ? LANDING_SHOWCASE_LIMIT
         : 200;
 
-  const rows = await db
+  const adminEntries = await db
+    .select({
+      id: landingShowcaseEntries.id,
+      imageUrl: landingShowcaseEntries.imageUrl,
+      title: landingShowcaseEntries.title,
+      category: landingShowcaseEntries.category,
+    })
+    .from(landingShowcaseEntries)
+    .where(eq(landingShowcaseEntries.isVisible, true))
+    .orderBy(asc(landingShowcaseEntries.sortOrder), desc(landingShowcaseEntries.createdAt));
+
+  const userRows = await db
     .select({
       id: publishSubmissions.id,
       assetUrl: publishSubmissions.assetUrl,
@@ -130,10 +141,23 @@ export async function getApprovedShowcaseEntries(options: {
       )
     )
     .orderBy(
-      desc(publishSubmissions.approvedAt),
+      placement === 'landing'
+        ? asc(publishSubmissions.landingOrder)
+        : desc(publishSubmissions.approvedAt),
       desc(publishSubmissions.createdAt)
     )
     .limit(queryLimit);
 
-  return rows;
+  const adminItems = adminEntries.map((entry) => ({
+    id: entry.id,
+    assetUrl: entry.imageUrl,
+    previewUrl: entry.imageUrl,
+    title: entry.title,
+    category: entry.category,
+    assetType: 'image' as const,
+    approvedAt: null,
+  }));
+
+  const combined = [...adminItems, ...userRows];
+  return combined.slice(0, queryLimit);
 }

@@ -162,6 +162,7 @@ export default function AdminPublishPage() {
 
   return (
     <div className="p-6 space-y-6">
+      <LandingShowcaseConfigurator />
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold text-slate-900">Publish Audit</h1>
@@ -333,5 +334,327 @@ export default function AdminPublishPage() {
         })}
       </div>
     </div>
+  );
+}
+type LandingShowcaseEntry = {
+  id: string;
+  imageUrl: string;
+  title: string;
+  subtitle: string | null;
+  category: string | null;
+  ctaUrl: string | null;
+  sortOrder: number;
+  isVisible: boolean;
+};
+
+function LandingShowcaseConfigurator() {
+  const [entries, setEntries] = useState<LandingShowcaseEntry[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [file, setFile] = useState<File | null>(null);
+  const [form, setForm] = useState({
+    title: '',
+    subtitle: '',
+    category: 'other',
+    ctaUrl: '',
+    imageUrl: '',
+  });
+
+  const fetchEntries = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      const response = await fetch('/api/admin/landing-showcase', { cache: 'no-store' });
+      const data = await response.json();
+      setEntries(Array.isArray(data.entries) ? data.entries : []);
+    } catch (error) {
+      console.error(error);
+      toast.error('Failed to load landing showcase entries');
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    void fetchEntries();
+  }, [fetchEntries]);
+
+  const prepareUpload = async (uploadFile: File) => {
+    const response = await fetch('/api/admin/uploads/prepare', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        fileName: uploadFile.name,
+        contentType: uploadFile.type || 'application/octet-stream',
+        fileSize: uploadFile.size,
+      }),
+    });
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok || !data?.uploadUrl || !data?.publicUrl) {
+      throw new Error(data?.error || 'Failed to prepare upload');
+    }
+    const uploadResponse = await fetch(data.uploadUrl, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': uploadFile.type || 'application/octet-stream',
+      },
+      body: uploadFile,
+    });
+    if (!uploadResponse.ok) {
+      throw new Error('Upload failed. Please try again.');
+    }
+    return data.publicUrl as string;
+  };
+
+  const handleCreateEntry = async () => {
+    if (!form.title.trim()) {
+      toast.error('Title is required');
+      return;
+    }
+    setIsSaving(true);
+    try {
+      let imageUrl = form.imageUrl.trim();
+      if (file) {
+        imageUrl = await prepareUpload(file);
+      }
+      if (!imageUrl) {
+        throw new Error('Image is required');
+      }
+      const response = await fetch('/api/admin/landing-showcase', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          imageUrl,
+          title: form.title.trim(),
+          subtitle: form.subtitle.trim() || null,
+          category: form.category,
+          ctaUrl: form.ctaUrl.trim() || null,
+        }),
+      });
+      if (!response.ok) {
+        const data = await response.json().catch(() => ({}));
+        throw new Error(data?.error || 'Failed to create entry');
+      }
+      toast.success('Showcase entry added');
+      setForm({
+        title: '',
+        subtitle: '',
+        category: 'other',
+        ctaUrl: '',
+        imageUrl: '',
+      });
+      setFile(null);
+      setIsModalOpen(false);
+      await fetchEntries();
+    } catch (error) {
+      console.error(error);
+      toast.error(error instanceof Error ? error.message : 'Failed to create entry');
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleDelete = async (entryId: string) => {
+    if (!window.confirm('Remove this showcase entry?')) {
+      return;
+    }
+    try {
+      const response = await fetch(`/api/admin/landing-showcase/${entryId}`, {
+        method: 'DELETE',
+      });
+      if (!response.ok) {
+        throw new Error('Failed to remove entry');
+      }
+      toast.success('Entry removed');
+      await fetchEntries();
+    } catch (error) {
+      console.error(error);
+      toast.error('Failed to remove entry');
+    }
+  };
+
+  const handleReorder = async (from: number, to: number) => {
+    if (to < 0 || to >= entries.length) return;
+    const updated = [...entries];
+    const [moved] = updated.splice(from, 1);
+    updated.splice(to, 0, moved);
+    setEntries(updated);
+    try {
+      await fetch('/api/admin/landing-showcase/reorder', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ids: updated.map((entry) => entry.id) }),
+      });
+    } catch (error) {
+      console.error(error);
+      toast.error('Failed to reorder entries');
+      void fetchEntries();
+    }
+  };
+
+  return (
+    <section className="rounded-2xl border border-slate-200 bg-white p-6 space-y-4">
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        <div>
+          <p className="text-sm uppercase tracking-widest text-teal-500">
+            Landing Page Showcase
+          </p>
+          <h2 className="text-2xl font-bold text-slate-900">Featured slots</h2>
+          <p className="text-sm text-slate-500">
+            Upload custom creatives, reorder highlights, and control visibility.
+          </p>
+        </div>
+        <button
+          className="rounded-full bg-teal-500 px-5 py-2 text-sm font-semibold text-white hover:bg-teal-600"
+          onClick={() => setIsModalOpen(true)}
+        >
+          Add Showcase Entry
+        </button>
+      </div>
+      {isLoading ? (
+        <div className="rounded-xl border border-dashed border-slate-200 p-6 text-center text-slate-500">
+          Loading showcase entries...
+        </div>
+      ) : entries.length === 0 ? (
+        <div className="rounded-xl border border-dashed border-slate-200 p-6 text-center text-slate-500">
+          No custom entries yet.
+        </div>
+      ) : (
+        <div className="space-y-4">
+          {entries.map((entry, index) => (
+            <div
+              key={entry.id}
+              className="flex flex-col gap-4 rounded-xl border border-slate-200 p-4 md:flex-row md:items-center"
+            >
+              <div className="flex items-center gap-4">
+                <div className="h-24 w-20 overflow-hidden rounded-lg border border-slate-100 bg-slate-50">
+                  <Image
+                    src={entry.imageUrl}
+                    alt={entry.title}
+                    width={160}
+                    height={120}
+                    className="h-full w-full object-cover"
+                  />
+                </div>
+                <div>
+                  <p className="text-xs text-slate-400">Slot #{index + 1}</p>
+                  <h3 className="text-lg font-semibold">{entry.title}</h3>
+                  <p className="text-xs text-slate-500">
+                    {entry.category
+                      ? SHOWCASE_CATEGORIES.find((c) => c.id === entry.category)?.label ||
+                        'Showcase'
+                      : 'Showcase'}
+                  </p>
+                </div>
+              </div>
+              <div className="flex flex-wrap items-center gap-3 md:ml-auto">
+                <button
+                  className="rounded-full border border-slate-200 px-4 py-1 text-sm"
+                  onClick={() => handleReorder(index, index - 1)}
+                  disabled={index === 0}
+                >
+                  Move Up
+                </button>
+                <button
+                  className="rounded-full border border-slate-200 px-4 py-1 text-sm"
+                  onClick={() => handleReorder(index, index + 1)}
+                  disabled={index === entries.length - 1}
+                >
+                  Move Down
+                </button>
+                <button
+                  className="rounded-full border border-red-200 px-4 py-1 text-sm text-red-600"
+                  onClick={() => handleDelete(entry.id)}
+                >
+                  Remove
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {isModalOpen && (
+        <dialog
+          open
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4"
+          onClose={() => setIsModalOpen(false)}
+        >
+          <div className="w-full max-w-lg rounded-2xl bg-white p-6 shadow-xl space-y-4 text-slate-700">
+            <h3 className="text-xl font-semibold">Add Landing Showcase</h3>
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Title</label>
+              <input
+                className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm"
+                value={form.title}
+                onChange={(e) => setForm((prev) => ({ ...prev, title: e.target.value }))}
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Subtitle</label>
+              <input
+                className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm"
+                value={form.subtitle}
+                onChange={(e) => setForm((prev) => ({ ...prev, subtitle: e.target.value }))}
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Category</label>
+              <select
+                className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm"
+                value={form.category}
+                onChange={(e) => setForm((prev) => ({ ...prev, category: e.target.value }))}
+              >
+                {SHOWCASE_CATEGORIES.map((category) => (
+                  <option key={category.id} value={category.id}>
+                    {category.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium">CTA URL (optional)</label>
+              <input
+                className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm"
+                value={form.ctaUrl}
+                onChange={(e) => setForm((prev) => ({ ...prev, ctaUrl: e.target.value }))}
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Upload Image</label>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={(e) => setFile(e.target.files?.[0] ?? null)}
+              />
+              <p className="text-xs text-slate-500">
+                Or provide an image URL:
+              </p>
+              <input
+                className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm"
+                value={form.imageUrl}
+                onChange={(e) => setForm((prev) => ({ ...prev, imageUrl: e.target.value }))}
+                placeholder="https://..."
+              />
+            </div>
+            <div className="flex flex-wrap gap-3">
+              <button
+                className="rounded-full bg-teal-500 px-4 py-2 text-sm font-semibold text-white hover:bg-teal-600 disabled:opacity-50"
+                onClick={handleCreateEntry}
+                disabled={isSaving}
+              >
+                {isSaving ? 'Uploading...' : 'Add Showcase'}
+              </button>
+              <button
+                className="rounded-full border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-700"
+                onClick={() => setIsModalOpen(false)}
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </dialog>
+      )}
+    </section>
   );
 }

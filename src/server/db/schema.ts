@@ -234,6 +234,24 @@ export const publishSubmissions = pgTable('publish_submissions', {
   reviewedAt: timestamp('reviewed_at'),
   approvedAt: timestamp('approved_at'),
   rejectedAt: timestamp('rejected_at'),
+  landingOrder: integer('landing_order'),
+  createdAt: timestamp('created_at')
+    .$defaultFn(() => new Date())
+    .notNull(),
+  updatedAt: timestamp('updated_at')
+    .$defaultFn(() => new Date())
+    .notNull(),
+});
+
+export const landingShowcaseEntries = pgTable('landing_showcase_entries', {
+  id: text('id').primaryKey(),
+  imageUrl: text('image_url').notNull(),
+  title: text('title').notNull(),
+  subtitle: text('subtitle'),
+  category: text('category'),
+  ctaUrl: text('cta_url'),
+  isVisible: boolean('is_visible').notNull().default(true),
+  sortOrder: integer('sort_order').notNull().default(0),
   createdAt: timestamp('created_at')
     .$defaultFn(() => new Date())
     .notNull(),

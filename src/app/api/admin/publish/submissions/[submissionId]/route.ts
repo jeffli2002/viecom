@@ -2,7 +2,7 @@ import { requireAdmin } from '@/lib/admin/auth';
 import { SHOWCASE_CATEGORIES } from '@/config/showcase.config';
 import { db } from '@/server/db';
 import { publishSubmissions } from '@/server/db/schema';
-import { eq } from 'drizzle-orm';
+import { eq, sql } from 'drizzle-orm';
 import { NextRequest, NextResponse } from 'next/server';
 
 export const dynamic = 'force-dynamic';
@@ -17,6 +17,14 @@ export async function PATCH(
     const id = params.submissionId;
     if (!id) {
       return NextResponse.json({ error: 'Submission ID is required' }, { status: 400 });
+    }
+
+    const submission = await db.query.publishSubmissions.findFirst({
+      where: eq(publishSubmissions.id, id),
+    });
+
+    if (!submission) {
+      return NextResponse.json({ error: 'Submission not found' }, { status: 404 });
     }
 
     const body = await request.json();
@@ -46,16 +54,41 @@ export async function PATCH(
       if (category && !SHOWCASE_CATEGORIES.some((item) => item.id === category)) {
         return NextResponse.json({ error: 'Invalid category' }, { status: 400 });
       }
-      updateData.publishToLanding = Boolean(publishToLanding);
-      updateData.publishToShowcase = Boolean(publishToShowcase || publishToLanding);
+      const landingFlag =
+        typeof publishToLanding === 'boolean' ? publishToLanding : submission.publishToLanding;
+      const showcaseFlag =
+        typeof publishToShowcase === 'boolean'
+          ? publishToShowcase
+          : submission.publishToShowcase || landingFlag;
+
+      updateData.publishToLanding = landingFlag;
+      updateData.publishToShowcase = showcaseFlag;
       updateData.category = category || null;
       updateData.approvedAt = now;
       updateData.rejectedAt = null;
       updateData.rejectionReason = null;
+
+      if (landingFlag) {
+        const existingOrder = submission.landingOrder;
+        if (existingOrder && existingOrder > 0) {
+          updateData.landingOrder = existingOrder;
+        } else {
+          const [maxRow] = await db
+            .select({
+              max: sql<number | null>`MAX(${publishSubmissions.landingOrder})`,
+            })
+            .from(publishSubmissions);
+          const nextOrder = (maxRow?.max ?? 0) + 1;
+          updateData.landingOrder = nextOrder;
+        }
+      } else {
+        updateData.landingOrder = null;
+      }
     } else {
       updateData.publishToLanding = false;
       updateData.publishToShowcase = false;
       updateData.category = null;
+      updateData.landingOrder = null;
       updateData.rejectionReason =
         typeof rejectionReason === 'string' && rejectionReason.trim().length > 0
           ? rejectionReason
@@ -69,10 +102,6 @@ export async function PATCH(
       .set(updateData)
       .where(eq(publishSubmissions.id, id))
       .returning();
-
-    if (!updated) {
-      return NextResponse.json({ error: 'Submission not found' }, { status: 404 });
-    }
 
     return NextResponse.json({ success: true, submission: updated });
   } catch (error) {

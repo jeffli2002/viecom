@@ -1,7 +1,7 @@
 import { getShowcaseCategoryLabel } from '@/config/showcase.config';
 import { db } from '@/server/db';
-import { publishSubmissions } from '@/server/db/schema';
-import { and, desc, eq } from 'drizzle-orm';
+import { landingShowcaseEntries, publishSubmissions } from '@/server/db/schema';
+import { and, asc, desc, eq } from 'drizzle-orm';
 import { NextRequest, NextResponse } from 'next/server';
 
 export const dynamic = 'force-dynamic';
@@ -18,7 +18,18 @@ export async function GET(request: NextRequest) {
         ? Math.min(Math.max(limitParam || 12, 1), 20)
         : Math.min(Math.max(limitParam || 48, 4), 200);
 
-    const rows = await db
+    const adminEntries = await db
+      .select({
+        id: landingShowcaseEntries.id,
+        imageUrl: landingShowcaseEntries.imageUrl,
+        title: landingShowcaseEntries.title,
+        category: landingShowcaseEntries.category,
+      })
+      .from(landingShowcaseEntries)
+      .where(eq(landingShowcaseEntries.isVisible, true))
+      .orderBy(asc(landingShowcaseEntries.sortOrder), desc(landingShowcaseEntries.createdAt));
+
+    const userRows = await db
       .select({
         id: publishSubmissions.id,
         assetUrl: publishSubmissions.assetUrl,
@@ -36,10 +47,24 @@ export async function GET(request: NextRequest) {
             : eq(publishSubmissions.publishToShowcase, true)
         )
       )
-      .orderBy(desc(publishSubmissions.approvedAt), desc(publishSubmissions.createdAt))
+      .orderBy(
+        placement === 'landing'
+          ? asc(publishSubmissions.landingOrder)
+          : desc(publishSubmissions.approvedAt),
+        desc(publishSubmissions.createdAt)
+      )
       .limit(limit);
 
-    const items = rows.map((row) => ({
+    const adminItems = adminEntries.map((entry) => ({
+      id: `admin-${entry.id}`,
+      type: 'image' as const,
+      url: entry.imageUrl,
+      previewUrl: entry.imageUrl,
+      title: entry.title,
+      category: getShowcaseCategoryLabel(entry.category),
+    }));
+
+    const userItems = userRows.map((row) => ({
       id: row.id,
       type: row.assetType === 'video' ? 'video' : 'image',
       url: row.assetUrl,
@@ -48,7 +73,10 @@ export async function GET(request: NextRequest) {
       category: getShowcaseCategoryLabel(row.category),
     }));
 
-    return NextResponse.json({ success: true, placement, items });
+    const combined =
+      limit > 0 ? [...adminItems, ...userItems].slice(0, limit) : [...adminItems, ...userItems];
+
+    return NextResponse.json({ success: true, placement, items: combined });
   } catch (error) {
     console.error('Failed to load showcase items:', error);
     return NextResponse.json(
