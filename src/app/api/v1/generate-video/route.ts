@@ -322,7 +322,18 @@ export async function POST(request: NextRequest) {
         });
       } catch (error) {
         console.error('Error spending credits:', error);
-        // Don't fail the request if credit spending fails
+        // Clean up uploaded video if credit charge fails
+        try {
+          await r2StorageService.deleteFile(r2Result.key);
+        } catch (cleanupError) {
+          console.error('Failed to clean up video asset after credit charge failure:', cleanupError);
+        }
+        const isInsufficient =
+          error instanceof Error && error.message.includes('Insufficient credits');
+        const message = isInsufficient
+          ? `Insufficient credits. Required: ${creditCost} credits. Please earn more credits or upgrade your plan.`
+          : 'Failed to charge credits for this generation. Please try again.';
+        return NextResponse.json({ error: message }, { status: isInsufficient ? 402 : 500 });
       }
     }
 
