@@ -371,6 +371,7 @@ function LandingShowcaseConfigurator() {
     imageUrl: '',
   });
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [draggedAdminIndex, setDraggedAdminIndex] = useState<number | null>(null);
 
   useEffect(() => {
     if (!file && form.imageUrl) {
@@ -670,23 +671,43 @@ function LandingShowcaseConfigurator() {
           <p className="text-center text-sm text-slate-500">No landing entries yet.</p>
         ) : (
           <div className="flex flex-wrap gap-4">
-            {combinedLandingItems.map((item, index) => {
+            {combinedLandingItems.map((item) => {
               const isSubmission = item.type === 'submission';
               const previewUrl = item.previewUrl;
               const isVideo =
                 previewUrl?.match(/\\.mp4$|\\.webm$|\\.mov$/i) ||
                 (isSubmission &&
                   (item.data as SubmissionResponse).assetUrl.match(/\\.mp4$|\\.webm$|\\.mov$/i));
+              const adminIndex =
+                item.type === 'admin'
+                  ? entries.findIndex((entry) => entry.id === item.id)
+                  : -1;
+              const isDraggable = !isSubmission && adminIndex >= 0;
               return (
                 <div
                   key={`${item.type}-${item.id}`}
                   className="relative flex h-40 w-32 flex-col overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm"
-                  draggable={!isSubmission}
+                  draggable={isDraggable}
                   onDragStart={() => {
-                    if (!isSubmission) {
-                      handleReorder(index, index);
+                    if (isDraggable) {
+                      setDraggedAdminIndex(adminIndex);
                     }
                   }}
+                  onDragOver={(event) => {
+                    if (isDraggable && draggedAdminIndex !== null) {
+                      event.preventDefault();
+                    }
+                  }}
+                  onDrop={(event) => {
+                    if (isDraggable && draggedAdminIndex !== null && adminIndex >= 0) {
+                      event.preventDefault();
+                      if (draggedAdminIndex !== adminIndex) {
+                        handleReorder(draggedAdminIndex, adminIndex);
+                      }
+                      setDraggedAdminIndex(null);
+                    }
+                  }}
+                  onDragEnd={() => setDraggedAdminIndex(null)}
                 >
                   <button
                     type="button"
