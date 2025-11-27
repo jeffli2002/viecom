@@ -9,9 +9,9 @@ export const metadata: Metadata = {
   description: 'Generate high-quality product images and videos at scale',
   keywords: DEFAULT_SEO_KEYWORDS,
   icons: {
-    icon: '/thumbnailV1.png',
-    shortcut: '/thumbnailV1.png',
-    apple: '/thumbnailV1.png',
+    icon: '/ViecomFav.png',
+    shortcut: '/ViecomFav.png',
+    apple: '/ViecomFav.png',
   },
 };
 
