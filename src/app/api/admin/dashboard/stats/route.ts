@@ -1,6 +1,12 @@
 import { requireAdmin } from '@/lib/admin/auth';
 import { db } from '@/server/db';
-import { creditTransactions, payment, subscription, user } from '@/server/db/schema';
+import {
+  creditTransactions,
+  generatedAsset,
+  payment,
+  subscription,
+  user,
+} from '@/server/db/schema';
 import { and, eq, gte, sql } from 'drizzle-orm';
 import { NextResponse } from 'next/server';
 
@@ -43,22 +49,31 @@ export async function GET(request: Request) {
     // TODO: Add amount column to payment table or calculate from subscription plans
     const todayRevenue = [{ total: 0 }];
 
-    // Get today's credits consumed (all API calls)
-    const todayCreditsConsumed = await db
-      .select({ total: sql<number>`COALESCE(SUM(ABS(amount)), 0)` })
-      .from(creditTransactions)
+    // Get today's credits consumed from generated assets
+    const todayImageCreditsResult = await db
+      .select({ total: sql<number>`COALESCE(SUM(credits_spent), 0)` })
+      .from(generatedAsset)
       .where(
         and(
-          eq(creditTransactions.type, 'spend'),
-          eq(creditTransactions.source, 'api_call'),
-          gte(creditTransactions.createdAt, today)
+          eq(generatedAsset.assetType, 'image'),
+          eq(generatedAsset.status, 'completed'),
+          gte(generatedAsset.createdAt, today)
         )
       );
 
-    // For now, we'll show total API credits consumed
-    // In the future, you can differentiate by checking metadata or description
-    const todayImageCredits = todayCreditsConsumed;
-    const todayVideoCredits = todayCreditsConsumed;
+    const todayVideoCreditsResult = await db
+      .select({ total: sql<number>`COALESCE(SUM(credits_spent), 0)` })
+      .from(generatedAsset)
+      .where(
+        and(
+          eq(generatedAsset.assetType, 'video'),
+          eq(generatedAsset.status, 'completed'),
+          gte(generatedAsset.createdAt, today)
+        )
+      );
+
+    const todayImageCredits = todayImageCreditsResult;
+    const todayVideoCredits = todayVideoCreditsResult;
 
     // Get registration trend (last 30 days)
     const registrationTrend = await db.execute(sql`
@@ -71,13 +86,13 @@ export async function GET(request: Request) {
       ORDER BY date ASC
     `);
 
-    // Get credits trend (last 30 days)
+    // Get credits trend from generated assets (more accurate)
     const creditsTrend = await db.execute(sql`
       SELECT 
         DATE(created_at) as date,
-        SUM(CASE WHEN type = 'spend' AND source = 'api_call' AND amount < 0 THEN ABS(amount) ELSE 0 END) as "imageCredits",
-        SUM(CASE WHEN type = 'spend' AND source = 'api_call' AND amount < 0 THEN ABS(amount) ELSE 0 END) as "videoCredits"
-      FROM ${creditTransactions}
+        COALESCE(SUM(CASE WHEN asset_type = 'image' AND status = 'completed' THEN credits_spent ELSE 0 END), 0) as "imageCredits",
+        COALESCE(SUM(CASE WHEN asset_type = 'video' AND status = 'completed' THEN credits_spent ELSE 0 END), 0) as "videoCredits"
+      FROM ${generatedAsset}
       WHERE created_at >= ${startDate}
       GROUP BY DATE(created_at)
       ORDER BY date ASC
