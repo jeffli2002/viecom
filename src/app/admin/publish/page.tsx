@@ -779,9 +779,17 @@ function LandingShowcaseConfigurator() {
                 {(file || previewUrl || form.imageUrl) && (
                   <div className="mt-4 w-full overflow-hidden rounded-lg border border-slate-200 bg-white">
                     {previewUrl ? (
-                      <img src={previewUrl} alt="Preview" className="w-full object-cover" />
+                      <img
+                        src={previewUrl}
+                        alt="Preview"
+                        className="h-48 w-full object-cover"
+                      />
                     ) : form.imageUrl ? (
-                      <img src={form.imageUrl} alt="Preview" className="w-full object-cover" />
+                      <img
+                        src={form.imageUrl}
+                        alt="Preview"
+                        className="h-48 w-full object-cover"
+                      />
                     ) : null}
                   </div>
                 )}
