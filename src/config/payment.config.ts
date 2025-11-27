@@ -1,3 +1,5 @@
+import { creditsConfig } from './credits.config';
+
 export interface CreditPack {
   id: string;
   name: string;
@@ -123,7 +125,7 @@ export const paymentConfig: PaymentConfig = {
         '30 credits sign-up bonus (one-time)',
         'Daily check-in rewards (2 credits/day)',
         'Referral rewards (10 credits per referral)',
-        'Social share rewards (5 credits per share)',
+        `Social share rewards (${creditsConfig.rewards.socialShare.creditsPerShare} credits per share)`,
         'Text-to-image generation',
         'Image-to-image generation',
         'Text-to-video generation',

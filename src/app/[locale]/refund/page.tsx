@@ -1,5 +1,6 @@
 // @ts-nocheck
 import { Card, CardContent } from '@/components/ui/card';
+import { creditsConfig } from '@/config/credits.config';
 import { Link } from '@/i18n/navigation';
 import { DEFAULT_SEO_KEYWORDS } from '@/lib/seo/metadata';
 import { AlertCircle } from 'lucide-react';
@@ -18,6 +19,7 @@ export const metadata: Metadata = {
 };
 
 export default function RefundPolicyPage() {
+  const socialShareCredits = creditsConfig.rewards.socialShare.creditsPerShare;
   return (
     <div className="container mx-auto px-4 py-12 max-w-4xl">
       <h1 className="mb-8 text-4xl font-bold text-gray-900 dark:text-white">Refund Policy</h1>
@@ -191,7 +193,7 @@ export default function RefundPolicyPage() {
                 <strong>Referral Rewards:</strong> Earn 10 credits per successful referral
               </li>
               <li>
-                <strong>Social Sharing:</strong> Earn 5 credits per share
+                <strong>Social Sharing:</strong> Earn {socialShareCredits} credits per share
               </li>
             </ul>
 

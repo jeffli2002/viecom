@@ -1,3 +1,5 @@
+import { creditsConfig } from './credits.config';
+
 export type ShareRewardKey = 'copyLink' | 'publishViecom' | 'socialShare';
 
 export interface ShareRewardConfigItem {
@@ -18,7 +20,7 @@ export const SHARE_REWARD_CONFIG: Record<ShareRewardKey, ShareRewardConfigItem> 
     referencePrefix: 'publish_viecom',
   },
   socialShare: {
-    credits: 5,
+    credits: creditsConfig.rewards.socialShare.creditsPerShare,
     platform: 'other',
     referencePrefix: 'social_share',
   },

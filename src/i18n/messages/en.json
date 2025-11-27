@@ -211,6 +211,8 @@
     "shareSocialToast": "Opening {{platform}}...",
     "sharePublishOnViecom": "Publish on Viecom.pro",
     "sharePublishToast": "Publishing flow opened in a new tab.",
+    "sharePublishPending": "Complete your publish on Viecom.pro, then confirm to collect +{{credits}} credits.",
+    "shareConfirmPublish": "Confirm Publishing",
     "shareRewardedAmount": "Thanks for sharing! +{{credits}} credits added.",
     "shareRewardFailed": "We couldn't add credits for this share. Please try again later.",
     "shareLoginRequired": "Log in to earn credits for sharing.",
@@ -671,7 +673,7 @@
     },
     "q2": {
       "question": "What's included in the Free plan?",
-      "answer": "Free users get 30 credits on signup, daily check-in rewards (2 credits/day), referral rewards (10 credits), and social share rewards (5 credits). You can generate images and videos using these credits, with batch generation support (1 concurrent) and 7-day asset display."
+      "answer": "Free users get 30 credits on signup, daily check-in rewards (2 credits/day), referral rewards (10 credits), and social share rewards (2 credits). You can generate images and videos using these credits, with batch generation support (1 concurrent) and 7-day asset display."
     },
     "q3": {
       "question": "What video models and resolutions are available?",
@@ -699,7 +701,7 @@
     },
     "q9": {
       "question": "What happens when I run out of credits?",
-      "answer": "You have several options: (1) Purchase one-time credit packs starting at $9.90 for 300 credits (packs never expire), (2) Upgrade to Pro/Pro+ for monthly credit allocations (500-900 credits/month), or (3) Earn credits daily through check-ins (2 credits/day), referrals (10 credits per referral), and social sharing (5 credits per share). Credit packs are perfect if you need extra credits without committing to a subscription."
+      "answer": "You have several options: (1) Purchase one-time credit packs starting at $9.90 for 300 credits (packs never expire), (2) Upgrade to Pro/Pro+ for monthly credit allocations (500-900 credits/month), or (3) Earn credits daily through check-ins (2 credits/day), referrals (10 credits per referral), and social sharing (2 credits per share). Credit packs are perfect if you need extra credits without committing to a subscription."
     }
   },
   "brandAnalysis": {

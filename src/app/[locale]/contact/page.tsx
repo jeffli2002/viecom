@@ -4,6 +4,8 @@ import { Clock, Globe, Mail, MapPin, MessageSquare } from 'lucide-react';
 
 export default function ContactPage() {
   const dailyCheckinCredits = creditsConfig.rewards.checkin.dailyCredits;
+  const referralCredits = creditsConfig.rewards.referral.creditsPerReferral;
+  const socialShareCredits = creditsConfig.rewards.socialShare.creditsPerShare;
   return (
     <div className="container mx-auto px-4 py-12 max-w-4xl">
       <div className="mb-12 text-center">
@@ -131,7 +133,8 @@ export default function ContactPage() {
               You have several options: (1) Upgrade to a higher plan for more monthly credits, (2)
               Purchase one-time credit packs starting at $9.90 for 300 credits (packs never expire),
               or (3) Earn credits through daily check-ins ({dailyCheckinCredits} credits/day),
-              referrals (10 credits per referral), and social sharing (5 credits per share). Credit
+              referrals ({referralCredits} credits per referral), and social sharing (
+              {socialShareCredits} credits per share). Credit
               packs are perfect if you need extra credits without committing to a subscription.
             </p>
           </div>

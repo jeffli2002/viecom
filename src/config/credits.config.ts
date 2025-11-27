@@ -157,7 +157,7 @@ export const creditsConfig: CreditsConfig = {
       creditsPerReferral: 10, // Credits when referred user completes first generation
     },
     socialShare: {
-      creditsPerShare: 5, // Credits per social media share
+      creditsPerShare: 2, // Credits per social media share
     },
   },
 };
@@ -212,4 +212,3 @@ export function getVideoModelInfo(params: {
     apiModel: 'sora-2-pro-text-to-video', // 或 sora-2-pro-image-to-video
   };
 }
-

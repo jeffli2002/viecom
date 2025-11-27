@@ -90,6 +90,7 @@ export default function VideoGenerator() {
     failProgress,
   } = useGenerationProgress();
   const publishUrl = 'https://viecom.pro/publish';
+  const [awaitingPublishConfirmation, setAwaitingPublishConfirmation] = useState(false);
   const defaultShareText = t('shareDefaultText');
   const sharePlatforms = buildSharePlatforms(
     {
@@ -104,6 +105,10 @@ export default function VideoGenerator() {
 
   // Brand analysis data (loaded from sessionStorage, no UI)
   const [brandAnalysis, setBrandAnalysis] = useState<BrandToneAnalysis | null>(null);
+
+  useEffect(() => {
+    setAwaitingPublishConfirmation(false);
+  }, [result?.videoUrl]);
 
   const maxPromptLength = 2000;
 
@@ -482,9 +487,7 @@ export default function VideoGenerator() {
       const publishTarget = `${publishUrl}?asset=${encodeURIComponent(result.videoUrl)}`;
       window.open(publishTarget, '_blank', 'noopener,noreferrer');
       toast.success(t('sharePublishToast'));
-      await awardShareReward('publishViecom', {
-        platformValue: SHARE_REWARD_CONFIG.publishViecom.platform,
-      });
+      setAwaitingPublishConfirmation(true);
       return;
     }
 
@@ -509,6 +512,13 @@ export default function VideoGenerator() {
         platformValue: platform.platformValue,
       });
     }
+  };
+
+  const handleConfirmPublish = async () => {
+    await awardShareReward('publishViecom', {
+      platformValue: SHARE_REWARD_CONFIG.publishViecom.platform,
+    });
+    setAwaitingPublishConfirmation(false);
   };
 
   const handleDownload = async (videoUrl: string) => {
@@ -1032,6 +1042,18 @@ export default function VideoGenerator() {
                     {t('generatingTakeMinutes')}
                   </p>
                 </div>
+                {awaitingPublishConfirmation && (
+                  <div className="rounded-lg border border-teal-200 bg-teal-50 dark:border-teal-800 dark:bg-teal-900/20 p-4 flex flex-col gap-3 text-sm text-slate-700 dark:text-slate-200">
+                    <p>{t('sharePublishPending', { credits: SHARE_REWARD_CONFIG.publishViecom.credits })}</p>
+                    <Button
+                      size="sm"
+                      onClick={handleConfirmPublish}
+                      className="self-center bg-teal-500 hover:bg-teal-600 text-white"
+                    >
+                      {t('shareConfirmPublish')}
+                    </Button>
+                  </div>
+                )}
               )}
 
               {result?.error && (

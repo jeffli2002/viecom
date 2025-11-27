@@ -107,6 +107,7 @@ export default function ImageGenerator() {
   const [shareMessage, setShareMessage] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const publishUrl = 'https://viecom.pro/publish';
+  const [awaitingPublishConfirmation, setAwaitingPublishConfirmation] = useState(false);
   const activeRequestIdRef = useRef<string | null>(null);
   const [lightboxImage, setLightboxImage] = useState<{ url: string; alt: string } | null>(null);
   const promptTextareaRef = useRef<HTMLTextAreaElement | null>(null);
@@ -186,6 +187,7 @@ export default function ImageGenerator() {
     void imageReference;
     setShareStatus('idle');
     setShareMessage(null);
+    setAwaitingPublishConfirmation(false);
   }, [imageReference]);
 
   useEffect(() => {
@@ -635,9 +637,9 @@ export default function ImageGenerator() {
       const publishTarget = `${publishUrl}?asset=${encodeURIComponent(result.imageUrl)}`;
       window.open(publishTarget, '_blank', 'noopener,noreferrer');
       toast.success(t('sharePublishToast'));
-      await awardShareReward('publishViecom', {
-        platformValue: SHARE_REWARD_CONFIG.publishViecom.platform,
-      });
+      setAwaitingPublishConfirmation(true);
+      setShareMessage(null);
+      setShareStatus('idle');
       return;
     }
 
@@ -663,6 +665,13 @@ export default function ImageGenerator() {
         platformValue: platform.platformValue,
       });
     }
+  };
+
+  const handleConfirmPublish = async () => {
+    await awardShareReward('publishViecom', {
+      platformValue: SHARE_REWARD_CONFIG.publishViecom.platform,
+    });
+    setAwaitingPublishConfirmation(false);
   };
 
   const handleDownload = async (imageUrl: string, fallbackUrl?: string) => {
@@ -1280,6 +1289,14 @@ export default function ImageGenerator() {
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </div>
+                  {awaitingPublishConfirmation && (
+                    <div className="rounded-lg border border-teal-200 bg-teal-50 dark:border-teal-800 dark:bg-teal-900/20 p-4 flex flex-col gap-3 text-sm text-slate-700 dark:text-slate-200">
+                      <p>{t('sharePublishPending', { credits: SHARE_REWARD_CONFIG.publishViecom.credits })}</p>
+                      <Button size="sm" onClick={handleConfirmPublish} className="self-center bg-teal-500 hover:bg-teal-600 text-white">
+                        {t('shareConfirmPublish')}
+                      </Button>
+                    </div>
+                  )}
                   {shareMessage && (
                     <p
                       className={`text-center text-xs ${
