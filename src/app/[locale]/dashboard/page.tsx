@@ -565,6 +565,11 @@ function DashboardPageContent() {
                 {t('generateImage')}
               </Button>
             </Link>
+            <Link href="/video-generation">
+              <Button variant="outline" className="w-full" size="sm">
+                {t('generateVideo')}
+              </Button>
+            </Link>
             <Link href="/batch-image-generation">
               <Button variant="outline" className="w-full" size="sm">
                 {t('batchImageGeneration')}
