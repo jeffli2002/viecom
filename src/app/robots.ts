@@ -1,19 +1,28 @@
 import { getMetadataBase } from '@/lib/seo/metadata';
 import type { MetadataRoute } from 'next';
 
-// Paths that should not be indexed by search engines
+/**
+ * Paths that should not be indexed by search engines.
+ *
+ * IMPORTANT: With localePrefix: 'always', user-facing pages are under /en/ and /zh/
+ * API and admin routes are NOT localized and remain at root level.
+ */
 const DISALLOWED_PATHS = [
+  // Admin panel (no locale prefix)
   '/admin',
+  '/admin/*',
+
+  // API routes (no locale prefix)
   '/api',
-  '/api/admin',
-  '/api/creem',
-  '/api/rewards',
-  '/api/v1/generate-image',
-  '/api/v1/generate-video',
-  '/api/v1/videos',
-  '/api/v1/showcase',
-  '/api/v1/media',
-  '/api/auth',
+  '/api/*',
+
+  // Private user pages (localized)
+  '/*/settings',
+  '/*/settings/*',
+  '/*/billing',
+
+  // Auth pages (publicly accessible but no SEO value)
+  '/*/reset-password',
 ];
 
 export default function robots(): MetadataRoute.Robots {
@@ -27,11 +36,19 @@ export default function robots(): MetadataRoute.Robots {
         allow: '/',
         disallow: DISALLOWED_PATHS,
       },
-      // Allow Googlebot to access more pages for better indexing
+      // Allow Googlebot to access public pages for better indexing
       {
         userAgent: 'Googlebot',
         allow: '/',
-        disallow: ['/admin', '/api'],
+        disallow: [
+          '/admin',
+          '/admin/*',
+          '/api',
+          '/api/*',
+          '/*/settings',
+          '/*/settings/*',
+          '/*/billing',
+        ],
       },
     ],
     sitemap: `${baseUrl}/sitemap.xml`,

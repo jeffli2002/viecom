@@ -28,6 +28,7 @@ const PUBLIC_PATHS: Array<{
   { path: '/assets', priority: 0.8, changeFrequency: 'daily' },
   { path: '/docs', priority: 0.8, changeFrequency: 'weekly' },
   { path: '/pricing', priority: 0.9, changeFrequency: 'weekly' },
+  { path: '/showcase', priority: 0.8, changeFrequency: 'daily' },
 
   // Company pages
   { path: '/about', priority: 0.7, changeFrequency: 'monthly' },
@@ -47,21 +48,25 @@ const PUBLIC_PATHS: Array<{
   { path: '/dashboard', priority: 0.6, changeFrequency: 'daily' },
 ];
 
-const defaultLocale = (routing as { defaultLocale?: string }).defaultLocale ?? 'en';
-
 const localeCodes = locales.map((locale) => locale.locale);
 
 const lastModified = new Date();
 
+/**
+ * Build localized paths with explicit locale prefixes.
+ *
+ * IMPORTANT: With localePrefix: 'always', all URLs must include the locale prefix.
+ * For example: /image-generation becomes /en/image-generation and /zh/image-generation
+ *
+ * This ensures compatibility with Next.js standalone builds in production.
+ */
 function buildLocalizedPaths(path: string): string[] {
   const normalizedPath = path === '/' ? '' : path;
-  const defaultPath = normalizedPath || '/';
-  const localizedPaths = [defaultPath];
+  const localizedPaths: string[] = [];
 
   for (const locale of localeCodes) {
-    if (locale === defaultLocale) continue;
-    const prefix = locale ? `/${locale}` : '';
-    localizedPaths.push(normalizedPath ? `${prefix}${normalizedPath}` : `${prefix || '/'}`);
+    const prefix = `/${locale}`;
+    localizedPaths.push(normalizedPath ? `${prefix}${normalizedPath}` : prefix);
   }
 
   return localizedPaths;
