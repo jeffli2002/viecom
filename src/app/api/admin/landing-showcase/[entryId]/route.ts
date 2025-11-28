@@ -53,7 +53,7 @@ export async function PATCH(request: NextRequest, { params }: { params: { entryI
   }
 }
 
-export async function DELETE(request: NextRequest, { params }: { params: { entryId: string } }) {
+export async function DELETE(_request: NextRequest, { params }: { params: { entryId: string } }) {
   try {
     await requireAdmin();
     await db.delete(landingShowcaseEntries).where(eq(landingShowcaseEntries.id, params.entryId));

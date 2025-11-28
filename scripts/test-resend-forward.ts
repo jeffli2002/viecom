@@ -46,7 +46,7 @@ async function testResendForward() {
     type: 'email.received',
     created_at: new Date().toISOString(),
     data: {
-      email_id: 'test-email-id-' + Date.now(),
+      email_id: `test-email-id-${Date.now()}`,
       created_at: new Date().toISOString(),
       from: 'test-sender@example.com',
       to: ['support@viecom.pro'],

@@ -381,11 +381,14 @@ const Hero = () => (
       </p>
 
       <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-16">
-        <button className="btn-primary">
+        <button type="button" className="btn-primary">
           <Zap className="w-5 h-5" />
           Start Generating Free
         </button>
-        <button className="px-8 py-4 bg-white dark:bg-white/10 hover:bg-slate-50 dark:hover:bg-white/20 text-slate-900 dark:text-white font-medium rounded-xl backdrop-blur-md border border-slate-200 dark:border-white/10 transition-all flex items-center gap-2 shadow-sm dark:shadow-none">
+        <button
+          type="button"
+          className="px-8 py-4 bg-white dark:bg-white/10 hover:bg-slate-50 dark:hover:bg-white/20 text-slate-900 dark:text-white font-medium rounded-xl backdrop-blur-md border border-slate-200 dark:border-white/10 transition-all flex items-center gap-2 shadow-sm dark:shadow-none"
+        >
           <Play className="w-5 h-5 fill-current" />
           Watch Demo
         </button>
@@ -488,8 +491,8 @@ const BrandAnalysis = () => (
               'Auto-extract brand assets from URL',
               'Tone of voice consistency check',
               'Automatic logo placement & watermark',
-            ].map((item, i) => (
-              <li key={i} className="flex items-center gap-3 text-slate-600 dark:text-slate-400">
+            ].map((item) => (
+              <li key={item} className="flex items-center gap-3 text-slate-600 dark:text-slate-400">
                 <div className="w-6 h-6 rounded-full bg-brand-blue/20 flex items-center justify-center text-brand-blue">
                   <Check className="w-3.5 h-3.5" />
                 </div>
@@ -538,6 +541,7 @@ const TransformationShowcase = () => {
           <div className="flex flex-wrap justify-center gap-2 bg-slate-100 dark:bg-slate-800/50 p-1.5 rounded-full border border-slate-200 dark:border-slate-700 backdrop-blur-sm">
             {TRANSFORMATION_SCENARIOS.map((scenario, index) => (
               <button
+                type="button"
                 key={scenario.id}
                 onClick={() => setActiveIndex(index)}
                 className={`px-5 py-2.5 rounded-full font-medium text-sm flex items-center gap-2 transition-all ${
@@ -556,16 +560,20 @@ const TransformationShowcase = () => {
         <div className="relative">
           {/* Left Arrow */}
           <button
+            type="button"
             onClick={handlePrev}
             className="absolute left-0 lg:-left-12 top-1/2 -translate-y-1/2 z-40 p-4 rounded-full glass-card shadow-xl text-slate-600 dark:text-slate-300 transition-all hover:scale-110 active:scale-95"
+            aria-label="Previous scenario"
           >
             <ChevronLeft className="w-6 h-6" />
           </button>
 
           {/* Right Arrow */}
           <button
+            type="button"
             onClick={handleNext}
             className="absolute right-0 lg:-right-12 top-1/2 -translate-y-1/2 z-40 p-4 rounded-full glass-card shadow-xl text-slate-600 dark:text-slate-300 transition-all hover:scale-110 active:scale-95"
+            aria-label="Next scenario"
           >
             <ChevronRight className="w-6 h-6" />
           </button>
@@ -654,9 +662,10 @@ const TransformationShowcase = () => {
                 const rotateY = offset * -15;
 
                 return (
-                  <div
+                  <button
+                    type="button"
                     key={scenario.id}
-                    className="absolute w-full max-w-[380px] aspect-[4/5] transition-all duration-700 ease-[cubic-bezier(0.23,1,0.32,1)] cursor-pointer origin-center"
+                    className="absolute w-full max-w-[380px] aspect-[4/5] transition-all duration-700 ease-[cubic-bezier(0.23,1,0.32,1)] cursor-pointer origin-center border-0 bg-transparent p-0"
                     style={{
                       zIndex,
                       opacity,
@@ -669,8 +678,7 @@ const TransformationShowcase = () => {
                         setActiveIndex(index);
                       }
                     }}
-                    role="button"
-                    tabIndex={0}
+                    aria-label={`View ${scenario.title || 'scenario'} ${index + 1}`}
                   >
                     <div
                       className={`relative w-full h-full rounded-2xl overflow-hidden shadow-2xl border transition-all duration-700 ${isActive ? 'border-brand-teal/50 shadow-teal-500/30' : 'border-slate-200 dark:border-slate-700 bg-slate-900'}`}
@@ -697,7 +705,7 @@ const TransformationShowcase = () => {
                         </p>
                       </div>
                     </div>
-                  </div>
+                  </button>
                 );
               })}
             </div>
@@ -906,6 +914,7 @@ const VideoGenerationShowcase = () => {
                 <div className="flex flex-wrap gap-2">
                   {categories.map((cat) => (
                     <button
+                      type="button"
                       key={cat}
                       onClick={() => handleCategoryChange(cat)}
                       className={`px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all border ${
@@ -962,6 +971,7 @@ const VideoGenerationShowcase = () => {
               {/* Generate Button Area */}
               <div className="p-5 border-t border-slate-800 bg-slate-900 relative z-10 flex-shrink-0">
                 <button
+                  type="button"
                   onClick={handleGenerate}
                   disabled={isGenerating}
                   className={`w-full py-4 bg-gradient-to-r from-brand-teal to-brand-blue hover:from-teal-500 hover:to-blue-500 text-white font-bold rounded-xl shadow-[0_4px_20px_rgba(20,184,166,0.3)] flex items-center justify-center gap-2 transition-all active:scale-95 group border border-white/10 ${isGenerating ? 'opacity-75 cursor-wait' : ''}`}
@@ -1091,13 +1101,25 @@ const VideoGenerationShowcase = () => {
                       <Play className="w-8 h-8 fill-white text-white ml-1" />
                     </div>
                   </div>
-                  <div className="absolute inset-0 cursor-pointer" onClick={togglePlay} />
+                  <button
+                    type="button"
+                    className="absolute inset-0 cursor-pointer"
+                    onClick={togglePlay}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        togglePlay();
+                      }
+                    }}
+                    aria-label={isPlaying ? 'Pause video' : 'Play video'}
+                  />
                 </div>
               </div>
 
               {/* Viewport Footer */}
               <div className="h-14 bg-slate-900 border-t border-slate-800 flex items-center px-6 gap-4 flex-shrink-0">
                 <button
+                  type="button"
                   onClick={togglePlay}
                   onKeyDown={(e) => {
                     if (e.key === 'Enter' || e.key === ' ') {
@@ -1106,6 +1128,7 @@ const VideoGenerationShowcase = () => {
                     }
                   }}
                   className="text-slate-400 hover:text-white transition-colors"
+                  aria-label={isPlaying ? 'Pause video' : 'Play video'}
                 >
                   {isPlaying ? (
                     <Pause className="w-4 h-4 fill-current" />
@@ -1138,6 +1161,7 @@ const VideoGenerationShowcase = () => {
               <div className="flex-1 overflow-y-auto custom-scrollbar p-4 space-y-4">
                 {VEO_DEMOS.map((demo, _idx) => (
                   <button
+                    type="button"
                     key={demo.id}
                     onClick={() => handleDemoChange(demo)}
                     className={`w-full text-left group rounded-xl overflow-hidden border transition-all duration-300 ${
@@ -1184,7 +1208,10 @@ const VideoGenerationShowcase = () => {
                 ))}
 
                 <div className="pt-2">
-                  <button className="w-full py-3 text-xs text-slate-400 hover:text-white hover:bg-slate-800 rounded-xl transition-all border border-slate-800 border-dashed hover:border-slate-600 flex items-center justify-center gap-2">
+                  <button
+                    type="button"
+                    className="w-full py-3 text-xs text-slate-400 hover:text-white hover:bg-slate-800 rounded-xl transition-all border border-slate-800 border-dashed hover:border-slate-600 flex items-center justify-center gap-2"
+                  >
                     <Upload className="w-3 h-3" /> Add Media to Queue
                   </button>
                 </div>
@@ -1245,6 +1272,7 @@ const Gallery = () => {
 
         <div className="relative px-4 md:px-12">
           <button
+            type="button"
             onClick={() => scroll('left')}
             className="absolute left-0 top-1/2 -translate-y-1/2 z-20 p-3 rounded-full bg-white dark:bg-slate-800 shadow-xl border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white transition-all duration-300 hover:scale-110 hover:border-brand-teal hover:text-brand-teal hidden md:flex items-center justify-center"
             aria-label="Scroll left"
@@ -1252,6 +1280,7 @@ const Gallery = () => {
             <ChevronLeft className="w-6 h-6" />
           </button>
           <button
+            type="button"
             onClick={() => scroll('right')}
             className="absolute right-0 top-1/2 -translate-y-1/2 z-20 p-3 rounded-full bg-white dark:bg-slate-800 shadow-xl border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white transition-all duration-300 hover:scale-110 hover:border-brand-teal hover:text-brand-teal hidden md:flex items-center justify-center"
             aria-label="Scroll right"
@@ -1294,9 +1323,10 @@ const Gallery = () => {
 
           {/* Pagination Indicators */}
           <div className="flex justify-center gap-2 mt-4">
-            {GALLERY_ITEMS.map((_, idx) => (
+            {GALLERY_ITEMS.map((item, idx) => (
               <button
-                key={idx}
+                type="button"
+                key={`gallery-${idx}-${item.id || idx}`}
                 onClick={() => scrollToItem(idx)}
                 className={`transition-all duration-300 rounded-full ${
                   activeIndex === idx
@@ -1333,8 +1363,10 @@ const Pricing = () => {
               Monthly
             </span>
             <button
+              type="button"
               onClick={() => setIsAnnual(!isAnnual)}
               className="w-14 h-7 bg-brand-teal rounded-full relative transition-colors duration-300"
+              aria-label={isAnnual ? 'Switch to monthly billing' : 'Switch to annual billing'}
             >
               <div
                 className={`absolute top-1 w-5 h-5 bg-white rounded-full transition-transform duration-300 shadow-sm ${isAnnual ? 'left-8' : 'left-1'}`}
@@ -1383,6 +1415,7 @@ const Pricing = () => {
               <p className="text-body text-sm mb-6">{plan.description}</p>
 
               <button
+                type="button"
                 className={`w-full py-3 rounded-xl font-bold mb-8 transition-all ${
                   plan.highlight
                     ? 'bg-brand-teal text-white hover:bg-teal-600 shadow-lg shadow-teal-500/30'
@@ -1393,8 +1426,8 @@ const Pricing = () => {
               </button>
 
               <ul className="space-y-4">
-                {plan.features.map((feature, i) => (
-                  <li key={i} className="flex items-center gap-3 text-sm text-body">
+                {plan.features.map((feature) => (
+                  <li key={feature} className="flex items-center gap-3 text-sm text-body">
                     <Check className="w-5 h-5 text-brand-teal flex-shrink-0" />
                     {feature}
                   </li>
@@ -1425,12 +1458,15 @@ const FAQ = () => {
         <div className="space-y-4">
           {FAQ_ITEMS.map((item, index) => (
             <div
-              key={index}
+              key={`faq-${index}-${item.question}`}
               className={`border border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden transition-all duration-300 ${openIndex === index ? 'bg-main shadow-md' : 'bg-slate-100 dark:bg-slate-900/50 hover:border-brand-teal/30'}`}
             >
               <button
+                type="button"
                 onClick={() => setOpenIndex(openIndex === index ? null : index)}
                 className="w-full px-6 py-5 flex items-center justify-between text-left focus:outline-none"
+                aria-expanded={openIndex === index}
+                aria-controls={`faq-${index}`}
               >
                 <span className="font-bold text-slate-900 dark:text-white pr-8">
                   {item.question}
@@ -1478,10 +1514,18 @@ const Footer = () => (
             scale.
           </p>
           <div className="flex gap-4">
-            {[Twitter, Instagram, Linkedin, Github].map((Icon, i) => (
+            {[
+              { Icon: Twitter, href: 'https://twitter.com', label: 'Twitter' },
+              { Icon: Instagram, href: 'https://instagram.com', label: 'Instagram' },
+              { Icon: Linkedin, href: 'https://linkedin.com', label: 'LinkedIn' },
+              { Icon: Github, href: 'https://github.com', label: 'GitHub' },
+            ].map(({ Icon, href, label }) => (
               <a
-                key={i}
-                href="#"
+                key={label}
+                href={href}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={label}
                 className="p-2 rounded-full bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-brand-teal hover:text-white transition-all"
               >
                 <Icon className="w-5 h-5" />
@@ -1494,27 +1538,27 @@ const Footer = () => (
           <h4 className="font-bold text-slate-900 dark:text-white mb-6">Product</h4>
           <ul className="space-y-4 text-sm text-slate-600 dark:text-slate-400">
             <li>
-              <a href="#" className="hover:text-brand-teal transition-colors">
+              <a href="/video-generation" className="hover:text-brand-teal transition-colors">
                 Video Generation
               </a>
             </li>
             <li>
-              <a href="#" className="hover:text-brand-teal transition-colors">
+              <a href="/image-generation" className="hover:text-brand-teal transition-colors">
                 Image Studio
               </a>
             </li>
             <li>
-              <a href="#" className="hover:text-brand-teal transition-colors">
+              <a href="/brand-analysis" className="hover:text-brand-teal transition-colors">
                 Brand Guard™
               </a>
             </li>
             <li>
-              <a href="#" className="hover:text-brand-teal transition-colors">
+              <a href="/batch-image-generation" className="hover:text-brand-teal transition-colors">
                 Batch Processing
               </a>
             </li>
             <li>
-              <a href="#" className="hover:text-brand-teal transition-colors">
+              <a href="/pricing" className="hover:text-brand-teal transition-colors">
                 Pricing
               </a>
             </li>
@@ -1525,27 +1569,27 @@ const Footer = () => (
           <h4 className="font-bold text-slate-900 dark:text-white mb-6">Resources</h4>
           <ul className="space-y-4 text-sm text-slate-600 dark:text-slate-400">
             <li>
-              <a href="#" className="hover:text-brand-teal transition-colors">
+              <a href="/docs" className="hover:text-brand-teal transition-colors">
                 Blog
               </a>
             </li>
             <li>
-              <a href="#" className="hover:text-brand-teal transition-colors">
+              <a href="/docs" className="hover:text-brand-teal transition-colors">
                 Case Studies
               </a>
             </li>
             <li>
-              <a href="#" className="hover:text-brand-teal transition-colors">
+              <a href="/docs" className="hover:text-brand-teal transition-colors">
                 Community
               </a>
             </li>
             <li>
-              <a href="#" className="hover:text-brand-teal transition-colors">
+              <a href="/contact" className="hover:text-brand-teal transition-colors">
                 Help Center
               </a>
             </li>
             <li>
-              <a href="#" className="hover:text-brand-teal transition-colors">
+              <a href="/docs" className="hover:text-brand-teal transition-colors">
                 API Docs
               </a>
             </li>
@@ -1556,27 +1600,27 @@ const Footer = () => (
           <h4 className="font-bold text-slate-900 dark:text-white mb-6">Company</h4>
           <ul className="space-y-4 text-sm text-slate-600 dark:text-slate-400">
             <li>
-              <a href="#" className="hover:text-brand-teal transition-colors">
+              <a href="/about" className="hover:text-brand-teal transition-colors">
                 About Us
               </a>
             </li>
             <li>
-              <a href="#" className="hover:text-brand-teal transition-colors">
+              <a href="/contact" className="hover:text-brand-teal transition-colors">
                 Careers
               </a>
             </li>
             <li>
-              <a href="#" className="hover:text-brand-teal transition-colors">
+              <a href="/privacy" className="hover:text-brand-teal transition-colors">
                 Privacy Policy
               </a>
             </li>
             <li>
-              <a href="#" className="hover:text-brand-teal transition-colors">
+              <a href="/terms" className="hover:text-brand-teal transition-colors">
                 Terms of Service
               </a>
             </li>
             <li>
-              <a href="#" className="hover:text-brand-teal transition-colors">
+              <a href="/contact" className="hover:text-brand-teal transition-colors">
                 Contact
               </a>
             </li>
@@ -1642,27 +1686,37 @@ const Navbar = ({ darkMode, setDarkMode }) => {
             </a>
 
             <button
+              type="button"
               onClick={() => setDarkMode(!darkMode)}
               className="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400 transition-colors"
+              aria-label={darkMode ? 'Switch to light mode' : 'Switch to dark mode'}
             >
               {darkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
             </button>
 
-            <button className="px-5 py-2.5 bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-bold rounded-lg text-sm hover:opacity-90 transition-opacity">
+            <button
+              type="button"
+              className="px-5 py-2.5 bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-bold rounded-lg text-sm hover:opacity-90 transition-opacity"
+            >
               Get Started
             </button>
           </div>
 
           <div className="md:hidden flex items-center gap-4">
             <button
+              type="button"
               onClick={() => setDarkMode(!darkMode)}
               className="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400 transition-colors"
+              aria-label={darkMode ? 'Switch to light mode' : 'Switch to dark mode'}
             >
               {darkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
             </button>
             <button
+              type="button"
               onClick={() => setIsMenuOpen(!isMenuOpen)}
               className="text-slate-900 dark:text-white"
+              aria-label={isMenuOpen ? 'Close menu' : 'Open menu'}
+              aria-expanded={isMenuOpen}
             >
               {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
             </button>
@@ -1692,7 +1746,10 @@ const Navbar = ({ darkMode, setDarkMode }) => {
             >
               Pricing
             </a>
-            <button className="w-full py-3 bg-brand-teal text-white font-bold rounded-xl mt-2">
+            <button
+              type="button"
+              className="w-full py-3 bg-brand-teal text-white font-bold rounded-xl mt-2"
+            >
               Get Started Free
             </button>
           </div>
@@ -1731,5 +1788,10 @@ const App = () => {
   );
 };
 
-const root = createRoot(document.getElementById('root')!);
-root.render(<App />);
+const rootElement = document.getElementById('root');
+if (rootElement) {
+  const root = createRoot(rootElement);
+  root.render(<App />);
+} else {
+  console.error('Root element not found');
+}

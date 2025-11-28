@@ -70,8 +70,11 @@ export function BrandAnalysis() {
             </h2>
             <p className="text-lg text-body leading-relaxed mb-8">{t('description')}</p>
             <ul className="space-y-4">
-              {[t('feature1'), t('feature2'), t('feature3')].map((item, i) => (
-                <li key={i} className="flex items-center gap-3 text-slate-600 dark:text-slate-400">
+              {[t('feature1'), t('feature2'), t('feature3')].map((item) => (
+                <li
+                  key={item}
+                  className="flex items-center gap-3 text-slate-600 dark:text-slate-400"
+                >
                   <div className="w-6 h-6 rounded-full bg-blue-500/20 flex items-center justify-center text-blue-500">
                     <Check className="w-3.5 h-3.5" />
                   </div>

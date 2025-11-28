@@ -1,4 +1,4 @@
-import crypto from 'crypto';
+import crypto from 'node:crypto';
 import { env } from '@/env';
 import { type NextRequest, NextResponse } from 'next/server';
 import { Resend } from 'resend';

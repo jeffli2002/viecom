@@ -64,7 +64,7 @@ function baseTemplate(content: string, footerText?: string): string {
 /**
  * Welcome email template for new user signup
  */
-export function getWelcomeEmailTemplate(userName: string, userEmail: string): string {
+export function getWelcomeEmailTemplate(userName: string, _userEmail: string): string {
   const freePlan = paymentConfig.plans.find((p) => p.id === 'free');
   const signupCredits = freePlan?.credits.onSignup || 30;
 

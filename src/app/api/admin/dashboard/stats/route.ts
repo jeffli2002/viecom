@@ -93,7 +93,7 @@ export async function GET(request: Request) {
         and(eq(creditTransactions.source, 'purchase'), gte(creditTransactions.createdAt, today))
       );
 
-    const revenueInRange = purchaseRowsInRange.reduce(
+    const _revenueInRange = purchaseRowsInRange.reduce(
       (sum, row) => sum + parsePurchaseMetadata(row.metadata).amount,
       0
     );

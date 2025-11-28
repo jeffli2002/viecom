@@ -18,8 +18,8 @@ interface CreditPackPurchaseButtonProps {
 
 export function CreditPackPurchaseButton({
   packId,
-  credits,
-  price,
+  credits: _credits,
+  price: _price,
   creemProductKey,
   popular = false,
 }: CreditPackPurchaseButtonProps) {

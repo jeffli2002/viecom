@@ -144,11 +144,16 @@ export default function UpgradePrompt({
     return null;
   }
 
+  if (!isOpen) {
+    return null;
+  }
+
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4"
-      role="dialog"
+    <dialog
+      open={isOpen}
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 border-0 bg-transparent"
       aria-modal="true"
+      onClose={onClose}
     >
       <Card className="w-full max-w-md max-h-[90vh] bg-white dark:bg-slate-900 shadow-2xl border-0 flex flex-col overflow-hidden">
         <CardHeader className="bg-white dark:bg-slate-900 flex-shrink-0">
@@ -285,6 +290,6 @@ export default function UpgradePrompt({
           )}
         </CardContent>
       </Card>
-    </div>
+    </dialog>
   );
 }

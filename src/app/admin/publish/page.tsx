@@ -48,9 +48,9 @@ export default function AdminPublishPage() {
   const [formState, setFormState] = useState<Record<string, SubmissionFormState>>({});
   const [statusFilter, setStatusFilter] = useState<string>('pending');
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  const redirectToLogin = () => {
+  const redirectToLogin = useCallback(() => {
     window.location.href = '/admin/login';
-  };
+  }, []);
 
   const fetchSubmissions = useCallback(async () => {
     setIsLoading(true);
@@ -84,7 +84,7 @@ export default function AdminPublishPage() {
     } finally {
       setIsLoading(false);
     }
-  }, [statusFilter]);
+  }, [statusFilter, redirectToLogin]);
 
   useEffect(() => {
     void fetchSubmissions();
@@ -302,12 +302,14 @@ export default function AdminPublishPage() {
                 </div>
                 <div className="flex flex-wrap gap-3">
                   <button
+                    type="button"
                     className="rounded-full bg-teal-500 px-5 py-2 text-sm font-semibold text-white hover:bg-teal-600"
                     onClick={() => handleApprove(submission)}
                   >
                     Approve & Publish
                   </button>
                   <button
+                    type="button"
                     className="rounded-full border border-slate-200 px-5 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-100"
                     onClick={() => handleReject(submission)}
                   >
@@ -594,7 +596,7 @@ function LandingShowcaseConfigurator() {
     }
   };
 
-  const handleLandingSubmissionToggle = async (submissionId: string) => {
+  const _handleLandingSubmissionToggle = async (submissionId: string) => {
     try {
       const response = await fetch('/api/admin/publish/submissions/landing', {
         method: 'POST',
@@ -644,6 +646,7 @@ function LandingShowcaseConfigurator() {
           </p>
         </div>
         <button
+          type="button"
           className="rounded-full bg-teal-500 px-5 py-2 text-sm font-semibold text-white hover:bg-teal-600"
           onClick={() => setIsModalOpen(true)}
         >
@@ -736,24 +739,33 @@ function LandingShowcaseConfigurator() {
           <div className="w-full max-w-lg rounded-2xl bg-white p-6 shadow-xl space-y-4 text-slate-700">
             <h3 className="text-xl font-semibold">Add Landing Showcase</h3>
             <div className="space-y-2">
-              <label className="text-sm font-medium">Title</label>
+              <label htmlFor="showcase-title" className="text-sm font-medium">
+                Title
+              </label>
               <input
+                id="showcase-title"
                 className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm"
                 value={form.title}
                 onChange={(e) => setForm((prev) => ({ ...prev, title: e.target.value }))}
               />
             </div>
             <div className="space-y-2">
-              <label className="text-sm font-medium">Subtitle</label>
+              <label htmlFor="showcase-subtitle" className="text-sm font-medium">
+                Subtitle
+              </label>
               <input
+                id="showcase-subtitle"
                 className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm"
                 value={form.subtitle}
                 onChange={(e) => setForm((prev) => ({ ...prev, subtitle: e.target.value }))}
               />
             </div>
             <div className="space-y-2">
-              <label className="text-sm font-medium">Category</label>
+              <label htmlFor="showcase-category" className="text-sm font-medium">
+                Category
+              </label>
               <select
+                id="showcase-category"
                 className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm"
                 value={form.category}
                 onChange={(e) => setForm((prev) => ({ ...prev, category: e.target.value }))}
@@ -766,22 +778,28 @@ function LandingShowcaseConfigurator() {
               </select>
             </div>
             <div className="space-y-2">
-              <label className="text-sm font-medium">CTA URL (optional)</label>
+              <label htmlFor="showcase-cta-url" className="text-sm font-medium">
+                CTA URL (optional)
+              </label>
               <input
+                id="showcase-cta-url"
                 className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm"
                 value={form.ctaUrl}
                 onChange={(e) => setForm((prev) => ({ ...prev, ctaUrl: e.target.value }))}
               />
             </div>
             <div className="space-y-2">
-              <label className="text-sm font-medium">Upload Image</label>
+              <span className="text-sm font-medium">Upload Image</span>
               <div
+                id="showcase-image-upload"
                 onDrop={handleDrop}
                 onDragOver={handleDragOver}
                 onDragLeave={handleDragLeave}
                 className={`flex flex-col items-center justify-center rounded-xl border-2 border-dashed px-4 py-8 text-center ${
                   isDragging ? 'border-teal-500 bg-teal-50' : 'border-slate-200 bg-slate-50'
                 }`}
+                role="region"
+                aria-label="Upload image by dragging and dropping or clicking"
               >
                 {previewUrl || form.imageUrl ? (
                   <div className="mt-4 w-full overflow-hidden rounded-lg border border-slate-200 bg-white">
@@ -825,6 +843,7 @@ function LandingShowcaseConfigurator() {
             </div>
             <div className="flex flex-wrap gap-3">
               <button
+                type="button"
                 className="rounded-full bg-teal-500 px-4 py-2 text-sm font-semibold text-white hover:bg-teal-600 disabled:opacity-50"
                 onClick={handleCreateEntry}
                 disabled={isSaving}
@@ -832,6 +851,7 @@ function LandingShowcaseConfigurator() {
                 {isSaving ? 'Uploading...' : 'Add Showcase'}
               </button>
               <button
+                type="button"
                 className="rounded-full border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-700"
                 onClick={() => setIsModalOpen(false)}
               >

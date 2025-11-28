@@ -55,10 +55,10 @@ export function BatchGenerationFeature() {
                 { image: '/batch/skincare.jpg', ratio: '9:16' },
                 { image: '/batch/sweater.png', ratio: '16:9' },
                 { image: '/batch/lotionmodel.png', ratio: '4:5' },
-              ].map((item, i) => (
+              ].map((item) => (
                 <div
-                  key={i}
-                  className={`aspect-square rounded-2xl overflow-hidden shadow-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 transform transition-transform hover:scale-105 ${i % 2 === 0 ? 'translate-y-8' : ''}`}
+                  key={item.image}
+                  className="aspect-square rounded-2xl overflow-hidden shadow-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 transform transition-transform hover:scale-105"
                 >
                   <div className="h-2/3 bg-slate-100 dark:bg-slate-800 relative overflow-hidden group">
                     <img

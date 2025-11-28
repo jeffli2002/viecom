@@ -49,7 +49,7 @@ export async function GET(request: Request) {
     // Note: payment table doesn't have amount/currency columns yet
     // TODO: Add amount and currency columns to payment schema
 
-    const paymentCount = await db
+    const _paymentCount = await db
       .select({ count: sql<number>`count(*)` })
       .from(payment)
       .where(gte(payment.createdAt, startDate));

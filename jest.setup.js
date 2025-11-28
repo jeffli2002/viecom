@@ -3,10 +3,10 @@
 
 // Polyfill TextEncoder/TextDecoder (Node.js built-in, but need to expose globally)
 if (typeof globalThis.TextEncoder === 'undefined') {
-  globalThis.TextEncoder = require('util').TextEncoder;
+  globalThis.TextEncoder = require('node:util').TextEncoder;
 }
 if (typeof globalThis.TextDecoder === 'undefined') {
-  globalThis.TextDecoder = require('util').TextDecoder;
+  globalThis.TextDecoder = require('node:util').TextDecoder;
 }
 
 // Polyfill ReadableStream and TransformStream
@@ -14,7 +14,7 @@ if (typeof globalThis.ReadableStream === 'undefined') {
   try {
     const { ReadableStream: UndiciReadableStream } = require('undici');
     globalThis.ReadableStream = UndiciReadableStream;
-  } catch (e) {
+  } catch (_e) {
     // Fallback: provide a minimal stub
     globalThis.ReadableStream = class ReadableStream {
       constructor() {
@@ -28,7 +28,7 @@ if (typeof globalThis.TransformStream === 'undefined') {
   try {
     const { TransformStream: UndiciTransformStream } = require('undici');
     globalThis.TransformStream = UndiciTransformStream;
-  } catch (e) {
+  } catch (_e) {
     // Fallback: provide a minimal stub
     globalThis.TransformStream = class TransformStream {
       constructor() {
@@ -53,17 +53,17 @@ if (typeof globalThis.Request === 'undefined') {
       const fetch = undici.fetch;
       // Create a dummy request to get the Request constructor
       const testReq = new (fetch.constructor || fetch)('https://example.com');
-      if (testReq && testReq.constructor) {
+      if (testReq?.constructor) {
         globalThis.Request = testReq.constructor;
       }
     }
-  } catch (e) {
+  } catch (_e) {
     // If undici doesn't work, try using Node's built-in fetch (Node 18+)
     try {
       const { Request, Response } = require('undici');
       globalThis.Request = Request;
       globalThis.Response = Response;
-    } catch (e2) {
+    } catch (_e2) {
       // Last resort: provide minimal stubs that don't throw
       globalThis.Request = class Request {
         constructor(input, init) {

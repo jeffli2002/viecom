@@ -33,7 +33,7 @@ export function FAQ() {
         <div className="space-y-4">
           {faqItems.map((item, index) => (
             <div
-              key={index}
+              key={`faq-${index}-${item.question}`}
               className={`border border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden transition-all duration-300 ${openIndex === index ? 'bg-white dark:bg-slate-900 shadow-md' : 'bg-slate-100 dark:bg-slate-900/50 hover:border-teal-500/30'}`}
             >
               <button

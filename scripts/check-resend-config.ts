@@ -24,7 +24,7 @@ const webhookUrl = `${appUrl}/api/webhooks/resend`;
 
 console.log('🌐 Webhook Configuration:');
 console.log(`  Webhook URL: ${webhookUrl}`);
-console.log(`  Expected Production URL: https://www.viecom.pro/api/webhooks/resend\n`);
+console.log('  Expected Production URL: https://www.viecom.pro/api/webhooks/resend\n');
 
 // Test webhook endpoint
 console.log('🧪 Testing Webhook Endpoint...');
