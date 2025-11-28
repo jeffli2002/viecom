@@ -1594,7 +1594,6 @@ export default function ImageGenerator() {
                 setLightboxImage(null);
               }
             }}
-            role="dialog"
             aria-modal="true"
             tabIndex={-1}
           >

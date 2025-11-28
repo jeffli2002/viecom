@@ -803,12 +803,24 @@ export function VideoGenerationShowcase() {
                       <Play className="w-8 h-8 fill-white text-white ml-1" />
                     </div>
                   </div>
-                  <div className="absolute inset-0 cursor-pointer z-20" onClick={togglePlay} />
+                  <div
+                    className="absolute inset-0 cursor-pointer z-20"
+                    onClick={togglePlay}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        togglePlay();
+                      }
+                    }}
+                    role="button"
+                    tabIndex={0}
+                  />
                 </div>
               </div>
 
               <div className="h-14 bg-slate-900 border-t border-slate-800 flex items-center px-6 gap-4 flex-shrink-0">
                 <button
+                  type="button"
                   onClick={togglePlay}
                   className="text-slate-400 hover:text-white transition-colors"
                 >
@@ -836,6 +848,27 @@ export function VideoGenerationShowcase() {
                       }
                     }
                   }}
+                  onKeyDown={(e) => {
+                    if (
+                      (e.key === 'Enter' || e.key === ' ') &&
+                      videoRef.current &&
+                      videoDuration > 0
+                    ) {
+                      e.preventDefault();
+                      const progressBar = e.currentTarget.querySelector(
+                        '.progress-bar-container'
+                      ) as HTMLElement;
+                      if (progressBar) {
+                        const rect = progressBar.getBoundingClientRect();
+                        const clickX = rect.width / 2; // Center position for keyboard
+                        const percentage = Math.max(0, Math.min(1, clickX / rect.width));
+                        const newTime = percentage * videoDuration;
+                        videoRef.current.currentTime = newTime;
+                        setCurrentTime(newTime);
+                        setVideoProgress(percentage * 100);
+                      }
+                    }
+                  }}
                 >
                   <div className="w-full h-1.5 bg-slate-800 rounded-full overflow-hidden relative progress-bar-container">
                     <div
@@ -853,6 +886,7 @@ export function VideoGenerationShowcase() {
                 </div>
                 <div className="flex items-center gap-3 border-l border-slate-800 pl-4">
                   <button
+                    type="button"
                     onClick={toggleMute}
                     className="text-slate-400 hover:text-white transition-colors"
                     title={isMuted ? t('unmute') : t('mute')}
@@ -864,6 +898,7 @@ export function VideoGenerationShowcase() {
                     )}
                   </button>
                   <button
+                    type="button"
                     onClick={toggleAutoLoop}
                     className={`text-[10px] font-mono transition-colors ${
                       autoLoop
@@ -901,6 +936,7 @@ export function VideoGenerationShowcase() {
                 ) : (
                   veoDemos.map((demo) => (
                     <button
+                      type="button"
                       key={demo.id}
                       onClick={() => handleDemoChange(demo)}
                       className={`w-full text-left group rounded-xl overflow-hidden border transition-all duration-300 ${
@@ -956,7 +992,10 @@ export function VideoGenerationShowcase() {
                 )}
 
                 <div className="pt-2">
-                  <button className="w-full py-3 text-xs text-slate-400 hover:text-white hover:bg-slate-800 rounded-xl transition-all border border-slate-800 border-dashed hover:border-slate-600 flex items-center justify-center gap-2">
+                  <button
+                    type="button"
+                    className="w-full py-3 text-xs text-slate-400 hover:text-white hover:bg-slate-800 rounded-xl transition-all border border-slate-800 border-dashed hover:border-slate-600 flex items-center justify-center gap-2"
+                  >
                     <Upload className="w-3 h-3" /> {t('addMediaToQueue')}
                   </button>
                 </div>

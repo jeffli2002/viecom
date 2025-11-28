@@ -2,7 +2,7 @@ import { requireAdmin } from '@/lib/admin/auth';
 import { getPlanPriceByPriceId } from '@/lib/admin/revenue-utils';
 import { db } from '@/server/db';
 import { creditPackPurchase, payment, user } from '@/server/db/schema';
-import { desc, eq, gte, sql } from 'drizzle-orm';
+import { and, desc, eq, gte, sql } from 'drizzle-orm';
 import { NextResponse } from 'next/server';
 
 export async function GET(request: Request) {
@@ -61,7 +61,9 @@ export async function GET(request: Request) {
       })
       .from(creditPackPurchase)
       .leftJoin(user, eq(user.id, creditPackPurchase.userId))
-      .where(gte(creditPackPurchase.createdAt, startDate))
+      .where(
+        and(gte(creditPackPurchase.createdAt, startDate), eq(creditPackPurchase.testMode, false))
+      )
       .orderBy(desc(creditPackPurchase.createdAt))
       .limit(100);
 
@@ -102,7 +104,8 @@ export async function GET(request: Request) {
 
     const totalPackRevenueRows = await db
       .select({ amountCents: creditPackPurchase.amountCents })
-      .from(creditPackPurchase);
+      .from(creditPackPurchase)
+      .where(eq(creditPackPurchase.testMode, false));
     const totalPackRevenue = totalPackRevenueRows.reduce(
       (sum, row) => sum + row.amountCents / 100,
       0

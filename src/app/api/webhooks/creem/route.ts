@@ -287,7 +287,7 @@ export async function POST(request: NextRequest) {
   }
 }
 
-async function handleCreditPackPurchase(data: CreemWebhookData) {
+export async function handleCreditPackPurchase(data: CreemWebhookData) {
   const { userId, credits, productName, checkoutId, orderId, productId, amount, currency } = data;
 
   console.log('[Creem Webhook] handleCreditPackPurchase called with:', {
@@ -363,9 +363,11 @@ async function handleCreditPackPurchase(data: CreemWebhookData) {
       }
 
       if (metadataConditions.length > 0) {
-        conditions.push(
-          metadataConditions.length === 1 ? metadataConditions[0]! : or(...metadataConditions)!
-        );
+        const condition =
+          metadataConditions.length === 1 ? metadataConditions[0] : or(...metadataConditions);
+        if (condition) {
+          conditions.push(condition);
+        }
 
         const existingByMetadata = await db
           .select()
@@ -419,6 +421,9 @@ async function handleCreditPackPurchase(data: CreemWebhookData) {
       return transactionRecord?.id ?? null;
     };
 
+    const isTestMode =
+      orderId?.startsWith('ord_test_') || checkoutId?.startsWith('ch_test_') || false;
+
     const insertCreditPackPurchase = async (creditTransactionId: string | null) => {
       await db.insert(creditPackPurchase).values({
         id: randomUUID(),
@@ -432,6 +437,7 @@ async function handleCreditPackPurchase(data: CreemWebhookData) {
         checkoutId: checkoutId || null,
         creditTransactionId,
         metadata: metadataPayload,
+        testMode: isTestMode,
         createdAt: new Date(),
       });
     };

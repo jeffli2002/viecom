@@ -197,6 +197,7 @@ export function Header() {
         {/* User Menu / Auth Buttons */}
         <div className="flex items-center space-x-4">
           <button
+            type="button"
             onClick={() => setDarkMode(!darkMode)}
             className="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400 transition-colors"
           >

@@ -171,7 +171,6 @@ export default function UpgradePrompt({
         }
       }}
       aria-modal="true"
-      role="dialog"
       tabIndex={-1}
     >
       <Card

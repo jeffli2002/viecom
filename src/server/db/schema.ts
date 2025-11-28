@@ -141,6 +141,7 @@ export const creditPackPurchase = pgTable('credit_pack_purchase', {
     onDelete: 'set null',
   }),
   metadata: jsonb('metadata').$type<Record<string, unknown> | null>(),
+  testMode: boolean('test_mode').default(false).notNull(),
   createdAt: timestamp('created_at')
     .$defaultFn(() => new Date())
     .notNull(),

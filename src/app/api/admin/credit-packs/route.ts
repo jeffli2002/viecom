@@ -1,7 +1,7 @@
 import { requireAdmin } from '@/lib/admin/auth';
 import { db } from '@/server/db';
 import { creditPackPurchase, user } from '@/server/db/schema';
-import { desc, eq, gte, sql } from 'drizzle-orm';
+import { and, desc, eq, gte, sql } from 'drizzle-orm';
 import { type NextRequest, NextResponse } from 'next/server';
 
 export async function GET(request: NextRequest) {
@@ -21,7 +21,9 @@ export async function GET(request: NextRequest) {
         createdAt: creditPackPurchase.createdAt,
       })
       .from(creditPackPurchase)
-      .where(gte(creditPackPurchase.createdAt, startDate));
+      .where(
+        and(gte(creditPackPurchase.createdAt, startDate), eq(creditPackPurchase.testMode, false))
+      );
 
     const revenueInRange = purchasesInRange.reduce(
       (sum, purchase) => sum + purchase.amountCents / 100,
@@ -30,7 +32,8 @@ export async function GET(request: NextRequest) {
 
     const totalRevenueRows = await db
       .select({ amountCents: creditPackPurchase.amountCents })
-      .from(creditPackPurchase);
+      .from(creditPackPurchase)
+      .where(eq(creditPackPurchase.testMode, false));
 
     const totalRevenue = totalRevenueRows.reduce((sum, row) => sum + row.amountCents / 100, 0);
 
@@ -46,7 +49,9 @@ export async function GET(request: NextRequest) {
       })
       .from(creditPackPurchase)
       .leftJoin(user, eq(user.id, creditPackPurchase.userId))
-      .where(gte(creditPackPurchase.createdAt, startDate))
+      .where(
+        and(gte(creditPackPurchase.createdAt, startDate), eq(creditPackPurchase.testMode, false))
+      )
       .orderBy(desc(creditPackPurchase.createdAt))
       .limit(100);
 

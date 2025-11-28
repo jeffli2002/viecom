@@ -14,12 +14,16 @@ export async function generateMetadata({
   const { locale } = await params;
   const baseMetadata = buildLocaleCanonicalMetadata(locale, '/ai-video-generator-free');
 
+  // Get config values for metadata
+  const freePlan = paymentConfig.plans.find((p) => p.id === 'free');
+  const signupBonus = freePlan?.credits.onSignup || 30;
+  const dailyCheckinCredits = creditsConfig.rewards.checkin.dailyCredits;
+
   if (locale === 'zh') {
     return {
       ...baseMetadata,
-      title: '免费AI视频生成器 | 送30积分，无需信用卡',
-      description:
-        '免费创建AI视频。注册送30积分，每日签到送2积分，无需信用卡。Sora 2模型，文字转视频，图片转视频。立即开始！',
+      title: `免费AI视频生成器 | 送${signupBonus}积分，无需信用卡`,
+      description: `免费创建AI视频。注册送${signupBonus}积分，每日签到送${dailyCheckinCredits}积分，无需信用卡。Sora 2模型，文字转视频，图片转视频。立即开始！`,
       keywords: [
         '免费AI视频生成器',
         'AI视频生成器免费在线',
@@ -29,8 +33,8 @@ export async function generateMetadata({
         '免费Sora 2',
       ],
       openGraph: {
-        title: '免费AI视频生成器 | 送30积分，无需信用卡',
-        description: '免费创建AI视频。注册送30积分，每日签到送2积分，无需信用卡。',
+        title: `免费AI视频生成器 | 送${signupBonus}积分，无需信用卡`,
+        description: `免费创建AI视频。注册送${signupBonus}积分，每日签到送${dailyCheckinCredits}积分，无需信用卡。`,
         type: 'website',
       },
     };
@@ -38,9 +42,8 @@ export async function generateMetadata({
 
   return {
     ...baseMetadata,
-    title: 'Free AI Video Generator | 30 Credits, No Credit Card Required',
-    description:
-      'Create AI videos for free. Get 30 credits on signup, earn 2 credits daily, no credit card required. Sora 2 models, text-to-video, image-to-video. Start now!',
+    title: `Free AI Video Generator | ${signupBonus} Credits, No Credit Card Required`,
+    description: `Create AI videos for free. Get ${signupBonus} credits on signup, earn ${dailyCheckinCredits} credits daily, no credit card required. Sora 2 models, text-to-video, image-to-video. Start now!`,
     keywords: [
       'free ai video generator',
       'ai video generator free online',
@@ -50,9 +53,8 @@ export async function generateMetadata({
       'free sora 2',
     ],
     openGraph: {
-      title: 'Free AI Video Generator | 30 Credits, No Credit Card',
-      description:
-        'Create AI videos for free. Get 30 credits on signup, earn 2 credits daily, no credit card required.',
+      title: `Free AI Video Generator | ${signupBonus} Credits, No Credit Card`,
+      description: `Create AI videos for free. Get ${signupBonus} credits on signup, earn ${dailyCheckinCredits} credits daily, no credit card required.`,
       type: 'website',
     },
   };
@@ -71,24 +73,29 @@ const freeFeatures = [
   'Upgrade anytime',
 ];
 
-const earnMoreCredits = [
+// This will be populated dynamically using config values
+const getEarnMoreCredits = (
+  dailyCheckinCredits: number,
+  referralReward: number,
+  shareReward: number
+) => [
   {
     title: 'Daily Check-in',
-    description: 'Get 2 free credits every day just by checking in',
+    description: `Get ${dailyCheckinCredits} free credits every day just by checking in`,
     icon: Calendar,
-    credits: '+2 credits/day',
+    credits: `+${dailyCheckinCredits} credits/day`,
   },
   {
     title: 'Referral Program',
-    description: 'Invite friends and earn 10 credits per signup',
+    description: `Invite friends and earn ${referralReward} credits per signup`,
     icon: Users,
-    credits: '+10 credits/referral',
+    credits: `+${referralReward} credits/referral`,
   },
   {
     title: 'Social Sharing',
     description: 'Share your videos on social media to earn bonus credits',
     icon: Sparkles,
-    credits: '+5 credits/share',
+    credits: `+${shareReward} credits/share`,
   },
 ];
 
@@ -98,13 +105,20 @@ export default function FreeAIVideoGeneratorPage() {
   const shareReward = creditsConfig.rewards.socialShare.creditsPerShare;
   const cheapestPack = paymentConfig.creditPacks[0]; // First pack is usually the cheapest
 
+  // Get earn more credits data dynamically from config
+  const earnMoreCredits = getEarnMoreCredits(dailyCheckinCredits, referralReward, shareReward);
+
   // Get plan configurations
   const freePlan = paymentConfig.plans.find((p) => p.id === 'free');
   const proPlan = paymentConfig.plans.find((p) => p.id === 'pro');
   const proPlusPlan = paymentConfig.plans.find((p) => p.id === 'proplus');
 
+  // Get video generation costs from config
+  const sora2MinCost = creditsConfig.consumption.videoGeneration['sora-2-720p-10s'];
+  const sora2MaxCost = creditsConfig.consumption.videoGeneration['sora-2-720p-15s'];
+
   // Build comparison table dynamically from config
-  // All plans get the same sign-up bonus (30 credits)
+  // All plans get the same sign-up bonus
   const signupBonus = freePlan?.credits.onSignup || 30;
   const comparisonTable = [
     {
@@ -134,6 +148,10 @@ export default function FreeAIVideoGeneratorPage() {
     },
   ];
 
+  // Calculate video count range based on signup bonus and video costs
+  const minVideos = Math.floor(signupBonus / sora2MaxCost);
+  const maxVideos = Math.floor(signupBonus / sora2MinCost);
+
   const softwareSchema = {
     '@context': 'https://schema.org',
     '@type': 'SoftwareApplication',
@@ -144,7 +162,7 @@ export default function FreeAIVideoGeneratorPage() {
       '@type': 'Offer',
       price: '0',
       priceCurrency: 'USD',
-      description: '30 free credits on signup, no credit card required',
+      description: `${signupBonus} free credits on signup, no credit card required`,
     },
     aggregateRating: {
       '@type': 'AggregateRating',
@@ -162,7 +180,7 @@ export default function FreeAIVideoGeneratorPage() {
         name: 'Is the free AI video generator really free?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'Yes! Get 30 free credits on signup with no credit card required. Earn 2 more credits daily through check-ins, plus bonuses for referrals and social sharing.',
+          text: `Yes! Get ${signupBonus} free credits on signup with no credit card required. Earn ${dailyCheckinCredits} more credits daily through check-ins, plus bonuses for referrals and social sharing.`,
         },
       },
       {
@@ -170,15 +188,15 @@ export default function FreeAIVideoGeneratorPage() {
         name: 'Do I need a credit card to sign up?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'No credit card required. Simply create an account with your email and start generating videos immediately with 30 free credits.',
+          text: `No credit card required. Simply create an account with your email and start generating videos immediately with ${signupBonus} free credits.`,
         },
       },
       {
         '@type': 'Question',
-        name: 'How many videos can I create with 30 credits?',
+        name: `How many videos can I create with ${signupBonus} credits?`,
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'With 30 credits, you can create approximately 1-6 videos depending on settings. Sora 2 720p videos cost 15-20 credits each.',
+          text: `With ${signupBonus} credits, you can create approximately ${minVideos}-${maxVideos} videos depending on settings. Sora 2 720p videos cost ${sora2MinCost}-${sora2MaxCost} credits each.`,
         },
       },
       {
@@ -231,9 +249,9 @@ export default function FreeAIVideoGeneratorPage() {
           </h1>
 
           <p className="text-xl text-slate-600 dark:text-slate-300 mb-8 leading-relaxed">
-            Start with 30 free credits sign-up bonus (one-time). No credit card, no hidden fees, no
-            time limits. Create videos with Sora 2 AI models and earn more credits daily. Perfect
-            for trying our platform risk-free.
+            Start with {signupBonus} free credits sign-up bonus (one-time). No credit card, no
+            hidden fees, no time limits. Create videos with Sora 2 AI models and earn more credits
+            daily. Perfect for trying our platform risk-free.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
@@ -253,7 +271,7 @@ export default function FreeAIVideoGeneratorPage() {
           <div className="flex flex-wrap justify-center gap-6 mt-8 text-sm text-slate-600 dark:text-slate-400">
             <div className="flex items-center gap-2">
               <Check className="h-5 w-5 text-green-500" />
-              <span>30 Free Credits</span>
+              <span>{signupBonus} Free Credits</span>
             </div>
             <div className="flex items-center gap-2">
               <Check className="h-5 w-5 text-green-500" />
@@ -363,8 +381,9 @@ export default function FreeAIVideoGeneratorPage() {
                 Is the free AI video generator really free?
               </h3>
               <p className="text-slate-600 dark:text-slate-300">
-                Yes! Get 30 free credits on signup with no credit card required. Earn 2 more credits
-                daily through check-ins, plus bonuses for referrals and social sharing.
+                Yes! Get {signupBonus} free credits on signup with no credit card required. Earn{' '}
+                {dailyCheckinCredits} more credits daily through check-ins, plus bonuses for
+                referrals and social sharing.
               </p>
             </div>
             <div>
@@ -373,16 +392,17 @@ export default function FreeAIVideoGeneratorPage() {
               </h3>
               <p className="text-slate-600 dark:text-slate-300">
                 No credit card required. Simply create an account with your email and start
-                generating videos immediately with 30 free credits.
+                generating videos immediately with {signupBonus} free credits.
               </p>
             </div>
             <div>
               <h3 className="text-xl font-semibold mb-3 text-slate-900 dark:text-white">
-                How many videos can I create with 30 credits?
+                How many videos can I create with {signupBonus} credits?
               </h3>
               <p className="text-slate-600 dark:text-slate-300">
-                With 30 credits, you can create approximately 1-6 videos depending on settings. Sora
-                2 720p videos cost 15-20 credits each.
+                With {signupBonus} credits, you can create approximately {minVideos}-{maxVideos}{' '}
+                videos depending on settings. Sora 2 720p videos cost {sora2MinCost}-{sora2MaxCost}{' '}
+                credits each.
               </p>
             </div>
             <div>
@@ -410,11 +430,13 @@ export default function FreeAIVideoGeneratorPage() {
               <p className="text-slate-600 dark:text-slate-300">
                 You have several options: (1) Purchase one-time credit packs starting at $
                 {cheapestPack.price} for {cheapestPack.credits} credits (packs never expire), (2)
-                Upgrade to Pro/Pro+ for monthly credit allocations (500-900 credits/month), or (3)
-                Earn credits daily through check-ins ({dailyCheckinCredits} credits/day), referrals
-                ({referralReward} credits per referral), and social sharing ({shareReward} credits
-                per share). Credit packs are perfect if you need extra credits without committing to
-                a subscription. No forced upgrades - stay free forever if you prefer!
+                Upgrade to Pro/Pro+ for monthly credit allocations (
+                {proPlan?.credits.monthly || 500}-{proPlusPlan?.credits.monthly || 900}{' '}
+                credits/month), or (3) Earn credits daily through check-ins ({dailyCheckinCredits}{' '}
+                credits/day), referrals ({referralReward} credits per referral), and social sharing
+                ({shareReward} credits per share). Credit packs are perfect if you need extra
+                credits without committing to a subscription. No forced upgrades - stay free forever
+                if you prefer!
               </p>
             </div>
           </div>
@@ -424,7 +446,7 @@ export default function FreeAIVideoGeneratorPage() {
           <div className="bg-gradient-to-r from-green-600 to-teal-600 rounded-2xl p-12 text-white">
             <h2 className="text-3xl font-bold mb-4">Ready to Start Creating?</h2>
             <p className="text-xl mb-8 opacity-90">
-              Get your 30 free credits now. No credit card. No commitment. No risk.
+              Get your {signupBonus} free credits now. No credit card. No commitment. No risk.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link href="/video-generation">

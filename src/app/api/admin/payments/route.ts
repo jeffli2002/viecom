@@ -1,11 +1,11 @@
 import { paymentConfig } from '@/config/payment.config';
 import { requireAdmin } from '@/lib/admin/auth';
 import { db } from '@/server/db';
-import { creditTransactions, payment, user } from '@/server/db/schema';
-import { desc, eq, gte, sql } from 'drizzle-orm';
+import { creditPackPurchase, payment, user } from '@/server/db/schema';
+import { and, desc, eq, gte, sql } from 'drizzle-orm';
 import { NextResponse } from 'next/server';
 
-const parsePurchaseMetadata = (metadata: string | null) => {
+const _parsePurchaseMetadata = (metadata: string | null) => {
   if (!metadata) {
     return { amount: 0, currency: 'USD', provider: 'unknown', credits: 0, productName: '' };
   }
@@ -76,45 +76,46 @@ export async function GET(request: Request) {
 
     const creditPackRows = await db
       .select({
-        id: creditTransactions.id,
-        userId: creditTransactions.userId,
+        id: creditPackPurchase.id,
+        userId: creditPackPurchase.userId,
         userEmail: user.email,
-        metadata: creditTransactions.metadata,
-        createdAt: creditTransactions.createdAt,
+        credits: creditPackPurchase.credits,
+        amountCents: creditPackPurchase.amountCents,
+        currency: creditPackPurchase.currency,
+        provider: creditPackPurchase.provider,
+        createdAt: creditPackPurchase.createdAt,
+        creditPackId: creditPackPurchase.creditPackId,
       })
-      .from(creditTransactions)
-      .leftJoin(user, eq(user.id, creditTransactions.userId))
+      .from(creditPackPurchase)
+      .leftJoin(user, eq(user.id, creditPackPurchase.userId))
       .where(
-        and(eq(creditTransactions.source, 'purchase'), gte(creditTransactions.createdAt, startDate))
+        and(gte(creditPackPurchase.createdAt, startDate), eq(creditPackPurchase.testMode, false))
       )
-      .orderBy(desc(creditTransactions.createdAt))
+      .orderBy(desc(creditPackPurchase.createdAt))
       .limit(100);
 
     const creditPackPayments = creditPackRows.map((row) => {
-      const parsed = parsePurchaseMetadata(row.metadata);
+      const pack = paymentConfig.creditPacks.find((p) => p.credits === row.credits);
       return {
         id: row.id,
         userEmail: row.userEmail || 'Unknown',
-        amount: parsed.amount,
-        currency: parsed.currency,
+        amount: row.amountCents / 100,
+        currency: row.currency,
         status: 'completed',
         createdAt: row.createdAt,
-        provider: parsed.provider,
+        provider: row.provider,
         type: 'credit_pack' as const,
-        credits: parsed.credits,
-        description: parsed.productName || `${parsed.credits} credits`,
+        credits: row.credits,
+        description: pack?.name || `${row.credits} credits`,
       };
     });
 
     const allCreditPackRows = await db
-      .select({ metadata: creditTransactions.metadata })
-      .from(creditTransactions)
-      .where(eq(creditTransactions.source, 'purchase'));
+      .select({ amountCents: creditPackPurchase.amountCents })
+      .from(creditPackPurchase)
+      .where(eq(creditPackPurchase.testMode, false));
 
-    const totalRevenue = allCreditPackRows.reduce(
-      (sum, row) => sum + parsePurchaseMetadata(row.metadata).amount,
-      0
-    );
+    const totalRevenue = allCreditPackRows.reduce((sum, row) => sum + row.amountCents / 100, 0);
 
     const revenueInRange = creditPackPayments.reduce((sum, item) => sum + item.amount, 0);
 
