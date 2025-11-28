@@ -80,6 +80,65 @@ const credits = 5;
 
 **Apply this rule to ALL pages, components, and API routes** that mention pricing, credits, or features. See `.cursorrules` for comprehensive examples.
 
+## Routing & Internationalization
+
+**CRITICAL RULES** - Follow these to avoid site-wide 404 errors:
+
+### Configuration Rules
+
+1. **NEVER use `localePrefix: 'as-needed'`** 
+   - It breaks in production with Next.js standalone builds
+   - Works in dev but fails in production
+   
+2. **ALWAYS use `localePrefix: 'always'`**
+   - Explicit locale prefixes ensure reliability
+   - All URLs include `/en` or `/zh` prefix
+   - This is the ONLY supported configuration
+
+3. **Test production builds locally before deploying**
+   ```bash
+   pnpm build
+   pnpm start
+   # Test critical routes manually
+   ```
+
+### Current Configuration
+
+**Location**: `src/i18n/routing.ts`
+
+```typescript
+export const routing = defineRouting({
+  locales: ['en', 'zh'],
+  defaultLocale: 'en',
+  localePrefix: 'always', // NEVER change this to 'as-needed'
+  localeDetection: true,
+});
+```
+
+**Middleware**: `middleware.ts` at root level
+
+- Root path redirect: `/` → `/en`
+- Admin routes bypass i18n (no locale prefix)
+- All other routes handled by `next-intl` middleware
+
+### URL Structure
+
+- ✅ `/` → redirects to `/en`
+- ✅ `/en/video-generation`
+- ✅ `/en/image-generation`
+- ✅ `/en/pricing`
+- ✅ `/zh/pricing` (Chinese)
+- ❌ `/video-generation` (will 404, must include locale)
+
+### Middleware Best Practices
+
+1. Keep middleware logic minimal
+2. Use explicit redirects over rewrites
+3. Never add custom rewrite logic for locale handling
+4. Let `next-intl` middleware handle routing
+
+**See `docs/BUG_REPORT_MIDDLEWARE_404.md` for detailed history of routing issues.**
+
 ## Architecture
 
 ### Authentication & Authorization
