@@ -52,7 +52,17 @@
     "footerRefund": "退款政策",
     "independenceDisclaimer": "独立性声明：Viecom 使用第三方 AI 模型（如 Google 的 Gemini、OpenAI 的模型及其他 AI 服务提供商）来驱动我们的内容生成服务。这些 AI 模型由其各自所有者提供，并受其自身条款和条件约束。Viecom 是一家独立服务提供商，我们的平台、功能和服务均为自有产品。我们与这些 AI 模型提供商无关联、未获其认可或赞助。",
     "brandAnalysis": "品牌分析",
-    "brandAnalysisDesc": "AI驱动的品牌调性和风格分析"
+    "brandAnalysisDesc": "AI驱动的品牌调性和风格分析",
+    "learn": "学习",
+    "pricing": "定价",
+    "settings": "设置",
+    "imageToVideoAI": "图片转视频 AI",
+    "imageToVideoAIDesc": "将产品照片转换为吸引人的视频",
+    "freeAIVideoGenerator": "免费 AI 视频生成器",
+    "freeAIVideoGeneratorDesc": "免费获得30积分，无需信用卡",
+    "videoEnhancer": "视频增强器",
+    "videoEnhancerDesc": "使用 AI 将视频提升至 4K 质量",
+    "footerLearn": "学习"
   },
   "hero": {
     "badge": "全新：Nano Banana Pro 图片生成引擎",

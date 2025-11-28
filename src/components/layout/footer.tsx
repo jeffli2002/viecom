@@ -21,7 +21,7 @@ export function Footer() {
               />
             </div>
             <p className="text-body leading-relaxed">
-              {t('footerDescription') || '为电商企业提供高质量的AI图片和视频生成服务'}
+              {t('footerDescription')}
             </p>
             <div className="flex gap-4">
               <a
@@ -46,7 +46,7 @@ export function Footer() {
           {/* Tools */}
           <div>
             <h4 className="font-bold text-slate-900 dark:text-white mb-6">
-              {t('footerProduct') || '产品'}
+              {t('footerProduct')}
             </h4>
             <ul className="space-y-4 text-sm text-slate-600 dark:text-slate-400">
               <li>
@@ -90,11 +90,11 @@ export function Footer() {
 
           {/* Learn */}
           <div>
-            <h4 className="font-bold text-slate-900 dark:text-white mb-6">Learn</h4>
+            <h4 className="font-bold text-slate-900 dark:text-white mb-6">{t('footerLearn')}</h4>
             <ul className="space-y-4 text-sm text-slate-600 dark:text-slate-400">
               <li>
                 <Link href="/image-to-video-ai" className="hover:text-teal-500 transition-colors">
-                  Image to Video AI
+                  {t('imageToVideoAI')}
                 </Link>
               </li>
               <li>
@@ -102,22 +102,22 @@ export function Footer() {
                   href="/ai-video-generator-free"
                   className="hover:text-teal-500 transition-colors"
                 >
-                  Free AI Video Generator
+                  {t('freeAIVideoGenerator')}
                 </Link>
               </li>
               <li>
                 <Link href="/video-enhancer-ai" className="hover:text-teal-500 transition-colors">
-                  Video Enhancer
+                  {t('videoEnhancer')}
                 </Link>
               </li>
               <li>
                 <Link href="/docs" className="hover:text-teal-500 transition-colors">
-                  {t('footerDocs') || '文档'}
+                  {t('footerDocs')}
                 </Link>
               </li>
               <li>
                 <Link href="/pricing" className="hover:text-teal-500 transition-colors">
-                  {t('footerPricing') || '定价'}
+                  {t('footerPricing')}
                 </Link>
               </li>
             </ul>
@@ -126,32 +126,32 @@ export function Footer() {
           {/* Company */}
           <div>
             <h4 className="font-bold text-slate-900 dark:text-white mb-6">
-              {t('footerCompany') || '公司'}
+              {t('footerCompany')}
             </h4>
             <ul className="space-y-4 text-sm text-slate-600 dark:text-slate-400">
               <li>
                 <Link href="/about" className="hover:text-teal-500 transition-colors">
-                  {t('footerAbout') || '关于我们'}
+                  {t('footerAbout')}
                 </Link>
               </li>
               <li>
                 <Link href="/contact" className="hover:text-teal-500 transition-colors">
-                  {t('footerContact') || '联系我们'}
+                  {t('footerContact')}
                 </Link>
               </li>
               <li>
                 <Link href="/privacy" className="hover:text-teal-500 transition-colors">
-                  {t('footerPrivacy') || '隐私政策'}
+                  {t('footerPrivacy')}
                 </Link>
               </li>
               <li>
                 <Link href="/terms" className="hover:text-teal-500 transition-colors">
-                  {t('footerTerms') || '服务条款'}
+                  {t('footerTerms')}
                 </Link>
               </li>
               <li>
                 <Link href="/refund" className="hover:text-teal-500 transition-colors">
-                  {t('footerRefund') || '退款政策'}
+                  {t('footerRefund')}
                 </Link>
               </li>
             </ul>

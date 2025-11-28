@@ -52,7 +52,17 @@
     "footerRefund": "Refund Policy",
     "independenceDisclaimer": "Independence Disclaimer: Viecom uses third-party AI models (such as Google's Gemini, OpenAI's models, and other AI service providers) to power our content generation services. These AI models are provided by their respective owners and are subject to their own terms and conditions. Viecom is an independent service provider and our platform, features, and services are our own proprietary products. We are not affiliated with, endorsed by, or sponsored by these AI model providers.",
     "brandAnalysis": "Brand Analysis",
-    "brandAnalysisDesc": "AI-powered brand tone and style analysis"
+    "brandAnalysisDesc": "AI-powered brand tone and style analysis",
+    "learn": "Learn",
+    "pricing": "Pricing",
+    "settings": "Settings",
+    "imageToVideoAI": "Image to Video AI",
+    "imageToVideoAIDesc": "Transform product photos into engaging videos",
+    "freeAIVideoGenerator": "Free AI Video Generator",
+    "freeAIVideoGeneratorDesc": "Start with 30 free credits, no credit card",
+    "videoEnhancer": "Video Enhancer",
+    "videoEnhancerDesc": "Upscale videos to 4K quality with AI",
+    "footerLearn": "Learn"
   },
   "hero": {
     "badge": "New: Nano Banana Pro Image Generation Engine",

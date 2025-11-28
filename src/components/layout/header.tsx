@@ -100,24 +100,24 @@ export function Header() {
       ],
     },
     {
-      title: 'Learn',
+      title: t('learn'),
       items: [
         {
-          title: 'Image to Video AI',
+          title: t('imageToVideoAI'),
           href: '/image-to-video-ai',
-          description: 'Transform product photos into engaging videos',
+          description: t('imageToVideoAIDesc'),
           icon: Video,
         },
         {
-          title: 'Free AI Video Generator',
+          title: t('freeAIVideoGenerator'),
           href: '/ai-video-generator-free',
-          description: 'Start with 30 free credits, no credit card',
+          description: t('freeAIVideoGeneratorDesc'),
           icon: Sparkles,
         },
         {
-          title: 'Video Enhancer',
+          title: t('videoEnhancer'),
           href: '/video-enhancer-ai',
-          description: 'Upscale videos to 4K quality with AI',
+          description: t('videoEnhancerDesc'),
           icon: Sparkles,
         },
       ],
@@ -190,7 +190,7 @@ export function Header() {
                 : 'text-slate-600 dark:text-slate-300'
             }`}
           >
-            Pricing
+            {t('pricing')}
           </Link>
         </nav>
 
@@ -242,7 +242,7 @@ export function Header() {
                     <Link href="/dashboard">{t('dashboard')}</Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
-                    <Link href="/settings">Settings</Link>
+                    <Link href="/settings">{t('settings')}</Link>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={handleSignOut}>
