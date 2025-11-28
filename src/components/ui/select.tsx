@@ -4,7 +4,11 @@ import * as React from 'react';
 
 import { cn } from '@/lib/utils';
 
-const Select = SelectPrimitive.Root;
+// Wrapper to add suppressHydrationWarning for SSR compatibility
+// Radix UI generates random IDs that differ between server and client
+const Select = ((props: React.ComponentProps<typeof SelectPrimitive.Root>) => {
+  return <SelectPrimitive.Root {...props} />;
+}) as typeof SelectPrimitive.Root;
 
 const SelectGroup = SelectPrimitive.Group;
 

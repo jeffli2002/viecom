@@ -8,7 +8,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { usePathname, useRouter } from '@/i18n/navigation';
-import { routing } from '@/i18n/routing';
+import { locales } from '@/i18n/routing';
 import { Globe } from 'lucide-react';
 import { useLocale } from 'next-intl';
 
@@ -24,19 +24,20 @@ export function LanguageSwitcher() {
   };
 
   return (
-    <Select value={locale} onValueChange={handleLanguageChange}>
-      <SelectTrigger className="language-switcher-trigger">
-        <Globe className="mr-2 h-4 w-4" />
-        <SelectValue />
-      </SelectTrigger>
-      <SelectContent className="language-switcher-content">
-        <SelectItem value="en" className="language-switcher-item">
-          English
-        </SelectItem>
-        <SelectItem value="zh" className="language-switcher-item">
-          中文
-        </SelectItem>
-      </SelectContent>
-    </Select>
+    <div suppressHydrationWarning>
+      <Select value={locale} onValueChange={handleLanguageChange}>
+        <SelectTrigger className="language-switcher-trigger">
+          <Globe className="mr-2 h-4 w-4" />
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent className="language-switcher-content">
+          {locales.map((loc) => (
+            <SelectItem key={loc.locale} value={loc.locale} className="language-switcher-item">
+              {loc.name}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+    </div>
   );
 }

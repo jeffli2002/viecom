@@ -20,9 +20,7 @@ export function Footer() {
                 style={{ height: '56px', width: '210px', objectFit: 'contain' }}
               />
             </div>
-            <p className="text-body leading-relaxed">
-              {t('footerDescription')}
-            </p>
+            <p className="text-body leading-relaxed">{t('footerDescription')}</p>
             <div className="flex gap-4">
               <a
                 href="https://x.com/jeffli2002"
@@ -45,9 +43,7 @@ export function Footer() {
 
           {/* Tools */}
           <div>
-            <h4 className="font-bold text-slate-900 dark:text-white mb-6">
-              {t('footerProduct')}
-            </h4>
+            <h4 className="font-bold text-slate-900 dark:text-white mb-6">{t('footerProduct')}</h4>
             <ul className="space-y-4 text-sm text-slate-600 dark:text-slate-400">
               <li>
                 <Link href="/image-generation" className="hover:text-teal-500 transition-colors">
@@ -125,9 +121,7 @@ export function Footer() {
 
           {/* Company */}
           <div>
-            <h4 className="font-bold text-slate-900 dark:text-white mb-6">
-              {t('footerCompany')}
-            </h4>
+            <h4 className="font-bold text-slate-900 dark:text-white mb-6">{t('footerCompany')}</h4>
             <ul className="space-y-4 text-sm text-slate-600 dark:text-slate-400">
               <li>
                 <Link href="/about" className="hover:text-teal-500 transition-colors">
@@ -161,6 +155,22 @@ export function Footer() {
         <div className="pt-8 border-t border-slate-200 dark:border-white/5 space-y-4">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-slate-500 dark:text-slate-500">
             <p>© {new Date().getFullYear()} Viecom. All rights reserved.</p>
+            <a
+              href="https://www.producthunt.com/products/ai-image-and-video-generator?embed=true&utm_source=badge-featured&utm_medium=badge&utm_source=badge-viecom&#0045;offcial&#0045;launch"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-block"
+              aria-label="Viecom on Product Hunt"
+            >
+              <img
+                src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=1043550&theme=neutral&t=1764334824681"
+                alt="Viecom&#0032;offcial&#0032;launch - &#0032;AI&#0045;powered&#0032;image&#0032;&#0038;&#0032;video&#0032;generation&#0032;for&#0032;e&#0045;commerce&#0032;sellers&#0046; | Product Hunt"
+                style={{ width: '250px', height: '54px' }}
+                width="250"
+                height="54"
+                className="transition-opacity hover:opacity-80"
+              />
+            </a>
           </div>
           <div className="pt-4 border-t border-slate-200 dark:border-white/5">
             <p className="text-xs text-slate-400 dark:text-slate-500 leading-relaxed">

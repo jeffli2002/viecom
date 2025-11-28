@@ -137,7 +137,7 @@ export function Header() {
         </Link>
 
         {/* Desktop Navigation */}
-        <nav className="hidden md:flex items-center space-x-6">
+        <nav className="hidden md:flex items-center space-x-6" suppressHydrationWarning>
           <NavigationMenu>
             <NavigationMenuList>
               {navItems.map((item) => (
