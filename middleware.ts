@@ -56,6 +56,17 @@ export default async function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL('/en', request.url));
   }
 
+  // Redirect non-localized paths to default locale (en)
+  // This handles URLs like /video-generation → /en/video-generation
+  const locales = ['en', 'zh'];
+  const hasLocalePrefix = locales.some((locale) => pathname.startsWith(`/${locale}`));
+  
+  if (!hasLocalePrefix && !pathname.startsWith('/api') && !pathname.startsWith('/_next')) {
+    const url = request.nextUrl.clone();
+    url.pathname = `/en${pathname}`;
+    return NextResponse.redirect(url, 301);
+  }
+
   // Apply i18n middleware for all other routes
   return intlMiddleware(request);
 }
