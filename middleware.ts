@@ -53,15 +53,18 @@ export default async function middleware(request: NextRequest) {
 
   // Redirect root path to default locale
   if (pathname === '/') {
-    return NextResponse.redirect(new URL('/en', request.url));
+    return NextResponse.redirect(new URL('/en', request.url), 301);
   }
 
   // Redirect non-localized paths to default locale (en)
   // This handles URLs like /video-generation → /en/video-generation
   const locales = ['en', 'zh'];
-  const hasLocalePrefix = locales.some((locale) => pathname.startsWith(`/${locale}`));
-  
-  if (!hasLocalePrefix && !pathname.startsWith('/api') && !pathname.startsWith('/_next')) {
+  const hasLocalePrefix = locales.some(
+    (locale) => pathname.startsWith(`/${locale}/`) || pathname === `/${locale}`
+  );
+
+  // If no locale prefix and not an excluded path, redirect to /en
+  if (!hasLocalePrefix) {
     const url = request.nextUrl.clone();
     url.pathname = `/en${pathname}`;
     return NextResponse.redirect(url, 301);
