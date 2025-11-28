@@ -3,6 +3,8 @@
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import {
   Select,
   SelectContent,
@@ -10,7 +12,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { DollarSign, Download, Image as ImageIcon, TrendingUp, Users, Video } from 'lucide-react';
+import {
+  DollarSign,
+  Download,
+  Image as ImageIcon,
+  ShoppingCart,
+  TrendingUp,
+  Users,
+  Video,
+} from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
 import {
   CartesianGrid,
@@ -25,14 +35,15 @@ import {
 
 interface DashboardStats {
   kpis: {
-    todayRegistrations: number;
-    registrationsInRange: number;
-    activeSubscriptions: number;
-    todayRevenue: number;
-    todaySubscriptionRevenue: number;
-    todayPackRevenue: number;
-    todayImageCredits: number;
-    todayVideoCredits: number;
+    registrations: number;
+    subscriptionUsers: number;
+    packPurchaseUsers: number;
+    totalRevenue: number;
+    subscriptionRevenue: number;
+    packRevenue: number;
+    totalCredits: number;
+    imageCredits: number;
+    videoCredits: number;
   };
   revenueSummary: {
     subscriptionRevenueInRange: number;
@@ -47,15 +58,20 @@ interface DashboardStats {
 
 export default function AdminDashboardPage() {
   const [stats, setStats] = useState<DashboardStats | null>(null);
-  const [range, setRange] = useState('7d');
+  const [range, setRange] = useState('today');
+  const [customStart, setCustomStart] = useState('');
+  const [customEnd, setCustomEnd] = useState('');
   const [isLoading, setIsLoading] = useState(true);
 
   const fetchStats = useCallback(async () => {
     setIsLoading(true);
     try {
-      // Add cache-busting timestamp to prevent stale data
       const timestamp = new Date().getTime();
-      const response = await fetch(`/api/admin/dashboard/stats?range=${range}&_t=${timestamp}`, {
+      let url = `/api/admin/dashboard/stats?range=${range}&_t=${timestamp}`;
+      if (range === 'custom' && customStart && customEnd) {
+        url += `&start=${customStart}&end=${customEnd}`;
+      }
+      const response = await fetch(url, {
         cache: 'no-store',
       });
       if (response.ok) {
@@ -69,11 +85,25 @@ export default function AdminDashboardPage() {
     } finally {
       setIsLoading(false);
     }
-  }, [range]);
+  }, [range, customStart, customEnd]);
 
   useEffect(() => {
     void fetchStats();
   }, [fetchStats]);
+
+  const handleRangeChange = (value: string) => {
+    setRange(value);
+    if (value !== 'custom') {
+      setCustomStart('');
+      setCustomEnd('');
+    }
+  };
+
+  const handleCustomDateApply = () => {
+    if (customStart && customEnd) {
+      void fetchStats();
+    }
+  };
 
   const downloadCSV = (filename: string, data: Array<Record<string, unknown>>) => {
     if (!data || !data.length) return;
@@ -104,147 +134,204 @@ export default function AdminDashboardPage() {
 
   return (
     <div className="p-6 space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between flex-wrap gap-4">
         <h1 className="text-3xl font-bold text-slate-900 dark:text-white">Dashboard</h1>
-        <Select value={range} onValueChange={setRange}>
-          <SelectTrigger className="w-[180px]">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="7d">Last 7 days</SelectItem>
-            <SelectItem value="30d">Last 30 days</SelectItem>
-            <SelectItem value="90d">Last 90 days</SelectItem>
-          </SelectContent>
-        </Select>
+        <div className="flex items-end gap-3 flex-wrap">
+          <div>
+            <Select value={range} onValueChange={handleRangeChange}>
+              <SelectTrigger className="w-[180px]">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="today">Today</SelectItem>
+                <SelectItem value="7d">Last 7 days</SelectItem>
+                <SelectItem value="30d">Last 30 days</SelectItem>
+                <SelectItem value="90d">Last 90 days</SelectItem>
+                <SelectItem value="custom">Custom Range</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          {range === 'custom' && (
+            <>
+              <div>
+                <Label htmlFor="start-date" className="text-xs mb-1 block">
+                  Start Date
+                </Label>
+                <Input
+                  id="start-date"
+                  type="date"
+                  value={customStart}
+                  onChange={(e) => setCustomStart(e.target.value)}
+                  className="w-[150px]"
+                />
+              </div>
+              <div>
+                <Label htmlFor="end-date" className="text-xs mb-1 block">
+                  End Date
+                </Label>
+                <Input
+                  id="end-date"
+                  type="date"
+                  value={customEnd}
+                  onChange={(e) => setCustomEnd(e.target.value)}
+                  className="w-[150px]"
+                />
+              </div>
+              <Button onClick={handleCustomDateApply} disabled={!customStart || !customEnd}>
+                Apply
+              </Button>
+            </>
+          )}
+        </div>
       </div>
 
-      {/* KPI Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-blue-100 rounded-lg">
-                <Users className="h-5 w-5 text-blue-600" />
-              </div>
-              <div>
-                <p className="text-sm text-gray-500">Today's Registrations</p>
-                <p className="text-2xl font-bold">{stats.kpis.todayRegistrations}</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+      <div className="space-y-6">
+        <div>
+          <h2 className="text-xl font-semibold text-slate-900 dark:text-white mb-3">User Data</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <Card>
+              <CardContent className="pt-6">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-blue-100 rounded-lg">
+                    <Users className="h-5 w-5 text-blue-600" />
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-500">Registrations</p>
+                    <p className="text-2xl font-bold">{stats.kpis.registrations}</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
 
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-green-100 rounded-lg">
-                <TrendingUp className="h-5 w-5 text-green-600" />
-              </div>
-              <div>
-                <p className="text-sm text-gray-500">Past {range}</p>
-                <p className="text-2xl font-bold">{stats.kpis.registrationsInRange}</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+            <Card>
+              <CardContent className="pt-6">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-teal-100 dark:bg-teal-900/30 rounded-lg">
+                    <TrendingUp className="h-5 w-5 text-teal-500" />
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-500">Subscription Users</p>
+                    <p className="text-2xl font-bold">{stats.kpis.subscriptionUsers}</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
 
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-teal-100 dark:bg-teal-900/30 rounded-lg">
-                <Users className="h-5 w-5 text-teal-500" />
-              </div>
-              <div>
-                <p className="text-sm text-gray-500">Active Subscriptions</p>
-                <p className="text-2xl font-bold">{stats.kpis.activeSubscriptions}</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-green-100 rounded-lg">
-                <DollarSign className="h-5 w-5 text-green-600" />
-              </div>
-              <div>
-                <p className="text-sm text-gray-500">Today Subscription Revenue</p>
-                <p className="text-2xl font-bold">
-                  {formatCurrency(stats.kpis.todaySubscriptionRevenue)}
-                </p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-amber-100 rounded-lg">
-                <DollarSign className="h-5 w-5 text-amber-600" />
-              </div>
-              <div>
-                <p className="text-sm text-gray-500">Today Pack Revenue</p>
-                <p className="text-2xl font-bold">{formatCurrency(stats.kpis.todayPackRevenue)}</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-blue-100 rounded-lg">
-                <DollarSign className="h-5 w-5 text-blue-600" />
-              </div>
-              <div>
-                <p className="text-sm text-gray-500">Today Revenue (Total)</p>
-                <p className="text-2xl font-bold">{formatCurrency(stats.kpis.todayRevenue)}</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+            <Card>
+              <CardContent className="pt-6">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-purple-100 dark:bg-purple-900/30 rounded-lg">
+                    <ShoppingCart className="h-5 w-5 text-purple-500" />
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-500">Pack Purchase Users</p>
+                    <p className="text-2xl font-bold">{stats.kpis.packPurchaseUsers}</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
 
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-amber-100 rounded-lg">
-                <DollarSign className="h-5 w-5 text-amber-600" />
-              </div>
-              <div>
-                <p className="text-sm text-gray-500">Today's Revenue</p>
-                <p className="text-2xl font-bold">${stats.kpis.todayRevenue.toFixed(2)}</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+        <div>
+          <h2 className="text-xl font-semibold text-slate-900 dark:text-white mb-3">
+            Revenue Data
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <Card>
+              <CardContent className="pt-6">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-blue-100 rounded-lg">
+                    <DollarSign className="h-5 w-5 text-blue-600" />
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-500">Total Revenue</p>
+                    <p className="text-2xl font-bold">{formatCurrency(stats.kpis.totalRevenue)}</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
 
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-cyan-100 rounded-lg">
-                <ImageIcon className="h-5 w-5 text-cyan-600" />
-              </div>
-              <div>
-                <p className="text-sm text-gray-500">Today's Image Credits</p>
-                <p className="text-2xl font-bold">{stats.kpis.todayImageCredits}</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+            <Card>
+              <CardContent className="pt-6">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-green-100 rounded-lg">
+                    <DollarSign className="h-5 w-5 text-green-600" />
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-500">Subscription Revenue</p>
+                    <p className="text-2xl font-bold">
+                      {formatCurrency(stats.kpis.subscriptionRevenue)}
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
 
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-pink-100 rounded-lg">
-                <Video className="h-5 w-5 text-pink-600" />
-              </div>
-              <div>
-                <p className="text-sm text-gray-500">Today's Video Credits</p>
-                <p className="text-2xl font-bold">{stats.kpis.todayVideoCredits}</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+            <Card>
+              <CardContent className="pt-6">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-amber-100 rounded-lg">
+                    <DollarSign className="h-5 w-5 text-amber-600" />
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-500">Pack Revenue</p>
+                    <p className="text-2xl font-bold">{formatCurrency(stats.kpis.packRevenue)}</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+
+        <div>
+          <h2 className="text-xl font-semibold text-slate-900 dark:text-white mb-3">
+            Credits Consumption Data
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <Card>
+              <CardContent className="pt-6">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-indigo-100 rounded-lg">
+                    <TrendingUp className="h-5 w-5 text-indigo-600" />
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-500">Overall Credits</p>
+                    <p className="text-2xl font-bold">{stats.kpis.totalCredits}</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardContent className="pt-6">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-cyan-100 rounded-lg">
+                    <ImageIcon className="h-5 w-5 text-cyan-600" />
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-500">Image Consumption</p>
+                    <p className="text-2xl font-bold">{stats.kpis.imageCredits}</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardContent className="pt-6">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-pink-100 rounded-lg">
+                    <Video className="h-5 w-5 text-pink-600" />
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-500">Video Consumption</p>
+                    <p className="text-2xl font-bold">{stats.kpis.videoCredits}</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
       </div>
 
       <Card>
@@ -342,12 +429,15 @@ export default function AdminDashboardPage() {
           onClick={() =>
             downloadCSV('dashboard-stats.csv', [
               {
-                todayRegistrations: stats.kpis.todayRegistrations,
-                registrationsInRange: stats.kpis.registrationsInRange,
-                activeSubscriptions: stats.kpis.activeSubscriptions,
-                todayRevenue: stats.kpis.todayRevenue,
-                todayImageCredits: stats.kpis.todayImageCredits,
-                todayVideoCredits: stats.kpis.todayVideoCredits,
+                registrations: stats.kpis.registrations,
+                subscriptionUsers: stats.kpis.subscriptionUsers,
+                packPurchaseUsers: stats.kpis.packPurchaseUsers,
+                totalRevenue: stats.kpis.totalRevenue,
+                subscriptionRevenue: stats.kpis.subscriptionRevenue,
+                packRevenue: stats.kpis.packRevenue,
+                totalCredits: stats.kpis.totalCredits,
+                imageCredits: stats.kpis.imageCredits,
+                videoCredits: stats.kpis.videoCredits,
               },
             ])
           }

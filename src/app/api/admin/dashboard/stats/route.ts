@@ -1,7 +1,9 @@
 import { paymentConfig } from '@/config/payment.config';
 import { requireAdmin } from '@/lib/admin/auth';
+import { getPlanPriceByPriceId } from '@/lib/admin/revenue-utils';
 import { db } from '@/server/db';
 import {
+  creditPackPurchase,
   creditTransactions,
   generatedAsset,
   payment,
@@ -41,145 +43,158 @@ const _parsePurchaseMetadata = (metadata: string | null) => {
 
 export async function GET(request: Request) {
   try {
-    // Verify admin
     await requireAdmin();
 
     const { searchParams } = new URL(request.url);
-    const range = searchParams.get('range') || '7d'; // 7d, 30d, 90d
+    const range = searchParams.get('range') || 'today';
 
-    // Calculate date range
-    const daysAgo = range === '7d' ? 7 : range === '30d' ? 30 : 90;
-    const startDate = new Date();
-    startDate.setDate(startDate.getDate() - daysAgo);
+    let startDate: Date;
+    let endDate: Date;
 
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
+    if (range === 'custom') {
+      const startParam = searchParams.get('start');
+      const endParam = searchParams.get('end');
+      if (!startParam || !endParam) {
+        return NextResponse.json(
+          { error: 'Custom range requires start and end dates' },
+          { status: 400 }
+        );
+      }
+      startDate = new Date(startParam);
+      startDate.setHours(0, 0, 0, 0);
+      endDate = new Date(endParam);
+      endDate.setHours(23, 59, 59, 999);
+    } else if (range === 'today') {
+      startDate = new Date();
+      startDate.setHours(0, 0, 0, 0);
+      endDate = new Date();
+      endDate.setHours(23, 59, 59, 999);
+    } else {
+      const daysAgo = range === '7d' ? 7 : range === '30d' ? 30 : 90;
+      startDate = new Date();
+      startDate.setDate(startDate.getDate() - daysAgo);
+      startDate.setHours(0, 0, 0, 0);
+      endDate = new Date();
+      endDate.setHours(23, 59, 59, 999);
+    }
 
-    // Get today's registrations
-    const todayRegistrations = await db
+    const registrations = await db
       .select({ count: sql<number>`count(*)` })
       .from(user)
-      .where(gte(user.createdAt, today));
+      .where(and(gte(user.createdAt, startDate), sql`${user.createdAt} <= ${endDate}`));
 
-    // Get registrations in range
-    const registrationsInRange = await db
-      .select({ count: sql<number>`count(*)` })
-      .from(user)
-      .where(gte(user.createdAt, startDate));
+    const subscriptionUsersResult = await db
+      .select({ count: sql<number>`count(DISTINCT ${payment.userId})` })
+      .from(payment)
+      .where(and(gte(payment.createdAt, startDate), sql`${payment.createdAt} <= ${endDate}`));
 
-    // Get active subscriptions
-    const activeSubscriptions = await db
-      .select({ count: sql<number>`count(*)` })
-      .from(subscription)
-      .where(eq(subscription.status, 'active'));
+    const packPurchaseUsersResult = await db
+      .select({ count: sql<number>`count(DISTINCT ${creditPackPurchase.userId})` })
+      .from(creditPackPurchase)
+      .where(
+        and(
+          gte(creditPackPurchase.createdAt, startDate),
+          sql`${creditPackPurchase.createdAt} <= ${endDate}`,
+          eq(creditPackPurchase.testMode, false)
+        )
+      );
 
-    // Revenue calculations
-    const subscriptionPaymentsInRange = await db
+    const subscriptionPayments = await db
       .select({
         priceId: payment.priceId,
         createdAt: payment.createdAt,
       })
       .from(payment)
-      .where(gte(payment.createdAt, startDate));
+      .where(and(gte(payment.createdAt, startDate), sql`${payment.createdAt} <= ${endDate}`));
 
-    const subscriptionPaymentsToday = subscriptionPaymentsInRange.filter(
-      (row) => row.createdAt >= today
-    );
-
-    const subscriptionRevenueInRange = subscriptionPaymentsInRange.reduce(
-      (sum, row) => sum + getPlanPriceByPriceId(row.priceId),
-      0
-    );
-    const todaySubscriptionRevenue = subscriptionPaymentsToday.reduce(
+    const subscriptionRevenue = subscriptionPayments.reduce(
       (sum, row) => sum + getPlanPriceByPriceId(row.priceId),
       0
     );
 
-    const packPurchasesInRange = await db
+    const packPurchases = await db
       .select({
         amountCents: creditPackPurchase.amountCents,
         createdAt: creditPackPurchase.createdAt,
       })
       .from(creditPackPurchase)
-      .where(gte(creditPackPurchase.createdAt, startDate));
+      .where(
+        and(
+          gte(creditPackPurchase.createdAt, startDate),
+          sql`${creditPackPurchase.createdAt} <= ${endDate}`,
+          eq(creditPackPurchase.testMode, false)
+        )
+      );
 
-    const packPurchasesToday = packPurchasesInRange.filter((row) => row.createdAt >= today);
+    const packRevenue = packPurchases.reduce((sum, row) => sum + row.amountCents / 100, 0);
 
-    const packRevenueInRange = packPurchasesInRange.reduce(
-      (sum, row) => sum + row.amountCents / 100,
-      0
-    );
-    const todayPackRevenue = packPurchasesToday.reduce(
-      (sum, row) => sum + row.amountCents / 100,
-      0
-    );
+    const totalRevenue = subscriptionRevenue + packRevenue;
 
-    const todayRevenueTotal = todaySubscriptionRevenue + todayPackRevenue;
-
-    // Get today's credits consumed from generated assets
-    const todayImageCreditsResult = await db
+    const imageCreditsResult = await db
       .select({ total: sql<number>`COALESCE(SUM(credits_spent), 0)` })
       .from(generatedAsset)
       .where(
         and(
           eq(generatedAsset.assetType, 'image'),
           eq(generatedAsset.status, 'completed'),
-          gte(generatedAsset.createdAt, today)
+          gte(generatedAsset.createdAt, startDate),
+          sql`${generatedAsset.createdAt} <= ${endDate}`
         )
       );
 
-    const todayVideoCreditsResult = await db
+    const videoCreditsResult = await db
       .select({ total: sql<number>`COALESCE(SUM(credits_spent), 0)` })
       .from(generatedAsset)
       .where(
         and(
           eq(generatedAsset.assetType, 'video'),
           eq(generatedAsset.status, 'completed'),
-          gte(generatedAsset.createdAt, today)
+          gte(generatedAsset.createdAt, startDate),
+          sql`${generatedAsset.createdAt} <= ${endDate}`
         )
       );
 
-    const todayImageCredits = todayImageCreditsResult;
-    const todayVideoCredits = todayVideoCreditsResult;
+    const imageCredits = Number(imageCreditsResult[0]?.total) || 0;
+    const videoCredits = Number(videoCreditsResult[0]?.total) || 0;
+    const totalCredits = imageCredits + videoCredits;
 
-    // Get registration trend (last 30 days)
     const registrationTrend = await db.execute(sql`
       SELECT 
         DATE(created_at) as date,
         COUNT(*) as count
       FROM ${user}
-      WHERE created_at >= ${startDate}
+      WHERE created_at >= ${startDate} AND created_at <= ${endDate}
       GROUP BY DATE(created_at)
       ORDER BY date ASC
     `);
 
-    // Get credits trend from generated assets (more accurate)
     const creditsTrend = await db.execute(sql`
       SELECT 
         DATE(created_at) as date,
         COALESCE(SUM(CASE WHEN asset_type = 'image' AND status = 'completed' THEN credits_spent ELSE 0 END), 0) as "imageCredits",
         COALESCE(SUM(CASE WHEN asset_type = 'video' AND status = 'completed' THEN credits_spent ELSE 0 END), 0) as "videoCredits"
       FROM ${generatedAsset}
-      WHERE created_at >= ${startDate}
+      WHERE created_at >= ${startDate} AND created_at <= ${endDate}
       GROUP BY DATE(created_at)
       ORDER BY date ASC
     `);
 
     const response = NextResponse.json({
       kpis: {
-        todayRegistrations: Number(todayRegistrations[0]?.count) || 0,
-        registrationsInRange: Number(registrationsInRange[0]?.count) || 0,
-        activeSubscriptions: Number(activeSubscriptions[0]?.count) || 0,
-        todayRevenue: todayRevenueTotal,
-        todaySubscriptionRevenue,
-        todayPackRevenue,
-        todayImageCredits: Number(todayImageCredits[0]?.total) || 0,
-        todayVideoCredits: Number(todayVideoCredits[0]?.total) || 0,
+        registrations: Number(registrations[0]?.count) || 0,
+        subscriptionUsers: Number(subscriptionUsersResult[0]?.count) || 0,
+        packPurchaseUsers: Number(packPurchaseUsersResult[0]?.count) || 0,
+        totalRevenue,
+        subscriptionRevenue,
+        packRevenue,
+        totalCredits,
+        imageCredits,
+        videoCredits,
       },
       revenueSummary: {
-        subscriptionRevenueInRange,
-        packRevenueInRange,
-        totalRevenueInRange: subscriptionRevenueInRange + packRevenueInRange,
+        subscriptionRevenueInRange: subscriptionRevenue,
+        packRevenueInRange: packRevenue,
+        totalRevenueInRange: totalRevenue,
       },
       trends: {
         registrations: registrationTrend.rows,
