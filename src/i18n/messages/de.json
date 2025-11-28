@@ -232,6 +232,10 @@
     "copyAll": "Alles kopieren",
     "copiedToClipboard": "In Zwischenablage kopiert",
     "copyFailed": "Kopieren fehlgeschlagen",
+    "videoPromotionTitle": "Verwandeln Sie diese Bilder in Videos",
+    "videoPromotionDescription": "Nachdem Sie Ihr perfektes Produktbild erstellt haben, verwandeln Sie es mit unserem KI-Videogenerator in ein ansprechendes Video. Perfekt für soziale Medien, Anzeigen und E-Commerce-Listings.",
+    "videoPromotionCtaPrimary": "Bild-zu-Video-KI ausprobieren",
+    "videoPromotionCtaSecondary": "Zum Videogenerator",
     "imageStyles": {
       "studio-shot": "Studio-Aufnahme",
       "lifestyle": "Lifestyle",

@@ -232,6 +232,10 @@
     "copyAll": "复制全部",
     "copiedToClipboard": "已复制到剪贴板",
     "copyFailed": "复制失败",
+    "videoPromotionTitle": "将这些图片转为视频",
+    "videoPromotionDescription": "创建完美的产品图片后，使用我们的 AI 视频生成器将其转换为引人入胜的视频。非常适合社交媒体、广告和电商展示。",
+    "videoPromotionCtaPrimary": "试用图片转视频 AI",
+    "videoPromotionCtaSecondary": "前往视频生成器",
     "imageStyles": {
       "studio-shot": "影棚拍摄",
       "lifestyle": "生活方式",

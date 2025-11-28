@@ -232,6 +232,10 @@
     "copyAll": "Copy all",
     "copiedToClipboard": "Copied to clipboard",
     "copyFailed": "Failed to copy",
+    "videoPromotionTitle": "Turn These Images into Videos",
+    "videoPromotionDescription": "Once you've created your perfect product image, transform it into an engaging video with our AI video generator. Perfect for social media, ads, and e-commerce listings.",
+    "videoPromotionCtaPrimary": "Try Image to Video AI",
+    "videoPromotionCtaSecondary": "Go to Video Generator",
     "imageStyles": {
       "studio-shot": "Studio Shot",
       "lifestyle": "Lifestyle",

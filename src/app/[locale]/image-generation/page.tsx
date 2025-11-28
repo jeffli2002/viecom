@@ -28,22 +28,21 @@ export default function ImageGenerationPage() {
 
       <div className="mt-12 bg-gradient-to-br from-teal-50 to-blue-50 dark:from-teal-900/20 dark:to-blue-900/20 rounded-xl p-8 border border-teal-200 dark:border-teal-800 text-center">
         <h2 className="h2-section mb-3 text-slate-900 dark:text-white">
-          Turn These Images into Videos
+          {t('videoPromotionTitle')}
         </h2>
         <p className="text-body mb-6 max-w-2xl mx-auto">
-          Once you've created your perfect product image, transform it into an engaging video with
-          our AI video generator. Perfect for social media, ads, and e-commerce listings.
+          {t('videoPromotionDescription')}
         </p>
         <div className="flex justify-center gap-4">
           <Link href="/image-to-video-ai">
             <Button size="lg" className="btn-primary group">
-              Try Image to Video AI
+              {t('videoPromotionCtaPrimary')}
               <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
             </Button>
           </Link>
           <Link href="/video-generation">
             <Button size="lg" variant="outline">
-              Go to Video Generator
+              {t('videoPromotionCtaSecondary')}
             </Button>
           </Link>
         </div>

@@ -232,6 +232,10 @@
     "copyAll": "Tout copier",
     "copiedToClipboard": "Copié dans le presse-papiers",
     "copyFailed": "Échec de la copie",
+    "videoPromotionTitle": "Transformez ces images en vidéos",
+    "videoPromotionDescription": "Une fois que vous avez créé votre image de produit parfaite, transformez-la en vidéo engageante avec notre générateur vidéo IA. Parfait pour les réseaux sociaux, les publicités et les listes e-commerce.",
+    "videoPromotionCtaPrimary": "Essayer l'IA image vers vidéo",
+    "videoPromotionCtaSecondary": "Aller au générateur vidéo",
     "imageStyles": {
       "studio-shot": "Photo studio",
       "lifestyle": "Lifestyle",

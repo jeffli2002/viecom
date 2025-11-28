@@ -232,6 +232,10 @@
     "copyAll": "すべてコピー",
     "copiedToClipboard": "クリップボードにコピーしました",
     "copyFailed": "コピーに失敗しました",
+    "videoPromotionTitle": "これらの画像を動画に変換",
+    "videoPromotionDescription": "完璧な製品画像を作成したら、AI動画ジェネレーターで魅力的な動画に変換しましょう。ソーシャルメディア、広告、ECサイトに最適です。",
+    "videoPromotionCtaPrimary": "画像から動画AIを試す",
+    "videoPromotionCtaSecondary": "動画ジェネレーターへ",
     "imageStyles": {
       "studio-shot": "スタジオショット",
       "lifestyle": "ライフスタイル",
