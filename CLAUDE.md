@@ -118,26 +118,50 @@ export const routing = defineRouting({
 **Middleware**: `middleware.ts` at root level
 
 - Root path redirect: `/` → `/en`
+- **Non-localized URL redirects**: `/video-generation` → `/en/video-generation` (301 permanent)
 - Admin routes bypass i18n (no locale prefix)
 - All other routes handled by `next-intl` middleware
 
-### URL Structure
+### URL Structure & Redirects
 
-- ✅ `/` → redirects to `/en`
+**Canonical URLs** (with locale prefix):
+- ✅ `/en` (homepage)
 - ✅ `/en/video-generation`
 - ✅ `/en/image-generation`
 - ✅ `/en/pricing`
 - ✅ `/zh/pricing` (Chinese)
-- ❌ `/video-generation` (will 404, must include locale)
+
+**Redirects** (301 permanent):
+- `/` → `/en`
+- `/video-generation` → `/en/video-generation`
+- `/pricing` → `/en/pricing`
+- (All non-localized URLs redirect to `/en` version)
+
+**Benefits**:
+- ✅ No 404 errors on non-localized URLs
+- ✅ SEO-friendly (301 redirects preserve rankings)
+- ✅ Backward compatibility with old links
+- ✅ Better user experience
 
 ### Middleware Best Practices
 
 1. Keep middleware logic minimal
-2. Use explicit redirects over rewrites
+2. Use explicit 301 redirects for non-localized URLs
 3. Never add custom rewrite logic for locale handling
-4. Let `next-intl` middleware handle routing
+4. Let `next-intl` middleware handle routing after redirects
 
-**See `docs/BUG_REPORT_MIDDLEWARE_404.md` for detailed history of routing issues.**
+### SEO Configuration
+
+**Sitemap** (`src/app/sitemap.ts`):
+- Generates only localized URLs (`/en/*`, `/zh/*`)
+- All public pages indexed with locale prefixes
+- Updates automatically from route list
+
+**Robots.txt** (`src/app/robots.ts`):
+- Allows all public localized pages
+- Blocks admin (`/admin/*`), API (`/api/*`), and private pages (`/*/settings`, `/*/billing`)
+
+**See `docs/BUG_REPORT_MIDDLEWARE_404.md` and `docs/ROUTING_GUIDELINES.md` for detailed history and guidelines.**
 
 ## Architecture
 
