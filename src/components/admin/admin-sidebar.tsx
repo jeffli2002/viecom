@@ -3,6 +3,7 @@
 import {
   CreditCard,
   DollarSign,
+  Gift,
   LayoutDashboard,
   Settings,
   Sparkles,
@@ -32,6 +33,11 @@ const menuItems = [
     name: 'Payments',
     href: '/admin/payments',
     icon: DollarSign,
+  },
+  {
+    name: 'Credit Packs',
+    href: '/admin/credit-packs',
+    icon: Gift,
   },
   {
     name: 'Credits (积分)',

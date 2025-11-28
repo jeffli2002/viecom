@@ -50,6 +50,13 @@
       "when": 1764251853877,
       "tag": "0006_round_terror",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1764292152630,
+      "tag": "0007_numerous_silver_centurion",
+      "breakpoints": true
     }
   ]
 }

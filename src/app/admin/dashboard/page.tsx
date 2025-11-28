@@ -29,8 +29,15 @@ interface DashboardStats {
     registrationsInRange: number;
     activeSubscriptions: number;
     todayRevenue: number;
+    todaySubscriptionRevenue: number;
+    todayPackRevenue: number;
     todayImageCredits: number;
     todayVideoCredits: number;
+  };
+  revenueSummary: {
+    subscriptionRevenueInRange: number;
+    packRevenueInRange: number;
+    totalRevenueInRange: number;
   };
   trends: {
     registrations: Array<{ date: string; count: number }>;
@@ -92,6 +99,9 @@ export default function AdminDashboardPage() {
     );
   }
 
+  const formatCurrency = (value: number) =>
+    `$${value.toLocaleString(undefined, { minimumFractionDigits: 2 })}`;
+
   return (
     <div className="p-6 space-y-6">
       {/* Header */}
@@ -110,7 +120,7 @@ export default function AdminDashboardPage() {
       </div>
 
       {/* KPI Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
         <Card>
           <CardContent className="pt-6">
             <div className="flex items-center gap-3">
@@ -148,6 +158,47 @@ export default function AdminDashboardPage() {
               <div>
                 <p className="text-sm text-gray-500">Active Subscriptions</p>
                 <p className="text-2xl font-bold">{stats.kpis.activeSubscriptions}</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="pt-6">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-green-100 rounded-lg">
+                <DollarSign className="h-5 w-5 text-green-600" />
+              </div>
+              <div>
+                <p className="text-sm text-gray-500">Today Subscription Revenue</p>
+                <p className="text-2xl font-bold">
+                  {formatCurrency(stats.kpis.todaySubscriptionRevenue)}
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="pt-6">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-amber-100 rounded-lg">
+                <DollarSign className="h-5 w-5 text-amber-600" />
+              </div>
+              <div>
+                <p className="text-sm text-gray-500">Today Pack Revenue</p>
+                <p className="text-2xl font-bold">{formatCurrency(stats.kpis.todayPackRevenue)}</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="pt-6">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-blue-100 rounded-lg">
+                <DollarSign className="h-5 w-5 text-blue-600" />
+              </div>
+              <div>
+                <p className="text-sm text-gray-500">Today Revenue (Total)</p>
+                <p className="text-2xl font-bold">{formatCurrency(stats.kpis.todayRevenue)}</p>
               </div>
             </div>
           </CardContent>
@@ -195,6 +246,32 @@ export default function AdminDashboardPage() {
           </CardContent>
         </Card>
       </div>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Revenue Summary ({range})</CardTitle>
+        </CardHeader>
+        <CardContent className="grid gap-4 md:grid-cols-3">
+          <div>
+            <p className="text-sm text-gray-500">Subscription Revenue</p>
+            <p className="text-2xl font-bold">
+              {formatCurrency(stats.revenueSummary.subscriptionRevenueInRange)}
+            </p>
+          </div>
+          <div>
+            <p className="text-sm text-gray-500">Pack Revenue</p>
+            <p className="text-2xl font-bold">
+              {formatCurrency(stats.revenueSummary.packRevenueInRange)}
+            </p>
+          </div>
+          <div>
+            <p className="text-sm text-gray-500">Total Revenue</p>
+            <p className="text-2xl font-bold">
+              {formatCurrency(stats.revenueSummary.totalRevenueInRange)}
+            </p>
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

@@ -389,23 +389,6 @@ async function handleCreditPackPurchase(data: CreemWebhookData) {
       .where(eq(userCredits.userId, userId))
       .limit(1);
 
-    const creditPack = paymentConfig.creditPacks.find(
-      (pack) => pack.creemProductKey === productId || pack.credits === credits
-    );
-    const rawAmount = typeof amount === 'number' ? amount : (creditPack?.price ?? 0);
-    const normalizedAmount = rawAmount > 100 ? rawAmount / 100 : rawAmount;
-    const metadataPayload = {
-      provider: 'creem',
-      checkoutId,
-      orderId,
-      productId,
-      productName,
-      credits,
-      amount: normalizedAmount,
-      currency: currency || 'USD',
-      creemEventId: data.eventId,
-    };
-
     const metadataPayload = {
       provider: 'creem',
       checkoutId,
