@@ -51,15 +51,6 @@ export default async function middleware(request: NextRequest) {
     }
   }
 
-  // Handle root path explicitly for localePrefix: 'as-needed'
-  // When localePrefix is 'as-needed', root path should map to default locale
-  if (pathname === '/') {
-    const url = request.nextUrl.clone();
-    url.pathname = '/en';
-    // Use rewrite instead of redirect to keep the URL as /
-    return NextResponse.rewrite(url);
-  }
-
   // Apply i18n middleware for all other routes
   return intlMiddleware(request);
 }
