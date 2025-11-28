@@ -235,7 +235,7 @@ export const paymentConfig: PaymentConfig = {
       id: 'pack-300',
       name: '300 Credits',
       credits: 300,
-      price: 4.49,
+      price: 9.9,
       stripePriceId: process.env.NEXT_PUBLIC_STRIPE_PRICE_PACK_300 || 'price_pack_300',
       creemProductKey: process.env.NEXT_PUBLIC_CREEM_PRICE_PACK_300 || '',
       badge: 'Starter',
