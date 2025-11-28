@@ -3,6 +3,7 @@ import { creditsConfig } from '@/config/credits.config';
 import { paymentConfig } from '@/config/payment.config';
 import { calculateGenerationCapacity, formatCapacityRange } from '@/lib/utils/pricing-calculator';
 import { Sparkles } from 'lucide-react';
+import { getTranslations } from 'next-intl/server';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
@@ -19,6 +20,8 @@ export const metadata: Metadata = {
 };
 
 export default async function PricingPage() {
+  const t = await getTranslations('pricingPage');
+  
   const plans = paymentConfig.plans.map((plan) => {
     const monthlyCredits = plan.credits.monthly;
     const yearlyCredits = plan.credits.yearly || 0;
@@ -49,7 +52,7 @@ export default async function PricingPage() {
       description: plan.description,
       features,
       popular: plan.popular,
-      cta: plan.id === 'free' ? 'Get Started' : `Upgrade to ${plan.name}`,
+      cta: plan.id === 'free' ? t('getStarted') : t('upgradeTo', { plan: plan.name }),
       highlighted: plan.popular,
       capacityInfo: monthlyCapacityInfo,
       yearlyCapacityInfo,
@@ -113,14 +116,14 @@ export default async function PricingPage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
       />
       <div className="mb-12 text-center">
-        <h1 className="h2-section mb-4">Simple, Transparent Pricing</h1>
+        <h1 className="h2-section mb-4">{t('title')}</h1>
         <p className="text-body text-lg mb-6">
-          Choose the plan that fits your business needs. Upgrade or downgrade anytime.
+          {t('subtitle')}
         </p>
         <div className="inline-flex items-center gap-2 bg-teal-50 dark:bg-teal-900/20 px-4 py-2 rounded-full border border-teal-200 dark:border-teal-800">
           <Sparkles className="h-4 w-4 text-teal-500" />
           <span className="text-sm font-medium text-slate-900 dark:text-white">
-            All plans include daily check-in rewards and referral bonuses
+            {t('rewardsBadge')}
           </span>
         </div>
       </div>
@@ -129,53 +132,47 @@ export default async function PricingPage() {
 
       <div className="mt-16 max-w-3xl mx-auto">
         <h2 className="text-2xl font-bold text-center mb-8 text-slate-900 dark:text-white">
-          Frequently Asked Questions
+          {t('faqTitle')}
         </h2>
         <div className="space-y-6">
           <div>
             <h3 className="text-lg font-semibold mb-2 text-slate-900 dark:text-white">
-              Is there a free plan?
+              {t('faqQ1')}
             </h3>
             <p className="text-body">
-              Yes, get 30 free credits on signup. No credit card required. Perfect for trying out
-              our AI video and image generation.
+              {t('faqA1')}
             </p>
           </div>
           <div>
             <h3 className="text-lg font-semibold mb-2 text-slate-900 dark:text-white">
-              How much do credits cost?
+              {t('faqQ2')}
             </h3>
             <p className="text-body">
-              Free plan: 30 credits sign-up bonus (one-time). Pro: 500 credits/month ($14.9). Pro+:
-              900 credits/month ($24.9). Credits cost 5-130 per generation depending on model and
-              settings.
+              {t('faqA2')}
             </p>
           </div>
           <div>
             <h3 className="text-lg font-semibold mb-2 text-slate-900 dark:text-white">
-              Can I upgrade or downgrade anytime?
+              {t('faqQ3')}
             </h3>
             <p className="text-body">
-              Yes, you can upgrade, downgrade, or cancel your subscription at any time. Changes take
-              effect on your next billing cycle.
+              {t('faqA3')}
             </p>
           </div>
           <div>
             <h3 className="text-lg font-semibold mb-2 text-slate-900 dark:text-white">
-              What payment methods do you accept?
+              {t('faqQ4')}
             </h3>
             <p className="text-body">
-              We accept all major credit cards, debit cards, and support secure payment processing
-              through Creem.
+              {t('faqA4')}
             </p>
           </div>
           <div>
             <h3 className="text-lg font-semibold mb-2 text-slate-900 dark:text-white">
-              Do unused credits roll over?
+              {t('faqQ5')}
             </h3>
             <p className="text-body">
-              Monthly subscription credits reset each billing cycle. Credit packs purchased
-              separately never expire.
+              {t('faqA5')}
             </p>
           </div>
         </div>

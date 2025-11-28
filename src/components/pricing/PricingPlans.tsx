@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useSubscription } from '@/hooks/use-subscription';
 import { Check } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { useMemo, useState } from 'react';
 
 interface PricingPlan {
@@ -46,6 +47,7 @@ interface PricingPlansProps {
 }
 
 export function PricingPlans({ plans, creditPacks }: PricingPlansProps) {
+  const t = useTranslations('pricingPage');
   const { planId, interval, loading: loadingSubscription, cancelAtPeriodEnd } = useSubscription();
 
   const resolvedPlans = useMemo(() => plans, [plans]);
@@ -72,7 +74,7 @@ export function PricingPlans({ plans, creditPacks }: PricingPlansProps) {
             }`}
             onClick={() => setBillingInterval('month')}
           >
-            Monthly
+            {t('monthly')}
           </Button>
           <Button
             variant="ghost"
@@ -84,9 +86,9 @@ export function PricingPlans({ plans, creditPacks }: PricingPlansProps) {
             }`}
             onClick={() => setBillingInterval('year')}
           >
-            Yearly
+            {t('yearly')}
             {resolvedPlans.some((p) => p.yearlyPrice) && (
-              <Badge className="ml-2 bg-teal-500 text-white border-0 text-xs px-2">Save 20%</Badge>
+              <Badge className="ml-2 bg-teal-500 text-white border-0 text-xs px-2">{t('savePercentage')}</Badge>
             )}
           </Button>
         </div>
@@ -116,7 +118,7 @@ export function PricingPlans({ plans, creditPacks }: PricingPlansProps) {
               ? calculateSavings(plan.price, plan.yearlyPrice)
               : null;
 
-          const buttonText = isCurrent && !loadingSubscription ? 'Current Plan' : plan.cta;
+          const buttonText = isCurrent && !loadingSubscription ? t('currentPlan') : plan.cta;
 
           return (
             <Card
@@ -129,7 +131,7 @@ export function PricingPlans({ plans, creditPacks }: PricingPlansProps) {
             >
               {plan.popular && (
                 <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
-                  <Badge className="bg-teal-500 text-white px-4 py-1">Most Popular</Badge>
+                  <Badge className="bg-teal-500 text-white px-4 py-1">{t('mostPopular')}</Badge>
                 </div>
               )}
 
@@ -154,14 +156,14 @@ export function PricingPlans({ plans, creditPacks }: PricingPlansProps) {
                             </span>
                           )}
                         </div>
-                        <span className="text-slate-600 dark:text-slate-400 text-sm">/mo</span>
+                        <span className="text-slate-600 dark:text-slate-400 text-sm">{t('perMonth')}</span>
                         {billingInterval === 'year' && (
                           <>
                             <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
-                              ${displayPrice}/year
+                              ${displayPrice}{t('perYear')}
                             </p>
                             <Badge className="mt-2 bg-teal-500 text-white border-0 text-xs px-2">
-                              Save {savings?.percentage}%
+                              {t('save', { percentage: savings?.percentage })}
                             </Badge>
                           </>
                         )}
@@ -172,8 +174,8 @@ export function PricingPlans({ plans, creditPacks }: PricingPlansProps) {
 
                 {displayCredits > 0 && (
                   <p className="text-sm text-teal-500 font-medium mt-2">
-                    {displayCredits.toLocaleString()} credits
-                    {billingInterval === 'year' ? '/year' : '/month'}
+                    {displayCredits.toLocaleString()} {t('credits')}
+                    {billingInterval === 'year' ? t('perYear') : t('perMonth')}
                   </p>
                 )}
 
@@ -224,10 +226,10 @@ export function PricingPlans({ plans, creditPacks }: PricingPlansProps) {
       <div className="mb-12">
         <div className="text-center mb-8">
           <h2 className="text-3xl font-bold text-slate-900 dark:text-white mb-2">
-            One-Time Credit Packs
+            {t('creditPacksTitle')}
           </h2>
           <p className="text-slate-600 dark:text-slate-400">
-            Need extra credits? Purchase credit packs without a subscription
+            {t('creditPacksSubtitle')}
           </p>
         </div>
 
@@ -260,7 +262,7 @@ export function PricingPlans({ plans, creditPacks }: PricingPlansProps) {
                   </span>
                 </div>
                 <p className="text-sm text-slate-600 dark:text-slate-400">
-                  {pack.credits.toLocaleString()} credits
+                  {pack.credits.toLocaleString()} {t('credits')}
                 </p>
               </CardHeader>
 
