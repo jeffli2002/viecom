@@ -317,7 +317,7 @@ async function handleCreditPackPurchase(data: CreemWebhookData) {
 
   try {
     const creditPack = getCreditPackByIdentifier(productId, credits);
-    const rawAmount = typeof amount === 'number' ? amount : creditPack?.price ?? 0;
+    const rawAmount = typeof amount === 'number' ? amount : (creditPack?.price ?? 0);
     const normalizedAmount = rawAmount > 100 ? rawAmount / 100 : rawAmount;
 
     // Generate referenceId without timestamp to ensure idempotency

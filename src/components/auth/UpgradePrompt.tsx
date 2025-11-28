@@ -165,8 +165,14 @@ export default function UpgradePrompt({
     <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4"
       onClick={onClose}
+      onKeyDown={(e) => {
+        if (e.key === 'Escape' && onClose) {
+          onClose();
+        }
+      }}
       aria-modal="true"
       role="dialog"
+      tabIndex={-1}
     >
       <Card
         className="w-full max-w-md max-h-[90vh] bg-white dark:bg-slate-900 shadow-2xl border-0 flex flex-col overflow-hidden"

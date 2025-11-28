@@ -11,7 +11,7 @@ import {
 import { and, eq, gte, sql } from 'drizzle-orm';
 import { NextResponse } from 'next/server';
 
-const parsePurchaseMetadata = (metadata: string | null) => {
+const _parsePurchaseMetadata = (metadata: string | null) => {
   if (!metadata) {
     return { amount: 0, currency: 'USD', provider: 'unknown', credits: 0 };
   }

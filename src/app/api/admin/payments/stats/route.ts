@@ -108,9 +108,7 @@ export async function GET(request: Request) {
       0
     );
 
-    const totalSubscriptionPayments = await db
-      .select({ priceId: payment.priceId })
-      .from(payment);
+    const totalSubscriptionPayments = await db.select({ priceId: payment.priceId }).from(payment);
     const totalSubscriptionRevenue = totalSubscriptionPayments.reduce(
       (sum, row) => sum + getPlanPriceByPriceId(row.priceId),
       0

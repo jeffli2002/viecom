@@ -2,7 +2,7 @@ import { requireAdmin } from '@/lib/admin/auth';
 import { db } from '@/server/db';
 import { creditPackPurchase, user } from '@/server/db/schema';
 import { desc, eq, gte, sql } from 'drizzle-orm';
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 
 export async function GET(request: NextRequest) {
   try {

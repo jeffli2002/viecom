@@ -9,7 +9,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Download, DollarSign, TrendingUp } from 'lucide-react';
+import { DollarSign, Download, TrendingUp } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
 
 interface CreditPackStats {
@@ -114,7 +114,10 @@ export default function AdminCreditPacksPage() {
               <div>
                 <p className="text-sm text-gray-500">Total Revenue</p>
                 <p className="text-2xl font-bold">
-                  ${data.summary.totalRevenue.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                  $
+                  {data.summary.totalRevenue.toLocaleString(undefined, {
+                    minimumFractionDigits: 2,
+                  })}
                 </p>
               </div>
             </div>
@@ -129,7 +132,10 @@ export default function AdminCreditPacksPage() {
               <div>
                 <p className="text-sm text-gray-500">Revenue in {range}</p>
                 <p className="text-2xl font-bold">
-                  ${data.summary.revenueInRange.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                  $
+                  {data.summary.revenueInRange.toLocaleString(undefined, {
+                    minimumFractionDigits: 2,
+                  })}
                 </p>
               </div>
             </div>
@@ -195,7 +201,12 @@ export default function AdminCreditPacksPage() {
         <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle>Recent Purchases</CardTitle>
           <Button
-            onClick={() => downloadCSV('credit-pack-purchases.csv', data.purchases as any)}
+            onClick={() =>
+              downloadCSV(
+                'credit-pack-purchases.csv',
+                data.purchases as Array<Record<string, unknown>>
+              )
+            }
             variant="outline"
           >
             <Download className="mr-2 h-4 w-4" />

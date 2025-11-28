@@ -790,7 +790,7 @@ function LandingShowcaseConfigurator() {
             </div>
             <div className="space-y-2">
               <span className="text-sm font-medium">Upload Image</span>
-              <div
+              <section
                 id="showcase-image-upload"
                 onDrop={handleDrop}
                 onDragOver={handleDragOver}
@@ -798,7 +798,6 @@ function LandingShowcaseConfigurator() {
                 className={`flex flex-col items-center justify-center rounded-xl border-2 border-dashed px-4 py-8 text-center ${
                   isDragging ? 'border-teal-500 bg-teal-50' : 'border-slate-200 bg-slate-50'
                 }`}
-                role="region"
                 aria-label="Upload image by dragging and dropping or clicking"
               >
                 {previewUrl || form.imageUrl ? (
@@ -832,7 +831,7 @@ function LandingShowcaseConfigurator() {
                   className="hidden"
                   onChange={(e) => handleFileSelect(e.target.files)}
                 />
-              </div>
+              </section>
               <p className="text-xs text-slate-500">Or provide an image URL:</p>
               <input
                 className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm"
