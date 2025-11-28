@@ -51,6 +51,11 @@ export default async function middleware(request: NextRequest) {
     }
   }
 
+  // Redirect root path to default locale
+  if (pathname === '/') {
+    return NextResponse.redirect(new URL('/en', request.url));
+  }
+
   // Apply i18n middleware for all other routes
   return intlMiddleware(request);
 }
