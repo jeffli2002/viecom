@@ -1,6 +1,7 @@
 // @ts-nocheck
 import crypto from 'node:crypto';
 import { paymentConfig } from '@/config/payment.config';
+import { getCreditPackByIdentifier } from '@/lib/admin/revenue-utils';
 import { env } from '@/env';
 
 const getCreemTestMode = () => {
@@ -1042,11 +1043,7 @@ class CreemPaymentService {
       // Extract credit amount from product name (e.g., "1000 credits")
       const creditMatch = productName?.match(/(\d+)\s*credits/i);
       const inferredCredits = creditMatch ? Number.parseInt(creditMatch[1], 10) : undefined;
-      const configPack =
-        paymentConfig.creditPacks.find((pack) => pack.creemProductKey === productId) ??
-        paymentConfig.creditPacks.find(
-          (pack) => typeof inferredCredits === 'number' && pack.credits === inferredCredits
-        );
+      const configPack = getCreditPackByIdentifier(productId, inferredCredits);
       const credits = configPack?.credits ?? inferredCredits;
       const normalizedAmount =
         typeof orderAmountRaw === 'number'

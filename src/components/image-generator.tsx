@@ -1586,8 +1586,7 @@ export default function ImageGenerator() {
         )}
 
         {lightboxImage && (
-          <dialog
-            open
+          <div
             className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-6"
             onClick={() => setLightboxImage(null)}
             onKeyDown={(e) => {
@@ -1595,6 +1594,9 @@ export default function ImageGenerator() {
                 setLightboxImage(null);
               }
             }}
+            role="dialog"
+            aria-modal="true"
+            tabIndex={-1}
           >
             <div
               className="relative max-h-full max-w-5xl"
@@ -1602,6 +1604,7 @@ export default function ImageGenerator() {
               onKeyDown={(e) => {
                 if (e.key === 'Escape') {
                   e.stopPropagation();
+                  setLightboxImage(null);
                 }
               }}
             >
@@ -1619,7 +1622,7 @@ export default function ImageGenerator() {
                 className="max-h-[80vh] w-full rounded-lg object-contain"
               />
             </div>
-          </dialog>
+          </div>
         )}
         {isPublishModalOpen && (
           <dialog

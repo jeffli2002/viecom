@@ -23,7 +23,7 @@ import {
 import { getUserInfo } from '@/lib/email/user-helper';
 import { db } from '@/server/db';
 import { paymentRepository } from '@/server/db/repositories/payment-repository';
-import { creditTransactions, userCredits } from '@/server/db/schema';
+import { creditPackPurchase, creditTransactions, userCredits } from '@/server/db/schema';
 import { and, desc, eq, or, sql } from 'drizzle-orm';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
@@ -131,6 +131,19 @@ function normalizeIntervalValue(value?: string | null): BillingInterval | undefi
   }
   return undefined;
 }
+
+const getCreditPackByIdentifier = (productId?: string | null, credits?: number) => {
+  if (productId) {
+    const pack = paymentConfig.creditPacks.find((pack) => pack.creemProductKey === productId);
+    if (pack) {
+      return pack;
+    }
+  }
+  if (typeof credits === 'number' && Number.isFinite(credits)) {
+    return paymentConfig.creditPacks.find((pack) => pack.credits === credits);
+  }
+  return undefined;
+};
 
 export async function POST(request: NextRequest) {
   const requestId = randomUUID();
@@ -303,6 +316,10 @@ async function handleCreditPackPurchase(data: CreemWebhookData) {
   }
 
   try {
+    const creditPack = getCreditPackByIdentifier(productId, credits);
+    const rawAmount = typeof amount === 'number' ? amount : creditPack?.price ?? 0;
+    const normalizedAmount = rawAmount > 100 ? rawAmount / 100 : rawAmount;
+
     // Generate referenceId without timestamp to ensure idempotency
     // Use orderId first (more stable), fallback to checkoutId
     const stableId = orderId || checkoutId;
@@ -389,6 +406,53 @@ async function handleCreditPackPurchase(data: CreemWebhookData) {
       creemEventId: data.eventId,
     };
 
+    const metadataPayload = {
+      provider: 'creem',
+      checkoutId,
+      orderId,
+      productId,
+      productName,
+      credits,
+      amount: normalizedAmount,
+      currency: currency || 'USD',
+      creemEventId: data.eventId,
+    };
+
+    const insertCreditTransaction = async (balanceAfter: number) => {
+      const [transactionRecord] = await db
+        .insert(creditTransactions)
+        .values({
+          id: randomUUID(),
+          userId,
+          type: 'earn',
+          amount: credits,
+          balanceAfter,
+          source: 'purchase',
+          description: `Credit pack purchase: ${productName || `${credits} credits`}`,
+          referenceId,
+          metadata: JSON.stringify(metadataPayload),
+        })
+        .returning({ id: creditTransactions.id });
+      return transactionRecord?.id ?? null;
+    };
+
+    const insertCreditPackPurchase = async (creditTransactionId: string | null) => {
+      await db.insert(creditPackPurchase).values({
+        id: randomUUID(),
+        userId,
+        creditPackId: creditPack?.id || productId || 'unknown',
+        credits,
+        amountCents: Math.round((normalizedAmount || 0) * 100),
+        currency: currency || 'USD',
+        provider: 'creem',
+        orderId: orderId || null,
+        checkoutId: checkoutId || null,
+        creditTransactionId,
+        metadata: metadataPayload,
+        createdAt: new Date(),
+      });
+    };
+
     if (!userCredit) {
       // Create credit account with purchased credits
       const now = new Date();
@@ -403,17 +467,8 @@ async function handleCreditPackPurchase(data: CreemWebhookData) {
         updatedAt: now,
       });
 
-      await db.insert(creditTransactions).values({
-        id: randomUUID(),
-        userId,
-        type: 'earn',
-        amount: credits,
-        balanceAfter: credits,
-        source: 'purchase',
-        description: `Credit pack purchase: ${productName || `${credits} credits`}`,
-        referenceId,
-        metadata: JSON.stringify(metadataPayload),
-      });
+      const creditTransactionId = await insertCreditTransaction(credits);
+      await insertCreditPackPurchase(creditTransactionId);
 
       console.log(
         `[Creem Webhook] Created credit account for ${userId} with ${credits} credits from pack purchase`
@@ -431,17 +486,8 @@ async function handleCreditPackPurchase(data: CreemWebhookData) {
         })
         .where(eq(userCredits.userId, userId));
 
-      await db.insert(creditTransactions).values({
-        id: randomUUID(),
-        userId,
-        type: 'earn',
-        amount: credits,
-        balanceAfter: newBalance,
-        source: 'purchase',
-        description: `Credit pack purchase: ${productName || `${credits} credits`}`,
-        referenceId,
-        metadata: JSON.stringify(metadataPayload),
-      });
+      const creditTransactionId = await insertCreditTransaction(newBalance);
+      await insertCreditPackPurchase(creditTransactionId);
 
       console.log(
         `[Creem Webhook] Granted ${credits} credits to ${userId} from pack purchase (new balance: ${newBalance})`

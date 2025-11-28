@@ -1,38 +1,9 @@
-import { paymentConfig } from '@/config/payment.config';
 import { requireAdmin } from '@/lib/admin/auth';
+import { getPlanPriceByPriceId } from '@/lib/admin/revenue-utils';
 import { db } from '@/server/db';
-import { creditTransactions, payment, user } from '@/server/db/schema';
+import { creditPackPurchase, payment, user } from '@/server/db/schema';
 import { desc, eq, gte, sql } from 'drizzle-orm';
 import { NextResponse } from 'next/server';
-
-const parsePurchaseMetadata = (metadata: string | null) => {
-  if (!metadata) {
-    return { amount: 0, currency: 'USD', provider: 'unknown', credits: 0, productName: '' };
-  }
-  try {
-    const parsed = JSON.parse(metadata) as Record<string, unknown>;
-    const productId = typeof parsed.productId === 'string' ? parsed.productId : undefined;
-    const creditsValue =
-      typeof parsed.credits === 'number' ? parsed.credits : Number(parsed.credits) || undefined;
-    const pack =
-      paymentConfig.creditPacks.find((pack) => pack.creemProductKey === productId) ||
-      (typeof creditsValue === 'number'
-        ? paymentConfig.creditPacks.find((pack) => pack.credits === creditsValue)
-        : undefined);
-    const rawAmount = Number(parsed.amount);
-    const amount = Number.isFinite(rawAmount) && rawAmount > 0 ? rawAmount : (pack?.price ?? 0);
-    return {
-      amount,
-      currency: typeof parsed.currency === 'string' ? parsed.currency : 'USD',
-      provider: typeof parsed.provider === 'string' ? parsed.provider : 'unknown',
-      credits: creditsValue ?? pack?.credits ?? 0,
-      productName: typeof parsed.productName === 'string' ? parsed.productName : pack?.name || '',
-    };
-  } catch (error) {
-    console.error('Failed to parse purchase metadata:', error);
-    return { amount: 0, currency: 'USD', provider: 'unknown', credits: 0, productName: '' };
-  }
-};
 
 export async function GET(request: Request) {
   try {
@@ -46,40 +17,69 @@ export async function GET(request: Request) {
     const startDate = new Date();
     startDate.setDate(startDate.getDate() - daysAgo);
 
-    const _paymentCount = await db
-      .select({ count: sql<number>`COUNT(*)` })
+    const subscriptionPayments = await db
+      .select({
+        id: payment.id,
+        userEmail: user.email,
+        priceId: payment.priceId,
+        createdAt: payment.createdAt,
+        provider: payment.provider,
+        status: payment.status,
+      })
       .from(payment)
-      .where(gte(payment.createdAt, startDate));
+      .leftJoin(user, eq(payment.userId, user.id))
+      .where(gte(payment.createdAt, startDate))
+      .orderBy(desc(payment.createdAt))
+      .limit(100);
+
+    const subscriptionRevenueInRange = subscriptionPayments.reduce(
+      (sum, row) => sum + getPlanPriceByPriceId(row.priceId),
+      0
+    );
+
+    const subscriptionRows = subscriptionPayments.map((row) => ({
+      id: row.id,
+      userEmail: row.userEmail || 'Unknown',
+      amount: getPlanPriceByPriceId(row.priceId),
+      currency: 'USD',
+      status: row.status,
+      createdAt: row.createdAt,
+      provider: row.provider || 'stripe',
+      type: 'subscription' as const,
+      credits: null,
+    }));
 
     const creditPackRows = await db
       .select({
-        id: creditTransactions.id,
-        metadata: creditTransactions.metadata,
-        createdAt: creditTransactions.createdAt,
+        id: creditPackPurchase.id,
         userEmail: user.email,
+        amountCents: creditPackPurchase.amountCents,
+        currency: creditPackPurchase.currency,
+        createdAt: creditPackPurchase.createdAt,
+        credits: creditPackPurchase.credits,
+        provider: creditPackPurchase.provider,
       })
-      .from(creditTransactions)
-      .leftJoin(user, eq(user.id, creditTransactions.userId))
-      .where(
-        and(eq(creditTransactions.source, 'purchase'), gte(creditTransactions.createdAt, startDate))
-      )
-      .orderBy(desc(creditTransactions.createdAt))
+      .from(creditPackPurchase)
+      .leftJoin(user, eq(user.id, creditPackPurchase.userId))
+      .where(gte(creditPackPurchase.createdAt, startDate))
+      .orderBy(desc(creditPackPurchase.createdAt))
       .limit(100);
 
-    const creditPackPayments = creditPackRows.map((row) => {
-      const parsed = parsePurchaseMetadata(row.metadata);
-      return {
-        id: row.id,
-        userEmail: row.userEmail || 'Unknown',
-        amount: parsed.amount,
-        currency: parsed.currency,
-        status: 'completed',
-        createdAt: row.createdAt,
-        provider: parsed.provider,
-        type: 'credit_pack' as const,
-        credits: parsed.credits,
-      };
-    });
+    const creditPackPayments = creditPackRows.map((row) => ({
+      id: row.id,
+      userEmail: row.userEmail || 'Unknown',
+      amount: row.amountCents / 100,
+      currency: row.currency || 'USD',
+      status: 'completed',
+      createdAt: row.createdAt,
+      provider: row.provider || 'creem',
+      type: 'credit_pack' as const,
+      credits: row.credits,
+    }));
+
+    const recentPayments = [...creditPackPayments, ...subscriptionRows].sort(
+      (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    );
 
     const trendMap = new Map<
       string,
@@ -90,27 +90,36 @@ export async function GET(request: Request) {
       }
     >();
 
-    creditPackPayments.forEach((payment) => {
-      const dateKey = new Date(payment.createdAt).toISOString().split('T')[0];
-      const entry = trendMap.get(dateKey) ?? { date: dateKey, amount: 0, count: 0 };
-      entry.amount += payment.amount;
-      entry.count += 1;
-      trendMap.set(dateKey, entry);
+    recentPayments.forEach((entry) => {
+      const dateKey = new Date(entry.createdAt).toISOString().split('T')[0];
+      const current = trendMap.get(dateKey) ?? { date: dateKey, amount: 0, count: 0 };
+      current.amount += entry.amount;
+      current.count += 1;
+      trendMap.set(dateKey, current);
     });
 
     const trend = Array.from(trendMap.values()).sort((a, b) => a.date.localeCompare(b.date));
 
-    const totalRevenueRows = await db
-      .select({ metadata: creditTransactions.metadata })
-      .from(creditTransactions)
-      .where(eq(creditTransactions.source, 'purchase'));
-
-    const totalRevenue = totalRevenueRows.reduce(
-      (sum, row) => sum + parsePurchaseMetadata(row.metadata).amount,
+    const totalPackRevenueRows = await db
+      .select({ amountCents: creditPackPurchase.amountCents })
+      .from(creditPackPurchase);
+    const totalPackRevenue = totalPackRevenueRows.reduce(
+      (sum, row) => sum + row.amountCents / 100,
       0
     );
-    const revenueInRange = creditPackPayments.reduce((sum, p) => sum + p.amount, 0);
-    const transactionCount = creditPackPayments.length;
+
+    const totalSubscriptionPayments = await db
+      .select({ priceId: payment.priceId })
+      .from(payment);
+    const totalSubscriptionRevenue = totalSubscriptionPayments.reduce(
+      (sum, row) => sum + getPlanPriceByPriceId(row.priceId),
+      0
+    );
+
+    const totalRevenue = totalPackRevenue + totalSubscriptionRevenue;
+    const revenueInRange =
+      creditPackPayments.reduce((sum, p) => sum + p.amount, 0) + subscriptionRevenueInRange;
+    const transactionCount = recentPayments.length;
     const averageTransaction = transactionCount > 0 ? revenueInRange / transactionCount : 0;
 
     const response = NextResponse.json({
@@ -121,7 +130,7 @@ export async function GET(request: Request) {
         averageTransaction,
       },
       trend,
-      recentPayments: creditPackPayments,
+      recentPayments,
     });
 
     // Prevent caching of admin data

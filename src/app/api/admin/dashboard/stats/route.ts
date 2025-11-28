@@ -73,34 +73,48 @@ export async function GET(request: Request) {
       .from(subscription)
       .where(eq(subscription.status, 'active'));
 
-    // Get today's revenue
-    // Note: payment table doesn't have amount column yet
-    // TODO: Add amount column to payment table or calculate from subscription plans
-    const purchaseRowsInRange = await db
+    // Revenue calculations
+    const subscriptionPaymentsInRange = await db
       .select({
-        metadata: creditTransactions.metadata,
-        createdAt: creditTransactions.createdAt,
+        priceId: payment.priceId,
+        createdAt: payment.createdAt,
       })
-      .from(creditTransactions)
-      .where(
-        and(eq(creditTransactions.source, 'purchase'), gte(creditTransactions.createdAt, startDate))
-      );
+      .from(payment)
+      .where(gte(payment.createdAt, startDate));
 
-    const todayPurchaseRows = await db
-      .select({ metadata: creditTransactions.metadata })
-      .from(creditTransactions)
-      .where(
-        and(eq(creditTransactions.source, 'purchase'), gte(creditTransactions.createdAt, today))
-      );
+    const subscriptionPaymentsToday = subscriptionPaymentsInRange.filter(
+      (row) => row.createdAt >= today
+    );
 
-    const _revenueInRange = purchaseRowsInRange.reduce(
-      (sum, row) => sum + parsePurchaseMetadata(row.metadata).amount,
+    const subscriptionRevenueInRange = subscriptionPaymentsInRange.reduce(
+      (sum, row) => sum + getPlanPriceByPriceId(row.priceId),
       0
     );
-    const todayRevenueTotal = todayPurchaseRows.reduce(
-      (sum, row) => sum + parsePurchaseMetadata(row.metadata).amount,
+    const todaySubscriptionRevenue = subscriptionPaymentsToday.reduce(
+      (sum, row) => sum + getPlanPriceByPriceId(row.priceId),
       0
     );
+
+    const packPurchasesInRange = await db
+      .select({
+        amountCents: creditPackPurchase.amountCents,
+        createdAt: creditPackPurchase.createdAt,
+      })
+      .from(creditPackPurchase)
+      .where(gte(creditPackPurchase.createdAt, startDate));
+
+    const packPurchasesToday = packPurchasesInRange.filter((row) => row.createdAt >= today);
+
+    const packRevenueInRange = packPurchasesInRange.reduce(
+      (sum, row) => sum + row.amountCents / 100,
+      0
+    );
+    const todayPackRevenue = packPurchasesToday.reduce(
+      (sum, row) => sum + row.amountCents / 100,
+      0
+    );
+
+    const todayRevenueTotal = todaySubscriptionRevenue + todayPackRevenue;
 
     // Get today's credits consumed from generated assets
     const todayImageCreditsResult = await db
@@ -157,8 +171,15 @@ export async function GET(request: Request) {
         registrationsInRange: Number(registrationsInRange[0]?.count) || 0,
         activeSubscriptions: Number(activeSubscriptions[0]?.count) || 0,
         todayRevenue: todayRevenueTotal,
+        todaySubscriptionRevenue,
+        todayPackRevenue,
         todayImageCredits: Number(todayImageCredits[0]?.total) || 0,
         todayVideoCredits: Number(todayVideoCredits[0]?.total) || 0,
+      },
+      revenueSummary: {
+        subscriptionRevenueInRange,
+        packRevenueInRange,
+        totalRevenueInRange: subscriptionRevenueInRange + packRevenueInRange,
       },
       trends: {
         registrations: registrationTrend.rows,

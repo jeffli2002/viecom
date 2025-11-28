@@ -34,16 +34,6 @@ interface SubscriptionStats {
     endDate: Date;
     amount: number;
   }>;
-  creditPackPurchases: Array<{
-    id: string;
-    userId: string;
-    userEmail: string;
-    credits: number;
-    amount: number;
-    currency: string;
-    createdAt: Date;
-    productName: string;
-  }>;
 }
 
 export default function AdminSubscriptionsPage() {
@@ -145,52 +135,6 @@ export default function AdminSubscriptionsPage() {
                 <p className="text-sm text-gray-500">Free Plan Users</p>
                 <p className="text-2xl font-bold">{data.planCounts.free}</p>
               </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Credit Pack Purchases */}
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle>Recent Credit Pack Purchases</CardTitle>
-            <Button
-              onClick={() => downloadCSV('credit-packs.csv', data.creditPackPurchases || [])}
-              variant="outline"
-            >
-              <Download className="mr-2 h-4 w-4" />
-              Export Credit Packs
-            </Button>
-          </CardHeader>
-          <CardContent>
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead>
-                  <tr className="text-left text-sm text-gray-500 border-b">
-                    <th className="py-3 px-4">Date</th>
-                    <th className="py-3 px-4">User Email</th>
-                    <th className="py-3 px-4">Product</th>
-                    <th className="py-3 px-4">Credits</th>
-                    <th className="py-3 px-4">Amount</th>
-                    <th className="py-3 px-4">Currency</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {(data.creditPackPurchases || []).map((purchase) => (
-                    <tr key={purchase.id} className="border-b">
-                      <td className="py-3 px-4 text-sm">
-                        {new Date(purchase.createdAt).toLocaleString()}
-                      </td>
-                      <td className="py-3 px-4 text-sm">{purchase.userEmail}</td>
-                      <td className="py-3 px-4 text-sm">{purchase.productName}</td>
-                      <td className="py-3 px-4 text-sm">{purchase.credits}</td>
-                      <td className="py-3 px-4 text-sm font-medium">
-                        ${purchase.amount.toFixed(2)}
-                      </td>
-                      <td className="py-3 px-4 text-sm">{purchase.currency}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
             </div>
           </CardContent>
         </Card>

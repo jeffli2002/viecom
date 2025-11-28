@@ -148,14 +148,30 @@ export default function UpgradePrompt({
     return null;
   }
 
+  useEffect(() => {
+    if (!isOpen || !onClose) return;
+
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        onClose();
+      }
+    };
+
+    document.addEventListener('keydown', handleEscape);
+    return () => document.removeEventListener('keydown', handleEscape);
+  }, [isOpen, onClose]);
+
   return (
-    <dialog
-      open={isOpen}
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 border-0 bg-transparent"
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4"
+      onClick={onClose}
       aria-modal="true"
-      onClose={onClose}
+      role="dialog"
     >
-      <Card className="w-full max-w-md max-h-[90vh] bg-white dark:bg-slate-900 shadow-2xl border-0 flex flex-col overflow-hidden">
+      <Card
+        className="w-full max-w-md max-h-[90vh] bg-white dark:bg-slate-900 shadow-2xl border-0 flex flex-col overflow-hidden"
+        onClick={(e) => e.stopPropagation()}
+      >
         <CardHeader className="bg-white dark:bg-slate-900 flex-shrink-0">
           <div className="flex items-center justify-between">
             <CardTitle className="text-xl font-bold text-slate-900 dark:text-white">
@@ -290,6 +306,6 @@ export default function UpgradePrompt({
           )}
         </CardContent>
       </Card>
-    </dialog>
+    </div>
   );
 }

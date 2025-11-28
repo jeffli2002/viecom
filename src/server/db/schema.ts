@@ -123,6 +123,29 @@ export const creditTransactions = pgTable(
   })
 );
 
+export const creditPackPurchase = pgTable('credit_pack_purchase', {
+  id: text('id').primaryKey(),
+  userId: text('user_id')
+    .notNull()
+    .references(() => user.id, { onDelete: 'cascade' }),
+  creditPackId: text('credit_pack_id').notNull(),
+  credits: integer('credits').notNull(),
+  amountCents: integer('amount_cents').notNull(),
+  currency: text('currency').notNull().default('USD'),
+  provider: text('provider', { enum: ['stripe', 'creem'] })
+    .notNull()
+    .default('creem'),
+  orderId: text('order_id'),
+  checkoutId: text('checkout_id'),
+  creditTransactionId: text('credit_transaction_id').references(() => creditTransactions.id, {
+    onDelete: 'set null',
+  }),
+  metadata: jsonb('metadata').$type<Record<string, unknown> | null>(),
+  createdAt: timestamp('created_at')
+    .$defaultFn(() => new Date())
+    .notNull(),
+});
+
 // Payment and Subscription
 export const payment = pgTable('payment', {
   id: text('id').primaryKey(),
