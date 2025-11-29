@@ -1,4 +1,7 @@
 import { Button } from '@/components/ui/button';
+import { creditsConfig } from '@/config/credits.config';
+import { paymentConfig } from '@/config/payment.config';
+import { getImageToVideoFAQSchema, getPricingData } from '@/lib/utils/faq-generator';
 import { buildLocaleCanonicalMetadata } from '@/lib/seo/metadata';
 import { ArrowRight, Check, Clock, Sparkles, TrendingUp, Zap } from 'lucide-react';
 import type { Metadata } from 'next';
@@ -86,32 +89,47 @@ const features = [
   'Download in MP4 format',
 ];
 
-const pricingComparison = [
-  {
-    plan: 'Free',
-    credits: '30 credits (sign-up bonus, one-time)',
-    videos: 'Up to 6 videos',
-    price: '$0',
-    features: ['720p quality', 'Sora 2 model', '1 video at a time', 'Watermark'],
-  },
-  {
-    plan: 'Pro',
-    credits: '500 credits/month',
-    videos: 'Up to 100 videos',
-    price: '$14.9',
-    features: ['720p/1080p quality', 'Sora 2 & 2 Pro', '3 videos at once', 'No watermark'],
-    popular: true,
-  },
-  {
-    plan: 'Pro+',
-    credits: '900 credits/month',
-    videos: 'Up to 180 videos',
-    price: '$24.9',
-    features: ['720p/1080p quality', 'Priority processing', '5 videos at once', 'No watermark'],
-  },
-];
+const getPricingComparison = () => {
+  const pricing = getPricingData();
+  const sora2Cost = pricing.credits.sora2_720p_10s;
+  const imageCount = Math.floor(pricing.free.signupCredits / pricing.credits.imageCostMin);
+  const proVideoCount = Math.floor(pricing.pro.monthlyCredits / sora2Cost);
+  const proplusVideoCount = Math.floor(pricing.proplus.monthlyCredits / sora2Cost);
+
+  return [
+    {
+      plan: 'Free',
+      credits: `${pricing.free.signupCredits} credits (sign-up bonus, one-time)`,
+      videos: `Up to 1 video (or ${imageCount} images)`,
+      price: '$0',
+      features: ['720p quality', 'Sora 2 model', `${pricing.free.batchSize} video at a time`, 'Watermark'],
+    },
+    {
+      plan: 'Pro',
+      credits: `${pricing.pro.monthlyCredits} credits/month`,
+      videos: `Up to ${proVideoCount} videos`,
+      price: `$${pricing.pro.price}`,
+      features: ['720p/1080p quality', 'Sora 2 & 2 Pro', `${pricing.pro.batchSize} videos at once`, 'No watermark'],
+      popular: true,
+    },
+    {
+      plan: 'Pro+',
+      credits: `${pricing.proplus.monthlyCredits} credits/month`,
+      videos: `Up to ${proplusVideoCount} videos`,
+      price: `$${pricing.proplus.price}`,
+      features: ['720p/1080p quality', 'Priority processing', `${pricing.proplus.batchSize} videos at once`, 'No watermark'],
+    },
+  ];
+};
+
+const pricingComparison = getPricingComparison();
 
 export default function ImageToVideoAIPage() {
+  const pricing = getPricingData();
+  const sora2Cost = `${pricing.credits.sora2_720p_10s}-${pricing.credits.sora2_720p_15s}`;
+  const sora2ProCost = `${pricing.credits.sora2Pro_720p_10s}-${pricing.credits.sora2Pro_1080p_15s}`;
+  const imageCount = Math.floor(pricing.free.signupCredits / pricing.credits.imageCostMin);
+  
   const howItWorksSchema = {
     '@context': 'https://schema.org',
     '@type': 'HowTo',
@@ -139,52 +157,7 @@ export default function ImageToVideoAIPage() {
     ],
   };
 
-  const faqSchema = {
-    '@context': 'https://schema.org',
-    '@type': 'FAQPage',
-    mainEntity: [
-      {
-        '@type': 'Question',
-        name: 'How long does it take to convert an image to video?',
-        acceptedAnswer: {
-          '@type': 'Answer',
-          text: '720p videos take 2-3 minutes. 1080p videos take 5-7 minutes. We use a priority queue system to process 720p videos first for faster results.',
-        },
-      },
-      {
-        '@type': 'Question',
-        name: 'What image formats are supported?',
-        acceptedAnswer: {
-          '@type': 'Answer',
-          text: 'We support PNG, JPG, JPEG, and WebP formats. Images up to 10MB and 4K resolution work best.',
-        },
-      },
-      {
-        '@type': 'Question',
-        name: 'Is there a free trial?',
-        acceptedAnswer: {
-          '@type': 'Answer',
-          text: 'Yes! Get 30 free credits on signup (no credit card required). This allows you to generate up to 2 Sora 2 videos to test our platform.',
-        },
-      },
-      {
-        '@type': 'Question',
-        name: 'How many credits does image-to-video cost?',
-        acceptedAnswer: {
-          '@type': 'Answer',
-          text: 'Sora 2 (720p): 15-20 credits per video. Sora 2 Pro (1080p): 45-130 credits per video depending on duration.',
-        },
-      },
-      {
-        '@type': 'Question',
-        name: 'Can I generate multiple videos at once?',
-        acceptedAnswer: {
-          '@type': 'Answer',
-          text: 'Yes! Free users can generate 1 video at a time. Pro users: 3 videos simultaneously. Pro+ users: 5 videos simultaneously.',
-        },
-      },
-    ],
-  };
+  const faqSchema = getImageToVideoFAQSchema();
 
   const softwareSchema = {
     '@context': 'https://schema.org',
@@ -430,8 +403,8 @@ export default function ImageToVideoAIPage() {
                 Is there a free trial?
               </h3>
               <p className="text-slate-600 dark:text-slate-300">
-                Yes! Get 30 free credits on signup (no credit card required). This allows you to
-                generate up to 2 Sora 2 videos to test our platform.
+                Yes! Get {pricing.free.signupCredits} free credits on signup (no credit card required). This allows you to
+                generate 1 Sora 2 video (or up to {imageCount} images) to test our platform. Pro plan costs ${pricing.pro.price}/month with {pricing.pro.monthlyCredits} credits.
               </p>
             </div>
             <div>
@@ -439,7 +412,7 @@ export default function ImageToVideoAIPage() {
                 How many credits does image-to-video cost?
               </h3>
               <p className="text-slate-600 dark:text-slate-300">
-                Sora 2 (720p): 15-20 credits per video. Sora 2 Pro (1080p): 45-130 credits per video
+                Sora 2 (720p): {sora2Cost} credits per video. Sora 2 Pro (1080p): {sora2ProCost} credits per video
                 depending on duration.
               </p>
             </div>
@@ -448,8 +421,8 @@ export default function ImageToVideoAIPage() {
                 Can I generate multiple videos at once?
               </h3>
               <p className="text-slate-600 dark:text-slate-300">
-                Yes! Free users can generate 1 video at a time. Pro users: 3 videos simultaneously.
-                Pro+ users: 5 videos simultaneously.
+                Yes! Free users can generate {pricing.free.batchSize} video at a time. Pro users: {pricing.pro.batchSize} videos simultaneously.
+                Pro+ users: {pricing.proplus.batchSize} videos simultaneously.
               </p>
             </div>
           </div>

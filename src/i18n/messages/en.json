@@ -651,7 +651,7 @@
     "faqQ1": "Is there a free plan?",
     "faqA1": "Yes, get 30 free credits on signup. No credit card required. Perfect for trying out our AI video and image generation.",
     "faqQ2": "How much do credits cost?",
-    "faqA2": "Free plan: 30 credits sign-up bonus (one-time). Pro: 500 credits/month ($14.9). Pro+: 900 credits/month ($24.9). Credits cost 5-130 per generation depending on model and settings.",
+    "faqA2": "Free plan: {signupCredits} credits sign-up bonus (one-time). Pro: {proCredits} credits/month (${proPrice}). Pro+: {proplusCredits} credits/month (${proplusPrice}). Credits cost {minCost}-{maxCost} per generation depending on model and settings.",
     "faqQ3": "Can I upgrade or downgrade anytime?",
     "faqA3": "Yes, you can upgrade, downgrade, or cancel your subscription at any time. Changes take effect on your next billing cycle.",
     "faqQ4": "What payment methods do you accept?",

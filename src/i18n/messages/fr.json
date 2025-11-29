@@ -651,7 +651,7 @@
     "faqQ1": "Y a-t-il un plan gratuit ?",
     "faqA1": "Oui, obtenez 30 crédits gratuits à l'inscription. Aucune carte de crédit requise. Parfait pour essayer notre génération de vidéos et d'images IA.",
     "faqQ2": "Combien coûtent les crédits ?",
-    "faqA2": "Plan gratuit : 30 crédits bonus à l'inscription (unique). Pro : 500 crédits/mois ($14.9). Pro+ : 900 crédits/mois ($24.9). Les crédits coûtent 5-130 par génération selon le modèle et les paramètres.",
+    "faqA2": "Plan gratuit : {signupCredits} crédits bonus à l'inscription (unique). Pro : {proCredits} crédits/mois (${proPrice}). Pro+ : {proplusCredits} crédits/mois (${proplusPrice}). Les crédits coûtent {minCost}-{maxCost} par génération selon le modèle et les paramètres.",
     "faqQ3": "Puis-je passer à un plan supérieur ou inférieur à tout moment ?",
     "faqA3": "Oui, vous pouvez passer à un plan supérieur, inférieur ou annuler votre abonnement à tout moment. Les modifications prennent effet lors de votre prochain cycle de facturation.",
     "faqQ4": "Quels modes de paiement acceptez-vous ?",

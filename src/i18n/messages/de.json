@@ -651,7 +651,7 @@
     "faqQ1": "Gibt es einen kostenlosen Plan?",
     "faqA1": "Ja, Sie erhalten 30 kostenlose Credits bei der Anmeldung. Keine Kreditkarte erforderlich. Perfekt zum Ausprobieren unserer KI-Video- und Bildgenerierung.",
     "faqQ2": "Wie viel kosten Credits?",
-    "faqA2": "Kostenloser Plan: 30 Credits Anmeldebonus (einmalig). Pro: 500 Credits/Monat ($14.9). Pro+: 900 Credits/Monat ($24.9). Credits kosten 5-130 pro Generierung je nach Modell und Einstellungen.",
+    "faqA2": "Kostenloser Plan: {signupCredits} Credits Anmeldebonus (einmalig). Pro: {proCredits} Credits/Monat (${proPrice}). Pro+: {proplusCredits} Credits/Monat (${proplusPrice}). Credits kosten {minCost}-{maxCost} pro Generierung je nach Modell und Einstellungen.",
     "faqQ3": "Kann ich jederzeit upgraden oder downgraden?",
     "faqA3": "Ja, Sie können Ihr Abonnement jederzeit upgraden, downgraden oder kündigen. Änderungen werden im nächsten Abrechnungszyklus wirksam.",
     "faqQ4": "Welche Zahlungsmethoden akzeptieren Sie?",

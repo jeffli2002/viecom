@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useSubscription } from '@/hooks/use-subscription';
+import { calculateGenerationCapacity } from '@/lib/utils/pricing-calculator';
 import { Check } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useMemo, useState } from 'react';
@@ -163,7 +164,7 @@ export function PricingPlans({ plans, creditPacks }: PricingPlansProps) {
                               ${displayPrice}{t('perYear')}
                             </p>
                             <Badge className="mt-2 bg-teal-500 text-white border-0 text-xs px-2">
-                              {t('save', { percentage: savings?.percentage })}
+                              {t('save', { percentage: savings?.percentage || 0 })}
                             </Badge>
                           </>
                         )}
@@ -193,8 +194,9 @@ export function PricingPlans({ plans, creditPacks }: PricingPlansProps) {
                         plan.yearlyCredits &&
                         plan.yearlyCapacityInfo
                       ) {
-                        const maxImages = Math.floor(plan.yearlyCredits / 5);
-                        const maxVideos = Math.floor(plan.yearlyCredits / 15);
+                        const yearlyCapacity = calculateGenerationCapacity(plan.yearlyCredits);
+                        const maxImages = yearlyCapacity.images.nanoBanana;
+                        const maxVideos = yearlyCapacity.videos.sora2_720p_10s;
                         displayFeature = `${plan.yearlyCredits.toLocaleString()} credits/year (up to ${maxImages} images or ${maxVideos} videos)`;
                       }
                     }

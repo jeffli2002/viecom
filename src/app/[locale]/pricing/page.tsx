@@ -1,15 +1,16 @@
 import { PricingPlans } from '@/components/pricing/PricingPlans';
 import { creditsConfig } from '@/config/credits.config';
 import { paymentConfig } from '@/config/payment.config';
+import { getPricingFAQSchema } from '@/lib/utils/faq-generator';
 import { calculateGenerationCapacity, formatCapacityRange } from '@/lib/utils/pricing-calculator';
 import { Sparkles } from 'lucide-react';
 import { getTranslations } from 'next-intl/server';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Pricing | AI Video Generator from $14.9/mo - Free Trial Available',
+  title: 'Pricing | AI Video Generator from $19.9/mo - Free Trial Available',
   description:
-    'Simple, transparent pricing for AI video and image generation. Free plan with 30 credits sign-up bonus (one-time). Pro plans from $14.9/month. No credit card required for trial.',
+    'Simple, transparent pricing for AI video and image generation. Free plan with 30 credits sign-up bonus (one-time). Pro plans from $19.9/month. No credit card required for trial.',
   keywords: [
     'ai video generator pricing',
     'free ai video credits',
@@ -21,6 +22,20 @@ export const metadata: Metadata = {
 
 export default async function PricingPage() {
   const t = await getTranslations('pricingPage');
+  
+  const freePlan = paymentConfig.plans.find((p) => p.id === 'free');
+  const proPlan = paymentConfig.plans.find((p) => p.id === 'pro');
+  const proplusPlan = paymentConfig.plans.find((p) => p.id === 'proplus');
+  
+  const faqParams = {
+    signupCredits: freePlan?.credits.onSignup || 30,
+    proCredits: proPlan?.credits.monthly || 500,
+    proPrice: proPlan?.price || 19.9,
+    proplusCredits: proplusPlan?.credits.monthly || 900,
+    proplusPrice: proplusPlan?.price || 34.9,
+    minCost: creditsConfig.consumption.imageGeneration['nano-banana'],
+    maxCost: creditsConfig.consumption.videoGeneration['sora-2-pro-1080p-15s'],
+  };
   
   const plans = paymentConfig.plans.map((plan) => {
     const monthlyCredits = plan.credits.monthly;
@@ -61,52 +76,7 @@ export default async function PricingPage() {
     };
   });
 
-  const faqSchema = {
-    '@context': 'https://schema.org',
-    '@type': 'FAQPage',
-    mainEntity: [
-      {
-        '@type': 'Question',
-        name: 'Is there a free plan?',
-        acceptedAnswer: {
-          '@type': 'Answer',
-          text: 'Yes, get 30 free credits on signup. No credit card required. Perfect for trying out our AI video and image generation.',
-        },
-      },
-      {
-        '@type': 'Question',
-        name: 'How much do credits cost?',
-        acceptedAnswer: {
-          '@type': 'Answer',
-          text: 'Free plan: 30 credits sign-up bonus (one-time). Pro: 500 credits/month ($14.9). Pro+: 900 credits/month ($24.9). Credits cost 5-130 per generation depending on model and settings.',
-        },
-      },
-      {
-        '@type': 'Question',
-        name: 'Can I upgrade or downgrade anytime?',
-        acceptedAnswer: {
-          '@type': 'Answer',
-          text: 'Yes, you can upgrade, downgrade, or cancel your subscription at any time. Changes take effect on your next billing cycle.',
-        },
-      },
-      {
-        '@type': 'Question',
-        name: 'What payment methods do you accept?',
-        acceptedAnswer: {
-          '@type': 'Answer',
-          text: 'We accept all major credit cards, debit cards, and support secure payment processing through Creem.',
-        },
-      },
-      {
-        '@type': 'Question',
-        name: 'Do unused credits roll over?',
-        acceptedAnswer: {
-          '@type': 'Answer',
-          text: 'Monthly subscription credits reset each billing cycle. Credit packs purchased separately never expire.',
-        },
-      },
-    ],
-  };
+  const faqSchema = getPricingFAQSchema();
 
   return (
     <div className="container-base py-24">
@@ -148,7 +118,7 @@ export default async function PricingPage() {
               {t('faqQ2')}
             </h3>
             <p className="text-body">
-              {t('faqA2')}
+              {t('faqA2', faqParams)}
             </p>
           </div>
           <div>
