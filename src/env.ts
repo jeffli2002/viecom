@@ -60,11 +60,11 @@ export const env = createEnv({
     NEXT_PUBLIC_DISABLE_AUTH: z.string().optional().default('false'),
     NEXT_PUBLIC_CREEM_TEST_MODE: z.string().optional().default('false'),
     // Creem Credit Packs (One-time purchases)
+    NEXT_PUBLIC_CREEM_PRICE_PACK_200: z.string().optional(),
+    NEXT_PUBLIC_CREEM_PRICE_PACK_500: z.string().optional(),
     NEXT_PUBLIC_CREEM_PRICE_PACK_1000: z.string().optional(),
     NEXT_PUBLIC_CREEM_PRICE_PACK_2000: z.string().optional(),
     NEXT_PUBLIC_CREEM_PRICE_PACK_5000: z.string().optional(),
-    NEXT_PUBLIC_CREEM_PRICE_PACK_10000: z.string().optional(),
-    NEXT_PUBLIC_CREEM_PRICE_PACK_300: z.string().optional(),
   },
 
   /**
@@ -106,11 +106,11 @@ export const env = createEnv({
     CREEM_PRO_PLAN_PRODUCT_KEY_YEARLY: process.env.CREEM_PRO_PLAN_PRODUCT_KEY_YEARLY,
     CREEM_PROPLUS_PLAN_PRODUCT_KEY_YEARLY: process.env.CREEM_PROPLUS_PLAN_PRODUCT_KEY_YEARLY,
     NEXT_PUBLIC_CREEM_TEST_MODE: process.env.NEXT_PUBLIC_CREEM_TEST_MODE,
+    NEXT_PUBLIC_CREEM_PRICE_PACK_200: process.env.NEXT_PUBLIC_CREEM_PRICE_PACK_200,
+    NEXT_PUBLIC_CREEM_PRICE_PACK_500: process.env.NEXT_PUBLIC_CREEM_PRICE_PACK_500,
     NEXT_PUBLIC_CREEM_PRICE_PACK_1000: process.env.NEXT_PUBLIC_CREEM_PRICE_PACK_1000,
     NEXT_PUBLIC_CREEM_PRICE_PACK_2000: process.env.NEXT_PUBLIC_CREEM_PRICE_PACK_2000,
     NEXT_PUBLIC_CREEM_PRICE_PACK_5000: process.env.NEXT_PUBLIC_CREEM_PRICE_PACK_5000,
-    NEXT_PUBLIC_CREEM_PRICE_PACK_10000: process.env.NEXT_PUBLIC_CREEM_PRICE_PACK_10000,
-    NEXT_PUBLIC_CREEM_PRICE_PACK_300: process.env.NEXT_PUBLIC_CREEM_PRICE_PACK_300,
   },
   /**
    * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation. This is especially
