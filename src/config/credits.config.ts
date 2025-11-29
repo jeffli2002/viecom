@@ -106,17 +106,17 @@ export const creditsConfig: CreditsConfig = {
     },
     videoGeneration: {
       // Sora 2 (仅720P, 2-3分钟生成)
-      'sora-2-720p-10s': 15,
-      'sora-2-720p-15s': 20,
+      'sora-2-720p-10s': 25,
+      'sora-2-720p-15s': 30,
       
       // Sora 2 Pro (支持720P和1080P，更高质量更高消耗)
-      'sora-2-pro-720p-10s': 45,    // Sora 2 的 3倍
-      'sora-2-pro-720p-15s': 60,    // Sora 2 的 3倍
-      'sora-2-pro-1080p-10s': 100,  // 1080P高分辨率
-      'sora-2-pro-1080p-15s': 130,  // 1080P高分辨率
+      'sora-2-pro-720p-10s': 75,
+      'sora-2-pro-720p-15s': 135,
+      'sora-2-pro-1080p-10s': 160,
+      'sora-2-pro-1080p-15s': 300,
       
       // 向后兼容（默认 Sora 2 720P 15s）
-      'sora-2': 20,
+      'sora-2': 30,
     },
     storage: {
       costPerGBPerMonth: 10,
