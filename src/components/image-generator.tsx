@@ -98,6 +98,7 @@ const formatBytesToMb = (bytes: number) => (bytes / (1024 * 1024)).toFixed(1);
 const MAX_SOURCE_IMAGE_SIZE_LABEL = `${formatBytesToMb(MAX_SOURCE_IMAGE_FILE_SIZE_BYTES)} MB`;
 const SOURCE_IMAGE_ACCEPT = ALLOWED_SOURCE_IMAGE_MIME_TYPES.join(',');
 const ALLOWED_SOURCE_IMAGE_TYPE_SET = new Set<string>(ALLOWED_SOURCE_IMAGE_MIME_TYPES);
+const IMAGE_GENERATION_TIMEOUT_MS = 10 * 60 * 1000; // Allow more time for 4K Nano Banana Pro jobs
 
 const parseJsonResponse = async <T,>(
   response: Response
@@ -678,9 +679,9 @@ export default function ImageGenerator() {
       }
 
       let response: Response;
-      // Create AbortController with 6 minute timeout (5 min generation + 1 min buffer)
+      // Abort the request if it runs longer than expected (4K renders can take ~8 min)
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 6 * 60 * 1000);
+      const timeoutId = setTimeout(() => controller.abort(), IMAGE_GENERATION_TIMEOUT_MS);
 
       advanceProgress(15, t('progressSubmitting'));
       try {
