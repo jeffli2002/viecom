@@ -57,6 +57,7 @@ export async function POST(request: NextRequest) {
       height = 1024,
       raw = false,
       aspect_ratio,
+      resolution: resolutionInput,
       prompt_upsampling = false,
       seed,
       safety_tolerance = 2,
@@ -92,7 +93,11 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const creditCost = getModelCost('imageGeneration', model);
+    // Extract resolution from request body (for nano-banana-pro)
+    const resolution = (resolutionInput as '1K' | '2K' | '4K' | '1k' | '2k' | '4k' | undefined)
+      ?.toLowerCase() as '1k' | '2k' | '4k' | undefined;
+
+    const creditCost = getModelCost('imageGeneration', model, resolution);
     if (creditCost === 0) {
       return NextResponse.json({ error: `Invalid model: ${model}` }, { status: 400 });
     }
@@ -297,15 +302,34 @@ export async function POST(request: NextRequest) {
         // Pass the model name to KIE API service
         // For nano-banana-pro, pass 'nano-banana-pro' as preferred model
         const preferredModel = model === 'nano-banana-pro' ? 'nano-banana-pro' : undefined;
-        taskResponse = await kieApiService.generateImage(
-          {
-            prompt,
-            imageUrls: imageUrlsForKie.length > 0 ? imageUrlsForKie : undefined,
-            imageSize: kieImageSize,
-            outputFormat: kieOutputFormat,
-          },
-          preferredModel
-        );
+        // For nano-banana-pro, use aspect_ratio and resolution instead of imageSize
+        const kieParams: Parameters<KieApiService['generateImage']>[0] =
+          model === 'nano-banana-pro'
+            ? {
+                prompt,
+                imageUrls: imageUrlsForKie.length > 0 ? imageUrlsForKie : undefined,
+                aspect_ratio: aspect_ratio || '1:1',
+                resolution: resolution ? (resolution.toUpperCase() as '1K' | '2K' | '4K') : '1K',
+                outputFormat: kieOutputFormat,
+              }
+            : {
+                prompt,
+                imageUrls: imageUrlsForKie.length > 0 ? imageUrlsForKie : undefined,
+                imageSize: kieImageSize,
+                outputFormat: kieOutputFormat,
+              };
+
+        // Debug: Log resolution parameter for nano-banana-pro
+        if (model === 'nano-banana-pro') {
+          console.log('[Image Generation] Resolution parameter:', {
+            model,
+            resolutionFromRequest: resolutionInput,
+            normalizedResolution: resolution,
+            kieResolution: kieParams.resolution,
+          });
+        }
+
+        taskResponse = await kieApiService.generateImage(kieParams, preferredModel);
       } catch (error) {
         console.error('[Image Generation] KIE API generateImage error:', {
           error: error instanceof Error ? error.message : String(error),
@@ -424,17 +448,32 @@ export async function POST(request: NextRequest) {
           // Pure credit-based system: always charge credits
           if (!isTestMode) {
             try {
+              // Build description with resolution info for nano-banana-pro
+              let description = `Image generation with ${model}`;
+              if (model === 'nano-banana-pro' && resolution) {
+                description = `Image generation with ${model} (${resolution.toUpperCase()})`;
+              }
+
+              // Build metadata with resolution info
+              const metadata: Record<string, unknown> = {
+                feature: 'image-generation',
+                model,
+                prompt: prompt.substring(0, 100),
+                taskId,
+              };
+
+              // Add resolution to metadata for nano-banana-pro
+              if (model === 'nano-banana-pro' && resolution) {
+                metadata.resolution = resolution.toUpperCase(); // '1K', '2K', or '4K'
+                metadata.creditCost = creditCost; // Store the actual cost used
+              }
+
               await creditService.spendCredits({
                 userId,
                 amount: creditCost,
                 source: 'api_call',
-                description: `Image generation with ${model}`,
-                metadata: {
-                  feature: 'image-generation',
-                  model,
-                  prompt: prompt.substring(0, 100),
-                  taskId,
-                },
+                description,
+                metadata,
               });
             } catch (error) {
               console.error('Error spending credits:', error);

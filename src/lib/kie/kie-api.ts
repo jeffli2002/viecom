@@ -34,6 +34,8 @@ export interface KIEImageGenerationParams {
     | '4:5'
     | '21:9'
     | 'auto';
+  aspect_ratio?: string; // For nano-banana-pro, use aspect_ratio instead of image_size
+  resolution?: '1K' | '2K' | '4K'; // Resolution for nano-banana-pro
   outputFormat?: 'png' | 'jpeg';
   imageUrl?: string; // For I2I - single image URL (will be converted to image_urls array)
   imageUrls?: string[]; // For I2I - array of image URLs (up to 10 images)
@@ -79,6 +81,8 @@ type KIEImageTaskInput = {
   prompt: string;
   image_urls?: string[];
   image_size?: KIEImageGenerationParams['imageSize'];
+  aspect_ratio?: string; // For nano-banana-pro
+  resolution?: '1K' | '2K' | '4K'; // For nano-banana-pro
   output_format?: KIEImageGenerationParams['outputFormat'];
 };
 
@@ -203,6 +207,21 @@ export class KIEAPIService {
       prompt: params.prompt,
     };
 
+    // For nano-banana-pro, use aspect_ratio and resolution instead of image_size
+    if (kieModelName === 'nano-banana-pro') {
+      if (params.aspect_ratio) {
+        input.aspect_ratio = params.aspect_ratio;
+      }
+      if (params.resolution) {
+        input.resolution = params.resolution; // '1K', '2K', or '4K'
+      }
+    } else {
+      // For other models, use image_size
+      if (params.imageSize) {
+        input.image_size = params.imageSize;
+      }
+    }
+
     // For I2I (google/nano-banana-edit), image_urls is required
     // Support both imageUrl (single) and imageUrls (array) for flexibility
     if (params.imageUrls && params.imageUrls.length > 0) {
@@ -211,8 +230,8 @@ export class KIEAPIService {
       input.image_urls = [params.imageUrl]; // Convert single URL to array
     }
 
-    // Add optional parameters
-    if (params.imageSize) {
+    // Add optional parameters (only if not already set for nano-banana-pro)
+    if (kieModelName !== 'nano-banana-pro' && params.imageSize) {
       input.image_size = params.imageSize;
     }
     if (params.outputFormat) {
@@ -228,6 +247,16 @@ export class KIEAPIService {
     // Add optional callback URL
     if (params.callBackUrl) {
       requestBody.callBackUrl = params.callBackUrl;
+    }
+
+    // Debug: Log resolution for nano-banana-pro
+    if (kieModelName === 'nano-banana-pro') {
+      console.log('[KIE API] Creating image task with resolution:', {
+        model: kieModelName,
+        resolution: input.resolution,
+        aspect_ratio: input.aspect_ratio,
+        requestBody: JSON.stringify(requestBody, null, 2),
+      });
     }
 
     const response = await fetch(`${this.baseUrl}/jobs/createTask`, {

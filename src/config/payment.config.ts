@@ -134,6 +134,7 @@ export const paymentConfig: PaymentConfig = {
         'Basic image styles',
         '7 days asset display',
         'Standard quality',
+        'Brand analysis',
       ],
       popular: false,
       limits: {
@@ -171,7 +172,7 @@ export const paymentConfig: PaymentConfig = {
         'Everything in Free plan',
         'All image generation features',
         'Sora 2 & Sora 2 Pro video models',
-        'Brand analysis',
+        'Nano Banana Pro 4K resolution support',
         'Batch generation (3 concurrent)',
         'No watermarks',
         'Commercial license',

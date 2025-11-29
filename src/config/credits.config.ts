@@ -13,7 +13,10 @@ export interface CreditsConfig {
     };
     imageGeneration: {
       'nano-banana': number;
-      'nano-banana-pro': number;
+      'nano-banana-pro': number; // Default for pro, but overridden by resolution-specific
+      'nano-banana-pro-1k': number;
+      'nano-banana-pro-2k': number;
+      'nano-banana-pro-4k': number;
       'flux-1.1': number;
       'flux-1.1-pro': number;
       'flux-1.1-ultra': number;
@@ -95,7 +98,10 @@ export const creditsConfig: CreditsConfig = {
     },
     imageGeneration: {
       'nano-banana': 5,
-      'nano-banana-pro': 30,
+      'nano-banana-pro': 30, // Default for pro, but overridden by resolution-specific
+      'nano-banana-pro-1k': 22,
+      'nano-banana-pro-2k': 22,
+      'nano-banana-pro-4k': 30,
       'flux-1.1': 5,
       'flux-1.1-pro': 5,
       'flux-1.1-ultra': 8,
@@ -164,12 +170,22 @@ export const creditsConfig: CreditsConfig = {
 
 export function getModelCost(
   feature: 'imageToPrompt' | 'imageGeneration' | 'videoGeneration',
-  model: string
+  model: string,
+  resolution?: '1k' | '2k' | '4k'
 ): number {
   const consumption = creditsConfig.consumption[feature];
   if (!consumption) {
     console.warn(`Unknown feature: ${feature}`);
     return 0;
+  }
+
+  // For nano-banana-pro with resolution, use resolution-specific cost
+  if (feature === 'imageGeneration' && model === 'nano-banana-pro' && resolution) {
+    const resolutionKey = `nano-banana-pro-${resolution}` as keyof typeof consumption;
+    const resolutionCost = (consumption as any)[resolutionKey];
+    if (resolutionCost !== undefined) {
+      return resolutionCost;
+    }
   }
 
   const cost = (consumption as any)[model];

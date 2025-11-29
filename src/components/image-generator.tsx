@@ -32,6 +32,8 @@ import {
 import { SHARE_REWARD_CONFIG, type ShareRewardKey } from '@/config/share.config';
 import { IMAGE_STYLES, getImageStyle } from '@/config/styles.config';
 import { useGenerationProgress } from '@/hooks/use-generation-progress';
+import { useHasCreditPack } from '@/hooks/use-has-credit-pack';
+import { useSubscription } from '@/hooks/use-subscription';
 import { useUpgradePrompt } from '@/hooks/use-upgrade-prompt';
 import type { BrandToneAnalysis } from '@/lib/brand/brand-tone-analyzer';
 import { buildSharePlatforms } from '@/lib/share/share-platforms';
@@ -129,6 +131,9 @@ export default function ImageGenerator() {
 
   const { isAuthenticated, user } = useAuthStore();
   const { showUpgradePrompt, openUpgradePrompt, closeUpgradePrompt } = useUpgradePrompt();
+  const { planId } = useSubscription();
+  const { hasCreditPack } = useHasCreditPack();
+  const isPaidUser = planId !== 'free' || hasCreditPack;
   const [mode, setMode] = useState<GenerationMode>(initialMode);
   const [prompt, setPrompt] = useState('');
   const [enhancedPrompt, setEnhancedPrompt] = useState('');
@@ -136,6 +141,7 @@ export default function ImageGenerator() {
   const [sourceImages, setSourceImages] = useState<SourceImage[]>([]);
   const [aspectRatio, setAspectRatio] = useState<string>('1:1');
   const [model, setModel] = useState<string>('nano-banana');
+  const [resolution, setResolution] = useState<'1k' | '2k' | '4k'>('1k'); // Resolution for nano-banana-pro
   const [imageStyle, setImageStyle] = useState<string>('studio-shot'); // Image style selection
   const [outputFormat, setOutputFormat] = useState<'PNG' | 'JPEG'>('PNG'); // Output format selection
   const [isGenerating, setIsGenerating] = useState(false);
@@ -655,6 +661,11 @@ export default function ImageGenerator() {
         output_format: outputFormat.toLowerCase(), // Pass output format (png or jpeg)
         clientRequestId: requestId,
       };
+
+      // Add resolution for nano-banana-pro
+      if (model === 'nano-banana-pro') {
+        requestBody.resolution = resolution.toUpperCase(); // Convert '1k' to '1K' for API
+      }
 
       if (mode === 'image-to-image' && sourceImages.length > 0) {
         const remoteSources = sourceImages
@@ -1340,7 +1351,16 @@ export default function ImageGenerator() {
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label className="font-light text-gray-700 text-sm">{t('model')}</Label>
-                  <Select value={model} onValueChange={setModel}>
+                  <Select
+                    value={model}
+                    onValueChange={(value) => {
+                      setModel(value);
+                      // Reset resolution to 1k when switching away from nano-banana-pro
+                      if (value !== 'nano-banana-pro') {
+                        setResolution('1k');
+                      }
+                    }}
+                  >
                     <SelectTrigger className="border-gray-200 font-light">
                       <SelectValue />
                     </SelectTrigger>
@@ -1350,8 +1370,7 @@ export default function ImageGenerator() {
                         credits
                       </SelectItem>
                       <SelectItem value="nano-banana-pro">
-                        Nano Banana Pro -{' '}
-                        {creditsConfig.consumption.imageGeneration['nano-banana-pro']} credits
+                        Nano Banana Pro - (22/30) credits
                       </SelectItem>
                     </SelectContent>
                   </Select>
@@ -1373,6 +1392,49 @@ export default function ImageGenerator() {
                   </Select>
                 </div>
               </div>
+
+              {/* Resolution selection for nano-banana-pro */}
+              {model === 'nano-banana-pro' && (
+                <div className="space-y-2">
+                  <Label className="font-light text-gray-700 text-sm">Resolution</Label>
+                  <div className="grid grid-cols-3 gap-3">
+                    {(['1k', '2k', '4k'] as const).map((res) => {
+                      const isDisabled = !isPaidUser && res !== '1k';
+                      const cost =
+                        creditsConfig.consumption.imageGeneration[
+                          `nano-banana-pro-${res}` as keyof typeof creditsConfig.consumption.imageGeneration
+                        ] || creditsConfig.consumption.imageGeneration['nano-banana-pro'];
+                      return (
+                        <button
+                          key={res}
+                          type="button"
+                          onClick={() => {
+                            if (isDisabled) {
+                              openUpgradePrompt();
+                            } else {
+                              setResolution(res);
+                            }
+                          }}
+                          disabled={isDisabled}
+                          className={`flex flex-col items-center justify-center rounded-lg border-2 py-3 px-4 text-sm font-medium transition-all ${
+                            resolution === res
+                              ? 'border-teal-500 bg-teal-50 dark:bg-teal-900/20 text-slate-700 dark:text-slate-300'
+                              : isDisabled
+                                ? 'border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-800 text-slate-400 cursor-not-allowed opacity-50'
+                                : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-gray-700 hover:border-teal-500'
+                          }`}
+                        >
+                          <span className="font-semibold">{res.toUpperCase()}</span>
+                          <span className="text-xs mt-1">{cost} credits</span>
+                          {isDisabled && (
+                            <span className="text-xs mt-1 text-red-500">Upgrade required</span>
+                          )}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
 
               <div className="space-y-2">
                 <Label className="font-light text-gray-700 text-sm">{t('outputFormat')}</Label>
