@@ -26,6 +26,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { creditsConfig } from '@/config/credits.config';
 import { SHARE_REWARD_CONFIG, type ShareRewardKey } from '@/config/share.config';
 import { VIDEO_STYLES, getVideoStyle } from '@/config/styles.config';
+import { useCreditBalance } from '@/hooks/use-credit-balance';
 import { useGenerationProgress } from '@/hooks/use-generation-progress';
 import { useUpgradePrompt } from '@/hooks/use-upgrade-prompt';
 import type { BrandToneAnalysis } from '@/lib/brand/brand-tone-analyzer';
@@ -58,6 +59,7 @@ interface GenerationResult {
 }
 
 type GenerationMode = 'text-to-video' | 'image-to-video';
+const GENERATION_REQUEST_COOLDOWN_MS = 4000;
 
 export default function VideoGenerator() {
   const t = useTranslations('videoGeneration');
@@ -79,7 +81,11 @@ export default function VideoGenerator() {
   const [duration, setDuration] = useState<10 | 15>(10); // Video duration selection
   const [isGenerating, setIsGenerating] = useState(false);
   const [result, setResult] = useState<GenerationResult | null>(null);
+  const [pendingCreditCost, setPendingCreditCost] = useState(0);
+  const { balance: creditBalance, refresh: refreshCreditBalance } = useCreditBalance();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const generationLockRef = useRef(false);
+  const lastGenerationTimestampRef = useRef(0);
   const promptTextareaRef = useRef<HTMLTextAreaElement | null>(null);
   const {
     progressValue,
@@ -107,8 +113,12 @@ export default function VideoGenerator() {
   const [brandAnalysis, setBrandAnalysis] = useState<BrandToneAnalysis | null>(null);
 
   useEffect(() => {
+    if (!result) {
+      setAwaitingPublishConfirmation(false);
+      return;
+    }
     setAwaitingPublishConfirmation(false);
-  }, [result?.videoUrl]);
+  }, [result]);
 
   const maxPromptLength = 2000;
 
@@ -125,6 +135,12 @@ export default function VideoGenerator() {
   const videoCreditCost = getVideoCreditCost();
   const textDefaultPrompt = t('textDefaultPrompt');
   const imageDefaultPrompt = t('imageDefaultPrompt');
+  const effectiveCredits =
+    creditBalance?.availableBalance !== undefined
+      ? creditBalance.availableBalance - pendingCreditCost
+      : null;
+  const hasSufficientCredits =
+    effectiveCredits === null || effectiveCredits >= videoCreditCost;
 
   useEffect(() => {
     if (searchParams?.get('mode')) {
@@ -297,6 +313,33 @@ export default function VideoGenerator() {
       return;
     }
 
+    if (generationLockRef.current) {
+      toast.error(t('generationInFlight'));
+      return;
+    }
+    const now = Date.now();
+    if (now - lastGenerationTimestampRef.current < GENERATION_REQUEST_COOLDOWN_MS) {
+      toast.error(t('generationCooldown'));
+      return;
+    }
+    generationLockRef.current = true;
+    lastGenerationTimestampRef.current = now;
+
+    const currentCreditCost = videoCreditCost;
+    let reservedCredits = 0;
+    if (creditBalance) {
+      const availableCreditsNow = creditBalance.availableBalance - pendingCreditCost;
+      if (availableCreditsNow < currentCreditCost) {
+        toast.error(t('insufficientCredits', { credits: currentCreditCost }));
+        openUpgradePrompt();
+        generationLockRef.current = false;
+        lastGenerationTimestampRef.current = 0;
+        return;
+      }
+      reservedCredits = currentCreditCost;
+      setPendingCreditCost((prev) => prev + currentCreditCost);
+    }
+
     setIsGenerating(true);
     setResult(null);
     startProgress(
@@ -390,6 +433,16 @@ export default function VideoGenerator() {
       });
     } finally {
       setIsGenerating(false);
+      generationLockRef.current = false;
+      if (reservedCredits > 0) {
+        try {
+          await refreshCreditBalance();
+        } finally {
+          setPendingCreditCost((prev) => Math.max(0, prev - reservedCredits));
+        }
+      } else {
+        void refreshCreditBalance();
+      }
     }
   };
 
@@ -538,7 +591,10 @@ export default function VideoGenerator() {
     }
   };
 
-  const canGenerate = prompt.trim().length > 0 && (mode === 'text-to-video' || imagePreview);
+  const canGenerate =
+    prompt.trim().length > 0 &&
+    (mode === 'text-to-video' || imagePreview) &&
+    hasSufficientCredits;
 
   return (
     <>
@@ -1007,6 +1063,11 @@ export default function VideoGenerator() {
                     </>
                   )}
                 </Button>
+                {creditBalance && !hasSufficientCredits && (
+                  <p className="mt-2 text-sm text-red-500">
+                    {t('insufficientCredits', { credits: videoCreditCost })}
+                  </p>
+                )}
               </div>
             </Card>
           </div>

@@ -25,6 +25,8 @@
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
     "test:e2e:headed": "playwright test --headed",
+    "test:e2e:video": "playwright test tests/e2e/video-generation-flow.spec.ts",
+    "test:video-flow": "tsx scripts/test-video-generation-flow.ts",
     "test:all": "pnpm test && pnpm test:e2e",
     "test:generation": "tsx scripts/test-generation.ts",
     "generate:secret": "tsx scripts/generate-secret.ts",

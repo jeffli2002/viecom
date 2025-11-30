@@ -9,6 +9,7 @@ import { checkAndAwardReferralReward } from '@/lib/rewards/referral-reward';
 import { r2StorageService } from '@/lib/storage/r2';
 import { db } from '@/server/db';
 import { generatedAsset } from '@/server/db/schema';
+import { eq, sql } from 'drizzle-orm';
 import { type NextRequest, NextResponse } from 'next/server';
 
 export const dynamic = 'force-dynamic';
@@ -36,13 +37,17 @@ const isR2Configured = () =>
   );
 
 export async function POST(request: NextRequest) {
+  // Declare variables in outer scope for error handling
+  let userId: string = 'unknown';
+  let taskId: string | undefined;
+  let generationMode: 't2v' | 'i2v' = 't2v';
+  let prompt: string = '';
+
   try {
     const isTestMode =
       process.env.NODE_ENV === 'test' ||
       process.env.DISABLE_AUTH === 'true' ||
       request.headers.get('x-test-mode') === 'true';
-
-    let userId: string;
 
     if (isTestMode) {
       userId = 'test-user-id';
@@ -58,8 +63,9 @@ export async function POST(request: NextRequest) {
       userId = session.user.id;
     }
 
+    const requestBody = await request.json();
     const {
-      prompt,
+      prompt: promptInput,
       model = 'sora-2',
       mode,
       aspect_ratio = '16:9',
@@ -68,7 +74,9 @@ export async function POST(request: NextRequest) {
       style,
       image,
       enhancedPrompt: enhancedPromptInput,
-    } = await request.json();
+    } = requestBody;
+
+    prompt = promptInput || '';
 
     if (!prompt || typeof prompt !== 'string') {
       return NextResponse.json(
@@ -102,8 +110,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid video model configuration' }, { status: 400 });
     }
 
-    const generationMode: 't2v' | 'i2v' =
-      mode === 'i2v' || mode === 'image-to-video' || Boolean(image) ? 'i2v' : 't2v';
+    generationMode = mode === 'i2v' || mode === 'image-to-video' || Boolean(image) ? 'i2v' : 't2v';
 
     // Pure credit-based system: always check and charge credits
     if (!isTestMode) {
@@ -220,16 +227,37 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    const generationResponse = await kieApiService.generateVideo({
-      prompt,
-      model: normalizedModel,
-      aspectRatio: mapAspectRatio(aspect_ratio),
-      quality: normalizedQuality,
-      duration: normalizedDuration,
-      imageUrls: imageUrlForKie ? [imageUrlForKie] : undefined,
-    });
+    let taskId: string;
+    try {
+      const generationResponse = await kieApiService.generateVideo({
+        prompt,
+        model: normalizedModel,
+        aspectRatio: mapAspectRatio(aspect_ratio),
+        quality: normalizedQuality,
+        duration: normalizedDuration,
+        imageUrls: imageUrlForKie ? [imageUrlForKie] : undefined,
+      });
 
-    const taskId = generationResponse.data.taskId;
+      taskId = generationResponse.data.taskId;
+
+      console.log('[Video Generation] Task created successfully:', {
+        taskId,
+        userId,
+        model: normalizedModel,
+        mode: generationMode,
+        prompt: prompt.substring(0, 100),
+      });
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      console.error('[Video Generation] Failed to create task:', {
+        userId,
+        model: normalizedModel,
+        mode: generationMode,
+        error: errorMessage,
+        stack: error instanceof Error ? error.stack : undefined,
+      });
+      throw error;
+    }
 
     const pollingIntervalMs = 5000;
     const maxAttempts =
@@ -240,39 +268,359 @@ export async function POST(request: NextRequest) {
         : normalizedDuration === 15
           ? 180
           : 150;
-    const videoResult = await kieApiService.pollTaskStatus(
-      taskId,
-      'video',
-      maxAttempts,
-      pollingIntervalMs
-    );
-    if (!videoResult.videoUrl) {
+
+    let videoResult: { imageUrl?: string; videoUrl?: string; status: string };
+    try {
+      console.log('[Video Generation] Starting to poll task status:', {
+        taskId,
+        userId,
+        maxAttempts,
+        pollingIntervalMs,
+      });
+
+      videoResult = await kieApiService.pollTaskStatus(
+        taskId,
+        'video',
+        maxAttempts,
+        pollingIntervalMs
+      );
+
+      console.log('[Video Generation] Task polling completed:', {
+        taskId,
+        userId,
+        status: videoResult.status,
+        hasVideoUrl: !!videoResult.videoUrl,
+      });
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      console.error('[Video Generation] Task polling failed:', {
+        taskId,
+        userId,
+        error: errorMessage,
+        stack: error instanceof Error ? error.stack : undefined,
+      });
+
+      // Record failed task in database even if polling fails
+      if (!isTestMode) {
+        try {
+          await db.insert(generatedAsset).values({
+            id: randomUUID(),
+            userId,
+            assetType: 'video',
+            generationMode,
+            prompt,
+            enhancedPrompt: enhancedPromptInput,
+            baseImageUrl: sourceImagePublicUrl,
+            styleId: typeof style === 'string' ? style : null,
+            videoStyle: typeof style === 'string' ? style : null,
+            status: 'failed',
+            errorMessage: errorMessage,
+            creditsSpent: 0, // Credits not charged if polling fails
+            generationParams: {
+              aspect_ratio,
+              duration: normalizedDuration,
+              quality: normalizedQuality,
+              resolution,
+              style,
+              model: normalizedModel,
+              modelKey,
+            },
+            metadata: {
+              taskId,
+              generationMode,
+              error: errorMessage,
+              failedAt: new Date().toISOString(),
+            },
+          });
+          console.log('[Video Generation] Recorded failed task in database:', {
+            taskId,
+            userId,
+          });
+        } catch (saveError) {
+          console.error('[Video Generation] Failed to record failed task in database:', {
+            taskId,
+            userId,
+            error: saveError instanceof Error ? saveError.message : String(saveError),
+          });
+        }
+      }
+
       return NextResponse.json(
-        { error: 'Video generation completed but no video URL found' },
+        {
+          error: `Video generation failed: ${errorMessage}`,
+          taskId,
+        },
         { status: 500 }
       );
     }
 
-    const videoResponse = await fetch(videoResult.videoUrl);
-    if (!videoResponse.ok) {
-      return NextResponse.json({ error: 'Failed to download generated video' }, { status: 500 });
+    if (!videoResult.videoUrl) {
+      const errorMsg = 'Video generation completed but no video URL found';
+      console.error('[Video Generation] No video URL in result:', {
+        taskId,
+        userId,
+        status: videoResult.status,
+      });
+
+      // Record failed task in database
+      if (!isTestMode) {
+        try {
+          await db.insert(generatedAsset).values({
+            id: randomUUID(),
+            userId,
+            assetType: 'video',
+            generationMode,
+            prompt,
+            enhancedPrompt: enhancedPromptInput,
+            baseImageUrl: sourceImagePublicUrl,
+            styleId: typeof style === 'string' ? style : null,
+            videoStyle: typeof style === 'string' ? style : null,
+            status: 'failed',
+            errorMessage: errorMsg,
+            creditsSpent: 0,
+            generationParams: {
+              aspect_ratio,
+              duration: normalizedDuration,
+              quality: normalizedQuality,
+              resolution,
+              style,
+              model: normalizedModel,
+              modelKey,
+            },
+            metadata: {
+              taskId,
+              generationMode,
+              error: errorMsg,
+              failedAt: new Date().toISOString(),
+            },
+          });
+        } catch (saveError) {
+          console.error('[Video Generation] Failed to record failed task (no URL):', {
+            taskId,
+            userId,
+            error: saveError instanceof Error ? saveError.message : String(saveError),
+          });
+        }
+      }
+
+      return NextResponse.json(
+        { error: errorMsg, taskId },
+        { status: 500 }
+      );
     }
 
-    const videoBuffer = Buffer.from(await videoResponse.arrayBuffer());
-    const outputFileSize = videoBuffer.length;
+    let videoBuffer: Buffer;
+    let outputFileSize: number;
+    try {
+      console.log('[Video Generation] Downloading video from KIE:', {
+        taskId,
+        userId,
+        videoUrl: videoResult.videoUrl.substring(0, 100) + '...',
+      });
+
+      const videoResponse = await fetch(videoResult.videoUrl);
+      if (!videoResponse.ok) {
+        const errorMsg = `Failed to download generated video: ${videoResponse.status} ${videoResponse.statusText}`;
+        console.error('[Video Generation] Video download failed:', {
+          taskId,
+          userId,
+          status: videoResponse.status,
+          statusText: videoResponse.statusText,
+        });
+
+        // Record failed task in database
+        if (!isTestMode) {
+          try {
+            await db.insert(generatedAsset).values({
+              id: randomUUID(),
+              userId,
+              assetType: 'video',
+              generationMode,
+              prompt,
+              enhancedPrompt: enhancedPromptInput,
+              baseImageUrl: sourceImagePublicUrl,
+              styleId: typeof style === 'string' ? style : null,
+              videoStyle: typeof style === 'string' ? style : null,
+              status: 'failed',
+              errorMessage: errorMsg,
+              creditsSpent: 0,
+              generationParams: {
+                aspect_ratio,
+                duration: normalizedDuration,
+                quality: normalizedQuality,
+                resolution,
+                style,
+                model: normalizedModel,
+                modelKey,
+              },
+              metadata: {
+                taskId,
+                generationMode,
+                videoUrl: videoResult.videoUrl,
+                error: errorMsg,
+                failedAt: new Date().toISOString(),
+              },
+            });
+          } catch (saveError) {
+            console.error('[Video Generation] Failed to record failed task (download error):', {
+              taskId,
+              userId,
+              error: saveError instanceof Error ? saveError.message : String(saveError),
+            });
+          }
+        }
+
+        return NextResponse.json(
+          { error: errorMsg, taskId },
+          { status: 500 }
+        );
+      }
+
+      videoBuffer = Buffer.from(await videoResponse.arrayBuffer());
+      outputFileSize = videoBuffer.length;
+
+      console.log('[Video Generation] Video downloaded successfully:', {
+        taskId,
+        userId,
+        fileSize: outputFileSize,
+      });
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      console.error('[Video Generation] Error downloading video:', {
+        taskId,
+        userId,
+        error: errorMessage,
+        stack: error instanceof Error ? error.stack : undefined,
+      });
+
+      // Record failed task in database
+      if (!isTestMode) {
+        try {
+          await db.insert(generatedAsset).values({
+            id: randomUUID(),
+            userId,
+            assetType: 'video',
+            generationMode,
+            prompt,
+            enhancedPrompt: enhancedPromptInput,
+            baseImageUrl: sourceImagePublicUrl,
+            styleId: typeof style === 'string' ? style : null,
+            videoStyle: typeof style === 'string' ? style : null,
+            status: 'failed',
+            errorMessage: errorMessage,
+            creditsSpent: 0,
+            generationParams: {
+              aspect_ratio,
+              duration: normalizedDuration,
+              quality: normalizedQuality,
+              resolution,
+              style,
+              model: normalizedModel,
+              modelKey,
+            },
+            metadata: {
+              taskId,
+              generationMode,
+              videoUrl: videoResult.videoUrl,
+              error: errorMessage,
+              failedAt: new Date().toISOString(),
+            },
+          });
+        } catch (saveError) {
+          console.error('[Video Generation] Failed to record failed task (download exception):', {
+            taskId,
+            userId,
+            error: saveError instanceof Error ? saveError.message : String(saveError),
+          });
+        }
+      }
+
+      return NextResponse.json(
+        { error: `Failed to download video: ${errorMessage}`, taskId },
+        { status: 500 }
+      );
+    }
 
     let r2Result: { key: string; url: string };
-    if (isTestMode) {
-      r2Result = {
-        key: `test-video-${randomUUID()}`,
-        url: videoResult.videoUrl,
-      };
-    } else {
-      r2Result = await r2StorageService.uploadAsset(
-        videoBuffer,
-        `video-${randomUUID()}.mp4`,
-        'video/mp4',
-        'video'
+    try {
+      if (isTestMode) {
+        r2Result = {
+          key: `test-video-${randomUUID()}`,
+          url: videoResult.videoUrl,
+        };
+      } else {
+        console.log('[Video Generation] Uploading video to R2:', {
+          taskId,
+          userId,
+          fileSize: outputFileSize,
+        });
+
+        r2Result = await r2StorageService.uploadAsset(
+          videoBuffer,
+          `video-${randomUUID()}.mp4`,
+          'video/mp4',
+          'video'
+        );
+
+        console.log('[Video Generation] Video uploaded to R2 successfully:', {
+          taskId,
+          userId,
+          r2Key: r2Result.key,
+        });
+      }
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      console.error('[Video Generation] Failed to upload video to R2:', {
+        taskId,
+        userId,
+        error: errorMessage,
+        stack: error instanceof Error ? error.stack : undefined,
+      });
+
+      // Record failed task in database
+      if (!isTestMode) {
+        try {
+          await db.insert(generatedAsset).values({
+            id: randomUUID(),
+            userId,
+            assetType: 'video',
+            generationMode,
+            prompt,
+            enhancedPrompt: enhancedPromptInput,
+            baseImageUrl: sourceImagePublicUrl,
+            styleId: typeof style === 'string' ? style : null,
+            videoStyle: typeof style === 'string' ? style : null,
+            status: 'failed',
+            errorMessage: errorMessage,
+            creditsSpent: 0,
+            generationParams: {
+              aspect_ratio,
+              duration: normalizedDuration,
+              quality: normalizedQuality,
+              resolution,
+              style,
+              model: normalizedModel,
+              modelKey,
+            },
+            metadata: {
+              taskId,
+              generationMode,
+              error: errorMessage,
+              failedAt: new Date().toISOString(),
+            },
+          });
+        } catch (saveError) {
+          console.error('[Video Generation] Failed to record failed task (R2 upload error):', {
+            taskId,
+            userId,
+            error: saveError instanceof Error ? saveError.message : String(saveError),
+          });
+        }
+      }
+
+      return NextResponse.json(
+        { error: `Failed to upload video: ${errorMessage}`, taskId },
+        { status: 500 }
       );
     }
 
@@ -280,7 +628,142 @@ export async function POST(request: NextRequest) {
       ? videoResult.videoUrl
       : `/api/v1/media?key=${encodeURIComponent(r2Result.key)}`;
 
-    // Update quota
+    // CRITICAL: KIE.ai has successfully generated the video
+    // We MUST save to database and charge credits, even if there are temporary failures
+    // Use retry mechanism to ensure eventual consistency
+    let savedAssetId: string | undefined;
+    let creditTransactionId: string | undefined;
+
+    if (!isTestMode) {
+      // Retry database save up to 3 times
+      const MAX_SAVE_RETRIES = 3;
+      let saveSuccess = false;
+      let lastSaveError: Error | null = null;
+
+      for (let saveAttempt = 1; saveAttempt <= MAX_SAVE_RETRIES; saveAttempt++) {
+        try {
+          savedAssetId = randomUUID();
+          await db.insert(generatedAsset).values({
+            id: savedAssetId,
+            userId,
+            assetType: 'video',
+            generationMode,
+            prompt,
+            enhancedPrompt: enhancedPromptInput,
+            baseImageUrl: sourceImagePublicUrl,
+            styleId: typeof style === 'string' ? style : null,
+            videoStyle: typeof style === 'string' ? style : null,
+            r2Key: r2Result.key,
+            publicUrl: r2Result.url,
+            thumbnailUrl: previewUrl.startsWith('http') ? previewUrl : undefined,
+            duration: normalizedDuration,
+            fileSize: outputFileSize,
+            status: 'completed',
+            creditsSpent: creditCost, // Will be confirmed after credit charge
+            generationParams: {
+              aspect_ratio,
+              duration: normalizedDuration,
+              quality: normalizedQuality,
+              resolution,
+              style,
+              model: normalizedModel,
+              modelKey,
+            },
+            metadata: {
+              previewUrl,
+              taskId,
+              generationMode,
+            },
+          });
+
+          saveSuccess = true;
+          console.log('[Video Generation] Successfully saved asset to database:', {
+            taskId,
+            userId,
+            assetId: savedAssetId,
+            r2Key: r2Result.key,
+            attempt: saveAttempt,
+          });
+          break;
+        } catch (saveError) {
+          lastSaveError = saveError instanceof Error ? saveError : new Error(String(saveError));
+          console.error(`[Video Generation] Database save attempt ${saveAttempt}/${MAX_SAVE_RETRIES} failed:`, {
+            taskId,
+            userId,
+            error: lastSaveError.message,
+            stack: lastSaveError.stack,
+            r2Key: r2Result.key,
+            r2Url: r2Result.url,
+          });
+
+          // Wait before retry (exponential backoff)
+          if (saveAttempt < MAX_SAVE_RETRIES) {
+            const waitTime = Math.min(1000 * Math.pow(2, saveAttempt - 1), 5000);
+            await new Promise((resolve) => setTimeout(resolve, waitTime));
+          }
+        }
+      }
+
+      // CRITICAL: Even if database save fails, we MUST charge credits
+      // because KIE.ai has already successfully generated the video
+      // The video is available at r2Result.url, so user should get it
+      if (!saveSuccess) {
+        console.error('[Video Generation] CRITICAL: All database save attempts failed, but KIE.ai succeeded:', {
+          taskId,
+          userId,
+          r2Key: r2Result.key,
+          r2Url: r2Result.url,
+          error: lastSaveError?.message,
+        });
+
+        // Try to create a minimal record to track this issue
+        try {
+          const fallbackId = randomUUID();
+          await db.insert(generatedAsset).values({
+            id: fallbackId,
+            userId,
+            assetType: 'video',
+            generationMode,
+            prompt: prompt.substring(0, 500), // Truncate if too long
+            baseImageUrl: sourceImagePublicUrl,
+            r2Key: r2Result.key,
+            publicUrl: r2Result.url,
+            duration: normalizedDuration,
+            fileSize: outputFileSize,
+            status: 'completed',
+            creditsSpent: creditCost,
+            generationParams: {
+              aspect_ratio,
+              duration: normalizedDuration,
+              quality: normalizedQuality,
+              resolution,
+              model: normalizedModel,
+              modelKey,
+            },
+            metadata: {
+              taskId,
+              generationMode,
+              saveRetryFailed: true,
+              originalError: lastSaveError?.message,
+            },
+          });
+          savedAssetId = fallbackId;
+          console.log('[Video Generation] Created minimal fallback record:', {
+            taskId,
+            assetId: fallbackId,
+          });
+        } catch (fallbackError) {
+          console.error('[Video Generation] CRITICAL: Even fallback save failed:', {
+            taskId,
+            userId,
+            error: fallbackError instanceof Error ? fallbackError.message : String(fallbackError),
+          });
+          // Continue - we'll still charge credits and return the video URL
+        }
+      }
+    }
+
+    // Update quota (non-critical, don't fail if this fails)
     try {
       await updateQuotaUsage({
         userId,
@@ -297,99 +780,174 @@ export async function POST(request: NextRequest) {
     } catch (error) {
       // In test mode, ignore quota update errors
       if (!isTestMode) {
-        throw error;
-      }
-      console.warn('Quota update error (ignored in test mode):', error);
-    }
-
-    // Pure credit-based system: always charge credits
-    if (!isTestMode) {
-      try {
-        await creditService.spendCredits({
+        console.warn('[Video Generation] Quota update failed (non-critical):', {
+          taskId,
           userId,
-          amount: creditCost,
-          source: 'api_call',
-          description: `Video generation (${generationMode}) with ${normalizedModel}`,
-          metadata: {
-            feature: 'video-generation',
-            model: normalizedModel,
-            modelKey,
-            resolution,
-            duration: normalizedDuration,
-            prompt: prompt.substring(0, 100),
-            taskId,
-          },
+          error: error instanceof Error ? error.message : String(error),
         });
-      } catch (error) {
-        console.error('Error spending credits:', error);
-        // Clean up uploaded video if credit charge fails
-        try {
-          await r2StorageService.deleteFile(r2Result.key);
-        } catch (cleanupError) {
-          console.error(
-            'Failed to clean up video asset after credit charge failure:',
-            cleanupError
-          );
-        }
-        const isInsufficient =
-          error instanceof Error && error.message.includes('Insufficient credits');
-        const message = isInsufficient
-          ? `Insufficient credits. Required: ${creditCost} credits. Please earn more credits or upgrade your plan.`
-          : 'Failed to charge credits for this generation. Please try again.';
-        return NextResponse.json({ error: message }, { status: isInsufficient ? 402 : 500 });
       }
     }
 
-    // Check and award referral reward if this is user's first generation
+    // CRITICAL: Charge credits - MUST succeed because KIE.ai has already generated the video
+    // Use retry mechanism to ensure credits are charged
+    if (!isTestMode) {
+      const MAX_CREDIT_RETRIES = 3;
+      let creditChargeSuccess = false;
+      let lastCreditError: Error | null = null;
+
+      for (let creditAttempt = 1; creditAttempt <= MAX_CREDIT_RETRIES; creditAttempt++) {
+        try {
+          const creditTransaction = await creditService.spendCredits({
+            userId,
+            amount: creditCost,
+            source: 'api_call',
+            description: `Video generation (${generationMode}) with ${normalizedModel}`,
+            referenceId: `video_${taskId}`, // Use taskId as reference for idempotency
+            metadata: {
+              feature: 'video-generation',
+              model: normalizedModel,
+              modelKey,
+              resolution,
+              duration: normalizedDuration,
+              prompt: prompt.substring(0, 100),
+              taskId,
+              assetId: savedAssetId,
+            },
+          });
+
+          creditTransactionId = creditTransaction.id;
+          creditChargeSuccess = true;
+
+          console.log('[Video Generation] Successfully charged credits:', {
+            taskId,
+            userId,
+            credits: creditCost,
+            transactionId: creditTransactionId,
+            assetId: savedAssetId,
+            attempt: creditAttempt,
+          });
+
+          // Update asset record with credit transaction ID
+          if (savedAssetId) {
+            try {
+              await db
+                .update(generatedAsset)
+                .set({
+                  creditsSpent: creditCost,
+                  metadata: sql`jsonb_set(
+                    COALESCE(metadata, '{}'::jsonb),
+                    '{creditTransactionId}',
+                    ${JSON.stringify(creditTransactionId)}::jsonb
+                  )`,
+                })
+                .where(eq(generatedAsset.id, savedAssetId));
+            } catch (updateError) {
+              console.warn('[Video Generation] Failed to update asset with credit transaction ID (non-critical):', {
+                taskId,
+                assetId: savedAssetId,
+                error: updateError instanceof Error ? updateError.message : String(updateError),
+              });
+            }
+          }
+
+          break;
+        } catch (error) {
+          lastCreditError = error instanceof Error ? error : new Error(String(error));
+          console.error(`[Video Generation] Credit charge attempt ${creditAttempt}/${MAX_CREDIT_RETRIES} failed:`, {
+            taskId,
+            userId,
+            credits: creditCost,
+            error: lastCreditError.message,
+            stack: lastCreditError.stack,
+            assetId: savedAssetId,
+          });
+
+          // Check if it's an idempotency issue (already charged)
+          if (lastCreditError.message.includes('referenceId') || lastCreditError.message.includes('unique')) {
+            console.log('[Video Generation] Credits may have already been charged (idempotency check):', {
+              taskId,
+              userId,
+            });
+            // Try to verify if credits were actually charged
+            // If referenceId exists, credits were likely already charged
+            creditChargeSuccess = true; // Assume success for idempotency
+            break;
+          }
+
+          // Wait before retry (exponential backoff)
+          if (creditAttempt < MAX_CREDIT_RETRIES) {
+            const waitTime = Math.min(1000 * Math.pow(2, creditAttempt - 1), 5000);
+            await new Promise((resolve) => setTimeout(resolve, waitTime));
+          }
+        }
+      }
+
+      // CRITICAL: If credit charge fails after all retries, we still need to return the video
+      // because KIE.ai has already generated it. Log this as a critical issue for manual review.
+      if (!creditChargeSuccess) {
+        console.error('[Video Generation] CRITICAL: All credit charge attempts failed, but video was generated:', {
+          taskId,
+          userId,
+          credits: creditCost,
+          r2Key: r2Result.key,
+          r2Url: r2Result.url,
+          assetId: savedAssetId,
+          error: lastCreditError?.message,
+        });
+
+        // Update asset record to mark credit charge failure
+        if (savedAssetId) {
+          try {
+            await db
+              .update(generatedAsset)
+              .set({
+                metadata: sql`jsonb_set(
+                  COALESCE(metadata, '{}'::jsonb),
+                  '{creditChargeFailed}',
+                  ${JSON.stringify({
+                    error: lastCreditError?.message,
+                    failedAt: new Date().toISOString(),
+                    credits: creditCost,
+                  })}::jsonb
+                )`,
+              })
+              .where(eq(generatedAsset.id, savedAssetId));
+          } catch (updateError) {
+            console.error('[Video Generation] Failed to update asset with credit charge failure:', {
+              taskId,
+              assetId: savedAssetId,
+              error: updateError instanceof Error ? updateError.message : String(updateError),
+            });
+          }
+        }
+
+        // CRITICAL: Still return success with video URL
+        // This ensures user gets the video even if credit charge failed
+        // The credit charge failure will be logged and can be manually reviewed/fixed
+        console.warn('[Video Generation] Returning video URL despite credit charge failure - requires manual review:', {
+          taskId,
+          userId,
+          credits: creditCost,
+        });
+      }
+    }
+
+    // Check and award referral reward if this is user's first generation (non-critical)
     if (!isTestMode) {
       await checkAndAwardReferralReward(userId).catch((error) => {
-        console.error('Error checking referral reward:', error);
+        console.error('[Video Generation] Error checking referral reward (non-critical):', {
+          taskId,
+          userId,
+          error: error instanceof Error ? error.message : String(error),
+        });
         // Don't fail the request if referral reward check fails
       });
     }
 
-    let savedAssetId: string | undefined;
-    if (!isTestMode) {
-      try {
-        savedAssetId = randomUUID();
-        await db.insert(generatedAsset).values({
-          id: savedAssetId,
-          userId,
-          assetType: 'video',
-          generationMode,
-          prompt,
-          enhancedPrompt: enhancedPromptInput,
-          baseImageUrl: sourceImagePublicUrl,
-          styleId: typeof style === 'string' ? style : null,
-          videoStyle: typeof style === 'string' ? style : null,
-          r2Key: r2Result.key,
-          publicUrl: r2Result.url,
-          thumbnailUrl: previewUrl.startsWith('http') ? previewUrl : undefined,
-          duration: normalizedDuration,
-          fileSize: outputFileSize,
-          status: 'completed',
-          creditsSpent: creditCost,
-          generationParams: {
-            aspect_ratio,
-            duration: normalizedDuration,
-            quality: normalizedQuality,
-            resolution,
-            style,
-            model: normalizedModel,
-            modelKey,
-          },
-          metadata: {
-            previewUrl,
-            taskId,
-            generationMode,
-          },
-        });
-      } catch (saveError) {
-        console.error('Failed to persist generated video asset:', saveError);
-      }
-    }
-
-    return NextResponse.json({
+    // CRITICAL: Always return success with video URL if KIE.ai succeeded
+    // Even if database save or credit charge had issues, the video is available
+    // This ensures user gets the video and we can fix credit/database issues later
+    const response = {
       videoUrl: r2Result.url,
       previewUrl,
       model: normalizedModel,
@@ -398,12 +956,82 @@ export async function POST(request: NextRequest) {
       taskId,
       creditsUsed: creditCost,
       assetId: savedAssetId ?? null,
+      // Include warnings if there were any issues
+      warnings: [] as string[],
+    };
+
+    if (!savedAssetId && !isTestMode) {
+      response.warnings.push('Video saved but database record may be incomplete');
+    }
+
+    if (!creditTransactionId && !isTestMode) {
+      response.warnings.push('Video generated but credit charge may have failed - requires manual review');
+    }
+
+    console.log('[Video Generation] Returning success response:', {
+      taskId,
+      userId,
+      videoUrl: r2Result.url,
+      assetId: savedAssetId,
+      creditTransactionId,
+      warnings: response.warnings,
     });
+
+    return NextResponse.json(response);
   } catch (error) {
-    console.error('Error generating video:', error);
+    const isTestMode =
+      process.env.NODE_ENV === 'test' ||
+      process.env.DISABLE_AUTH === 'true' ||
+      request.headers.get('x-test-mode') === 'true';
+
+    const errorMessage = error instanceof Error ? error.message : 'Internal server error';
+    const errorStack = error instanceof Error ? error.stack : undefined;
+
+    console.error('[Video Generation] Unhandled error in video generation:', {
+      userId,
+      taskId: taskId || 'not-created',
+      generationMode,
+      prompt: prompt.substring(0, 100),
+      error: errorMessage,
+      stack: errorStack,
+    });
+
+    // Try to record failed task if we have taskId
+    if (taskId && !isTestMode) {
+      try {
+        await db.insert(generatedAsset).values({
+          id: randomUUID(),
+          userId,
+          assetType: 'video',
+          generationMode,
+          prompt,
+          status: 'failed',
+          errorMessage: errorMessage,
+          creditsSpent: 0,
+          metadata: {
+            taskId,
+            error: errorMessage,
+            failedAt: new Date().toISOString(),
+            unhandledError: true,
+          },
+        });
+        console.log('[Video Generation] Recorded unhandled error in database:', {
+          taskId,
+          userId,
+        });
+      } catch (saveError) {
+        console.error('[Video Generation] Failed to record unhandled error:', {
+          taskId,
+          userId,
+          error: saveError instanceof Error ? saveError.message : String(saveError),
+        });
+      }
+    }
+
     return NextResponse.json(
       {
-        error: error instanceof Error ? error.message : 'Internal server error',
+        error: errorMessage,
+        taskId: taskId || undefined,
       },
       { status: 500 }
     );

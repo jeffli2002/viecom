@@ -23,7 +23,7 @@ import {
 } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
-import { creditsConfig } from '@/config/credits.config';
+import { creditsConfig, getModelCost } from '@/config/credits.config';
 import {
   ALLOWED_SOURCE_IMAGE_MIME_TYPES,
   MAX_SOURCE_IMAGES,
@@ -31,6 +31,7 @@ import {
 } from '@/config/image-upload.config';
 import { SHARE_REWARD_CONFIG, type ShareRewardKey } from '@/config/share.config';
 import { IMAGE_STYLES, getImageStyle } from '@/config/styles.config';
+import { useCreditBalance } from '@/hooks/use-credit-balance';
 import { useGenerationProgress } from '@/hooks/use-generation-progress';
 import { useHasCreditPack } from '@/hooks/use-has-credit-pack';
 import { useSubscription } from '@/hooks/use-subscription';
@@ -55,7 +56,7 @@ import {
 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useSearchParams } from 'next/navigation';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { toast } from 'sonner';
 
 interface GenerationResult {
@@ -99,6 +100,7 @@ const MAX_SOURCE_IMAGE_SIZE_LABEL = `${formatBytesToMb(MAX_SOURCE_IMAGE_FILE_SIZ
 const SOURCE_IMAGE_ACCEPT = ALLOWED_SOURCE_IMAGE_MIME_TYPES.join(',');
 const ALLOWED_SOURCE_IMAGE_TYPE_SET = new Set<string>(ALLOWED_SOURCE_IMAGE_MIME_TYPES);
 const IMAGE_GENERATION_TIMEOUT_MS = 10 * 60 * 1000; // Allow more time for 4K Nano Banana Pro jobs
+const GENERATION_REQUEST_COOLDOWN_MS = 4000;
 
 const parseJsonResponse = async <T,>(
   response: Response
@@ -147,12 +149,16 @@ export default function ImageGenerator() {
   const [outputFormat, setOutputFormat] = useState<'PNG' | 'JPEG'>('PNG'); // Output format selection
   const [isGenerating, setIsGenerating] = useState(false);
   const [result, setResult] = useState<GenerationResult | null>(null);
+  const [pendingCreditCost, setPendingCreditCost] = useState(0);
+  const { balance: creditBalance, refresh: refreshCreditBalance } = useCreditBalance();
   const [shareStatus, setShareStatus] = useState<'idle' | 'pending' | 'awarded' | 'error'>('idle');
   const [shareMessage, setShareMessage] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isPublishModalOpen, setIsPublishModalOpen] = useState(false);
   // ...
   const activeRequestIdRef = useRef<string | null>(null);
+  const generationLockRef = useRef(false);
+  const lastGenerationTimestampRef = useRef(0);
   const [lightboxImage, setLightboxImage] = useState<{ url: string; alt: string } | null>(null);
   const promptTextareaRef = useRef<HTMLTextAreaElement | null>(null);
   const {
@@ -183,6 +189,20 @@ export default function ImageGenerator() {
     'A serene Japanese garden with cherry blossoms in full bloom, koi fish swimming in a crystal-clear pond, traditional wooden bridge, soft morning light filtering through maple trees, ultra-realistic, high detail';
   const imageDefaultPrompt =
     'Transform this image into a watercolor painting style, soft pastel colors, artistic brush strokes';
+
+  const imageCreditCost = useMemo(() => {
+    return getModelCost(
+      'imageGeneration',
+      model,
+      model === 'nano-banana-pro' ? resolution : undefined
+    );
+  }, [model, resolution]);
+  const effectiveCredits =
+    creditBalance?.availableBalance !== undefined
+      ? creditBalance.availableBalance - pendingCreditCost
+      : null;
+  const hasSufficientCredits =
+    effectiveCredits === null || effectiveCredits >= imageCreditCost;
 
   // User is already available from useAuthStore, no need to fetch separately
 
@@ -611,6 +631,33 @@ export default function ImageGenerator() {
       }
     }
 
+    if (generationLockRef.current) {
+      toast.error(t('generationInFlight'));
+      return;
+    }
+    const now = Date.now();
+    if (now - lastGenerationTimestampRef.current < GENERATION_REQUEST_COOLDOWN_MS) {
+      toast.error(t('generationCooldown'));
+      return;
+    }
+    generationLockRef.current = true;
+    lastGenerationTimestampRef.current = now;
+
+    const currentCreditCost = imageCreditCost;
+    let reservedCredits = 0;
+    if (creditBalance) {
+      const availableCreditsNow = creditBalance.availableBalance - pendingCreditCost;
+      if (availableCreditsNow < currentCreditCost) {
+        toast.error(t('insufficientCredits', { credits: currentCreditCost }));
+        openUpgradePrompt();
+        generationLockRef.current = false;
+        lastGenerationTimestampRef.current = 0;
+        return;
+      }
+      reservedCredits = currentCreditCost;
+      setPendingCreditCost((prev) => prev + currentCreditCost);
+    }
+
     const requestId = createClientRequestId();
     activeRequestIdRef.current = requestId;
     setIsGenerating(true);
@@ -792,6 +839,16 @@ export default function ImageGenerator() {
       });
     } finally {
       setIsGenerating(false);
+      generationLockRef.current = false;
+      if (reservedCredits > 0) {
+        try {
+          await refreshCreditBalance();
+        } finally {
+          setPendingCreditCost((prev) => Math.max(0, prev - reservedCredits));
+        }
+      } else {
+        void refreshCreditBalance();
+      }
     }
   };
 
@@ -1003,7 +1060,9 @@ export default function ImageGenerator() {
   };
 
   const canGenerate =
-    prompt.trim().length > 0 && (mode === 'text-to-image' || sourceImages.length > 0);
+    prompt.trim().length > 0 &&
+    (mode === 'text-to-image' || sourceImages.length > 0) &&
+    hasSufficientCredits;
 
   return (
     <div className="px-4 py-8 lg:px-8">
@@ -1515,6 +1574,11 @@ export default function ImageGenerator() {
                   </>
                 )}
               </Button>
+              {creditBalance && !hasSufficientCredits && (
+                <p className="mt-2 text-sm text-red-500">
+                  {t('insufficientCredits', { credits: imageCreditCost })}
+                </p>
+              )}
             </div>
 
             <div className="lg:sticky lg:top-24 lg:h-fit">
