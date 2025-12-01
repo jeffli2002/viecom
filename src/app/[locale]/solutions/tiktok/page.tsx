@@ -1,4 +1,4 @@
-import { Check, Play, Smartphone, Zap } from 'lucide-react';
+import { Check, Play, Smartphone, Sparkles, Zap } from 'lucide-react';
 import Link from 'next/link';
 import { getSEOMetadata } from '@/lib/seo/metadata-translations';
 import { getSoftwareApplicationSchema, getFAQPageSchema, getHowToSchema } from '@/lib/utils/schema-generator';
@@ -113,39 +113,56 @@ export default function TikTokSolutionPage() {
       <section className="py-20 bg-slate-50 dark:bg-slate-900">
         <div className="container-base">
           <div className="bg-white dark:bg-slate-800 rounded-3xl border border-slate-200 dark:border-slate-700 p-8 shadow-2xl">
-            <div className="flex flex-col md:flex-row gap-8 items-center">
-              <div className="w-full md:w-1/3 space-y-4">
-                <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-900 border-2 border-teal-500 relative">
-                  <span className="absolute -top-3 left-4 px-2 bg-teal-500 text-white text-[10px] font-bold rounded uppercase">
+            <div className="relative grid gap-8 md:grid-cols-2 items-center">
+              {/* Input card */}
+              <div className="flex justify-center">
+                <div className="group relative max-w-[320px] w-full rounded-2xl border-2 border-teal-500 bg-slate-50 dark:bg-slate-900 p-4 overflow-hidden shadow-xl transition-all duration-300 hover:shadow-teal-500/40 hover:-translate-y-1">
+                  <span className="absolute -top-3 left-4 px-2 bg-teal-500 text-white text-[10px] font-bold rounded uppercase tracking-wide">
                     Input Image
                   </span>
-                  <img
-                    src="/imagesgen/cloth.jpg"
-                    className="w-full rounded-lg"
-                    alt="Source Product - Apparel"
-                  />
+                  <div className="aspect-[4/5] rounded-xl overflow-hidden">
+                    <img
+                      src="/imagesgen/cloth.jpg"
+                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                      alt="Source Product - Apparel"
+                    />
+                  </div>
                 </div>
               </div>
 
-              <div className="w-full md:w-2/3">
-                <div className="aspect-[9/16] bg-black rounded-xl overflow-hidden relative border-2 border-teal-500 shadow-lg">
+              {/* Output video card */}
+              <div className="flex flex-col items-center gap-3">
+                <div className="group relative w-full max-w-[260px] aspect-[9/16] rounded-2xl border-2 border-teal-500 bg-black overflow-hidden shadow-2xl transition-all duration-300 hover:shadow-teal-500/40 hover:-translate-y-1">
                   <video
                     src="/video/apparel.mp4"
                     autoPlay
                     muted
                     loop
                     playsInline
-                    className="w-full h-full object-cover opacity-80"
+                    controls
+                    className="w-full h-full object-cover opacity-90"
                   />
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <Play className="w-8 h-8 text-white fill-white" />
-                  </div>
                 </div>
-                <div className="mt-3 text-center">
+                <div className="text-center">
                   <div className="flex items-center justify-center gap-2 mb-1">
-                    <span className="text-xs font-bold text-slate-900 dark:text-white">TikTok 9:16</span>
+                    <span className="text-xs font-bold text-slate-900 dark:text-white tracking-wide">
+                      TikTok 9:16
+                    </span>
                   </div>
-                  <p className="text-[10px] text-slate-500">Motion & Audio</p>
+                  <p className="text-[11px] text-slate-500">Looping motion video · Tap speaker to enable sound</p>
+                </div>
+              </div>
+
+              {/* Transform icon between input and output (desktop only) */}
+              <div className="pointer-events-none hidden md:flex items-center justify-center absolute inset-y-0 left-1/2 -translate-x-1/2">
+                <div className="flex flex-col items-center gap-2">
+                  <div className="relative bg-white dark:bg-slate-900 rounded-full border border-teal-500/40 p-3 shadow-lg shadow-teal-500/20">
+                    <Sparkles className="w-5 h-5 text-teal-500" />
+                    <div className="absolute -inset-1 rounded-full bg-teal-500/20 blur opacity-40" />
+                  </div>
+                  <span className="text-[10px] font-semibold uppercase tracking-widest text-slate-500 dark:text-slate-300">
+                    AI Transform
+                  </span>
                 </div>
               </div>
             </div>

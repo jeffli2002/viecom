@@ -2,7 +2,7 @@ import { BatchGenerationFeature } from '@/components/blocks/batch-generation-fea
 import { BrandAnalysis } from '@/components/blocks/brand-analysis';
 import { FAQ } from '@/components/blocks/faq';
 import { Hero } from '@/components/blocks/hero';
-// import { ShowcaseGallery } from '@/components/blocks/showcase-gallery';
+import { ShowcaseGallery } from '@/components/blocks/showcase-gallery';
 import { TransformationShowcase } from '@/components/blocks/transformation-showcase';
 import { VideoGenerationShowcase } from '@/components/blocks/video-generation-showcase';
 import { getSEOMetadata } from '@/lib/seo/metadata-translations';
@@ -25,8 +25,7 @@ export default function HomePage() {
       <TransformationShowcase />
       <BatchGenerationFeature />
       <VideoGenerationShowcase />
-      {/* ShowcaseGallery is temporarily hidden from the homepage for SEO optimization */}
-      {/* <ShowcaseGallery /> */}
+      <ShowcaseGallery />
       <FAQ />
     </div>
   );

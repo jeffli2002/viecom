@@ -612,7 +612,7 @@
     "subtitle": "Everything you need to know about Viecom AI",
     "q1": {
       "question": "How does the credit system work?",
-      "answer": "Credits are used for AI generations. Image generation costs 5-30 credits depending on the model (e.g., Nano Banana 5 credits, Nano Banana Pro 30 credits, Flux models 5-10 credits). Videos cost 15-130 credits depending on model and resolution. Free users get 30 signup credits. Pro plans include 500-900 monthly credits. You can also purchase credit packs starting at $9.90 for 300 credits."
+      "answer": "Credits are used for AI generations. Image generation costs 5-30 credits depending on the model (e.g., Nano Banana 5 credits, Nano Banana Pro 30 credits, Flux models 5-10 credits). Videos cost 15-130 credits depending on model and resolution. Free users get 30 signup credits. Pro plans include 500-900 monthly credits. You can also purchase credit packs starting at $9.90 for 200 credits."
     },
     "q2": {
       "question": "What's included in the Free plan?",
@@ -644,7 +644,7 @@
     },
     "q9": {
       "question": "What happens when I run out of credits?",
-      "answer": "You have several options: (1) Purchase one-time credit packs starting at $9.90 for 300 credits (packs never expire), (2) Upgrade to Pro/Pro+ for monthly credit allocations (500-900 credits/month), or (3) Earn credits daily through check-ins (2 credits/day), referrals (10 credits per referral), and social sharing (2 credits per share). Credit packs are perfect if you need extra credits without committing to a subscription."
+      "answer": "You have several options: (1) Purchase one-time credit packs starting at $9.90 for 200 credits (packs never expire), (2) Upgrade to Pro/Pro+ for monthly credit allocations (500-900 credits/month), or (3) Earn credits daily through check-ins (2 credits/day), referrals (10 credits per referral), and social sharing (2 credits per share). Credit packs are perfect if you need extra credits without committing to a subscription."
     }
   },
   "pricingPage": {

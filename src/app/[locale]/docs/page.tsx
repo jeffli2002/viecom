@@ -639,7 +639,7 @@ export default function DocsPage() {
                     Purchase Credit Packs
                   </div>
                   <div className="text-xs text-purple-800 dark:text-purple-200">
-                    Starting at $9.90 for 300 credits (never expire)
+                    Starting at $9.90 for 200 credits (never expire)
                   </div>
                 </div>
               </div>
