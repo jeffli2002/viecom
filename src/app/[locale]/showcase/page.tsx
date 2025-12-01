@@ -1,14 +1,20 @@
 import { SHOWCASE_CATEGORIES, getShowcaseCategoryLabel } from '@/config/showcase.config';
 import { getApprovedShowcaseEntries } from '@/lib/publish/submissions';
+import { getSEOMetadata } from '@/lib/seo/metadata-translations';
+import type { Metadata } from 'next';
 
 type ShowcasePageProps = {
   params: Promise<{ locale: string }>;
 };
 
-export const metadata = {
-  title: 'Viecom Showcase',
-  description: 'Discover curated AI-generated assets from the Viecom community.',
-};
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  return getSEOMetadata(locale, 'landing', '/showcase');
+}
 
 export default async function ShowcasePage({ params }: ShowcasePageProps) {
   void params;

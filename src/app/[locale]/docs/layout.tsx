@@ -1,4 +1,4 @@
-import { buildLocaleCanonicalMetadata } from '@/lib/seo/metadata';
+import { getSEOMetadata } from '@/lib/seo/metadata-translations';
 import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
 
@@ -8,7 +8,7 @@ export async function generateMetadata({
   params: Promise<{ locale: string }>;
 }): Promise<Metadata> {
   const { locale } = await params;
-  return buildLocaleCanonicalMetadata(locale, '/docs');
+  return getSEOMetadata(locale, 'learn', '/docs');
 }
 
 export default function DocsLayout({

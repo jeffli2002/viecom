@@ -1,5 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { buildLocaleCanonicalMetadata } from '@/lib/seo/metadata';
+import { getSEOMetadata } from '@/lib/seo/metadata-translations';
 import { Sparkles, Target, Users, Zap } from 'lucide-react';
 import type { Metadata } from 'next';
 
@@ -9,7 +9,7 @@ export async function generateMetadata({
   params: Promise<{ locale: string }>;
 }): Promise<Metadata> {
   const { locale } = await params;
-  return buildLocaleCanonicalMetadata(locale, '/about');
+  return getSEOMetadata(locale, 'landing', '/about');
 }
 
 export default function AboutPage() {
