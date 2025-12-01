@@ -120,9 +120,9 @@ export default function TikTokSolutionPage() {
                     Input Image
                   </span>
                   <img
-                    src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&q=80&w=400"
+                    src="/imagesgen/cloth.jpg"
                     className="w-full rounded-lg"
-                    alt="Source Product"
+                    alt="Source Product - Apparel"
                   />
                 </div>
               </div>
@@ -130,7 +130,7 @@ export default function TikTokSolutionPage() {
               <div className="w-full md:w-2/3">
                 <div className="aspect-[9/16] bg-black rounded-xl overflow-hidden relative border-2 border-teal-500 shadow-lg">
                   <video
-                    src="https://videos.pexels.com/video-files/4724036/4724036-uhd_2560_1440_25fps.mp4"
+                    src="/video/apparel.mp4"
                     autoPlay
                     muted
                     loop

@@ -120,9 +120,9 @@ export default function AmazonSolutionPage() {
                     Input Asset
                   </span>
                   <img
-                    src="https://images.unsplash.com/photo-1595777457583-95e059d581b8?auto=format&fit=crop&q=80&w=400"
+                    src="/imagesgen/shoeinptut.jpg"
                     className="w-full rounded-lg"
-                    alt="Source Product"
+                    alt="Source Product - Shoes"
                   />
                 </div>
               </div>
@@ -130,9 +130,9 @@ export default function AmazonSolutionPage() {
               <div className="w-full md:w-2/3">
                 <div className="aspect-[4/5] bg-white rounded-xl border-2 border-teal-500 p-4 flex items-center justify-center relative overflow-hidden shadow-lg">
                   <img
-                    src="https://images.unsplash.com/photo-1595777457583-95e059d581b8?auto=format&fit=crop&q=80&w=400"
+                    src="/imagesgen/shoeoutput.png"
                     className="object-contain max-h-full mix-blend-multiply"
-                    alt="Amazon Compliant"
+                    alt="Amazon Compliant Output"
                   />
                   <div className="absolute top-2 right-2">
                     <CheckCircle2 className="w-4 h-4 text-green-500" />
