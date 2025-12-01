@@ -62,7 +62,18 @@
     "freeAIVideoGeneratorDesc": "免费获得30积分，无需信用卡",
     "videoEnhancer": "视频增强器",
     "videoEnhancerDesc": "使用 AI 将视频提升至 4K 质量",
-    "footerLearn": "学习"
+    "footerLearn": "学习",
+    "documentation": "文档",
+    "documentationDesc": "完整指南和教程",
+    "nanoBananaPro": "Nano Banana Pro",
+    "nanoBananaProDesc": "产品摄影AI模型",
+    "solutions": "解决方案",
+    "amazonSolutions": "Amazon 解决方案",
+    "amazonSolutionsDesc": "符合Amazon要求的产品图像",
+    "tiktokSolutions": "TikTok 解决方案",
+    "tiktokSolutionsDesc": "TikTok Shop视频生成",
+    "shopifySolutions": "Shopify 解决方案",
+    "shopifySolutionsDesc": "Shopify批量图像生成"
   },
   "hero": {
     "badge": "全新：Nano Banana Pro 图片生成引擎",

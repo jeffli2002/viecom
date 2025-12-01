@@ -62,7 +62,18 @@
     "freeAIVideoGeneratorDesc": "Comienza con 30 créditos gratis, sin tarjeta de crédito",
     "videoEnhancer": "Mejorador de video",
     "videoEnhancerDesc": "Escala videos a calidad 4K con IA",
-    "footerLearn": "Aprender"
+    "footerLearn": "Aprender",
+    "documentation": "Documentación",
+    "documentationDesc": "Guías y tutoriales completos",
+    "nanoBananaPro": "Nano Banana Pro",
+    "nanoBananaProDesc": "Modelo IA para fotografía de productos",
+    "solutions": "Soluciones",
+    "amazonSolutions": "Soluciones Amazon",
+    "amazonSolutionsDesc": "Imágenes de productos compatibles con Amazon",
+    "tiktokSolutions": "Soluciones TikTok",
+    "tiktokSolutionsDesc": "Generación de videos para TikTok Shop",
+    "shopifySolutions": "Soluciones Shopify",
+    "shopifySolutionsDesc": "Generación masiva de imágenes para Shopify"
   },
   "hero": {
     "badge": "Nuevo: Motor de generación de imágenes Nano Banana Pro",

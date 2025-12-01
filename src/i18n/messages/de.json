@@ -62,7 +62,18 @@
     "freeAIVideoGeneratorDesc": "Starten Sie mit 30 kostenlosen Credits, keine Kreditkarte",
     "videoEnhancer": "Video-Enhancer",
     "videoEnhancerDesc": "Skalieren Sie Videos mit KI auf 4K-Qualität",
-    "footerLearn": "Lernen"
+    "footerLearn": "Lernen",
+    "documentation": "Dokumentation",
+    "documentationDesc": "Vollständige Anleitungen und Tutorials",
+    "nanoBananaPro": "Nano Banana Pro",
+    "nanoBananaProDesc": "KI-Modell für Produktfotografie",
+    "solutions": "Lösungen",
+    "amazonSolutions": "Amazon Lösungen",
+    "amazonSolutionsDesc": "Amazon-konforme Produktbilder",
+    "tiktokSolutions": "TikTok Lösungen",
+    "tiktokSolutionsDesc": "Videogenerierung für TikTok Shop",
+    "shopifySolutions": "Shopify Lösungen",
+    "shopifySolutionsDesc": "Massenbildgenerierung für Shopify"
   },
   "hero": {
     "badge": "Neu: Nano Banana Pro Bildgenerierungs-Engine",

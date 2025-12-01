@@ -62,7 +62,18 @@
     "freeAIVideoGeneratorDesc": "30クレジット無料で開始、クレジットカード不要",
     "videoEnhancer": "ビデオエンハンサー",
     "videoEnhancerDesc": "AIで動画を4K品質にアップスケール",
-    "footerLearn": "学ぶ"
+    "footerLearn": "学ぶ",
+    "documentation": "ドキュメント",
+    "documentationDesc": "完全なガイドとチュートリアル",
+    "nanoBananaPro": "Nano Banana Pro",
+    "nanoBananaProDesc": "商品写真用AIモデル",
+    "solutions": "ソリューション",
+    "amazonSolutions": "Amazonソリューション",
+    "amazonSolutionsDesc": "Amazon準拠の商品画像",
+    "tiktokSolutions": "TikTokソリューション",
+    "tiktokSolutionsDesc": "TikTok Shop動画生成",
+    "shopifySolutions": "Shopifyソリューション",
+    "shopifySolutionsDesc": "Shopify一括画像生成"
   },
   "hero": {
     "badge": "新機能: Nano Banana Pro 画像生成エンジン",

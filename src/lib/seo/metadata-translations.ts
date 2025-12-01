@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { buildLocaleCanonicalMetadata } from './metadata';
 
-export type PageType = 'landing' | 'tool' | 'learn' | 'pricing';
+export type PageType = 'landing' | 'tool' | 'learn' | 'pricing' | 'solution' | 'model';
 
 export type PagePath =
   | '/'
@@ -15,7 +15,11 @@ export type PagePath =
   | '/batch-image-generation'
   | '/batch-video-generation'
   | '/brand-analysis'
-  | '/pricing';
+  | '/pricing'
+  | '/models/nano-banana'
+  | '/solutions/amazon'
+  | '/solutions/tiktok'
+  | '/solutions/shopify';
 
 export interface SEOTranslations {
   title: string;
@@ -59,6 +63,29 @@ export const seoTranslations: Record<
         'free nano banana image',
         'gemini 3',
         'gemini 3 pro',
+        'ai image generator no restrictions',
+        'ai video generator from image',
+        'image to video ai free',
+        'nano banana image editing',
+        'nano banana google',
+        'gemini nano banana',
+        'nano banana model',
+        'nano banana prompt',
+        'ai image generator free no sign up',
+        'ai image generator from text free',
+        'ai video generator for ecommerce',
+        'free ai video generator from image',
+        'image to video ai generator free online',
+        'product photography ai generator',
+        'ai background generator for product photography',
+        'best ai for product photography',
+        'ai generated product images free',
+        'ecommerce video maker ai',
+        'shopify product video generator',
+        'amazon product video maker',
+        'tiktok product video generator',
+        'batch image generation ai',
+        'bulk ai image generator',
       ],
       openGraph: {
         title: 'AI Video Generator for E-commerce | Image to Video in Seconds',
@@ -565,16 +592,232 @@ export const seoTranslations: Record<
       },
     },
   },
+  // Solution Pages (Platform-Specific)
+  solution: {
+    en: {
+      title: 'E-commerce Platform Solutions | Amazon, TikTok & Shopify Optimization',
+      description:
+        'Platform-specific solutions for Amazon compliant images, TikTok Shop videos, and Shopify bulk generation. Optimize your content for each marketplace.',
+      keywords: [
+        'amazon solutions',
+        'tiktok solutions',
+        'shopify solutions',
+        'platform optimization',
+        'e-commerce solutions',
+        'marketplace compliance',
+      ],
+      openGraph: {
+        title: 'E-commerce Platform Solutions | Amazon, TikTok & Shopify',
+        description: 'Platform-specific solutions for optimizing your e-commerce content.',
+      },
+      twitter: {
+        title: 'E-commerce Platform Solutions | Amazon, TikTok & Shopify',
+        description: 'Platform-specific solutions for optimizing your e-commerce content.',
+      },
+    },
+    zh: {
+      title: '电商平台解决方案 | Amazon、TikTok和Shopify优化',
+      description: '针对Amazon合规图像、TikTok Shop视频和Shopify批量生成的平台特定解决方案。为每个市场优化您的内容。',
+      keywords: ['amazon解决方案', 'tiktok解决方案', 'shopify解决方案', '平台优化', '电商解决方案', '市场合规'],
+      openGraph: {
+        title: '电商平台解决方案 | Amazon、TikTok和Shopify',
+        description: '针对优化电商内容的平台特定解决方案。',
+      },
+      twitter: {
+        title: '电商平台解决方案 | Amazon、TikTok和Shopify',
+        description: '针对优化电商内容的平台特定解决方案。',
+      },
+    },
+    es: {
+      title: 'Soluciones para Plataformas E-commerce | Optimización Amazon, TikTok y Shopify',
+      description:
+        'Soluciones específicas para imágenes compatibles con Amazon, videos de TikTok Shop y generación masiva para Shopify. Optimice su contenido para cada marketplace.',
+      keywords: [
+        'soluciones amazon',
+        'soluciones tiktok',
+        'soluciones shopify',
+        'optimización plataforma',
+        'soluciones e-commerce',
+        'cumplimiento marketplace',
+      ],
+      openGraph: {
+        title: 'Soluciones para Plataformas E-commerce | Amazon, TikTok y Shopify',
+        description: 'Soluciones específicas para optimizar su contenido e-commerce.',
+      },
+      twitter: {
+        title: 'Soluciones para Plataformas E-commerce | Amazon, TikTok y Shopify',
+        description: 'Soluciones específicas para optimizar su contenido e-commerce.',
+      },
+    },
+    fr: {
+      title: 'Solutions pour Plateformes E-commerce | Optimisation Amazon, TikTok et Shopify',
+      description:
+        'Solutions spécifiques pour images conformes Amazon, vidéos TikTok Shop et génération en masse Shopify. Optimisez votre contenu pour chaque marketplace.',
+      keywords: [
+        'solutions amazon',
+        'solutions tiktok',
+        'solutions shopify',
+        'optimisation plateforme',
+        'solutions e-commerce',
+        'conformité marketplace',
+      ],
+      openGraph: {
+        title: 'Solutions pour Plateformes E-commerce | Amazon, TikTok et Shopify',
+        description: 'Solutions spécifiques pour optimiser votre contenu e-commerce.',
+      },
+      twitter: {
+        title: 'Solutions pour Plateformes E-commerce | Amazon, TikTok et Shopify',
+        description: 'Solutions spécifiques pour optimiser votre contenu e-commerce.',
+      },
+    },
+    de: {
+      title: 'E-Commerce-Plattform-Lösungen | Amazon, TikTok & Shopify Optimierung',
+      description:
+        'Plattformspezifische Lösungen für Amazon-konforme Bilder, TikTok Shop Videos und Shopify Massengenerierung. Optimieren Sie Ihre Inhalte für jeden Marktplatz.',
+      keywords: [
+        'amazon lösungen',
+        'tiktok lösungen',
+        'shopify lösungen',
+        'plattform optimierung',
+        'e-commerce lösungen',
+        'marketplace konformität',
+      ],
+      openGraph: {
+        title: 'E-Commerce-Plattform-Lösungen | Amazon, TikTok & Shopify',
+        description: 'Plattformspezifische Lösungen zur Optimierung Ihrer E-Commerce-Inhalte.',
+      },
+      twitter: {
+        title: 'E-Commerce-Plattform-Lösungen | Amazon, TikTok & Shopify',
+        description: 'Plattformspezifische Lösungen zur Optimierung Ihrer E-Commerce-Inhalte.',
+      },
+    },
+    ja: {
+      title: 'Eコマースプラットフォームソリューション | Amazon、TikTok、Shopify最適化',
+      description:
+        'Amazon準拠画像、TikTok Shop動画、Shopify一括生成のためのプラットフォーム固有のソリューション。各マーケットプレイス向けにコンテンツを最適化。',
+      keywords: [
+        'amazonソリューション',
+        'tiktokソリューション',
+        'shopifyソリューション',
+        'プラットフォーム最適化',
+        'eコマースソリューション',
+        'マーケットプレイス準拠',
+      ],
+      openGraph: {
+        title: 'Eコマースプラットフォームソリューション | Amazon、TikTok、Shopify',
+        description: 'Eコマースコンテンツを最適化するためのプラットフォーム固有のソリューション。',
+      },
+      twitter: {
+        title: 'Eコマースプラットフォームソリューション | Amazon、TikTok、Shopify',
+        description: 'Eコマースコンテンツを最適化するためのプラットフォーム固有のソリューション。',
+      },
+    },
+  },
+  // Model Pages
+  model: {
+    en: {
+      title: 'AI Models | Nano Banana Pro for Product Photography',
+      description:
+        'Learn about Nano Banana Pro AI model for e-commerce product photography. Specialized model for detail preservation and realistic lighting.',
+      keywords: [
+        'nano banana pro',
+        'ai models',
+        'product photography ai',
+        'ai image models',
+        'e-commerce ai models',
+      ],
+      openGraph: {
+        title: 'AI Models | Nano Banana Pro for Product Photography',
+        description: 'Learn about Nano Banana Pro AI model for e-commerce product photography.',
+      },
+      twitter: {
+        title: 'AI Models | Nano Banana Pro for Product Photography',
+        description: 'Learn about Nano Banana Pro AI model for e-commerce product photography.',
+      },
+    },
+    zh: {
+      title: 'AI模型 | Nano Banana Pro产品摄影',
+      description: '了解Nano Banana Pro AI模型，专为电商产品摄影设计。专注于细节保留和逼真光照的专业模型。',
+      keywords: ['nano banana pro', 'ai模型', '产品摄影ai', 'ai图像模型', '电商ai模型'],
+      openGraph: {
+        title: 'AI模型 | Nano Banana Pro产品摄影',
+        description: '了解Nano Banana Pro AI模型，专为电商产品摄影设计。',
+      },
+      twitter: {
+        title: 'AI模型 | Nano Banana Pro产品摄影',
+        description: '了解Nano Banana Pro AI模型，专为电商产品摄影设计。',
+      },
+    },
+    es: {
+      title: 'Modelos IA | Nano Banana Pro para Fotografía de Productos',
+      description:
+        'Conoce el modelo IA Nano Banana Pro para fotografía de productos e-commerce. Modelo especializado en preservación de detalles e iluminación realista.',
+      keywords: ['nano banana pro', 'modelos ia', 'fotografía producto ia', 'modelos imagen ia', 'modelos ia e-commerce'],
+      openGraph: {
+        title: 'Modelos IA | Nano Banana Pro para Fotografía de Productos',
+        description: 'Conoce el modelo IA Nano Banana Pro para fotografía de productos e-commerce.',
+      },
+      twitter: {
+        title: 'Modelos IA | Nano Banana Pro para Fotografía de Productos',
+        description: 'Conoce el modelo IA Nano Banana Pro para fotografía de productos e-commerce.',
+      },
+    },
+    fr: {
+      title: 'Modèles IA | Nano Banana Pro pour Photographie de Produits',
+      description:
+        'Découvrez le modèle IA Nano Banana Pro pour la photographie de produits e-commerce. Modèle spécialisé pour la préservation des détails et l\'éclairage réaliste.',
+      keywords: [
+        'nano banana pro',
+        'modèles ia',
+        'photographie produit ia',
+        'modèles image ia',
+        'modèles ia e-commerce',
+      ],
+      openGraph: {
+        title: 'Modèles IA | Nano Banana Pro pour Photographie de Produits',
+        description: 'Découvrez le modèle IA Nano Banana Pro pour la photographie de produits e-commerce.',
+      },
+      twitter: {
+        title: 'Modèles IA | Nano Banana Pro pour Photographie de Produits',
+        description: 'Découvrez le modèle IA Nano Banana Pro pour la photographie de produits e-commerce.',
+      },
+    },
+    de: {
+      title: 'KI-Modelle | Nano Banana Pro für Produktfotografie',
+      description:
+        'Erfahren Sie mehr über das KI-Modell Nano Banana Pro für E-Commerce-Produktfotografie. Spezialisiertes Modell für Detailerhaltung und realistische Beleuchtung.',
+      keywords: ['nano banana pro', 'ki modelle', 'produktfotografie ki', 'ki bildmodelle', 'e-commerce ki modelle'],
+      openGraph: {
+        title: 'KI-Modelle | Nano Banana Pro für Produktfotografie',
+        description: 'Erfahren Sie mehr über das KI-Modell Nano Banana Pro für E-Commerce-Produktfotografie.',
+      },
+      twitter: {
+        title: 'KI-Modelle | Nano Banana Pro für Produktfotografie',
+        description: 'Erfahren Sie mehr über das KI-Modell Nano Banana Pro für E-Commerce-Produktfotografie.',
+      },
+    },
+    ja: {
+      title: 'AIモデル | 商品写真用Nano Banana Pro',
+      description:
+        'Eコマース商品写真向けのNano Banana Pro AIモデルについて学ぶ。詳細保持とリアルな照明に特化したモデル。',
+      keywords: ['nano banana pro', 'aiモデル', '商品写真ai', 'ai画像モデル', 'eコマースaiモデル'],
+      openGraph: {
+        title: 'AIモデル | 商品写真用Nano Banana Pro',
+        description: 'Eコマース商品写真向けのNano Banana Pro AIモデルについて学ぶ。',
+      },
+      twitter: {
+        title: 'AIモデル | 商品写真用Nano Banana Pro',
+        description: 'Eコマース商品写真向けのNano Banana Pro AIモデルについて学ぶ。',
+      },
+    },
+  },
 };
 
 /**
  * Page-specific SEO translations
  * These override the generic page type translations for specific pages
  */
-export const pageSpecificTranslations: Record<
-  PagePath,
-  Record<string, SEOTranslations>
-> = {
+export const pageSpecificTranslations: Partial<Record<PagePath, Record<string, SEOTranslations>>> = {
   '/about': {
     en: {
       title: 'About Viecom | AI-Powered E-commerce Content Generation Platform',
@@ -1152,6 +1395,666 @@ export const pageSpecificTranslations: Record<
       twitter: {
         title: 'バッチ動画生成 | 複数の動画を一度に生成',
         description: 'Excel/CSVファイルをアップロードして、複数の商品動画を同時に生成。Eコマース向けバッチ処理。',
+      },
+    },
+  },
+  '/models/nano-banana': {
+    en: {
+      title: 'Nano Banana Pro AI Model | Product Photography with Detail Preservation',
+      description:
+        'Nano Banana Pro ensures 100% product detail preservation, accurate text rendering, and realistic lighting for e-commerce. Specialized AI model for commercial product photography.',
+      keywords: [
+        'nano banana pro',
+        'nano banana image editing',
+        'nano banana ai',
+        'product photography ai',
+        'detail preservation ai',
+        'e-commerce ai model',
+        'commercial photography ai',
+        'realistic lighting ai',
+        'text rendering ai',
+        'product integrity ai',
+        'nano banana google',
+        'gemini nano banana',
+        'nano banana model',
+        'nano banana prompt',
+        'ai image generator',
+        'ai video generator',
+      ],
+      openGraph: {
+        title: 'Nano Banana Pro AI Model | Product Photography with Detail Preservation',
+        description: 'Specialized AI model for e-commerce product photography with 100% detail preservation and realistic lighting.',
+      },
+      twitter: {
+        title: 'Nano Banana Pro AI Model | Product Photography with Detail Preservation',
+        description: 'Specialized AI model for e-commerce product photography with 100% detail preservation and realistic lighting.',
+      },
+    },
+    zh: {
+      title: 'Nano Banana Pro AI模型 | 细节保留的产品摄影',
+      description:
+        'Nano Banana Pro确保100%产品细节保留、准确的文本渲染和逼真的光照效果，专为电商产品摄影设计的AI模型。',
+      keywords: [
+        'nano banana pro',
+        'nano banana图像编辑',
+        'nano banana ai',
+        '产品摄影ai',
+        '细节保留ai',
+        '电商ai模型',
+        '商业摄影ai',
+        '逼真光照ai',
+        '文本渲染ai',
+        '产品完整性ai',
+        'ai图像生成器',
+        'ai视频生成器',
+      ],
+      openGraph: {
+        title: 'Nano Banana Pro AI模型 | 细节保留的产品摄影',
+        description: '专为电商产品摄影设计的AI模型，100%细节保留和逼真光照。',
+      },
+      twitter: {
+        title: 'Nano Banana Pro AI模型 | 细节保留的产品摄影',
+        description: '专为电商产品摄影设计的AI模型，100%细节保留和逼真光照。',
+      },
+    },
+    es: {
+      title: 'Modelo IA Nano Banana Pro | Fotografía de Productos con Preservación de Detalles',
+      description:
+        'Nano Banana Pro garantiza 100% de preservación de detalles del producto, renderizado preciso de texto e iluminación realista para e-commerce. Modelo IA especializado para fotografía comercial.',
+      keywords: [
+        'nano banana pro',
+        'edición imagen nano banana',
+        'nano banana ia',
+        'fotografía producto ia',
+        'preservación detalles ia',
+        'modelo ia e-commerce',
+        'fotografía comercial ia',
+        'iluminación realista ia',
+        'renderizado texto ia',
+        'integridad producto ia',
+        'generador imagen ia',
+        'generador video ia',
+      ],
+      openGraph: {
+        title: 'Modelo IA Nano Banana Pro | Fotografía de Productos con Preservación de Detalles',
+        description: 'Modelo IA especializado para fotografía de productos e-commerce con 100% de preservación de detalles.',
+      },
+      twitter: {
+        title: 'Modelo IA Nano Banana Pro | Fotografía de Productos con Preservación de Detalles',
+        description: 'Modelo IA especializado para fotografía de productos e-commerce con 100% de preservación de detalles.',
+      },
+    },
+    fr: {
+      title: 'Modèle IA Nano Banana Pro | Photographie Produit avec Préservation des Détails',
+      description:
+        'Nano Banana Pro garantit 100% de préservation des détails du produit, rendu précis du texte et éclairage réaliste pour l\'e-commerce. Modèle IA spécialisé pour la photographie commerciale.',
+      keywords: [
+        'nano banana pro',
+        'édition image nano banana',
+        'nano banana ia',
+        'photographie produit ia',
+        'préservation détails ia',
+        'modèle ia e-commerce',
+        'photographie commerciale ia',
+        'éclairage réaliste ia',
+        'rendu texte ia',
+        'intégrité produit ia',
+        'générateur image ia',
+        'générateur vidéo ia',
+      ],
+      openGraph: {
+        title: 'Modèle IA Nano Banana Pro | Photographie Produit avec Préservation des Détails',
+        description: 'Modèle IA spécialisé pour la photographie de produits e-commerce avec 100% de préservation des détails.',
+      },
+      twitter: {
+        title: 'Modèle IA Nano Banana Pro | Photographie Produit avec Préservation des Détails',
+        description: 'Modèle IA spécialisé pour la photographie de produits e-commerce avec 100% de préservation des détails.',
+      },
+    },
+    de: {
+      title: 'Nano Banana Pro KI-Modell | Produktfotografie mit Detailerhaltung',
+      description:
+        'Nano Banana Pro gewährleistet 100% Detailerhaltung des Produkts, präzise Textdarstellung und realistische Beleuchtung für E-Commerce. Spezialisiertes KI-Modell für kommerzielle Produktfotografie.',
+      keywords: [
+        'nano banana pro',
+        'nano banana bildbearbeitung',
+        'nano banana ki',
+        'produktfotografie ki',
+        'detailerhaltung ki',
+        'e-commerce ki modell',
+        'kommerzielle fotografie ki',
+        'realistische beleuchtung ki',
+        'textdarstellung ki',
+        'produktintegrität ki',
+        'ki bildgenerator',
+        'ki videogenerator',
+      ],
+      openGraph: {
+        title: 'Nano Banana Pro KI-Modell | Produktfotografie mit Detailerhaltung',
+        description: 'Spezialisiertes KI-Modell für E-Commerce-Produktfotografie mit 100% Detailerhaltung.',
+      },
+      twitter: {
+        title: 'Nano Banana Pro KI-Modell | Produktfotografie mit Detailerhaltung',
+        description: 'Spezialisiertes KI-Modell für E-Commerce-Produktfotografie mit 100% Detailerhaltung.',
+      },
+    },
+    ja: {
+      title: 'Nano Banana Pro AIモデル | 詳細保持の商品写真',
+      description:
+        'Nano Banana Proは、Eコマース向けに100%の商品詳細保持、正確なテキストレンダリング、リアルな照明を保証。商業商品写真専用AIモデル。',
+      keywords: [
+        'nano banana pro',
+        'nano banana画像編集',
+        'nano banana ai',
+        '商品写真ai',
+        '詳細保持ai',
+        'eコマースaiモデル',
+        '商業写真ai',
+        'リアル照明ai',
+        'テキストレンダリングai',
+        '商品整合性ai',
+        'ai画像生成器',
+        'ai動画生成器',
+      ],
+      openGraph: {
+        title: 'Nano Banana Pro AIモデル | 詳細保持の商品写真',
+        description: '100%詳細保持でEコマース商品写真専用のAIモデル。',
+      },
+      twitter: {
+        title: 'Nano Banana Pro AIモデル | 詳細保持の商品写真',
+        description: '100%詳細保持でEコマース商品写真専用のAIモデル。',
+      },
+    },
+  },
+  '/solutions/amazon': {
+    en: {
+      title: 'Amazon Compliant Product Images | White Background Generator for Amazon Listings',
+      description:
+        'Generate Amazon-compliant product images with pure white backgrounds (RGB 255,255,255). Automated 85% frame fill, no text overlays. Perfect for Amazon, eBay, and marketplace listings.',
+      keywords: [
+        'amazon compliant images',
+        'white background generator',
+        'amazon product images',
+        'pure white background',
+        'marketplace safe images',
+        'amazon listing images',
+        'e-commerce compliance',
+        'product photography amazon',
+        'white background ai',
+        'amazon image requirements',
+        'ai image generator',
+        'batch image generation',
+      ],
+      openGraph: {
+        title: 'Amazon Compliant Product Images | White Background Generator',
+        description: 'Generate Amazon-compliant product images with pure white backgrounds. Automated compliance for marketplace listings.',
+      },
+      twitter: {
+        title: 'Amazon Compliant Product Images | White Background Generator',
+        description: 'Generate Amazon-compliant product images with pure white backgrounds. Automated compliance for marketplace listings.',
+      },
+    },
+    zh: {
+      title: 'Amazon合规产品图像 | 纯白背景生成器',
+      description:
+        '生成符合Amazon要求的产品图像，纯白背景（RGB 255,255,255）。自动85%画面填充，无文本叠加。完美适用于Amazon、eBay和市场平台。',
+      keywords: [
+        'amazon合规图像',
+        '白背景生成器',
+        'amazon产品图像',
+        '纯白背景',
+        '市场安全图像',
+        'amazon列表图像',
+        '电商合规',
+        '产品摄影amazon',
+        '白背景ai',
+        'amazon图像要求',
+        'ai图像生成器',
+        '批量图像生成',
+      ],
+      openGraph: {
+        title: 'Amazon合规产品图像 | 白背景生成器',
+        description: '生成符合Amazon要求的产品图像，纯白背景。自动合规市场列表。',
+      },
+      twitter: {
+        title: 'Amazon合规产品图像 | 白背景生成器',
+        description: '生成符合Amazon要求的产品图像，纯白背景。自动合规市场列表。',
+      },
+    },
+    es: {
+      title: 'Imágenes de Productos Compatibles con Amazon | Generador de Fondo Blanco',
+      description:
+        'Genera imágenes de productos compatibles con Amazon con fondos blancos puros (RGB 255,255,255). Relleno automático del 85% del marco, sin superposiciones de texto. Perfecto para listados de Amazon, eBay y marketplaces.',
+      keywords: [
+        'imágenes compatibles amazon',
+        'generador fondo blanco',
+        'imágenes producto amazon',
+        'fondo blanco puro',
+        'imágenes seguras marketplace',
+        'imágenes listado amazon',
+        'cumplimiento e-commerce',
+        'fotografía producto amazon',
+        'fondo blanco ia',
+        'requisitos imagen amazon',
+        'generador imagen ia',
+        'generación imagen por lotes',
+      ],
+      openGraph: {
+        title: 'Imágenes de Productos Compatibles con Amazon | Generador de Fondo Blanco',
+        description: 'Genera imágenes de productos compatibles con Amazon con fondos blancos puros. Cumplimiento automático para listados.',
+      },
+      twitter: {
+        title: 'Imágenes de Productos Compatibles con Amazon | Generador de Fondo Blanco',
+        description: 'Genera imágenes de productos compatibles con Amazon con fondos blancos puros. Cumplimiento automático para listados.',
+      },
+    },
+    fr: {
+      title: 'Images Produit Conformes Amazon | Générateur de Fond Blanc',
+      description:
+        'Générez des images de produits conformes Amazon avec des fonds blancs purs (RGB 255,255,255). Remplissage automatique 85% du cadre, pas de superpositions de texte. Parfait pour les listages Amazon, eBay et marketplaces.',
+      keywords: [
+        'images conformes amazon',
+        'générateur fond blanc',
+        'images produit amazon',
+        'fond blanc pur',
+        'images sûres marketplace',
+        'images listage amazon',
+        'conformité e-commerce',
+        'photographie produit amazon',
+        'fond blanc ia',
+        'exigences image amazon',
+        'générateur image ia',
+        'génération image par lots',
+      ],
+      openGraph: {
+        title: 'Images Produit Conformes Amazon | Générateur de Fond Blanc',
+        description: 'Générez des images de produits conformes Amazon avec des fonds blancs purs. Conformité automatique pour listages.',
+      },
+      twitter: {
+        title: 'Images Produit Conformes Amazon | Générateur de Fond Blanc',
+        description: 'Générez des images de produits conformes Amazon avec des fonds blancs purs. Conformité automatique pour listages.',
+      },
+    },
+    de: {
+      title: 'Amazon-konforme Produktbilder | Weißer Hintergrund Generator',
+      description:
+        'Generieren Sie Amazon-konforme Produktbilder mit reinweißen Hintergründen (RGB 255,255,255). Automatische 85% Rahmenfüllung, keine Textüberlagerungen. Perfekt für Amazon-, eBay- und Marketplace-Listings.',
+      keywords: [
+        'amazon konforme bilder',
+        'weißer hintergrund generator',
+        'amazon produktbilder',
+        'reinweißer hintergrund',
+        'marketplace sichere bilder',
+        'amazon listing bilder',
+        'e-commerce konformität',
+        'produktfotografie amazon',
+        'weißer hintergrund ki',
+        'amazon bildanforderungen',
+        'ki bildgenerator',
+        'batch bildgenerierung',
+      ],
+      openGraph: {
+        title: 'Amazon-konforme Produktbilder | Weißer Hintergrund Generator',
+        description: 'Generieren Sie Amazon-konforme Produktbilder mit reinweißen Hintergründen. Automatische Konformität für Listings.',
+      },
+      twitter: {
+        title: 'Amazon-konforme Produktbilder | Weißer Hintergrund Generator',
+        description: 'Generieren Sie Amazon-konforme Produktbilder mit reinweißen Hintergründen. Automatische Konformität für Listings.',
+      },
+    },
+    ja: {
+      title: 'Amazon準拠商品画像 | 白背景生成器',
+      description:
+        '純白背景（RGB 255,255,255）でAmazon準拠の商品画像を生成。自動85%フレームフィル、テキストオーバーレイなし。Amazon、eBay、マーケットプレイスリストに最適。',
+      keywords: [
+        'amazon準拠画像',
+        '白背景生成器',
+        'amazon商品画像',
+        '純白背景',
+        'マーケットプレイス安全画像',
+        'amazonリスト画像',
+        'eコマース準拠',
+        '商品写真amazon',
+        '白背景ai',
+        'amazon画像要件',
+        'ai画像生成器',
+        'バッチ画像生成',
+      ],
+      openGraph: {
+        title: 'Amazon準拠商品画像 | 白背景生成器',
+        description: '純白背景でAmazon準拠の商品画像を生成。リストの自動準拠。',
+      },
+      twitter: {
+        title: 'Amazon準拠商品画像 | 白背景生成器',
+        description: '純白背景でAmazon準拠の商品画像を生成。リストの自動準拠。',
+      },
+    },
+  },
+  '/solutions/tiktok': {
+    en: {
+      title: 'TikTok Video Generator | 9:16 Vertical Video Maker for TikTok Shop',
+      description:
+        'Create viral 9:16 vertical videos for TikTok Shop. Convert static product images to engaging videos with motion effects. Perfect for TikTok, Instagram Reels, and short-form content.',
+      keywords: [
+        'tiktok video generator',
+        '9:16 video maker',
+        'tiktok shop video',
+        'vertical video generator',
+        'tiktok product video',
+        'viral video maker',
+        'short form video ai',
+        'instagram reels maker',
+        'social media video generator',
+        'product video tiktok',
+        'image to video ai',
+        'ai video generator',
+      ],
+      openGraph: {
+        title: 'TikTok Video Generator | 9:16 Vertical Video Maker',
+        description: 'Create viral 9:16 vertical videos for TikTok Shop. Convert static images to engaging videos with motion effects.',
+      },
+      twitter: {
+        title: 'TikTok Video Generator | 9:16 Vertical Video Maker',
+        description: 'Create viral 9:16 vertical videos for TikTok Shop. Convert static images to engaging videos with motion effects.',
+      },
+    },
+    zh: {
+      title: 'TikTok视频生成器 | 9:16竖屏视频制作器',
+      description:
+        '为TikTok Shop创建病毒式9:16竖屏视频。将静态产品图像转换为带运动效果的吸引人视频。完美适用于TikTok、Instagram Reels和短视频内容。',
+      keywords: [
+        'tiktok视频生成器',
+        '9:16视频制作器',
+        'tiktok shop视频',
+        '竖屏视频生成器',
+        'tiktok产品视频',
+        '病毒视频制作器',
+        '短视频ai',
+        'instagram reels制作器',
+        '社交媒体视频生成器',
+        '产品视频tiktok',
+        '图片转视频ai',
+        'ai视频生成器',
+      ],
+      openGraph: {
+        title: 'TikTok视频生成器 | 9:16竖屏视频制作器',
+        description: '为TikTok Shop创建病毒式9:16竖屏视频。将静态图像转换为带运动效果的吸引人视频。',
+      },
+      twitter: {
+        title: 'TikTok视频生成器 | 9:16竖屏视频制作器',
+        description: '为TikTok Shop创建病毒式9:16竖屏视频。将静态图像转换为带运动效果的吸引人视频。',
+      },
+    },
+    es: {
+      title: 'Generador de Video TikTok | Creador de Video Vertical 9:16',
+      description:
+        'Crea videos verticales 9:16 virales para TikTok Shop. Convierte imágenes de productos estáticas en videos atractivos con efectos de movimiento. Perfecto para TikTok, Instagram Reels y contenido de formato corto.',
+      keywords: [
+        'generador video tiktok',
+        'creador video 9:16',
+        'video tiktok shop',
+        'generador video vertical',
+        'video producto tiktok',
+        'creador video viral',
+        'video formato corto ia',
+        'creador instagram reels',
+        'generador video redes sociales',
+        'video producto tiktok',
+        'imagen a video ia',
+        'generador video ia',
+      ],
+      openGraph: {
+        title: 'Generador de Video TikTok | Creador de Video Vertical 9:16',
+        description: 'Crea videos verticales 9:16 virales para TikTok Shop. Convierte imágenes estáticas en videos atractivos.',
+      },
+      twitter: {
+        title: 'Generador de Video TikTok | Creador de Video Vertical 9:16',
+        description: 'Crea videos verticales 9:16 virales para TikTok Shop. Convierte imágenes estáticas en videos atractivos.',
+      },
+    },
+    fr: {
+      title: 'Générateur de Vidéo TikTok | Créateur de Vidéo Verticale 9:16',
+      description:
+        'Créez des vidéos verticales 9:16 virales pour TikTok Shop. Convertissez des images de produits statiques en vidéos attrayantes avec effets de mouvement. Parfait pour TikTok, Instagram Reels et contenu court.',
+      keywords: [
+        'générateur vidéo tiktok',
+        'créateur vidéo 9:16',
+        'vidéo tiktok shop',
+        'générateur vidéo verticale',
+        'vidéo produit tiktok',
+        'créateur vidéo viral',
+        'vidéo format court ia',
+        'créateur instagram reels',
+        'générateur vidéo réseaux sociaux',
+        'vidéo produit tiktok',
+        'image en vidéo ia',
+        'générateur vidéo ia',
+      ],
+      openGraph: {
+        title: 'Générateur de Vidéo TikTok | Créateur de Vidéo Verticale 9:16',
+        description: 'Créez des vidéos verticales 9:16 virales pour TikTok Shop. Convertissez des images statiques en vidéos attrayantes.',
+      },
+      twitter: {
+        title: 'Générateur de Vidéo TikTok | Créateur de Vidéo Verticale 9:16',
+        description: 'Créez des vidéos verticales 9:16 virales pour TikTok Shop. Convertissez des images statiques en vidéos attrayantes.',
+      },
+    },
+    de: {
+      title: 'TikTok-Videogenerator | 9:16 Vertikales Video-Tool',
+      description:
+        'Erstellen Sie virale 9:16 vertikale Videos für TikTok Shop. Konvertieren Sie statische Produktbilder in ansprechende Videos mit Bewegungseffekten. Perfekt für TikTok, Instagram Reels und Kurzform-Inhalte.',
+      keywords: [
+        'tiktok videogenerator',
+        '9:16 video tool',
+        'tiktok shop video',
+        'vertikaler videogenerator',
+        'tiktok produktvideo',
+        'virales video tool',
+        'kurzform video ki',
+        'instagram reels tool',
+        'social media videogenerator',
+        'produktvideo tiktok',
+        'bild zu video ki',
+        'ki videogenerator',
+      ],
+      openGraph: {
+        title: 'TikTok-Videogenerator | 9:16 Vertikales Video-Tool',
+        description: 'Erstellen Sie virale 9:16 vertikale Videos für TikTok Shop. Konvertieren Sie statische Bilder in ansprechende Videos.',
+      },
+      twitter: {
+        title: 'TikTok-Videogenerator | 9:16 Vertikales Video-Tool',
+        description: 'Erstellen Sie virale 9:16 vertikale Videos für TikTok Shop. Konvertieren Sie statische Bilder in ansprechende Videos.',
+      },
+    },
+    ja: {
+      title: 'TikTok動画生成器 | 9:16縦型動画メーカー',
+      description:
+        'TikTok Shop向けのバイラル9:16縦型動画を作成。静的商品画像をモーション効果付きの魅力的な動画に変換。TikTok、Instagram Reels、ショートフォームコンテンツに最適。',
+      keywords: [
+        'tiktok動画生成器',
+        '9:16動画メーカー',
+        'tiktok shop動画',
+        '縦型動画生成器',
+        'tiktok商品動画',
+        'バイラル動画メーカー',
+        'ショートフォーム動画ai',
+        'instagram reelsメーカー',
+        'ソーシャルメディア動画生成器',
+        '商品動画tiktok',
+        '画像から動画ai',
+        'ai動画生成器',
+      ],
+      openGraph: {
+        title: 'TikTok動画生成器 | 9:16縦型動画メーカー',
+        description: 'TikTok Shop向けのバイラル9:16縦型動画を作成。静的画像を魅力的な動画に変換。',
+      },
+      twitter: {
+        title: 'TikTok動画生成器 | 9:16縦型動画メーカー',
+        description: 'TikTok Shop向けのバイラル9:16縦型動画を作成。静的画像を魅力的な動画に変換。',
+      },
+    },
+  },
+  '/solutions/shopify': {
+    en: {
+      title: 'Shopify Product Video Generator | Bulk Image Generation for Shopify',
+      description:
+        'Generate product images and videos for Shopify stores. Bulk CSV upload for variants, automated optimization, and seamless Shopify integration. Perfect for scaling your e-commerce store.',
+      keywords: [
+        'shopify product video generator',
+        'shopify image generator',
+        'bulk image generation shopify',
+        'shopify variants images',
+        'csv upload shopify',
+        'shopify product images',
+        'e-commerce store images',
+        'shopify integration',
+        'product photography shopify',
+        'shopify batch processing',
+        'ai image generator',
+        'batch image generation',
+      ],
+      openGraph: {
+        title: 'Shopify Product Video Generator | Bulk Image Generation',
+        description: 'Generate product images and videos for Shopify stores. Bulk CSV upload and automated optimization.',
+      },
+      twitter: {
+        title: 'Shopify Product Video Generator | Bulk Image Generation',
+        description: 'Generate product images and videos for Shopify stores. Bulk CSV upload and automated optimization.',
+      },
+    },
+    zh: {
+      title: 'Shopify产品视频生成器 | 批量图像生成',
+      description:
+        '为Shopify商店生成产品图像和视频。批量CSV上传变体、自动优化和无缝Shopify集成。完美适用于扩展您的电商商店。',
+      keywords: [
+        'shopify产品视频生成器',
+        'shopify图像生成器',
+        '批量图像生成shopify',
+        'shopify变体图像',
+        'csv上传shopify',
+        'shopify产品图像',
+        '电商商店图像',
+        'shopify集成',
+        '产品摄影shopify',
+        'shopify批量处理',
+        'ai图像生成器',
+        '批量图像生成',
+      ],
+      openGraph: {
+        title: 'Shopify产品视频生成器 | 批量图像生成',
+        description: '为Shopify商店生成产品图像和视频。批量CSV上传和自动优化。',
+      },
+      twitter: {
+        title: 'Shopify产品视频生成器 | 批量图像生成',
+        description: '为Shopify商店生成产品图像和视频。批量CSV上传和自动优化。',
+      },
+    },
+    es: {
+      title: 'Generador de Video Producto Shopify | Generación Masiva de Imágenes',
+      description:
+        'Genera imágenes y videos de productos para tiendas Shopify. Carga masiva CSV para variantes, optimización automatizada e integración perfecta con Shopify. Perfecto para escalar tu tienda e-commerce.',
+      keywords: [
+        'generador video producto shopify',
+        'generador imagen shopify',
+        'generación masiva imagen shopify',
+        'imágenes variantes shopify',
+        'carga csv shopify',
+        'imágenes producto shopify',
+        'imágenes tienda e-commerce',
+        'integración shopify',
+        'fotografía producto shopify',
+        'procesamiento por lotes shopify',
+        'generador imagen ia',
+        'generación imagen por lotes',
+      ],
+      openGraph: {
+        title: 'Generador de Video Producto Shopify | Generación Masiva de Imágenes',
+        description: 'Genera imágenes y videos de productos para tiendas Shopify. Carga masiva CSV y optimización automatizada.',
+      },
+      twitter: {
+        title: 'Generador de Video Producto Shopify | Generación Masiva de Imágenes',
+        description: 'Genera imágenes y videos de productos para tiendas Shopify. Carga masiva CSV y optimización automatizada.',
+      },
+    },
+    fr: {
+      title: 'Générateur de Vidéo Produit Shopify | Génération d\'Images en Masse',
+      description:
+        'Générez des images et vidéos de produits pour les boutiques Shopify. Téléchargement CSV en masse pour variantes, optimisation automatique et intégration transparente avec Shopify. Parfait pour faire évoluer votre boutique e-commerce.',
+      keywords: [
+        'générateur vidéo produit shopify',
+        'générateur image shopify',
+        'génération masse image shopify',
+        'images variantes shopify',
+        'téléchargement csv shopify',
+        'images produit shopify',
+        'images boutique e-commerce',
+        'intégration shopify',
+        'photographie produit shopify',
+        'traitement par lots shopify',
+        'générateur image ia',
+        'génération image par lots',
+      ],
+      openGraph: {
+        title: 'Générateur de Vidéo Produit Shopify | Génération d\'Images en Masse',
+        description: 'Générez des images et vidéos de produits pour les boutiques Shopify. Téléchargement CSV en masse et optimisation automatique.',
+      },
+      twitter: {
+        title: 'Générateur de Vidéo Produit Shopify | Génération d\'Images en Masse',
+        description: 'Générez des images et vidéos de produits pour les boutiques Shopify. Téléchargement CSV en masse et optimisation automatique.',
+      },
+    },
+    de: {
+      title: 'Shopify-Produktvideogenerator | Massenbildgenerierung',
+      description:
+        'Generieren Sie Produktbilder und -videos für Shopify-Shops. Massen-CSV-Upload für Varianten, automatisierte Optimierung und nahtlose Shopify-Integration. Perfekt zum Skalieren Ihres E-Commerce-Shops.',
+      keywords: [
+        'shopify produktvideogenerator',
+        'shopify bildgenerator',
+        'massenbildgenerierung shopify',
+        'shopify varianten bilder',
+        'csv upload shopify',
+        'shopify produktbilder',
+        'e-commerce shop bilder',
+        'shopify integration',
+        'produktfotografie shopify',
+        'shopify batch verarbeitung',
+        'ki bildgenerator',
+        'batch bildgenerierung',
+      ],
+      openGraph: {
+        title: 'Shopify-Produktvideogenerator | Massenbildgenerierung',
+        description: 'Generieren Sie Produktbilder und -videos für Shopify-Shops. Massen-CSV-Upload und automatisierte Optimierung.',
+      },
+      twitter: {
+        title: 'Shopify-Produktvideogenerator | Massenbildgenerierung',
+        description: 'Generieren Sie Produktbilder und -videos für Shopify-Shops. Massen-CSV-Upload und automatisierte Optimierung.',
+      },
+    },
+    ja: {
+      title: 'Shopify商品動画生成器 | 一括画像生成',
+      description:
+        'Shopifyストア向けの商品画像と動画を生成。バリアントの一括CSVアップロード、自動最適化、シームレスなShopify統合。Eコマースストアのスケーリングに最適。',
+      keywords: [
+        'shopify商品動画生成器',
+        'shopify画像生成器',
+        '一括画像生成shopify',
+        'shopifyバリアント画像',
+        'csvアップロードshopify',
+        'shopify商品画像',
+        'eコマースストア画像',
+        'shopify統合',
+        '商品写真shopify',
+        'shopifyバッチ処理',
+        'ai画像生成器',
+        'バッチ画像生成',
+      ],
+      openGraph: {
+        title: 'Shopify商品動画生成器 | 一括画像生成',
+        description: 'Shopifyストア向けの商品画像と動画を生成。一括CSVアップロードと自動最適化。',
+      },
+      twitter: {
+        title: 'Shopify商品動画生成器 | 一括画像生成',
+        description: 'Shopifyストア向けの商品画像と動画を生成。一括CSVアップロードと自動最適化。',
       },
     },
   },

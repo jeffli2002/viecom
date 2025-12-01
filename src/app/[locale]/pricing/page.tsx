@@ -1,24 +1,21 @@
 import { PricingPlans } from '@/components/pricing/PricingPlans';
 import { creditsConfig } from '@/config/credits.config';
 import { paymentConfig } from '@/config/payment.config';
+import { getSEOMetadata } from '@/lib/seo/metadata-translations';
 import { getPricingFAQSchema } from '@/lib/utils/faq-generator';
 import { calculateGenerationCapacity, formatCapacityRange } from '@/lib/utils/pricing-calculator';
 import { Sparkles } from 'lucide-react';
 import { getTranslations } from 'next-intl/server';
 import type { Metadata } from 'next';
 
-export const metadata: Metadata = {
-  title: 'Pricing | AI Video Generator from $19.9/mo - Free Trial Available',
-  description:
-    'Simple, transparent pricing for AI video and image generation. Free plan with 30 credits sign-up bonus (one-time). Pro plans from $19.9/month. No credit card required for trial.',
-  keywords: [
-    'ai video generator pricing',
-    'free ai video credits',
-    'video generation pricing',
-    'image to video pricing',
-    'ai video subscription',
-  ],
-};
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  return getSEOMetadata(locale, 'pricing', '/pricing');
+}
 
 export default async function PricingPage() {
   const t = await getTranslations('pricingPage');

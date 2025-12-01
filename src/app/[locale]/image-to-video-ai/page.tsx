@@ -15,8 +15,34 @@ export async function generateMetadata({
   const { locale } = await params;
   const baseMetadata = buildLocaleCanonicalMetadata(locale, '/image-to-video-ai');
 
-  if (locale === 'zh') {
-    return {
+  const translations: Record<string, Metadata> = {
+    en: {
+      ...baseMetadata,
+      title: 'Image to Video AI Free | Product Photos to Videos in 60 Seconds',
+      description:
+        'Transform product images into engaging videos with AI. Upload photos, get professional videos instantly. Sora 2 models, 720p/1080p quality. Free trial with 30 credits sign-up bonus.',
+      keywords: [
+        'image to video',
+        'image to video ai',
+        'image to video ai free',
+        'ai image to video generator',
+        'product photos to videos',
+        'e-commerce video ai',
+      ],
+      openGraph: {
+        title: 'Image to Video AI Free | Product Photos to Videos',
+        description:
+          'Transform product images into engaging videos with AI. Free trial with 30 credits sign-up bonus.',
+        type: 'website',
+      },
+      twitter: {
+        card: 'summary_large_image',
+        title: 'Image to Video AI Free | Product Photos to Videos',
+        description:
+          'Transform product images into engaging videos with AI. Free trial with 30 credits sign-up bonus.',
+      },
+    },
+    zh: {
       ...baseMetadata,
       title: '图片转视频AI工具免费 | 产品照片60秒变视频',
       description:
@@ -34,29 +60,111 @@ export async function generateMetadata({
         description: '用AI将产品图片转换为吸引人的视频。注册送30积分免费试用。',
         type: 'website',
       },
-    };
-  }
-
-  return {
-    ...baseMetadata,
-    title: 'Image to Video AI Free | Product Photos to Videos in 60 Seconds',
-    description:
-      'Transform product images into engaging videos with AI. Upload photos, get professional videos instantly. Sora 2 models, 720p/1080p quality. Free trial with 30 credits sign-up bonus.',
-    keywords: [
-      'image to video',
-      'image to video ai',
-      'image to video ai free',
-      'ai image to video generator',
-      'product photos to videos',
-      'e-commerce video ai',
-    ],
-    openGraph: {
-      title: 'Image to Video AI Free | Product Photos to Videos',
+      twitter: {
+        card: 'summary_large_image',
+        title: '图片转视频AI工具免费 | 产品照片转视频',
+        description: '用AI将产品图片转换为吸引人的视频。注册送30积分免费试用。',
+      },
+    },
+    es: {
+      ...baseMetadata,
+      title: 'Imagen a Video IA Gratis | Fotos de Productos a Videos en 60 Segundos',
       description:
-        'Transform product images into engaging videos with AI. Free trial with 30 credits sign-up bonus.',
-      type: 'website',
+        'Transforma imágenes de productos en videos atractivos con IA. Sube fotos, obtén videos profesionales al instante. Modelos Sora 2, calidad 720p/1080p. Prueba gratuita con 30 créditos.',
+      keywords: [
+        'imagen a video',
+        'imagen a video ia',
+        'imagen a video ia gratis',
+        'generador imagen a video ia',
+        'fotos producto a videos',
+        'video ia e-commerce',
+      ],
+      openGraph: {
+        title: 'Imagen a Video IA Gratis | Fotos de Productos a Videos',
+        description: 'Transforma imágenes de productos en videos atractivos con IA. Prueba gratuita con 30 créditos.',
+        type: 'website',
+      },
+      twitter: {
+        card: 'summary_large_image',
+        title: 'Imagen a Video IA Gratis | Fotos de Productos a Videos',
+        description: 'Transforma imágenes de productos en videos atractivos con IA. Prueba gratuita con 30 créditos.',
+      },
+    },
+    fr: {
+      ...baseMetadata,
+      title: 'Image en Vidéo IA Gratuit | Photos Produit en Vidéos en 60 Secondes',
+      description:
+        'Transformez des images de produits en vidéos attrayantes avec l\'IA. Téléchargez des photos, obtenez des vidéos professionnelles instantanément. Modèles Sora 2, qualité 720p/1080p. Essai gratuit avec 30 crédits.',
+      keywords: [
+        'image en vidéo',
+        'image en vidéo ia',
+        'image en vidéo ia gratuit',
+        'générateur image en vidéo ia',
+        'photos produit en vidéos',
+        'vidéo ia e-commerce',
+      ],
+      openGraph: {
+        title: 'Image en Vidéo IA Gratuit | Photos Produit en Vidéos',
+        description: 'Transformez des images de produits en vidéos attrayantes avec l\'IA. Essai gratuit avec 30 crédits.',
+        type: 'website',
+      },
+      twitter: {
+        card: 'summary_large_image',
+        title: 'Image en Vidéo IA Gratuit | Photos Produit en Vidéos',
+        description: 'Transformez des images de produits en vidéos attrayantes avec l\'IA. Essai gratuit avec 30 crédits.',
+      },
+    },
+    de: {
+      ...baseMetadata,
+      title: 'Bild zu Video KI Kostenlos | Produktfotos zu Videos in 60 Sekunden',
+      description:
+        'Verwandeln Sie Produktbilder mit KI in ansprechende Videos. Laden Sie Fotos hoch, erhalten Sie sofort professionelle Videos. Sora 2 Modelle, 720p/1080p Qualität. Kostenlose Testversion mit 30 Credits.',
+      keywords: [
+        'bild zu video',
+        'bild zu video ki',
+        'bild zu video ki kostenlos',
+        'ki bild zu video generator',
+        'produktfotos zu videos',
+        'e-commerce video ki',
+      ],
+      openGraph: {
+        title: 'Bild zu Video KI Kostenlos | Produktfotos zu Videos',
+        description: 'Verwandeln Sie Produktbilder mit KI in ansprechende Videos. Kostenlose Testversion mit 30 Credits.',
+        type: 'website',
+      },
+      twitter: {
+        card: 'summary_large_image',
+        title: 'Bild zu Video KI Kostenlos | Produktfotos zu Videos',
+        description: 'Verwandeln Sie Produktbilder mit KI in ansprechende Videos. Kostenlose Testversion mit 30 Credits.',
+      },
+    },
+    ja: {
+      ...baseMetadata,
+      title: '画像から動画AI 無料 | 商品写真を60秒で動画に変換',
+      description:
+        'AIで商品画像を魅力的な動画に変換。写真をアップロードして、すぐにプロフェッショナルな動画を取得。Sora 2モデル、720p/1080p品質。30クレジットの無料トライアル。',
+      keywords: [
+        '画像から動画',
+        '画像から動画ai',
+        '画像から動画ai無料',
+        'ai画像から動画生成器',
+        '商品写真から動画',
+        'eコマース動画ai',
+      ],
+      openGraph: {
+        title: '画像から動画AI 無料 | 商品写真から動画',
+        description: 'AIで商品画像を魅力的な動画に変換。30クレジットの無料トライアル。',
+        type: 'website',
+      },
+      twitter: {
+        card: 'summary_large_image',
+        title: '画像から動画AI 無料 | 商品写真から動画',
+        description: 'AIで商品画像を魅力的な動画に変換。30クレジットの無料トライアル。',
+      },
     },
   };
+
+  return translations[locale] || translations.en;
 }
 
 const useCases = [

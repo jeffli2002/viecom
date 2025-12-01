@@ -65,3 +65,4 @@ fetch(webhookUrl, {
     console.error('   3. Environment variables are set correctly');
     process.exit(1);
   });
+

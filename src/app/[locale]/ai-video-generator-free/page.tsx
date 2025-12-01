@@ -19,8 +19,31 @@ export async function generateMetadata({
   const signupBonus = freePlan?.credits.onSignup || 30;
   const dailyCheckinCredits = creditsConfig.rewards.checkin.dailyCredits;
 
-  if (locale === 'zh') {
-    return {
+  const translations: Record<string, Metadata> = {
+    en: {
+      ...baseMetadata,
+      title: `Free AI Video Generator | ${signupBonus} Credits, No Credit Card Required`,
+      description: `Create AI videos for free. Get ${signupBonus} credits on signup, earn ${dailyCheckinCredits} credits daily, no credit card required. Sora 2 models, text-to-video, image-to-video. Start now!`,
+      keywords: [
+        'free ai video generator',
+        'ai video generator free online',
+        'free video ai',
+        'no credit card ai video',
+        'free ai video maker',
+        'free sora 2',
+      ],
+      openGraph: {
+        title: `Free AI Video Generator | ${signupBonus} Credits, No Credit Card`,
+        description: `Create AI videos for free. Get ${signupBonus} credits on signup, earn ${dailyCheckinCredits} credits daily, no credit card required.`,
+        type: 'website',
+      },
+      twitter: {
+        card: 'summary_large_image',
+        title: `Free AI Video Generator | ${signupBonus} Credits, No Credit Card`,
+        description: `Create AI videos for free. Get ${signupBonus} credits on signup, earn ${dailyCheckinCredits} credits daily, no credit card required.`,
+      },
+    },
+    zh: {
       ...baseMetadata,
       title: `免费AI视频生成器 | 送${signupBonus}积分，无需信用卡`,
       description: `免费创建AI视频。注册送${signupBonus}积分，每日签到送${dailyCheckinCredits}积分，无需信用卡。Sora 2模型，文字转视频，图片转视频。立即开始！`,
@@ -37,27 +60,107 @@ export async function generateMetadata({
         description: `免费创建AI视频。注册送${signupBonus}积分，每日签到送${dailyCheckinCredits}积分，无需信用卡。`,
         type: 'website',
       },
-    };
-  }
-
-  return {
-    ...baseMetadata,
-    title: `Free AI Video Generator | ${signupBonus} Credits, No Credit Card Required`,
-    description: `Create AI videos for free. Get ${signupBonus} credits on signup, earn ${dailyCheckinCredits} credits daily, no credit card required. Sora 2 models, text-to-video, image-to-video. Start now!`,
-    keywords: [
-      'free ai video generator',
-      'ai video generator free online',
-      'free video ai',
-      'no credit card ai video',
-      'free ai video maker',
-      'free sora 2',
-    ],
-    openGraph: {
-      title: `Free AI Video Generator | ${signupBonus} Credits, No Credit Card`,
-      description: `Create AI videos for free. Get ${signupBonus} credits on signup, earn ${dailyCheckinCredits} credits daily, no credit card required.`,
-      type: 'website',
+      twitter: {
+        card: 'summary_large_image',
+        title: `免费AI视频生成器 | 送${signupBonus}积分，无需信用卡`,
+        description: `免费创建AI视频。注册送${signupBonus}积分，每日签到送${dailyCheckinCredits}积分，无需信用卡。`,
+      },
+    },
+    es: {
+      ...baseMetadata,
+      title: `Generador de Video IA Gratis | ${signupBonus} Créditos, Sin Tarjeta de Crédito`,
+      description: `Crea videos IA gratis. Obtén ${signupBonus} créditos al registrarte, gana ${dailyCheckinCredits} créditos diarios, sin tarjeta de crédito. Modelos Sora 2, texto a video, imagen a video. ¡Comienza ahora!`,
+      keywords: [
+        'generador video ia gratis',
+        'generador video ia gratis online',
+        'video ia gratis',
+        'video ia sin tarjeta',
+        'creador video ia gratis',
+        'sora 2 gratis',
+      ],
+      openGraph: {
+        title: `Generador de Video IA Gratis | ${signupBonus} Créditos, Sin Tarjeta`,
+        description: `Crea videos IA gratis. Obtén ${signupBonus} créditos al registrarte, gana ${dailyCheckinCredits} créditos diarios, sin tarjeta de crédito.`,
+        type: 'website',
+      },
+      twitter: {
+        card: 'summary_large_image',
+        title: `Generador de Video IA Gratis | ${signupBonus} Créditos, Sin Tarjeta`,
+        description: `Crea videos IA gratis. Obtén ${signupBonus} créditos al registrarte, gana ${dailyCheckinCredits} créditos diarios, sin tarjeta de crédito.`,
+      },
+    },
+    fr: {
+      ...baseMetadata,
+      title: `Générateur de Vidéo IA Gratuit | ${signupBonus} Crédits, Sans Carte de Crédit`,
+      description: `Créez des vidéos IA gratuitement. Obtenez ${signupBonus} crédits à l'inscription, gagnez ${dailyCheckinCredits} crédits par jour, sans carte de crédit. Modèles Sora 2, texte en vidéo, image en vidéo. Commencez maintenant !`,
+      keywords: [
+        'générateur vidéo ia gratuit',
+        'générateur vidéo ia gratuit en ligne',
+        'vidéo ia gratuite',
+        'vidéo ia sans carte',
+        'créateur vidéo ia gratuit',
+        'sora 2 gratuit',
+      ],
+      openGraph: {
+        title: `Générateur de Vidéo IA Gratuit | ${signupBonus} Crédits, Sans Carte`,
+        description: `Créez des vidéos IA gratuitement. Obtenez ${signupBonus} crédits à l'inscription, gagnez ${dailyCheckinCredits} crédits par jour, sans carte de crédit.`,
+        type: 'website',
+      },
+      twitter: {
+        card: 'summary_large_image',
+        title: `Générateur de Vidéo IA Gratuit | ${signupBonus} Crédits, Sans Carte`,
+        description: `Créez des vidéos IA gratuitement. Obtenez ${signupBonus} crédits à l'inscription, gagnez ${dailyCheckinCredits} crédits par jour, sans carte de crédit.`,
+      },
+    },
+    de: {
+      ...baseMetadata,
+      title: `Kostenloser KI-Videogenerator | ${signupBonus} Credits, Keine Kreditkarte`,
+      description: `Erstellen Sie kostenlos KI-Videos. Erhalten Sie ${signupBonus} Credits bei der Anmeldung, verdienen Sie täglich ${dailyCheckinCredits} Credits, keine Kreditkarte erforderlich. Sora 2 Modelle, Text zu Video, Bild zu Video. Jetzt starten!`,
+      keywords: [
+        'kostenloser ki videogenerator',
+        'ki videogenerator kostenlos online',
+        'kostenloses video ki',
+        'video ki ohne kreditkarte',
+        'kostenloser ki video ersteller',
+        'kostenloses sora 2',
+      ],
+      openGraph: {
+        title: `Kostenloser KI-Videogenerator | ${signupBonus} Credits, Keine Kreditkarte`,
+        description: `Erstellen Sie kostenlos KI-Videos. Erhalten Sie ${signupBonus} Credits bei der Anmeldung, verdienen Sie täglich ${dailyCheckinCredits} Credits, keine Kreditkarte erforderlich.`,
+        type: 'website',
+      },
+      twitter: {
+        card: 'summary_large_image',
+        title: `Kostenloser KI-Videogenerator | ${signupBonus} Credits, Keine Kreditkarte`,
+        description: `Erstellen Sie kostenlos KI-Videos. Erhalten Sie ${signupBonus} Credits bei der Anmeldung, verdienen Sie täglich ${dailyCheckinCredits} Credits, keine Kreditkarte erforderlich.`,
+      },
+    },
+    ja: {
+      ...baseMetadata,
+      title: `無料AI動画生成器 | ${signupBonus}クレジット、クレジットカード不要`,
+      description: `無料でAI動画を作成。登録時に${signupBonus}クレジット、毎日${dailyCheckinCredits}クレジット獲得、クレジットカード不要。Sora 2モデル、テキストから動画、画像から動画。今すぐ始める！`,
+      keywords: [
+        '無料ai動画生成器',
+        'ai動画生成器無料オンライン',
+        '無料動画ai',
+        'クレジットカード不要動画ai',
+        '無料ai動画メーカー',
+        '無料sora 2',
+      ],
+      openGraph: {
+        title: `無料AI動画生成器 | ${signupBonus}クレジット、クレジットカード不要`,
+        description: `無料でAI動画を作成。登録時に${signupBonus}クレジット、毎日${dailyCheckinCredits}クレジット獲得、クレジットカード不要。`,
+        type: 'website',
+      },
+      twitter: {
+        card: 'summary_large_image',
+        title: `無料AI動画生成器 | ${signupBonus}クレジット、クレジットカード不要`,
+        description: `無料でAI動画を作成。登録時に${signupBonus}クレジット、毎日${dailyCheckinCredits}クレジット獲得、クレジットカード不要。`,
+      },
     },
   };
+
+  return translations[locale] || translations.en;
 }
 
 const freeFeatures = [

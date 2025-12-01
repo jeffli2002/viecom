@@ -19,20 +19,26 @@ const PUBLIC_PATHS: Array<{
   { path: '/batch-video-generation', priority: 0.9, changeFrequency: 'daily' },
   { path: '/brand-analysis', priority: 0.8, changeFrequency: 'weekly' },
 
-  // Feature pages
+  // Learn Pages (Educational/Guide content)
+  { path: '/docs', priority: 0.9, changeFrequency: 'weekly' },
   { path: '/image-to-video-ai', priority: 0.9, changeFrequency: 'weekly' },
   { path: '/ai-video-generator-free', priority: 0.9, changeFrequency: 'weekly' },
   { path: '/video-enhancer-ai', priority: 0.8, changeFrequency: 'weekly' },
+  { path: '/models/nano-banana', priority: 0.9, changeFrequency: 'weekly' },
 
-  // Resources
+  // Solution Pages (Platform-specific optimization)
+  { path: '/solutions/amazon', priority: 0.9, changeFrequency: 'weekly' },
+  { path: '/solutions/tiktok', priority: 0.9, changeFrequency: 'weekly' },
+  { path: '/solutions/shopify', priority: 0.9, changeFrequency: 'weekly' },
+
+  // Resources (public tools; showcase temporarily excluded from sitemap)
   { path: '/assets', priority: 0.8, changeFrequency: 'daily' },
-  { path: '/docs', priority: 0.8, changeFrequency: 'weekly' },
   { path: '/pricing', priority: 0.9, changeFrequency: 'weekly' },
-  { path: '/showcase', priority: 0.8, changeFrequency: 'daily' },
 
   // Company pages
   { path: '/about', priority: 0.7, changeFrequency: 'monthly' },
   { path: '/contact', priority: 0.7, changeFrequency: 'monthly' },
+
 
   // Legal pages
   { path: '/terms', priority: 0.5, changeFrequency: 'yearly' },

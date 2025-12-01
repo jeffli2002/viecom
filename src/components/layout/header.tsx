@@ -24,11 +24,13 @@ import { Link, usePathname } from '@/i18n/navigation';
 import { routing } from '@/i18n/routing';
 import { useAuthStore } from '@/store/auth-store';
 import {
+  BookOpen,
   FileSpreadsheet,
   Image as ImageIcon,
   LogOut,
   Menu,
   Moon,
+  ShoppingBag,
   Sparkles,
   Sun,
   User,
@@ -103,6 +105,12 @@ export function Header() {
       title: t('learn'),
       items: [
         {
+          title: t('documentation'),
+          href: '/docs',
+          description: t('documentationDesc'),
+          icon: BookOpen,
+        },
+        {
           title: t('imageToVideoAI'),
           href: '/image-to-video-ai',
           description: t('imageToVideoAIDesc'),
@@ -119,6 +127,35 @@ export function Header() {
           href: '/video-enhancer-ai',
           description: t('videoEnhancerDesc'),
           icon: Sparkles,
+        },
+        {
+          title: t('nanoBananaPro'),
+          href: '/models/nano-banana',
+          description: t('nanoBananaProDesc'),
+          icon: Sparkles,
+        },
+      ],
+    },
+    {
+      title: t('solutions'),
+      items: [
+        {
+          title: t('amazonSolutions'),
+          href: '/solutions/amazon',
+          description: t('amazonSolutionsDesc'),
+          icon: ShoppingBag,
+        },
+        {
+          title: t('tiktokSolutions'),
+          href: '/solutions/tiktok',
+          description: t('tiktokSolutionsDesc'),
+          icon: Video,
+        },
+        {
+          title: t('shopifySolutions'),
+          href: '/solutions/shopify',
+          description: t('shopifySolutionsDesc'),
+          icon: ShoppingBag,
         },
       ],
     },
@@ -290,24 +327,67 @@ export function Header() {
       {/* Mobile Menu */}
       {isMobileMenuOpen && (
         <div className="border-t md:hidden">
-          <div className="container py-4 space-y-2">
-            {navItems[0]?.items.map((item) => (
-              <Link
-                key={item.title}
-                href={item.href}
-                className="flex items-center space-x-2 px-3 py-2 rounded-md hover:bg-accent"
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                <item.icon className="h-4 w-4" />
-                <span>{item.title}</span>
-              </Link>
-            ))}
+          <div className="container py-4 space-y-4">
+            {/* Generation Tools */}
+            <div>
+              <h3 className="px-3 py-2 text-xs font-semibold text-slate-500 uppercase">{t('generationTools')}</h3>
+              {navItems[0]?.items.map((item) => (
+                <Link
+                  key={item.title}
+                  href={item.href}
+                  className="flex items-center space-x-2 px-3 py-2 rounded-md hover:bg-accent"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  <item.icon className="h-4 w-4" />
+                  <span>{item.title}</span>
+                </Link>
+              ))}
+            </div>
+            {/* Learn */}
+            <div>
+              <h3 className="px-3 py-2 text-xs font-semibold text-slate-500 uppercase">{t('learn')}</h3>
+              {navItems[1]?.items.map((item) => (
+                <Link
+                  key={item.title}
+                  href={item.href}
+                  className="flex items-center space-x-2 px-3 py-2 rounded-md hover:bg-accent"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  <item.icon className="h-4 w-4" />
+                  <span>{item.title}</span>
+                </Link>
+              ))}
+            </div>
+            {/* Solutions */}
+            {navItems[2] && (
+              <div>
+                <h3 className="px-3 py-2 text-xs font-semibold text-slate-500 uppercase">{t('solutions')}</h3>
+                {navItems[2]?.items.map((item) => (
+                  <Link
+                    key={item.title}
+                    href={item.href}
+                    className="flex items-center space-x-2 px-3 py-2 rounded-md hover:bg-accent"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    <item.icon className="h-4 w-4" />
+                    <span>{item.title}</span>
+                  </Link>
+                ))}
+              </div>
+            )}
             <Link
               href="/assets"
               className="block px-3 py-2 rounded-md hover:bg-accent"
               onClick={() => setIsMobileMenuOpen(false)}
             >
               {t('assets')}
+            </Link>
+            <Link
+              href="/pricing"
+              className="block px-3 py-2 rounded-md hover:bg-accent"
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              {t('pricing')}
             </Link>
           </div>
         </div>

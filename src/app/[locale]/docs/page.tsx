@@ -1,11 +1,13 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { creditsConfig } from '@/config/credits.config';
 import { paymentConfig } from '@/config/payment.config';
-import { DEFAULT_SEO_KEYWORDS } from '@/lib/seo/metadata';
+import { getSEOMetadata } from '@/lib/seo/metadata-translations';
 import {
   ArrowRight,
+  BarChart3,
   BookOpen,
   CheckCircle2,
+  Coins,
   FileSpreadsheet,
   Image as ImageIcon,
   Sparkles,
@@ -17,25 +19,14 @@ import {
 import type { Metadata } from 'next';
 import Link from 'next/link';
 
-export const metadata: Metadata = {
-  title: 'Documentation - How to Use Viecom AI Image & Video Generator',
-  description:
-    'Complete guide on how to generate AI images and videos for e-commerce. Learn how to use text-to-image, image-to-image, text-to-video, batch generation, and brand analysis features.',
-  keywords: [
-    ...DEFAULT_SEO_KEYWORDS,
-    'how to generate AI images',
-    'how to create AI videos',
-    'AI image generator guide',
-    'e-commerce product images',
-    'batch image generation tutorial',
-    'Sora 2 Pro guide',
-  ],
-  openGraph: {
-    title: 'How to Use Viecom AI Generator - Complete Documentation',
-    description: 'Step-by-step guides for AI image and video generation',
-    type: 'website',
-  },
-};
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  return getSEOMetadata(locale, 'learn', '/docs');
+}
 
 export default function DocsPage() {
   const freePlan = paymentConfig.plans.find((p) => p.id === 'free');
@@ -58,6 +49,20 @@ export default function DocsPage() {
           Complete step-by-step guides for creating stunning e-commerce visuals with AI. Learn how
           to generate product images, create marketing videos, and scale your content production.
         </p>
+        <div className="mt-6 flex flex-wrap justify-center gap-4 text-sm">
+          <Link href="/image-to-video-ai" className="text-teal-500 hover:underline">
+            Image to Video AI Guide →
+          </Link>
+          <Link href="/ai-video-generator-free" className="text-teal-500 hover:underline">
+            Free AI Video Generator →
+          </Link>
+          <Link href="/video-enhancer-ai" className="text-teal-500 hover:underline">
+            Video Enhancer AI →
+          </Link>
+          <Link href="/models/nano-banana" className="text-teal-500 hover:underline">
+            Nano Banana Pro Model →
+          </Link>
+        </div>
       </div>
 
       {/* Quick Start Guide */}
@@ -774,6 +779,128 @@ export default function DocsPage() {
                 <br />💡 <strong>Pro Tip:</strong> Use Sora 2 for testing and previews, then upgrade
                 to Sora 2 Pro 1080P for final marketing materials.
               </p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Comparison Section */}
+      <Card className="mt-8 border-teal-200 dark:border-teal-800">
+        <CardHeader className="bg-gradient-to-r from-orange-50 to-red-50 dark:from-orange-900/20 dark:to-red-900/20">
+          <CardTitle className="flex items-center gap-2 text-xl text-gray-900 dark:text-white">
+            <Sparkles className="h-6 w-6 text-teal-500" />
+            How Viecom Compares to Alternatives
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="pt-6">
+          <div className="space-y-6">
+            <div>
+              <h3 className="font-semibold text-gray-900 dark:text-white mb-4">
+                Why Choose Viecom Over Other AI Tools?
+              </h3>
+              <div className="overflow-x-auto mb-8 shadow-lg rounded-xl border border-slate-200 dark:border-slate-800">
+                <table className="w-full text-left border-collapse bg-white dark:bg-slate-800">
+                  <thead>
+                    <tr className="border-b border-slate-200 dark:border-slate-700">
+                      <th className="py-4 px-4 text-slate-500 font-medium uppercase tracking-wider text-sm">Feature</th>
+                      <th className="py-4 px-4 bg-teal-500/5 text-teal-500 font-bold text-base border-x border-teal-500/10">Viecom</th>
+                      <th className="py-4 px-4 text-slate-900 dark:text-white font-bold opacity-60">Alternative Tools</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
+                    {[
+                      { feature: 'Core Technology', viecom: 'Nano Banana Pro (Proprietary)', alt: 'Generic Models' },
+                      { feature: 'Video Generation', viecom: '✅ Native (Sora 2)', alt: '❌ No' },
+                      { feature: 'Batch Processing', viecom: '✅ Excel/CSV Upload', alt: '⚠️ Limited' },
+                      { feature: 'Product Integrity', viecom: '✅ Geometry Lock', alt: '❌ Hallucination Risk' },
+                      { feature: 'Commercial License', viecom: '✅ Included', alt: '✅ Included' },
+                      { feature: 'Platform Compliance', viecom: '✅ Amazon/TikTok/Shopify', alt: '⚠️ Manual' },
+                    ].map((row, i) => (
+                      <tr key={i} className="hover:bg-slate-50 dark:hover:bg-slate-800/50">
+                        <td className="py-3 px-4 font-medium text-sm text-slate-900 dark:text-white">{row.feature}</td>
+                        <td className="py-3 px-4 bg-teal-500/5 font-bold text-sm text-teal-500 border-x border-teal-500/10">{row.viecom}</td>
+                        <td className="py-3 px-4 text-sm text-slate-500">{row.alt}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <div className="grid md:grid-cols-2 gap-6">
+              <div className="bg-slate-900 text-white p-6 rounded-xl border border-slate-800">
+                <h4 className="text-lg font-bold mb-4 flex items-center gap-2">
+                  <BarChart3 className="text-teal-500" /> The Video Advantage
+                </h4>
+                <p className="text-slate-400 mb-4 text-sm">
+                  Most alternatives only give you static JPEGs. In 2024, video ads convert <strong>86% higher</strong> than images.
+                </p>
+                <div className="space-y-3">
+                  <div className="flex justify-between items-center p-3 bg-slate-800 rounded-lg">
+                    <span className="text-sm">Static Image CTR</span>
+                    <span className="font-mono text-xs text-slate-400">0.8%</span>
+                  </div>
+                  <div className="flex justify-between items-center p-3 bg-teal-500/20 border border-teal-500/50 rounded-lg">
+                    <span className="text-sm font-bold text-teal-500">Viecom Video CTR</span>
+                    <span className="font-mono text-xs font-bold text-teal-500">3.2%</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-white dark:bg-slate-800 p-6 rounded-xl border border-slate-200 dark:border-slate-700">
+                <h4 className="text-lg font-bold mb-4 flex items-center gap-2">
+                  <Coins className="text-orange-500" /> Cost Analysis
+                </h4>
+                <p className="text-slate-600 dark:text-slate-400 mb-4 text-sm">Cost to produce 10 Product Videos:</p>
+                <div className="space-y-3">
+                  <div className="flex items-center gap-3">
+                    <div className="w-20 text-xs font-bold">Traditional</div>
+                    <div className="flex-1 h-6 bg-slate-100 rounded-full overflow-hidden relative">
+                      <div className="absolute top-0 left-0 h-full bg-slate-400 w-[100%]" />
+                      <span className="absolute right-2 top-1/2 -translate-y-1/2 text-[10px] font-bold text-white">$2,500+</span>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <div className="w-20 text-xs font-bold">Alternatives</div>
+                    <div className="flex-1 h-6 bg-slate-100 rounded-full overflow-hidden relative">
+                      <div className="absolute top-0 left-0 h-full bg-slate-300 w-[0%]" />
+                      <span className="absolute left-2 top-1/2 -translate-y-1/2 text-[10px] text-slate-500">Not Supported</span>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <div className="w-20 text-xs font-bold text-teal-500">Viecom</div>
+                    <div className="flex-1 h-6 bg-slate-100 rounded-full overflow-hidden relative">
+                      <div className="absolute top-0 left-0 h-full bg-teal-500 w-[10%]" />
+                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[10px] font-bold text-white">Competitive</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-teal-50 dark:bg-teal-900/20 rounded-lg p-4 border border-teal-200 dark:border-teal-800">
+              <h4 className="font-semibold text-teal-900 dark:text-teal-200 mb-2 text-sm">Key Differentiators:</h4>
+              <ul className="space-y-1 text-xs text-teal-800 dark:text-teal-200">
+                <li>✓ Native video generation (Sora 2) - most alternatives don't offer this</li>
+                <li>✓ Advanced batch processing with CSV upload for enterprise scale</li>
+                <li>✓ Nano Banana Pro model ensures 100% product detail preservation</li>
+                <li>✓ Platform-specific compliance (Amazon, TikTok, Shopify) built-in</li>
+                <li>✓ Commercial license included in all plans</li>
+              </ul>
+              <div className="mt-4 pt-4 border-t border-teal-200 dark:border-teal-800">
+                <p className="text-xs text-teal-700 dark:text-teal-300 mb-2">Platform-Specific Solutions:</p>
+                <div className="flex flex-wrap gap-2">
+                  <Link href="/solutions/amazon" className="text-xs text-teal-600 dark:text-teal-400 hover:underline">
+                    Amazon Solutions →
+                  </Link>
+                  <Link href="/solutions/tiktok" className="text-xs text-teal-600 dark:text-teal-400 hover:underline">
+                    TikTok Solutions →
+                  </Link>
+                  <Link href="/solutions/shopify" className="text-xs text-teal-600 dark:text-teal-400 hover:underline">
+                    Shopify Solutions →
+                  </Link>
+                </div>
+              </div>
             </div>
           </div>
         </CardContent>

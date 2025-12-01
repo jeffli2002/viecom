@@ -10,7 +10,7 @@ export function Footer() {
   return (
     <footer className="bg-main pt-20 pb-10 border-t border-slate-200 dark:border-white/5 transition-colors duration-300">
       <div className="container-base">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-12 mb-16">
           {/* Brand */}
           <div className="space-y-6">
             <div className="flex items-center">
@@ -89,6 +89,11 @@ export function Footer() {
             <h4 className="font-bold text-slate-900 dark:text-white mb-6">{t('footerLearn')}</h4>
             <ul className="space-y-4 text-sm text-slate-600 dark:text-slate-400">
               <li>
+                <Link href="/docs" className="hover:text-teal-500 transition-colors">
+                  {t('footerDocs')}
+                </Link>
+              </li>
+              <li>
                 <Link href="/image-to-video-ai" className="hover:text-teal-500 transition-colors">
                   {t('imageToVideoAI')}
                 </Link>
@@ -107,13 +112,30 @@ export function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="/docs" className="hover:text-teal-500 transition-colors">
-                  {t('footerDocs')}
+                <Link href="/models/nano-banana" className="hover:text-teal-500 transition-colors">
+                  {t('nanoBananaPro')}
+                </Link>
+              </li>
+            </ul>
+          </div>
+
+          {/* Solutions */}
+          <div>
+            <h4 className="font-bold text-slate-900 dark:text-white mb-6">{t('solutions')}</h4>
+            <ul className="space-y-4 text-sm text-slate-600 dark:text-slate-400">
+              <li>
+                <Link href="/solutions/amazon" className="hover:text-teal-500 transition-colors">
+                  {t('amazonSolutions')}
                 </Link>
               </li>
               <li>
-                <Link href="/pricing" className="hover:text-teal-500 transition-colors">
-                  {t('footerPricing')}
+                <Link href="/solutions/tiktok" className="hover:text-teal-500 transition-colors">
+                  {t('tiktokSolutions')}
+                </Link>
+              </li>
+              <li>
+                <Link href="/solutions/shopify" className="hover:text-teal-500 transition-colors">
+                  {t('shopifySolutions')}
                 </Link>
               </li>
             </ul>
