@@ -144,9 +144,6 @@ function VideoGalleryItem({
         onError={handleError}
       />
       <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover/card:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-4">
-        <span className="text-white font-bold text-base transform translate-y-4 group-hover/card:translate-y-0 transition-transform duration-300">
-          {item.title}
-        </span>
         <span className="text-xs text-white/80 transform translate-y-4 group-hover/card:translate-y-0 transition-transform duration-300 delay-75">
           {item.category}
         </span>
@@ -385,9 +382,6 @@ export function ShowcaseGallery() {
                         className="w-full h-full object-cover transition-transform duration-700 group-hover/card:scale-110"
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover/card:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-4">
-                        <span className="text-white font-bold text-base transform translate-y-4 group-hover/card:translate-y-0 transition-transform duration-300">
-                          {item.title}
-                        </span>
                         <span className="text-xs text-white/80 transform translate-y-4 group-hover/card:translate-y-0 transition-transform duration-300 delay-75">
                           {item.category}
                         </span>
