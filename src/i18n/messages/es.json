@@ -612,7 +612,7 @@
     "subtitle": "Todo lo que necesitas saber sobre Viecom AI",
     "q1": {
       "question": "¿Cómo funciona el sistema de créditos?",
-      "answer": "Los créditos se usan para generaciones con IA. La generación de imágenes cuesta 5-30 créditos dependiendo del modelo (ej., Nano Banana 5 créditos, Nano Banana Pro 30 créditos, modelos Flux 5-10 créditos). Los videos cuestan 15-130 créditos dependiendo del modelo y resolución. Los usuarios gratuitos obtienen 30 créditos al registrarse. Los planes Pro incluyen 500-900 créditos mensuales. También puedes comprar paquetes de créditos desde $9.90 por 300 créditos."
+      "answer": "Los créditos se usan para generaciones con IA. La generación de imágenes cuesta 5-30 créditos dependiendo del modelo (ej., Nano Banana 5 créditos, Nano Banana Pro 30 créditos). Los videos cuestan 15-130 créditos dependiendo del modelo y resolución. Los usuarios gratuitos obtienen 30 créditos al registrarse. Los planes Pro incluyen 500-900 créditos mensuales. También puedes comprar paquetes de créditos desde $9.90 por 200 créditos."
     },
     "q2": {
       "question": "¿Qué incluye el plan gratuito?",
@@ -640,11 +640,11 @@
     },
     "q8": {
       "question": "¿Qué modelos de generación de imágenes están disponibles?",
-      "answer": "Ofrecemos múltiples modelos de IA: Nano Banana (5 créditos) para calidad estándar, Nano Banana Pro (30 créditos) para calidad premium con detalles mejorados y realismo, y varios modelos Flux (5-10 créditos) incluyendo Flux 1.1, Flux Kontext Pro/Max y Stable Diffusion. Nano Banana Pro entrega resultados superiores para contenido profesional de e-commerce con mejor consistencia de marca y salida de mayor resolución."
+      "answer": "Ofrecemos múltiples modelos de IA: Nano Banana (5 créditos) para calidad estándar, y Nano Banana Pro (30 créditos) para calidad premium con detalles mejorados y realismo. Nano Banana Pro entrega resultados superiores para contenido profesional de e-commerce con mejor consistencia de marca y salida de mayor resolución."
     },
     "q9": {
       "question": "¿Qué sucede cuando me quedo sin créditos?",
-      "answer": "Tienes varias opciones: (1) Compra paquetes de créditos únicos desde $9.90 por 300 créditos (los paquetes nunca expiran), (2) Actualiza a Pro/Pro+ para asignaciones mensuales de créditos (500-900 créditos/mes), o (3) Gana créditos diariamente a través de registros (2 créditos/día), referidos (10 créditos por referido) y compartiendo en redes sociales (2 créditos por compartición). Los paquetes de créditos son perfectos si necesitas créditos adicionales sin comprometerte con una suscripción."
+      "answer": "Tienes varias opciones: (1) Compra paquetes de créditos únicos desde $9.90 por 200 créditos (los paquetes nunca expiran), (2) Actualiza a Pro/Pro+ para asignaciones mensuales de créditos (500-900 créditos/mes), o (3) Gana créditos diariamente a través de registros (2 créditos/día), referidos (10 créditos por referido) y compartiendo en redes sociales (2 créditos por compartición). Los paquetes de créditos son perfectos si necesitas créditos adicionales sin comprometerte con una suscripción."
     }
   },
   "pricingPage": {

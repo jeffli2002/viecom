@@ -612,7 +612,7 @@
     "subtitle": "Tout ce que vous devez savoir sur Viecom AI",
     "q1": {
       "question": "Comment fonctionne le système de crédits ?",
-      "answer": "Les crédits sont utilisés pour les générations IA. La génération d'images coûte 5 à 30 crédits selon le modèle (par ex., Nano Banana 5 crédits, Nano Banana Pro 30 crédits, modèles Flux 5 à 10 crédits). Les vidéos coûtent 15 à 130 crédits selon le modèle et la résolution. Les utilisateurs gratuits reçoivent 30 crédits à l'inscription. Les plans Pro incluent 500 à 900 crédits mensuels. Vous pouvez également acheter des packs de crédits à partir de 9,90 $ pour 300 crédits."
+      "answer": "Les crédits sont utilisés pour les générations IA. La génération d'images coûte 5 à 30 crédits selon le modèle (par ex., Nano Banana 5 crédits, Nano Banana Pro 30 crédits). Les vidéos coûtent 15 à 130 crédits selon le modèle et la résolution. Les utilisateurs gratuits reçoivent 30 crédits à l'inscription. Les plans Pro incluent 500 à 900 crédits mensuels. Vous pouvez également acheter des packs de crédits à partir de 9,90 $ pour 200 crédits."
     },
     "q2": {
       "question": "Qu'est-ce qui est inclus dans le plan gratuit ?",
@@ -640,11 +640,11 @@
     },
     "q8": {
       "question": "Quels modèles de génération d'images sont disponibles ?",
-      "answer": "Nous proposons plusieurs modèles IA : Nano Banana (5 crédits) pour une qualité standard, Nano Banana Pro (30 crédits) pour une qualité premium avec des détails améliorés et du réalisme, et divers modèles Flux (5-10 crédits) incluant Flux 1.1, Flux Kontext Pro/Max et Stable Diffusion. Nano Banana Pro offre des résultats supérieurs pour le contenu e-commerce professionnel avec une meilleure cohérence de marque et une sortie haute résolution."
+      "answer": "Nous proposons plusieurs modèles IA : Nano Banana (5 crédits) pour une qualité standard, et Nano Banana Pro (30 crédits) pour une qualité premium avec des détails améliorés et du réalisme. Nano Banana Pro offre des résultats supérieurs pour le contenu e-commerce professionnel avec une meilleure cohérence de marque et une sortie haute résolution."
     },
     "q9": {
       "question": "Que se passe-t-il quand je manque de crédits ?",
-      "answer": "Vous avez plusieurs options : (1) Achetez des packs de crédits ponctuels à partir de 9,90 $ pour 300 crédits (les packs n'expirent jamais), (2) Passez à Pro/Pro+ pour des allocations de crédits mensuelles (500-900 crédits/mois), ou (3) Gagnez des crédits quotidiennement grâce aux pointages (2 crédits/jour), aux parrainages (10 crédits par parrainage) et au partage social (2 crédits par partage). Les packs de crédits sont parfaits si vous avez besoin de crédits supplémentaires sans vous engager dans un abonnement."
+      "answer": "Vous avez plusieurs options : (1) Achetez des packs de crédits ponctuels à partir de 9,90 $ pour 200 crédits (les packs n'expirent jamais), (2) Passez à Pro/Pro+ pour des allocations de crédits mensuelles (500-900 crédits/mois), ou (3) Gagnez des crédits quotidiennement grâce aux pointages (2 crédits/jour), aux parrainages (10 crédits par parrainage) et au partage social (2 crédits par partage). Les packs de crédits sont parfaits si vous avez besoin de crédits supplémentaires sans vous engager dans un abonnement."
     }
   },
   "pricingPage": {

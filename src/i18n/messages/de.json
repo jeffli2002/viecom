@@ -612,7 +612,7 @@
     "subtitle": "Alles, was Sie über Viecom AI wissen müssen",
     "q1": {
       "question": "Wie funktioniert das Credit-System?",
-      "answer": "Credits werden für KI-Generierungen verwendet. Die Bildgenerierung kostet je nach Modell 5-30 Credits (z.B. Nano Banana 5 Credits, Nano Banana Pro 30 Credits, Flux-Modelle 5-10 Credits). Videos kosten je nach Modell und Auflösung 15-130 Credits. Kostenlose Nutzer erhalten 30 Anmelde-Credits. Pro-Pläne beinhalten 500-900 monatliche Credits. Sie können auch Credit-Pakete ab 9,90 $ für 300 Credits erwerben."
+      "answer": "Credits werden für KI-Generierungen verwendet. Die Bildgenerierung kostet je nach Modell 5-30 Credits (z.B. Nano Banana 5 Credits, Nano Banana Pro 30 Credits). Videos kosten je nach Modell und Auflösung 15-130 Credits. Kostenlose Nutzer erhalten 30 Anmelde-Credits. Pro-Pläne beinhalten 500-900 monatliche Credits. Sie können auch Credit-Pakete ab 9,90 $ für 200 Credits erwerben."
     },
     "q2": {
       "question": "Was ist im kostenlosen Plan enthalten?",
@@ -640,11 +640,11 @@
     },
     "q8": {
       "question": "Welche Bildgenerierungsmodelle sind verfügbar?",
-      "answer": "Wir bieten mehrere KI-Modelle an: Nano Banana (5 Credits) für Standardqualität, Nano Banana Pro (30 Credits) für Premium-Qualität mit verbesserter Detailgenauigkeit und Realismus sowie verschiedene Flux-Modelle (5-10 Credits) einschließlich Flux 1.1, Flux Kontext Pro/Max und Stable Diffusion. Nano Banana Pro liefert überlegene Ergebnisse für professionelle E-Commerce-Inhalte mit besserer Markenkonsistenz und höherer Auflösung."
+      "answer": "Wir bieten mehrere KI-Modelle an: Nano Banana (5 Credits) für Standardqualität, und Nano Banana Pro (30 Credits) für Premium-Qualität mit verbesserter Detailgenauigkeit und Realismus. Nano Banana Pro liefert überlegene Ergebnisse für professionelle E-Commerce-Inhalte mit besserer Markenkonsistenz und höherer Auflösung."
     },
     "q9": {
       "question": "Was passiert, wenn mir die Credits ausgehen?",
-      "answer": "Sie haben mehrere Optionen: (1) Erwerben Sie einmalige Credit-Pakete ab 9,90 $ für 300 Credits (Pakete verfallen nie), (2) Upgraden Sie auf Pro/Pro+ für monatliche Credit-Zuteilungen (500-900 Credits/Monat), oder (3) Verdienen Sie täglich Credits durch Check-ins (2 Credits/Tag), Empfehlungen (10 Credits pro Empfehlung) und Social Sharing (2 Credits pro Share). Credit-Pakete sind perfekt, wenn Sie zusätzliche Credits benötigen, ohne sich für ein Abonnement zu verpflichten."
+      "answer": "Sie haben mehrere Optionen: (1) Erwerben Sie einmalige Credit-Pakete ab 9,90 $ für 200 Credits (Pakete verfallen nie), (2) Upgraden Sie auf Pro/Pro+ für monatliche Credit-Zuteilungen (500-900 Credits/Monat), oder (3) Verdienen Sie täglich Credits durch Check-ins (2 Credits/Tag), Empfehlungen (10 Credits pro Empfehlung) und Social Sharing (2 Credits pro Share). Credit-Pakete sind perfekt, wenn Sie zusätzliche Credits benötigen, ohne sich für ein Abonnement zu verpflichten."
     }
   },
   "pricingPage": {

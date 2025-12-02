@@ -115,8 +115,7 @@ export default function TermsPage() {
             <ul className="list-disc list-inside space-y-1 ml-4">
               <li>
                 Image generation: 5-30 credits per image depending on the model (e.g., Nano Banana{' '}
-                {nanoBananaCost} credits, Nano Banana Pro {nanoBananaProCost} credits, Flux models
-                5-10 credits)
+                {nanoBananaCost} credits, Nano Banana Pro {nanoBananaProCost} credits)
               </li>
               <li>
                 Video generation: {videoCostMin}-{videoCostMax} credits per video (depending on

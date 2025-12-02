@@ -586,8 +586,7 @@ export default function DocsPage() {
                   </h4>
                   <p className="text-xs text-blue-800 dark:text-blue-200">
                     {nanoBananaCost}-{nanoBananaProCost} credits per image (Nano Banana{' '}
-                    {nanoBananaCost} credits, Nano Banana Pro {nanoBananaProCost} credits, Flux
-                    models 5-10 credits)
+                    {nanoBananaCost} credits, Nano Banana Pro {nanoBananaProCost} credits)
                   </p>
                 </div>
                 <div className="bg-teal-50 dark:bg-teal-900/20 rounded-lg p-3 border border-teal-200 dark:border-teal-800">
