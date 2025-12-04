@@ -279,6 +279,9 @@ export function Header() {
                     <Link href="/dashboard">{t('dashboard')}</Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
+                    <Link href="/referrals">{t('referrals')}</Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
                     <Link href="/settings">{t('settings')}</Link>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />

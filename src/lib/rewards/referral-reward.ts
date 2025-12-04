@@ -2,7 +2,58 @@ import { creditsConfig } from '@/config/credits.config';
 import { creditService } from '@/lib/credits';
 import { db } from '@/server/db';
 import { creditTransactions, userReferrals } from '@/server/db/schema';
-import { and, eq, or } from 'drizzle-orm';
+import { and, eq } from 'drizzle-orm';
+import type { InferInsertModel, InferSelectModel } from 'drizzle-orm';
+
+type ReferralRecord = InferSelectModel<typeof userReferrals>;
+type ReferralUpdate = Partial<InferInsertModel<typeof userReferrals>>;
+
+interface FinalizeReferralOptions {
+  reason: 'first_generation' | 'subscription' | 'credit_pack' | 'paid';
+  description: string;
+  metadata?: Record<string, unknown>;
+  updateFields?: ReferralUpdate;
+}
+
+async function finalizeReferralReward(
+  referralRecord: ReferralRecord,
+  options: FinalizeReferralOptions
+): Promise<void> {
+  const creditsToAward = creditsConfig.rewards.referral.creditsPerReferral;
+  const referenceId = `${options.reason}_${referralRecord.id}_${Date.now()}`;
+
+  await db.transaction(async (tx) => {
+    await creditService.earnCredits({
+      userId: referralRecord.referrerId,
+      amount: creditsToAward,
+      source: 'referral',
+      description: options.description,
+      referenceId,
+      metadata: {
+        referralId: referralRecord.id,
+        referredUserId: referralRecord.referredId,
+        referralCode: referralRecord.referralCode,
+        trigger: options.reason,
+        ...(options.metadata || {}),
+      },
+    });
+
+    const referralUpdate: ReferralUpdate = {
+      ...options.updateFields,
+      creditsAwarded: true,
+      creditsAwardedAt: new Date(),
+      referredUserFirstGenerationCompleted:
+        options.updateFields?.referredUserFirstGenerationCompleted ??
+        referralRecord.referredUserFirstGenerationCompleted,
+    };
+
+    await tx.update(userReferrals).set(referralUpdate).where(eq(userReferrals.id, referralRecord.id));
+  });
+
+  console.log(
+    `✅ Awarded ${creditsToAward} referral credits to user ${referralRecord.referrerId} for referral ${referralRecord.id} (${options.reason})`
+  );
+}
 
 /**
  * Check if this is the user's first successful generation and award referral credits
@@ -48,43 +99,59 @@ export async function checkAndAwardReferralReward(userId: string): Promise<void>
     // Note: The current transaction might not be committed yet, so we check if there are 0 or 1 transactions
     // If there's already more than 1, it means this is not the first generation
     if (previousGenerations.length <= 1) {
-      // This appears to be the first generation, award credits
-      const creditsToAward = creditsConfig.rewards.referral.creditsPerReferral;
-      const referenceId = `referral_${referralRecord.id}_${Date.now()}`;
-
-      // Award credits to referrer and mark referral as completed in a transaction
-      await db.transaction(async (tx) => {
-        // Award credits to referrer
-        await creditService.earnCredits({
-          userId: referralRecord.referrerId,
-          amount: creditsToAward,
-          source: 'referral',
-          description: 'Referral reward - User completed first generation',
-          referenceId,
-          metadata: {
-            referralId: referralRecord.id,
-            referredUserId: referralRecord.referredId,
-            referralCode: referralRecord.referralCode,
-          },
-        });
-
-        // Mark referral as completed and credits as awarded
-        await tx
-          .update(userReferrals)
-          .set({
-            referredUserFirstGenerationCompleted: true,
-            creditsAwarded: true,
-            creditsAwardedAt: new Date(),
-          })
-          .where(eq(userReferrals.id, referralRecord.id));
+      await finalizeReferralReward(referralRecord, {
+        reason: 'first_generation',
+        description: 'Referral reward - User completed first generation',
+        metadata: { stage: 'first_generation' },
+        updateFields: { referredUserFirstGenerationCompleted: true },
       });
-
-      console.log(
-        `✅ Awarded ${creditsToAward} referral credits to user ${referralRecord.referrerId} for referral ${referralRecord.id}`
-      );
     }
   } catch (error) {
     // Don't throw - referral reward failure shouldn't break generation
     console.error('Error awarding referral reward:', error);
+  }
+}
+
+/**
+ * Award referral credits when the invited user becomes a paying customer
+ * (subscription activation or credit pack purchase)
+ */
+export async function awardReferralForPaidUser(
+  userId: string,
+  options?: {
+    reason?: 'subscription' | 'credit_pack';
+    metadata?: Record<string, unknown>;
+  }
+): Promise<void> {
+  try {
+    const referral = await db
+      .select()
+      .from(userReferrals)
+      .where(eq(userReferrals.referredId, userId))
+      .limit(1);
+
+    if (referral.length === 0) {
+      return;
+    }
+
+    const referralRecord = referral[0];
+
+    if (referralRecord.creditsAwarded) {
+      return;
+    }
+
+    await finalizeReferralReward(referralRecord, {
+      reason: options?.reason ?? 'paid',
+      description:
+        options?.reason === 'credit_pack'
+          ? 'Referral reward - Invited user purchased a credit pack'
+          : 'Referral reward - Invited user became a paid subscriber',
+      metadata: {
+        rewardReason: options?.reason ?? 'paid',
+        ...(options?.metadata || {}),
+      },
+    });
+  } catch (error) {
+    console.error('Error awarding referral reward for paid user:', error);
   }
 }

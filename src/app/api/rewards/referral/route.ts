@@ -3,7 +3,7 @@ import { creditsConfig } from '@/config/credits.config';
 import { auth } from '@/lib/auth/auth';
 import { creditService } from '@/lib/credits';
 import { db } from '@/server/db';
-import { userReferrals } from '@/server/db/schema';
+import { user, userReferrals } from '@/server/db/schema';
 import { eq } from 'drizzle-orm';
 import { type NextRequest, NextResponse } from 'next/server';
 
@@ -108,20 +108,35 @@ export async function GET(request: NextRequest) {
 
     // Get referrals made by this user
     const referrals = await db
-      .select()
+      .select({
+        id: userReferrals.id,
+        referralCode: userReferrals.referralCode,
+        referrerId: userReferrals.referrerId,
+        referredId: userReferrals.referredId,
+        creditsAwarded: userReferrals.creditsAwarded,
+        referredUserFirstGenerationCompleted: userReferrals.referredUserFirstGenerationCompleted,
+        createdAt: userReferrals.createdAt,
+        creditsAwardedAt: userReferrals.creditsAwardedAt,
+        referredEmail: user.email,
+        referredName: user.name,
+      })
       .from(userReferrals)
+      .leftJoin(user, eq(user.id, userReferrals.referredId))
       .where(eq(userReferrals.referrerId, userId));
 
     // Generate referral code (using userId for now, can be enhanced)
     const referralCode = userId; // TODO: Generate a more user-friendly code
+    const successfulReferrals = referrals.filter((r) => r.creditsAwarded).length;
+    const pendingReferrals = referrals.length - successfulReferrals;
 
     return NextResponse.json({
       success: true,
       data: {
         referralCode,
         totalReferrals: referrals.length,
-        successfulReferrals: referrals.filter((r) => r.creditsAwarded).length,
-        pendingReferrals: referrals.filter((r) => !r.creditsAwarded).length,
+        successfulReferrals,
+        pendingReferrals,
+        totalEarnedCredits: successfulReferrals * creditsConfig.rewards.referral.creditsPerReferral,
         referrals,
       },
     });

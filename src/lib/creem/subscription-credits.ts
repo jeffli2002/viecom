@@ -1,5 +1,6 @@
 import { randomUUID } from 'node:crypto';
 import { type BillingInterval, formatPlanName, getCreditsForPlan } from '@/lib/creem/plan-utils';
+import { awardReferralForPaidUser } from '@/lib/rewards/referral-reward';
 import { db } from '@/server/db';
 import { creditTransactions, userCredits } from '@/server/db/schema';
 import { and, desc, eq, like, or } from 'drizzle-orm';
@@ -112,6 +113,16 @@ export async function grantSubscriptionCredits(
     console.log(
       `[Creem Credits] Granted ${creditsToGrant} credits to user ${userId} for ${normalizedPlanId} ${isRenewal ? 'renewal' : 'subscription'}`
     );
+
+    if (!isRenewal) {
+      await awardReferralForPaidUser(userId, {
+        reason: 'subscription',
+        metadata: {
+          planId: normalizedPlanId,
+          subscriptionId,
+        },
+      });
+    }
 
     return true;
   } catch (error) {

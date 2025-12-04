@@ -13,6 +13,7 @@ import {
 } from '@/lib/creem/plan-utils';
 import { normalizeCreemStatus } from '@/lib/creem/status-utils';
 import { grantSubscriptionCredits } from '@/lib/creem/subscription-credits';
+import { awardReferralForPaidUser } from '@/lib/rewards/referral-reward';
 import {
   sendCreditPackPurchaseEmail,
   sendSubscriptionCancelledEmail,
@@ -482,6 +483,17 @@ export async function handleCreditPackPurchase(data: CreemWebhookData) {
         `[Creem Webhook] Granted ${credits} credits to ${userId} from pack purchase (new balance: ${newBalance})`
       );
     }
+
+    await awardReferralForPaidUser(userId, {
+      reason: 'credit_pack',
+      metadata: {
+        referenceId,
+        orderId,
+        checkoutId,
+        productId,
+        productName,
+      },
+    });
 
     // Send credit pack purchase email
     try {
