@@ -180,6 +180,8 @@ export default function ImageGenerator() {
     },
     defaultShareText
   );
+  const socialShareReward = SHARE_REWARD_CONFIG.socialShare.credits;
+  const publishShareReward = SHARE_REWARD_CONFIG.publishViecom.credits;
 
   // Brand analysis data (loaded from sessionStorage, no UI)
   const [brandAnalysis, setBrandAnalysis] = useState<BrandToneAnalysis | null>(null);
@@ -1657,20 +1659,42 @@ export default function ImageGenerator() {
                             {t('shareCopyLink')}
                           </DropdownMenuItem>
                           <DropdownMenuSeparator />
-                          <DropdownMenuLabel>{t('shareSocialLabel')}</DropdownMenuLabel>
+                          <DropdownMenuLabel>
+                            <div className="flex flex-col">
+                              <span>{t('shareSocialLabel')}</span>
+                              <span className="text-xs font-normal text-teal-600">
+                                {t('shareSocialRewardHint', { credits: socialShareReward })}
+                              </span>
+                            </div>
+                          </DropdownMenuLabel>
                           {sharePlatforms.map((platform) => (
                             <DropdownMenuItem
                               key={platform.id}
                               onClick={() => void handleShareAction('social', platform.id)}
+                              className="flex items-center gap-2"
                             >
                               <platform.icon className="mr-2 h-4 w-4" />
-                              {platform.label}
+                              <span className="flex-1">{platform.label}</span>
+                              <span className="text-xs font-medium text-teal-600">
+                                {t('shareRewardSuffix', { credits: socialShareReward })}
+                              </span>
                             </DropdownMenuItem>
                           ))}
                           <DropdownMenuSeparator />
+                          <DropdownMenuLabel>
+                            <div className="flex flex-col">
+                              <span>{t('sharePublishOnViecomLabel')}</span>
+                              <span className="text-xs font-normal text-teal-600">
+                                {t('shareViecomRewardHint', { credits: publishShareReward })}
+                              </span>
+                            </div>
+                          </DropdownMenuLabel>
                           <DropdownMenuItem onClick={() => void handleShareAction('publish')}>
                             <Globe className="mr-2 h-4 w-4" />
-                            {t('sharePublishOnViecom')}
+                            <span className="flex-1">{t('sharePublishOnViecom')}</span>
+                            <span className="text-xs font-medium text-teal-600">
+                              {t('shareRewardSuffix', { credits: publishShareReward })}
+                            </span>
                           </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
