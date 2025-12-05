@@ -268,14 +268,27 @@ export class CreditService {
   }
 
   /**
-   * Check if user has enough credits
+   * Check if user has enough credits (accounting for frozen credits)
+   * CRITICAL: This MUST consider frozen credits to prevent race conditions
    */
   async hasEnoughCredits(userId: string, amount: number): Promise<boolean> {
     try {
       const account = await this.getCreditAccount(userId);
       if (!account) return false;
 
+      // CRITICAL: Available balance = total balance - frozen balance
+      // Frozen credits are reserved for in-progress generations
       const availableBalance = account.balance - account.frozenBalance;
+      
+      console.log('[Credit Service] Credit check:', {
+        userId,
+        totalBalance: account.balance,
+        frozenBalance: account.frozenBalance,
+        availableBalance,
+        required: amount,
+        hasEnough: availableBalance >= amount,
+      });
+
       return availableBalance >= amount;
     } catch (error) {
       throw new DatabaseError(`Failed to check credit balance: ${error}`);

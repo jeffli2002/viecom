@@ -112,15 +112,86 @@ export async function POST(request: NextRequest) {
 
     generationMode = mode === 'i2v' || mode === 'image-to-video' || Boolean(image) ? 'i2v' : 't2v';
 
-    // Pure credit-based system: always check and charge credits
+    // CRITICAL OPTIMIZATION 1: Rate limiting - prevent too frequent requests (3-minute cooldown)
+    if (!isTestMode) {
+      const { checkGenerationRateLimit } = await import('@/lib/rate-limit/generation-rate-limit');
+      const rateLimit = await checkGenerationRateLimit(userId, 'video');
+      
+      if (!rateLimit.allowed) {
+        console.warn('[Video Generation] Rate limited:', {
+          userId,
+          reason: rateLimit.reason,
+          waitTimeSeconds: rateLimit.waitTimeSeconds,
+        });
+        
+        return NextResponse.json(
+          {
+            error: rateLimit.reason || 'Too many requests. Please wait before trying again.',
+            waitTimeSeconds: rateLimit.waitTimeSeconds,
+          },
+          { status: 429 }
+        );
+      }
+    }
+
+    // CRITICAL OPTIMIZATION 2: Check credits and FREEZE immediately to prevent race conditions
+    // Available balance = total balance - frozen balance (accounts for in-progress generations)
+    let creditsFrozen = false;
     if (!isTestMode) {
       const hasCredits = await creditService.hasEnoughCredits(userId, creditCost);
       if (!hasCredits) {
+        // Get detailed balance info for error message
+        const account = await creditService.getCreditAccount(userId);
+        const availableBalance = account ? account.balance - account.frozenBalance : 0;
+        const frozenBalance = account?.frozenBalance || 0;
+        
+        console.warn('[Video Generation] Insufficient credits:', {
+          userId,
+          required: creditCost,
+          totalBalance: account?.balance || 0,
+          frozenBalance,
+          availableBalance,
+        });
+
         return NextResponse.json(
           {
-            error: `Insufficient credits. Required: ${creditCost} credits. Please earn more credits or upgrade your plan.`,
+            error: frozenBalance > 0
+              ? `Insufficient credits. Required: ${creditCost} credits. You have ${availableBalance} available (${frozenBalance} credits reserved for in-progress generations). Please wait for current generations to complete or purchase more credits.`
+              : `Insufficient credits. Required: ${creditCost} credits. Please earn more credits or upgrade your plan.`,
+            required: creditCost,
+            available: availableBalance,
+            frozen: frozenBalance,
           },
           { status: 402 }
+        );
+      }
+
+      // CRITICAL: Freeze credits immediately to prevent race conditions
+      // This ensures that concurrent requests cannot both pass the credit check
+      try {
+        await creditService.freezeCredits(
+          userId,
+          creditCost,
+          `Video generation reservation (${normalizedModel})`,
+          `video_reserve_${randomUUID()}`
+        );
+        creditsFrozen = true;
+        console.log('[Video Generation] Credits frozen successfully:', {
+          userId,
+          credits: creditCost,
+          model: normalizedModel,
+        });
+      } catch (freezeError) {
+        console.error('[Video Generation] Failed to freeze credits:', {
+          userId,
+          credits: creditCost,
+          error: freezeError instanceof Error ? freezeError.message : String(freezeError),
+        });
+        return NextResponse.json(
+          {
+            error: `Failed to reserve credits. ${freezeError instanceof Error && freezeError.message.includes('Insufficient') ? 'Another generation may be in progress.' : 'Please try again.'}`,
+          },
+          { status: 500 }
         );
       }
     }
@@ -256,9 +327,100 @@ export async function POST(request: NextRequest) {
         error: errorMessage,
         stack: error instanceof Error ? error.stack : undefined,
       });
+
+      // Unfreeze credits on task creation failure
+      if (creditsFrozen && !isTestMode) {
+        try {
+          await creditService.unfreezeCredits(
+            userId,
+            creditCost,
+            `Task creation failed - credits refunded`,
+            `video_refund_creation_${randomUUID()}`
+          );
+          console.log('[Video Generation] Credits unfrozen after task creation failure');
+        } catch (unfreezeError) {
+          console.error('[Video Generation] Failed to unfreeze credits after creation failure:', unfreezeError);
+        }
+      }
+
       throw error;
     }
 
+    // ASYNC FLOW: Save task to database and return immediately (no polling/waiting)
+    // Frontend will poll /api/v1/video-status/:taskId for completion
+    if (!isTestMode) {
+      try {
+        const assetId = randomUUID();
+        await db.insert(generatedAsset).values({
+          id: assetId,
+          userId,
+          assetType: 'video',
+          generationMode,
+          prompt,
+          enhancedPrompt: enhancedPromptInput,
+          baseImageUrl: sourceImagePublicUrl,
+          styleId: typeof style === 'string' ? style : null,
+          videoStyle: typeof style === 'string' ? style : null,
+          r2Key: `processing-${taskId}`, // Placeholder
+          publicUrl: `processing-${taskId}`, // Placeholder
+          status: 'processing',
+          creditsSpent: creditCost, // Will be charged when completed
+          generationParams: {
+            aspect_ratio,
+            duration: normalizedDuration,
+            quality: normalizedQuality,
+            resolution,
+            style,
+            model: normalizedModel,
+            modelKey,
+          },
+          metadata: {
+            taskId,
+            generationMode,
+            startedAt: new Date().toISOString(),
+            creditsFrozen: true,
+          },
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        });
+
+        console.log('[Video Generation] Task record saved, returning immediately:', {
+          taskId,
+          userId,
+          assetId,
+          creditsReserved: creditCost,
+        });
+
+        return NextResponse.json({
+          taskId,
+          assetId,
+          status: 'processing',
+          message: 'Video generation started. This may take 5-20 minutes depending on model and duration.',
+          estimatedTime: normalizedModel === 'sora-2-pro' ? '10-20 minutes' : '5-10 minutes',
+        });
+
+      } catch (saveError) {
+        console.error('[Video Generation] Failed to save task record:', saveError);
+        
+        // Unfreeze credits
+        if (creditsFrozen) {
+          try {
+            await creditService.unfreezeCredits(
+              userId,
+              creditCost,
+              `Failed to save task - credits refunded`,
+              `video_refund_save_${taskId}`
+            );
+          } catch (unfreezeError) {
+            console.error('[Video Generation] Failed to unfreeze after save error:', unfreezeError);
+          }
+        }
+        
+        throw saveError;
+      }
+    }
+
+    // Test mode - continue with old synchronous flow for testing
     const pollingIntervalMs = 5000;
     const maxAttempts =
       normalizedModel === 'sora-2-pro'
@@ -788,9 +950,33 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // CRITICAL: Charge credits - MUST succeed because KIE.ai has already generated the video
+    // CRITICAL: Unfreeze and charge credits - MUST succeed because KIE.ai has already generated the video
     // Use retry mechanism to ensure credits are charged
     if (!isTestMode) {
+      // First, unfreeze the credits
+      if (creditsFrozen) {
+        try {
+          await creditService.unfreezeCredits(
+            userId,
+            creditCost,
+            `Video generation completed (${normalizedModel})`,
+            `video_unfreeze_${taskId}`
+          );
+          console.log('[Video Generation] Credits unfrozen successfully:', {
+            taskId,
+            userId,
+            credits: creditCost,
+          });
+        } catch (unfreezeError) {
+          console.error('[Video Generation] Failed to unfreeze credits (will retry):', {
+            taskId,
+            userId,
+            error: unfreezeError instanceof Error ? unfreezeError.message : String(unfreezeError),
+          });
+          // Continue - we'll still try to charge credits
+        }
+      }
+
       const MAX_CREDIT_RETRIES = 3;
       let creditChargeSuccess = false;
       let lastCreditError: Error | null = null;
@@ -995,6 +1181,32 @@ export async function POST(request: NextRequest) {
       error: errorMessage,
       stack: errorStack,
     });
+
+    // CRITICAL: Unfreeze credits if they were frozen (refund on failure)
+    if (creditsFrozen && !isTestMode) {
+      try {
+        await creditService.unfreezeCredits(
+          userId,
+          creditCost,
+          `Video generation failed - credits refunded`,
+          `video_refund_${taskId || randomUUID()}`
+        );
+        console.log('[Video Generation] Credits unfrozen (refunded) after failure:', {
+          userId,
+          credits: creditCost,
+          error: errorMessage,
+        });
+      } catch (unfreezeError) {
+        console.error('[Video Generation] CRITICAL: Failed to unfreeze credits after generation failure:', {
+          userId,
+          credits: creditCost,
+          unfreezeError: unfreezeError instanceof Error ? unfreezeError.message : String(unfreezeError),
+          originalError: errorMessage,
+        });
+        // This is a critical issue - credits are frozen but generation failed
+        // Need manual intervention to unfreeze
+      }
+    }
 
     // Try to record failed task if we have taskId
     if (taskId && !isTestMode) {

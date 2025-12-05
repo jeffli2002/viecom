@@ -399,7 +399,6 @@ export default function VideoGenerator() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(requestBody),
       });
-      advanceProgress(55, t('progressRendering'));
 
       const data = await response.json();
 
@@ -412,6 +411,66 @@ export default function VideoGenerator() {
         throw new Error(data.error || 'Failed to generate video');
       }
 
+      // NEW ASYNC FLOW: Backend returns taskId immediately
+      if (data.taskId && data.status === 'processing') {
+        const taskId = data.taskId;
+        console.log('[Video Generator] Task started, polling for completion:', {
+          taskId,
+          estimatedTime: data.estimatedTime,
+        });
+
+        advanceProgress(30, `${t('progressRendering')} (${data.estimatedTime || '10-20 minutes'})`);
+
+        // Poll for status until complete
+        const pollInterval = 5000; // Poll every 5 seconds
+        const maxPolls = 300; // 25 minutes max (300 * 5s = 1500s)
+        
+        for (let pollCount = 0; pollCount < maxPolls; pollCount++) {
+          await new Promise(resolve => setTimeout(resolve, pollInterval));
+          
+          try {
+            const statusResponse = await fetch(`/api/v1/video-status/${taskId}`);
+            const statusData = await statusResponse.json();
+
+            if (statusData.status === 'completed') {
+              // Video is ready!
+              advanceProgress(100, t('progressReady'));
+              completeProgress(t('progressReady'));
+              
+              setResult({
+                videoUrl: statusData.videoUrl,
+                prompt: prompt,
+                model: model,
+              });
+              
+              console.log('[Video Generator] Video generation completed:', {
+                taskId,
+                videoUrl: statusData.videoUrl,
+              });
+              
+              return; // Exit the function successfully
+            }
+
+            if (statusData.status === 'failed') {
+              throw new Error(statusData.error || 'Video generation failed');
+            }
+
+            // Still processing - update progress
+            const progress = Math.min(30 + Math.floor((pollCount / maxPolls) * 60), 90);
+            const elapsed = Math.floor((pollCount * pollInterval) / 1000 / 60);
+            advanceProgress(progress, `${t('progressRendering')} (${elapsed}/${data.estimatedTime || '20'} min)`);
+            
+          } catch (pollError) {
+            console.error('[Video Generator] Error polling status:', pollError);
+            // Continue polling - transient errors shouldn't stop us
+          }
+        }
+
+        // If we got here, polling timed out
+        throw new Error('Video generation is taking longer than expected. Please check your Assets page in a few minutes.');
+      }
+
+      // OLD SYNC FLOW: Backend returns video directly (test mode or legacy)
       if (!data.videoUrl) {
         throw new Error('No video URL in response');
       }

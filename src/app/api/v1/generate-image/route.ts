@@ -102,15 +102,85 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: `Invalid model: ${model}` }, { status: 400 });
     }
 
-    // Pure credit-based system: always check and charge credits
+    // CRITICAL OPTIMIZATION 1: Rate limiting - prevent too frequent requests (3-minute cooldown)
+    if (!isTestMode) {
+      const { checkGenerationRateLimit } = await import('@/lib/rate-limit/generation-rate-limit');
+      const rateLimit = await checkGenerationRateLimit(userId, 'image');
+      
+      if (!rateLimit.allowed) {
+        console.warn('[Image Generation] Rate limited:', {
+          userId,
+          reason: rateLimit.reason,
+          waitTimeSeconds: rateLimit.waitTimeSeconds,
+        });
+        
+        return NextResponse.json(
+          {
+            error: rateLimit.reason || 'Too many requests. Please wait before trying again.',
+            waitTimeSeconds: rateLimit.waitTimeSeconds,
+          },
+          { status: 429 }
+        );
+      }
+    }
+
+    // CRITICAL OPTIMIZATION 2: Check credits and FREEZE immediately to prevent race conditions
+    // Available balance = total balance - frozen balance (accounts for in-progress generations)
+    let creditsFrozen = false;
     if (!isTestMode) {
       const hasCredits = await creditService.hasEnoughCredits(userId, creditCost);
       if (!hasCredits) {
+        // Get detailed balance info for error message
+        const account = await creditService.getCreditAccount(userId);
+        const availableBalance = account ? account.balance - account.frozenBalance : 0;
+        const frozenBalance = account?.frozenBalance || 0;
+        
+        console.warn('[Image Generation] Insufficient credits:', {
+          userId,
+          required: creditCost,
+          totalBalance: account?.balance || 0,
+          frozenBalance,
+          availableBalance,
+        });
+
         return NextResponse.json(
           {
-            error: `Insufficient credits. Required: ${creditCost} credits. Please earn more credits or upgrade your plan.`,
+            error: frozenBalance > 0
+              ? `Insufficient credits. Required: ${creditCost} credits. You have ${availableBalance} available (${frozenBalance} credits reserved for in-progress generations). Please wait for current generations to complete or purchase more credits.`
+              : `Insufficient credits. Required: ${creditCost} credits. Please earn more credits or upgrade your plan.`,
+            required: creditCost,
+            available: availableBalance,
+            frozen: frozenBalance,
           },
           { status: 402 }
+        );
+      }
+
+      // CRITICAL: Freeze credits immediately to prevent race conditions
+      try {
+        await creditService.freezeCredits(
+          userId,
+          creditCost,
+          `Image generation reservation (${model})`,
+          `image_reserve_${randomUUID()}`
+        );
+        creditsFrozen = true;
+        console.log('[Image Generation] Credits frozen successfully:', {
+          userId,
+          credits: creditCost,
+          model,
+        });
+      } catch (freezeError) {
+        console.error('[Image Generation] Failed to freeze credits:', {
+          userId,
+          credits: creditCost,
+          error: freezeError instanceof Error ? freezeError.message : String(freezeError),
+        });
+        return NextResponse.json(
+          {
+            error: `Failed to reserve credits. ${freezeError instanceof Error && freezeError.message.includes('Insufficient') ? 'Another generation may be in progress.' : 'Please try again.'}`,
+          },
+          { status: 500 }
         );
       }
     }
@@ -468,6 +538,21 @@ export async function POST(request: NextRequest) {
                 metadata.creditCost = creditCost; // Store the actual cost used
               }
 
+              // Unfreeze credits first
+              if (creditsFrozen) {
+                try {
+                  await creditService.unfreezeCredits(
+                    userId,
+                    creditCost,
+                    `Image generation completed (${model})`,
+                    `image_unfreeze_${taskId}`
+                  );
+                } catch (unfreezeError) {
+                  console.error('[Image Generation] Failed to unfreeze credits:', unfreezeError);
+                }
+              }
+
+              // Then charge credits
               await creditService.spendCredits({
                 userId,
                 amount: creditCost,
@@ -477,6 +562,21 @@ export async function POST(request: NextRequest) {
               });
             } catch (error) {
               console.error('Error spending credits:', error);
+              
+              // Unfreeze credits on charge failure
+              if (creditsFrozen) {
+                try {
+                  await creditService.unfreezeCredits(
+                    userId,
+                    creditCost,
+                    `Image generation charge failed - credits refunded`,
+                    `image_refund_${taskId}`
+                  );
+                } catch (unfreezeError) {
+                  console.error('[Image Generation] Failed to unfreeze after charge error:', unfreezeError);
+                }
+              }
+
               // Clean up uploaded asset if credit charge fails
               try {
                 await r2StorageService.deleteFile(r2Result.key);
@@ -642,6 +742,34 @@ export async function POST(request: NextRequest) {
       stack: error instanceof Error ? error.stack : undefined,
       name: error instanceof Error ? error.name : undefined,
     });
+
+    // CRITICAL: Unfreeze credits if they were frozen (refund on failure)
+    const isTestMode =
+      process.env.NODE_ENV === 'test' ||
+      process.env.DISABLE_AUTH === 'true' ||
+      request.headers.get('x-test-mode') === 'true';
+
+    if (creditsFrozen && !isTestMode) {
+      try {
+        await creditService.unfreezeCredits(
+          userId,
+          creditCost,
+          `Image generation failed - credits refunded`,
+          `image_refund_${randomUUID()}`
+        );
+        console.log('[Image Generation] Credits unfrozen (refunded) after failure:', {
+          userId,
+          credits: creditCost,
+        });
+      } catch (unfreezeError) {
+        console.error('[Image Generation] CRITICAL: Failed to unfreeze credits after generation failure:', {
+          userId,
+          credits: creditCost,
+          unfreezeError: unfreezeError instanceof Error ? unfreezeError.message : String(unfreezeError),
+        });
+      }
+    }
+
     const errorMessage = error instanceof Error ? error.message : 'Internal server error';
     const errorStack = error instanceof Error ? error.stack : undefined;
     return NextResponse.json(
