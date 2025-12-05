@@ -37,7 +37,18 @@ async function processStuckTasks(request: NextRequest) {
   }
 
   const startTime = Date.now();
-  console.log('[Cron] Starting stuck task processor...');
+  const executionId = randomUUID();
+  
+  // PHASE 2: Log cron execution start
+  const { cronJobExecutions } = await import('@/server/db/schema');
+  await db.insert(cronJobExecutions).values({
+    id: executionId,
+    jobName: 'process-stuck-tasks',
+    startedAt: new Date(),
+    status: 'running',
+  });
+
+  console.log(`[Cron] Starting stuck task processor (execution: ${executionId})...`);
 
   try {
     // Find stuck tasks (processing for more than 10 minutes)
@@ -188,6 +199,72 @@ async function processStuckTasks(request: NextRequest) {
           console.log(`[Cron] ✅ Task ${taskId} completed successfully`);
           results.completed++;
 
+          // PHASE 2: Send email notification to user
+          try {
+            const { user } = await import('@/server/db/schema');
+            const [userRecord] = await db
+              .select()
+              .from(user)
+              .where(eq(user.id, task.userId))
+              .limit(1);
+
+            if (userRecord) {
+              const { sendEmail } = await import('@/lib/email/email-service');
+              
+              const assetTypeName = task.assetType === 'video' ? 'Video' : 'Image';
+              const emailHtml = `
+                <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; padding: 40px 20px;">
+                  <div style="text-align: center; margin-bottom: 30px;">
+                    <h1 style="color: #111827; margin: 0 0 10px 0; font-size: 28px;">${task.assetType === 'video' ? '🎬' : '🖼️'} Your AI ${assetTypeName} is Ready!</h1>
+                  </div>
+                  
+                  <div style="background-color: #ffffff; border: 1px solid #e5e7eb; border-radius: 12px; padding: 30px;">
+                    <p style="margin: 0 0 20px 0; color: #374151; line-height: 1.6;">
+                      Hi ${userRecord.name || 'there'},
+                    </p>
+                    
+                    <p style="margin: 0 0 20px 0; color: #374151; line-height: 1.6;">
+                      Great news! Your AI-generated ${task.assetType} has been successfully created and is now available in your account.
+                    </p>
+                    
+                    <div style="background-color: #f0fdf4; border-left: 4px solid #22c55e; padding: 20px; margin: 20px 0; border-radius: 4px;">
+                      <p style="margin: 0; color: #166534; font-weight: 600; font-size: 16px;">
+                        ✅ Generation Complete
+                      </p>
+                    </div>
+                    
+                    <div style="margin: 30px 0; text-align: center;">
+                      <a href="https://www.viecom.pro/assets" style="display: inline-block; padding: 14px 32px; background-color: #14b8a6; color: #ffffff; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 16px;">
+                        View in Assets Library
+                      </a>
+                    </div>
+                    
+                    <div style="background-color: #fef3c7; border-left: 4px solid #f59e0b; padding: 15px; margin: 20px 0; border-radius: 4px;">
+                      <p style="margin: 0; color: #92400e; font-size: 14px;">
+                        💡 <strong>Tip:</strong> Visit your Assets page and refresh (F5) to see your new ${task.assetType}!
+                      </p>
+                    </div>
+                  </div>
+                  
+                  <div style="text-align: center; padding: 20px 0; color: #9ca3af; font-size: 12px;">
+                    <p style="margin: 0;">© 2025 Viecom. All rights reserved.</p>
+                  </div>
+                </div>
+              `;
+
+              await sendEmail({
+                to: userRecord.email,
+                subject: `${task.assetType === 'video' ? '🎬' : '🖼️'} Your AI ${assetTypeName} is Ready!`,
+                html: emailHtml,
+              });
+
+              console.log(`[Cron] ✅ Notification email sent to ${userRecord.email}`);
+            }
+          } catch (emailError) {
+            console.error('[Cron] Failed to send notification email (non-critical):', emailError);
+            // Don't fail the recovery if email fails
+          }
+
         } else if (state === 'fail' || state === 'failed') {
           // Generation failed - refund credits
           console.log(`[Cron] Task ${taskId} failed in KIE.ai, refunding credits...`);
@@ -252,27 +329,95 @@ async function processStuckTasks(request: NextRequest) {
       results,
     });
 
+    // PHASE 2: Log successful completion
+    const finalResults = {
+      ...results,
+      totalFound: stuckTasks.length,
+    };
+
+    await db
+      .update(cronJobExecutions)
+      .set({
+        completedAt: new Date(),
+        duration,
+        status: 'completed',
+        results: finalResults,
+      })
+      .where(eq(cronJobExecutions.id, executionId));
+
+    // PHASE 2: Send alerts if there are issues
+    try {
+      const { sendCronAlert, shouldSendAlert } = await import('@/lib/alerts/cron-alerts');
+      
+      if (shouldSendAlert(finalResults)) {
+        await sendCronAlert({
+          jobName: 'process-stuck-tasks',
+          executionId,
+          status: 'high_error_rate',
+          duration,
+          results: finalResults,
+        });
+        console.log('[Cron] Alert sent due to high error rate');
+      }
+    } catch (alertError) {
+      console.error('[Cron] Failed to send alert (non-critical):', alertError);
+    }
+
     return NextResponse.json({
       success: true,
       message: 'Stuck tasks processed',
       results,
       duration,
       totalFound: stuckTasks.length,
+      executionId,
     });
 
   } catch (error) {
     const duration = Date.now() - startTime;
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    
     console.error('[Cron] Error in stuck task processor:', {
-      error: error instanceof Error ? error.message : String(error),
+      error: errorMessage,
       stack: error instanceof Error ? error.stack : undefined,
       duration: `${duration}ms`,
     });
 
+    // PHASE 2: Log failed execution
+    try {
+      await db
+        .update(cronJobExecutions)
+        .set({
+          completedAt: new Date(),
+          duration,
+          status: 'failed',
+          errorMessage,
+        })
+        .where(eq(cronJobExecutions.id, executionId));
+    } catch (logError) {
+      console.error('[Cron] Failed to log error:', logError);
+    }
+
+    // PHASE 2: Send alert about failure
+    try {
+      const { sendCronAlert } = await import('@/lib/alerts/cron-alerts');
+      await sendCronAlert({
+        jobName: 'process-stuck-tasks',
+        executionId,
+        status: 'failed',
+        duration,
+        error: errorMessage,
+      });
+      console.log('[Cron] Alert sent about cron failure');
+    } catch (alertError) {
+      console.error('[Cron] Failed to send failure alert:', alertError);
+    }
+
     return NextResponse.json(
       {
         success: false,
-        error: error instanceof Error ? error.message : 'Unknown error',
+        error: errorMessage,
         duration,
+        executionId,
       },
       { status: 500 }
     );

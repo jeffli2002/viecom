@@ -1,0 +1,9 @@
+{
+  "crons": [
+    {
+      "path": "/api/cron/process-stuck-tasks",
+      "schedule": "*/10 * * * *"
+    }
+  ]
+}
+

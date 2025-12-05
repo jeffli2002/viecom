@@ -36,6 +36,9 @@ export const env = createEnv({
     ADMIN_EMAILS: z.string().optional().default(''),
     // Cron Security
     CRON_SECRET: z.string().optional().default('dummy'),
+    // Alert Webhooks (optional)
+    SLACK_WEBHOOK_URL: z.string().optional(),
+    DISCORD_WEBHOOK_URL: z.string().optional(),
     // Redis for queue (optional)
     REDIS_URL: z.string().optional(),
     // Creem Payment
@@ -97,6 +100,8 @@ export const env = createEnv({
     NEXT_PUBLIC_DISABLE_AUTH: process.env.NEXT_PUBLIC_DISABLE_AUTH,
     ADMIN_EMAILS: process.env.ADMIN_EMAILS,
     CRON_SECRET: process.env.CRON_SECRET,
+    SLACK_WEBHOOK_URL: process.env.SLACK_WEBHOOK_URL,
+    DISCORD_WEBHOOK_URL: process.env.DISCORD_WEBHOOK_URL,
     REDIS_URL: process.env.REDIS_URL,
     CREEM_API_KEY: process.env.CREEM_API_KEY,
     CREEM_WEBHOOK_SECRET: process.env.CREEM_WEBHOOK_SECRET,

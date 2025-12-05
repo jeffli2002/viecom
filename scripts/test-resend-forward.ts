@@ -1,8 +1,8 @@
 /**
  * Test script for Resend email forwarding
- *
+ * 
  * This script simulates a Resend webhook event to test the forwarding functionality
- *
+ * 
  * Usage: pnpm tsx scripts/test-resend-forward.ts
  */
 
@@ -16,9 +16,7 @@ async function testResendForward() {
   console.log(`  RESEND_API_KEY: ${env.RESEND_API_KEY ? '✅ Set' : '❌ Missing'}`);
   console.log(`  RESEND_FROM_EMAIL: ${env.RESEND_FROM_EMAIL || '❌ Missing'}`);
   console.log(`  RESEND_FORWARD_TO_EMAIL: ${env.RESEND_FORWARD_TO_EMAIL || '❌ Missing'}`);
-  console.log(
-    `  RESEND_WEBHOOK_SECRET: ${env.RESEND_WEBHOOK_SECRET ? '✅ Set (optional)' : '⚠️  Not set (optional)'}\n`
-  );
+  console.log(`  RESEND_WEBHOOK_SECRET: ${env.RESEND_WEBHOOK_SECRET ? '✅ Set (optional)' : '⚠️  Not set (optional)'}\n`);
 
   if (!env.RESEND_API_KEY) {
     console.error('❌ RESEND_API_KEY is required');
@@ -46,7 +44,7 @@ async function testResendForward() {
     type: 'email.received',
     created_at: new Date().toISOString(),
     data: {
-      email_id: `test-email-id-${Date.now()}`,
+      email_id: 'test-email-id-' + Date.now(),
       created_at: new Date().toISOString(),
       from: 'test-sender@example.com',
       to: ['support@viecom.pro'],
@@ -87,6 +85,7 @@ async function testResendForward() {
       console.log('✅ Webhook endpoint is working!');
       console.log('\n📝 Note: This is a mock event. To test with a real email:');
       console.log('   1. Send an email to support@viecom.pro');
+      console.log('   1. Send an email to support@viecom.pro');
       console.log('   2. Check if it gets forwarded to', env.RESEND_FORWARD_TO_EMAIL);
       console.log('   3. Check server logs for processing details');
     } else {
@@ -108,3 +107,7 @@ testResendForward().catch((error) => {
   console.error('❌ Test failed:', error);
   process.exit(1);
 });
+
+
+
+

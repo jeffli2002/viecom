@@ -674,6 +674,33 @@ export const admins = pgTable('admins', {
   lastLoginAt: timestamp('last_login_at'),
 });
 
+// Cron Job Execution Logs (for monitoring and analytics)
+export const cronJobExecutions = pgTable('cron_job_executions', {
+  id: text('id').primaryKey(),
+  jobName: text('job_name').notNull(), // e.g., "process-stuck-tasks"
+  startedAt: timestamp('started_at')
+    .$defaultFn(() => new Date())
+    .notNull(),
+  completedAt: timestamp('completed_at'),
+  duration: integer('duration'), // in milliseconds
+  status: text('status', {
+    enum: ['running', 'completed', 'failed'],
+  })
+    .notNull()
+    .default('running'),
+  results: jsonb('results').$type<{
+    completed?: number;
+    failed?: number;
+    stillProcessing?: number;
+    errors?: number;
+    totalFound?: number;
+  } | null>(),
+  errorMessage: text('error_message'),
+  createdAt: timestamp('created_at')
+    .$defaultFn(() => new Date())
+    .notNull(),
+});
+
 // Export aliases for admin API compatibility
 export const users = user;
 export const creditBalances = userCredits;
