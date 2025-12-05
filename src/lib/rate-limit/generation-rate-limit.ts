@@ -18,7 +18,8 @@ export interface RateLimitCheck {
 
 /**
  * Check if user can make a new generation request
- * Enforces 3-minute cooldown between requests
+ * Enforces 3-minute cooldown ONLY if previous generation is still processing
+ * Allows immediate retry if previous generation completed or failed
  */
 export async function checkGenerationRateLimit(
   userId: string,
@@ -51,17 +52,39 @@ export async function checkGenerationRateLimit(
     }
 
     const lastRequest = recentAssets[0];
+    
+    // CRITICAL: Only enforce cooldown if previous generation is still PROCESSING
+    // If it completed or failed, user can start new generation immediately
+    if (lastRequest.status === 'completed' || lastRequest.status === 'failed') {
+      console.log('[Rate Limit] Previous generation finished, allowing new request:', {
+        userId,
+        assetType,
+        previousStatus: lastRequest.status,
+        timeSinceLastRequest: Math.floor((now.getTime() - lastRequest.createdAt.getTime()) / 1000),
+      });
+      return { allowed: true };
+    }
+
+    // Previous generation still processing - enforce cooldown
     const timeSinceLastRequest = now.getTime() - lastRequest.createdAt.getTime();
     const waitTimeMs = RATE_LIMIT_WINDOW_MS - timeSinceLastRequest;
 
     if (waitTimeMs > 0) {
-      // Too soon - rate limited
+      // Too soon and previous still processing - rate limited
       const waitTimeSeconds = Math.ceil(waitTimeMs / 1000);
       const waitTimeMinutes = Math.ceil(waitTimeSeconds / 60);
 
+      console.warn('[Rate Limit] Blocking request - previous generation still processing:', {
+        userId,
+        assetType,
+        previousStatus: lastRequest.status,
+        timeSinceLastRequest: Math.floor(timeSinceLastRequest / 1000),
+        waitTimeSeconds,
+      });
+
       return {
         allowed: false,
-        reason: `Please wait ${waitTimeMinutes} minute${waitTimeMinutes > 1 ? 's' : ''} before starting another ${assetType} generation. This helps ensure your credits are properly synchronized and prevents duplicate charges.`,
+        reason: `A previous ${assetType} generation is still in progress. Please wait ${waitTimeMinutes} minute${waitTimeMinutes > 1 ? 's' : ''} or until it completes before starting another. This prevents duplicate charges and ensures your credits are properly synchronized.`,
         waitTimeSeconds,
         lastRequestTime: lastRequest.createdAt,
       };
