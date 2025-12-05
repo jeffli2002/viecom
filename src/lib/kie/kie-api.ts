@@ -325,19 +325,16 @@ export class KIEAPIService {
       model = hasImage ? 'sora-2-image-to-video' : 'sora-2-text-to-video';
     }
 
+    const normalizedDuration = params.duration === 15 ? '15' : '10';
+
     // 构建输入参数
     const requestedSize = params.quality === 'high' ? 'high' : 'standard';
     const input: KIEVideoTaskInput = {
       prompt: params.prompt,
       aspect_ratio: params.aspectRatio || 'landscape',
       size: requestedSize,
+      n_frames: normalizedDuration,
     };
-
-    // Sora 2 Pro 支持 quality 和 n_frames 参数
-    if (useProModel) {
-      // 根据 duration 设置 n_frames
-      input.n_frames = params.duration === 10 ? '10' : '15';
-    }
 
     // 添加图片URL（如果有）
     if (hasImage) {
