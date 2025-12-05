@@ -1056,7 +1056,7 @@ class CreemPaymentService {
         productId,
         productName,
         credits,
-        orderAmount,
+        normalizedAmount,
         checkoutId: (checkout as { id?: string }).id,
         orderId: (order as { id?: string } | undefined)?.id,
         userId,
