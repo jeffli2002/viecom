@@ -32,14 +32,17 @@ export default function AdminUsersPage() {
   const [range, setRange] = useState('all');
   const [isLoading, setIsLoading] = useState(true);
   const [total, setTotal] = useState(0);
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(20);
 
   const fetchUsers = useCallback(async () => {
     setIsLoading(true);
     try {
       // Add cache-busting timestamp to prevent stale data
       const timestamp = new Date().getTime();
+      const offset = (page - 1) * pageSize;
       const response = await fetch(
-        `/api/admin/users?search=${search}&range=${range}&limit=100&_t=${timestamp}`,
+        `/api/admin/users?search=${search}&range=${range}&limit=${pageSize}&offset=${offset}&_t=${timestamp}`,
         {
           cache: 'no-store',
         }
@@ -56,11 +59,31 @@ export default function AdminUsersPage() {
     } finally {
       setIsLoading(false);
     }
-  }, [range, search]);
+  }, [range, search, page, pageSize]);
 
   useEffect(() => {
     void fetchUsers();
   }, [fetchUsers]);
+
+  // Reset to page 1 when search or range changes
+  useEffect(() => {
+    setPage(1);
+  }, [search, range]);
+
+  const totalPages = Math.ceil(total / pageSize);
+  const startItem = total === 0 ? 0 : (page - 1) * pageSize + 1;
+  const endItem = Math.min(page * pageSize, total);
+
+  const handlePageSizeChange = (newSize: string) => {
+    setPageSize(Number(newSize));
+    setPage(1); // Reset to first page when changing page size
+  };
+
+  const goToPage = (newPage: number) => {
+    if (newPage >= 1 && newPage <= totalPages) {
+      setPage(newPage);
+    }
+  };
 
   const downloadCSV = (filename: string, data: Array<Record<string, unknown>>) => {
     if (!data || !data.length) return;
@@ -81,12 +104,14 @@ export default function AdminUsersPage() {
   return (
     <div className="p-6 space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between flex-wrap gap-4">
         <div>
           <h1 className="text-3xl font-bold text-slate-900 dark:text-white">Users Management</h1>
-          <p className="text-gray-500 mt-1">Total: {total} users</p>
+          <p className="text-gray-500 mt-1">
+            Total: {total} users {total > 0 && `(showing ${startItem}-${endItem})`}
+          </p>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 flex-wrap">
           <Select value={range} onValueChange={setRange}>
             <SelectTrigger className="w-[180px]">
               <SelectValue />
@@ -97,6 +122,16 @@ export default function AdminUsersPage() {
               <SelectItem value="30d">Last 30 days</SelectItem>
               <SelectItem value="90d">Last 90 days</SelectItem>
               <SelectItem value="all">All Time</SelectItem>
+            </SelectContent>
+          </Select>
+          <Select value={pageSize.toString()} onValueChange={handlePageSizeChange}>
+            <SelectTrigger className="w-[140px]">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="10">10 per page</SelectItem>
+              <SelectItem value="20">20 per page</SelectItem>
+              <SelectItem value="50">50 per page</SelectItem>
             </SelectContent>
           </Select>
           <Button onClick={() => downloadCSV('users.csv', users)} variant="outline">
@@ -186,6 +221,92 @@ export default function AdminUsersPage() {
                   ))}
                 </tbody>
               </table>
+            </div>
+          )}
+          
+          {/* Pagination */}
+          {!isLoading && total > 0 && totalPages > 1 && (
+            <div className="flex items-center justify-between mt-6 pt-4 border-t">
+              <div className="text-sm text-gray-500">
+                Showing {startItem} to {endItem} of {total} users
+              </div>
+              
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => goToPage(page - 1)}
+                  disabled={page === 1}
+                >
+                  Previous
+                </Button>
+                
+                <div className="flex items-center gap-1">
+                  {/* First page */}
+                  {page > 3 && (
+                    <>
+                      <Button
+                        variant={page === 1 ? 'default' : 'outline'}
+                        size="sm"
+                        onClick={() => goToPage(1)}
+                        className="min-w-[40px]"
+                      >
+                        1
+                      </Button>
+                      {page > 4 && (
+                        <span className="px-2 text-gray-400">...</span>
+                      )}
+                    </>
+                  )}
+                  
+                  {/* Pages around current page */}
+                  {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                    const pageNum = Math.max(1, page - 2) + i;
+                    if (pageNum > totalPages) return null;
+                    if (pageNum < 1) return null;
+                    if (totalPages > 5 && page > 3 && pageNum === 1) return null;
+                    if (totalPages > 5 && page < totalPages - 2 && pageNum === totalPages) return null;
+                    
+                    return (
+                      <Button
+                        key={pageNum}
+                        variant={page === pageNum ? 'default' : 'outline'}
+                        size="sm"
+                        onClick={() => goToPage(pageNum)}
+                        className="min-w-[40px]"
+                      >
+                        {pageNum}
+                      </Button>
+                    );
+                  })}
+                  
+                  {/* Last page */}
+                  {page < totalPages - 2 && totalPages > 5 && (
+                    <>
+                      {page < totalPages - 3 && (
+                        <span className="px-2 text-gray-400">...</span>
+                      )}
+                      <Button
+                        variant={page === totalPages ? 'default' : 'outline'}
+                        size="sm"
+                        onClick={() => goToPage(totalPages)}
+                        className="min-w-[40px]"
+                      >
+                        {totalPages}
+                      </Button>
+                    </>
+                  )}
+                </div>
+                
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => goToPage(page + 1)}
+                  disabled={page === totalPages}
+                >
+                  Next
+                </Button>
+              </div>
             </div>
           )}
         </CardContent>
