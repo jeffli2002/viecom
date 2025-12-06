@@ -1,12 +1,62 @@
 import { SHOWCASE_CATEGORIES } from '@/config/showcase.config';
+import { SHARE_REWARD_CONFIG } from '@/config/share.config';
 import { requireAdmin } from '@/lib/admin/auth';
+import { creditService } from '@/lib/credits';
 import { db } from '@/server/db';
-import { publishSubmissions } from '@/server/db/schema';
-import { eq, sql } from 'drizzle-orm';
+import { publishSubmissions, socialShares } from '@/server/db/schema';
+import { and, eq, sql } from 'drizzle-orm';
+import { randomUUID } from 'node:crypto';
 import { type NextRequest, NextResponse } from 'next/server';
 
 export const dynamic = 'force-dynamic';
 export const fetchCache = 'force-no-store';
+
+type PublishSubmission = typeof publishSubmissions.$inferSelect;
+
+async function awardPublishReward(submission: PublishSubmission) {
+  const reward = SHARE_REWARD_CONFIG.publishViecom;
+  if (!submission.userId || reward.credits <= 0) {
+    return;
+  }
+
+  const referenceId = `publish_submission_${submission.id}`;
+  const existingReward = await db.query.socialShares.findFirst({
+    where: and(eq(socialShares.userId, submission.userId), eq(socialShares.referenceId, referenceId)),
+  });
+
+  if (existingReward) {
+    return;
+  }
+
+  const shareId = randomUUID();
+  await db.insert(socialShares).values({
+    id: shareId,
+    userId: submission.userId,
+    assetId: submission.assetId ?? null,
+    platform: reward.platform,
+    shareUrl: submission.assetUrl,
+    creditsEarned: reward.credits,
+    referenceId,
+  });
+
+  try {
+    await creditService.earnCredits({
+      userId: submission.userId,
+      amount: reward.credits,
+      source: 'social_share',
+      description: 'Publish on Viecom.pro (admin approved)',
+      referenceId: `social_share_${shareId}`,
+      metadata: {
+        submissionId: submission.id,
+        assetType: submission.assetType,
+        rewardType: 'publishViecom',
+      },
+    });
+  } catch (error) {
+    await db.delete(socialShares).where(eq(socialShares.id, shareId));
+    throw error;
+  }
+}
 
 export async function PATCH(
   request: NextRequest,
@@ -35,6 +85,7 @@ export async function PATCH(
       return NextResponse.json({ error: 'Invalid status update' }, { status: 400 });
     }
 
+    const shouldAwardReward = status === 'approved' && submission.status !== 'approved';
     const now = new Date();
     const updateData: Record<string, unknown> = {
       status,
@@ -96,6 +147,36 @@ export async function PATCH(
       .set(updateData)
       .where(eq(publishSubmissions.id, id))
       .returning();
+
+    if (shouldAwardReward) {
+      try {
+        await awardPublishReward(updated);
+      } catch (error) {
+        console.error('Failed to award publish reward:', error);
+        await db
+          .update(publishSubmissions)
+          .set({
+            status: submission.status,
+            publishToLanding: submission.publishToLanding,
+            publishToShowcase: submission.publishToShowcase,
+            category: submission.category,
+            landingOrder: submission.landingOrder,
+            approvedAt: submission.approvedAt,
+            rejectedAt: submission.rejectedAt,
+            reviewedAt: submission.reviewedAt,
+            reviewedBy: submission.reviewedBy,
+            rejectionReason: submission.rejectionReason,
+            adminNotes: submission.adminNotes,
+            updatedAt: submission.updatedAt,
+          })
+          .where(eq(publishSubmissions.id, id));
+
+        return NextResponse.json(
+          { error: 'Failed to award publish reward. Approval was not saved.' },
+          { status: 500 }
+        );
+      }
+    }
 
     return NextResponse.json({ success: true, submission: updated });
   } catch (error) {

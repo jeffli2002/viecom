@@ -95,8 +95,7 @@ export default function VideoGenerator() {
     completeProgress,
     failProgress,
   } = useGenerationProgress();
-  const publishUrl = 'https://viecom.pro/publish';
-  const [awaitingPublishConfirmation, setAwaitingPublishConfirmation] = useState(false);
+  const [isPublishModalOpen, setIsPublishModalOpen] = useState(false);
   const defaultShareText = t('shareDefaultText');
   const sharePlatforms = buildSharePlatforms(
     {
@@ -113,14 +112,6 @@ export default function VideoGenerator() {
 
   // Brand analysis data (loaded from sessionStorage, no UI)
   const [brandAnalysis, setBrandAnalysis] = useState<BrandToneAnalysis | null>(null);
-
-  useEffect(() => {
-    if (!result) {
-      setAwaitingPublishConfirmation(false);
-      return;
-    }
-    setAwaitingPublishConfirmation(false);
-  }, [result]);
 
   const maxPromptLength = 2000;
 
@@ -534,6 +525,34 @@ export default function VideoGenerator() {
     }
   };
 
+  const submitPublishEntry = async () => {
+    if (!result?.videoUrl) {
+      throw new Error('No video available to publish.');
+    }
+
+    const response = await fetch('/api/v1/publish/submissions', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        assetUrl: result.videoUrl,
+        previewUrl: result.videoUrl,
+        assetId: null,
+        prompt,
+        title: prompt.trim().slice(0, 120),
+        assetType: 'video',
+        metadata: {
+          model: result.model,
+        },
+      }),
+    });
+
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok) {
+      throw new Error(data?.error || 'Unable to submit for publishing. Please try again.');
+    }
+    return data.submission;
+  };
+
   const awardShareReward = async (
     rewardKey: ShareRewardKey,
     metadata?: { platformId?: SharePlatformId; platformValue?: SharePlatform['platformValue'] }
@@ -597,11 +616,7 @@ export default function VideoGenerator() {
     }
 
     if (action === 'publish') {
-      await copyVideoLink();
-      const publishTarget = `${publishUrl}?asset=${encodeURIComponent(result.videoUrl)}`;
-      window.open(publishTarget, '_blank', 'noopener,noreferrer');
-      toast.success(t('sharePublishToast'));
-      setAwaitingPublishConfirmation(true);
+      setIsPublishModalOpen(true);
       return;
     }
 
@@ -627,10 +642,22 @@ export default function VideoGenerator() {
   };
 
   const handleConfirmPublish = async () => {
-    await awardShareReward('publishViecom', {
-      platformValue: SHARE_REWARD_CONFIG.publishViecom.platform,
-    });
-    setAwaitingPublishConfirmation(false);
+    if (!result?.videoUrl) {
+      toast.error('Generate a video before confirming publish.');
+      return;
+    }
+    try {
+      await submitPublishEntry();
+      toast.success(t('sharePublishToast'));
+    } catch (error) {
+      console.error('Video publish submission failed:', error);
+      const message =
+        error instanceof Error ? error.message : 'Failed to submit your publish confirmation.';
+      toast.error(message);
+      return;
+    }
+
+    setIsPublishModalOpen(false);
   };
 
   const handleDownload = async (videoUrl: string) => {
@@ -1163,22 +1190,6 @@ export default function VideoGenerator() {
                       {t('generatingTakeMinutes')}
                     </p>
                   </div>
-                  {awaitingPublishConfirmation && (
-                    <div className="rounded-lg border border-teal-200 bg-teal-50 dark:border-teal-800 dark:bg-teal-900/20 p-4 flex flex-col gap-3 text-sm text-slate-700 dark:text-slate-200">
-                      <p>
-                        {t('sharePublishPending', {
-                          credits: SHARE_REWARD_CONFIG.publishViecom.credits,
-                        })}
-                      </p>
-                      <Button
-                        size="sm"
-                        onClick={handleConfirmPublish}
-                        className="self-center bg-teal-500 hover:bg-teal-600 text-white"
-                      >
-                        {t('shareConfirmPublish')}
-                      </Button>
-                    </div>
-                  )}
                 </>
               )}
 
@@ -1275,6 +1286,43 @@ export default function VideoGenerator() {
           </div>
         </div>
       </div>
+      {isPublishModalOpen && (
+        <dialog
+          open
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4"
+          onClose={() => setIsPublishModalOpen(false)}
+        >
+          <div className="max-w-md rounded-2xl bg-white p-6 shadow-xl space-y-4 text-slate-700">
+            <div className="flex items-start gap-3">
+              <div className="rounded-full bg-teal-100 p-2 text-teal-600">
+                <Globe className="h-5 w-5" />
+              </div>
+              <div>
+                <h2 className="text-xl font-semibold text-slate-900">
+                  {t('sharePublishInfoTitle')}
+                </h2>
+                <p className="text-sm text-slate-500">{t('sharePublishInfoSubtext')}</p>
+              </div>
+            </div>
+            <p className="text-sm text-slate-600">{t('sharePublishInfoDescription')}</p>
+            <div className="flex flex-wrap gap-3">
+              <Button
+                onClick={handleConfirmPublish}
+                className="flex-1 bg-teal-500 text-white hover:bg-teal-600"
+              >
+                {t('shareConfirmPublish')}
+              </Button>
+              <Button
+                variant="outline"
+                className="flex-1 border-slate-200"
+                onClick={() => setIsPublishModalOpen(false)}
+              >
+                {t('sharePublishCancel')}
+              </Button>
+            </div>
+          </div>
+        </dialog>
+      )}
     </>
   );
 }

@@ -963,7 +963,9 @@ export default function ImageGenerator() {
     }
     try {
       await submitPublishEntry();
-      await copyShareLink(t('sharePublishToast'));
+      toast.success(t('sharePublishToast'));
+      setShareStatus('idle');
+      setShareMessage(t('sharePublishToast'));
     } catch (error) {
       console.error('Publish confirmation failed:', error);
       const message =
@@ -974,9 +976,6 @@ export default function ImageGenerator() {
       return;
     }
 
-    await awardShareReward('publishViecom', {
-      platformValue: SHARE_REWARD_CONFIG.publishViecom.platform,
-    });
     setIsPublishModalOpen(false);
   };
 
@@ -1780,28 +1779,32 @@ export default function ImageGenerator() {
             className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4"
             onClose={() => setIsPublishModalOpen(false)}
           >
-            <div className="max-w-lg rounded-2xl bg-white p-6 shadow-xl space-y-4 text-slate-700">
-              <h2 className="text-xl font-semibold text-slate-900">Publish Guidelines</h2>
-              <ul className="list-disc space-y-2 pl-5 text-sm">
-                <li>All content must comply with Viecom policies and local regulations.</li>
-                <li>No adult, hateful, infringing, or misleading material is allowed.</li>
-                <li>Our audit team reviews each submission before it appears publicly.</li>
-                <li>Approved assets will be showcased and eligible for reward credits.</li>
-                <li>We reserve the right to remove content that violates any policy.</li>
-              </ul>
+            <div className="max-w-md rounded-2xl bg-white p-6 shadow-xl space-y-4 text-slate-700">
+              <div className="flex items-start gap-3">
+                <div className="rounded-full bg-teal-100 p-2 text-teal-600">
+                  <Globe className="h-5 w-5" />
+                </div>
+                <div>
+                  <h2 className="text-xl font-semibold text-slate-900">
+                    {t('sharePublishInfoTitle')}
+                  </h2>
+                  <p className="text-sm text-slate-500">{t('sharePublishInfoSubtext')}</p>
+                </div>
+              </div>
+              <p className="text-sm text-slate-600">{t('sharePublishInfoDescription')}</p>
               <div className="flex flex-wrap gap-3">
                 <Button
                   onClick={handleConfirmPublish}
-                  className="bg-teal-500 hover:bg-teal-600 text-white flex-1"
+                  className="flex-1 bg-teal-500 text-white hover:bg-teal-600"
                 >
-                  I Understand & Submit
+                  {t('shareConfirmPublish')}
                 </Button>
                 <Button
                   variant="outline"
                   className="flex-1 border-slate-200"
                   onClick={() => setIsPublishModalOpen(false)}
                 >
-                  Cancel
+                  {t('sharePublishCancel')}
                 </Button>
               </div>
             </div>
