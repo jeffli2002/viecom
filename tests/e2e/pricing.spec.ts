@@ -22,7 +22,12 @@ test.describe('Pricing Page', () => {
 
   test('should display pro plan', async ({ page }) => {
     await page.goto('/pricing', { waitUntil: 'domcontentloaded', timeout: 60000 });
-    await expect(page.getByText(/pro\+?/i).first().or(page.getByText(/^pro$/i).first())).toBeVisible({
+    await expect(
+      page
+        .getByText(/pro\+?/i)
+        .first()
+        .or(page.getByText(/^pro$/i).first())
+    ).toBeVisible({
       timeout: 15_000,
     });
   });
