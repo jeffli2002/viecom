@@ -1,9 +1,9 @@
-import { expect, test } from '@playwright/test';
 import { randomUUID } from 'node:crypto';
+import { expect, test } from '@playwright/test';
 
 /**
  * E2E Test: Video Generation Complete Flow
- * 
+ *
  * This test covers the complete video generation flow to ensure:
  * 1. KIE.ai success = user gets video + credits deducted
  * 2. Database save retry mechanism works
@@ -12,9 +12,26 @@ import { randomUUID } from 'node:crypto';
  */
 
 test.describe('Video Generation Complete Flow', () => {
+  test.setTimeout(120_000);
+
   test.beforeEach(async ({ page }) => {
     // Navigate to video generation page
-    await page.goto('/en/video-generation');
+    await page.goto('/en/video-generation', { waitUntil: 'domcontentloaded', timeout: 60_000 });
+
+    // Wait for main hero/title or CTA to ensure page is rendered
+    await expect(page.getByText(/video generation|ai video/i).first()).toBeVisible({
+      timeout: 30_000,
+    });
+
+    // If tabs exist, ensure video tab is active
+    const videoTab = page.getByRole('tab', { name: /video/i }).first();
+    if ((await videoTab.count()) > 0) {
+      await videoTab.click();
+    }
+
+    // Wait for prompt input to be ready
+    const promptInput = page.locator('textarea').first();
+    await promptInput.waitFor({ timeout: 30_000 });
   });
 
   test('should complete full video generation flow successfully', async ({ page, request }) => {
@@ -28,17 +45,25 @@ test.describe('Video Generation Complete Flow', () => {
     }
 
     // Step 2: Fill in video generation form
-    const promptInput = page.locator('textarea[placeholder*="prompt" i], textarea[placeholder*="描述" i]').first();
+    const promptInput = page
+      .locator('textarea[placeholder*="prompt" i], textarea[placeholder*="描述" i]')
+      .first();
     await promptInput.fill('A beautiful sunset over the ocean, cinematic, 4K quality');
 
     // Step 3: Select model (if available)
-    const modelSelect = page.locator('select, [role="combobox"]').filter({ hasText: /sora/i }).first();
+    const modelSelect = page
+      .locator('select, [role="combobox"]')
+      .filter({ hasText: /sora/i })
+      .first();
     if (await modelSelect.isVisible()) {
       await modelSelect.selectOption({ label: /sora-2/i });
     }
 
     // Step 4: Select duration (if available)
-    const durationSelect = page.locator('select, [role="combobox"], button').filter({ hasText: /10|15|duration/i }).first();
+    const durationSelect = page
+      .locator('select, [role="combobox"], button')
+      .filter({ hasText: /10|15|duration/i })
+      .first();
     if (await durationSelect.isVisible()) {
       await durationSelect.click();
       await page.getByText('10').first().click();
@@ -49,7 +74,9 @@ test.describe('Video Generation Complete Flow', () => {
     await generateButton.click();
 
     // Step 6: Wait for generation to start
-    await expect(page.getByText(/generating|生成中|processing/i).first()).toBeVisible({ timeout: 10000 });
+    await expect(page.getByText(/generating|生成中|processing/i).first()).toBeVisible({
+      timeout: 10000,
+    });
 
     // Step 7: Wait for completion (with timeout)
     // Note: Real video generation can take 2-5 minutes
@@ -57,7 +84,7 @@ test.describe('Video Generation Complete Flow', () => {
     const startTime = Date.now();
 
     let videoUrl: string | null = null;
-    let taskId: string | null = null;
+    const _taskId: string | null = null;
 
     while (Date.now() - startTime < maxWaitTime) {
       // Check for success message or video element
@@ -91,9 +118,10 @@ test.describe('Video Generation Complete Flow', () => {
     // Step 9: Verify credits were deducted by checking API
     const balanceResponse = await request.get('/api/credits/balance', {
       headers: {
-        Cookie: await page.context().cookies().then((cookies) =>
-          cookies.map((c) => `${c.name}=${c.value}`).join('; ')
-        ),
+        Cookie: await page
+          .context()
+          .cookies()
+          .then((cookies) => cookies.map((c) => `${c.name}=${c.value}`).join('; ')),
       },
     });
 
@@ -106,9 +134,10 @@ test.describe('Video Generation Complete Flow', () => {
     // Step 10: Verify asset was saved to database
     const assetsResponse = await request.get('/api/v1/assets?limit=1', {
       headers: {
-        Cookie: await page.context().cookies().then((cookies) =>
-          cookies.map((c) => `${c.name}=${c.value}`).join('; ')
-        ),
+        Cookie: await page
+          .context()
+          .cookies()
+          .then((cookies) => cookies.map((c) => `${c.name}=${c.value}`).join('; ')),
       },
     });
 
@@ -124,13 +153,13 @@ test.describe('Video Generation Complete Flow', () => {
     }
   });
 
-  test('should handle database save retry on failure', async ({ page, request }) => {
+  test('should handle database save retry on failure', async () => {
     // This test would require mocking database failures
     // For now, we'll test the API directly with a mock scenario
     test.skip(); // Skip until we have proper mocking setup
   });
 
-  test('should handle credit charge retry on failure', async ({ page, request }) => {
+  test('should handle credit charge retry on failure', async () => {
     // This test would require mocking credit service failures
     // For now, we'll test the API directly with a mock scenario
     test.skip(); // Skip until we have proper mocking setup
@@ -142,8 +171,8 @@ test.describe('Video Generation Complete Flow', () => {
  * Tests the complete API flow including retry mechanisms
  */
 test.describe('Video Generation API E2E', () => {
-  const testUserId = `test-user-${randomUUID()}`;
-  const testTaskId = randomUUID().replace(/-/g, '').substring(0, 32);
+  const _testUserId = `test-user-${randomUUID()}`;
+  const _testTaskId = randomUUID().replace(/-/g, '').substring(0, 32);
 
   test('should complete video generation API flow', async ({ request }) => {
     // Note: This test requires:
@@ -184,5 +213,3 @@ test.describe('Video Generation API E2E', () => {
     expect(videoResponse.headers()['content-type']).toContain('video');
   });
 });
-
-

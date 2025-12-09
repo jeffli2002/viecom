@@ -1,25 +1,24 @@
 import { expect, test } from '@playwright/test';
 
 test.describe('Authentication', () => {
-  test('should navigate to login page', async ({ page }) => {
-    await page.goto('/');
+  test('login page should be reachable and show form', async ({ page }) => {
+    await page.goto('/login', { waitUntil: 'domcontentloaded', timeout: 60000 });
 
-    // Try to find and click login link
-    const loginLink = page.getByRole('link', { name: /login|sign in/i }).first();
-    if (await loginLink.isVisible()) {
-      await loginLink.click();
-      await expect(page).toHaveURL(/.*login.*/i);
-    }
+    // Ensure URL includes login (locale redirects allowed)
+    await expect(page).toHaveURL(/login/i);
+
+    // Form fields should be visible
+    await expect(page.getByLabel(/email/i).first()).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByLabel(/password/i).first()).toBeVisible({ timeout: 10_000 });
   });
 
-  test('should navigate to signup page', async ({ page }) => {
-    await page.goto('/');
+  test('signup page should be reachable and show form', async ({ page }) => {
+    await page.goto('/signup', { waitUntil: 'domcontentloaded', timeout: 60000 });
 
-    // Try to find and click signup link
-    const signupLink = page.getByRole('link', { name: /sign up|signup|register/i }).first();
-    if (await signupLink.isVisible()) {
-      await signupLink.click();
-      await expect(page).toHaveURL(/.*signup|register.*/i);
-    }
+    await expect(page).toHaveURL(/signup/i);
+
+    await expect(page.getByLabel(/email/i).first()).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByLabel(/password/i).first()).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByLabel(/confirm password/i).first()).toBeVisible({ timeout: 10_000 });
   });
 });
