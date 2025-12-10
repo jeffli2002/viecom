@@ -210,11 +210,16 @@ const getPricingComparison = () => {
   const proVideoCount = Math.floor(pricing.pro.monthlyCredits / sora2Cost);
   const proplusVideoCount = Math.floor(pricing.proplus.monthlyCredits / sora2Cost);
 
+  // Free plan: 15 credits can only generate images (3 images), not videos (minimum 25 credits needed)
+  const freeCanGenerateVideo = pricing.free.signupCredits >= sora2Cost;
+
   return [
     {
       plan: 'Free',
       credits: `${pricing.free.signupCredits} credits (sign-up bonus, one-time)`,
-      videos: `Up to 1 video (or ${imageCount} images)`,
+      videos: freeCanGenerateVideo
+        ? `Up to 1 video (or ${imageCount} images)`
+        : `Up to ${imageCount} images`,
       price: '$0',
       features: [
         '720p quality',
@@ -364,7 +369,7 @@ export default function ImageToVideoAIPage() {
           <div className="flex flex-wrap justify-center gap-6 mt-8 text-sm text-slate-600 dark:text-slate-400">
             <div className="flex items-center gap-2">
               <Check className="h-5 w-5 text-green-500" />
-              <span>30 Free Credits</span>
+              <span>{pricing.free.signupCredits} Free Credits</span>
             </div>
             <div className="flex items-center gap-2">
               <Check className="h-5 w-5 text-green-500" />
@@ -533,8 +538,8 @@ export default function ImageToVideoAIPage() {
               </h3>
               <p className="text-slate-600 dark:text-slate-300">
                 Yes! Get {pricing.free.signupCredits} free credits on signup (no credit card
-                required). This allows you to generate 1 Sora 2 video (or up to {imageCount} images)
-                to test our platform. Pro plan costs ${pricing.pro.price}/month with{' '}
+                required). This allows you to generate up to {imageCount} images to test our
+                platform. Pro plan costs ${pricing.pro.price}/month with{' '}
                 {pricing.pro.monthlyCredits} credits.
               </p>
             </div>

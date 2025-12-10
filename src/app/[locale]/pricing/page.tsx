@@ -52,6 +52,14 @@ export default async function PricingPage() {
       const maxVideos = monthlyCapacity.videos.sora2_720p_10s;
 
       features[0] = `${monthlyCredits.toLocaleString()} credits/month (up to ${maxImages} images or ${maxVideos} videos)`;
+    } else if (plan.id === 'free' && plan.credits.onSignup) {
+      // For free plan, show signup credits capacity (images only, no videos since 15 < 25)
+      const signupCapacity = calculateGenerationCapacity(plan.credits.onSignup);
+      const maxImages = signupCapacity.images.nanoBanana;
+      // Don't show videos since signup credits (15) < minimum video cost (25)
+      if (features.length > 0 && features[0].includes('credits')) {
+        features[0] = `${plan.credits.onSignup} credits sign-up bonus (one-time) - up to ${maxImages} images`;
+      }
     }
 
     return {
