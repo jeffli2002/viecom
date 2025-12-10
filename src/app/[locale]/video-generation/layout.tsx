@@ -9,13 +9,13 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { locale } = await params;
   const baseMetadata = getSEOMetadata(locale, 'tool', '/video-generation');
-  
+
   // Page-specific overrides
   const pageSpecific: Record<string, Partial<Metadata>> = {
     en: {
       title: 'AI Video Generator | Text to Video & Image to Video Free',
       description:
-        'Create professional product videos with AI. Text-to-video and image-to-video modes. Sora 2 models, 720p/1080p quality. Free trial with 30 credits.',
+        'Create professional product videos with AI. Text-to-video and image-to-video modes. Sora 2 models, 720p/1080p quality. Free trial with 15 credits.',
       keywords: [
         'ai video generator',
         'text to video',
@@ -55,7 +55,7 @@ export async function generateMetadata({
     fr: {
       title: 'Générateur de Vidéo IA | Texte en Vidéo et Image en Vidéo Gratuit',
       description:
-        'Créez des vidéos de produits professionnelles avec l\'IA. Modes texte vers vidéo et image vers vidéo. Modèles Sora 2, qualité 720p/1080p. Essai gratuit avec 30 crédits.',
+        "Créez des vidéos de produits professionnelles avec l'IA. Modes texte vers vidéo et image vers vidéo. Modèles Sora 2, qualité 720p/1080p. Essai gratuit avec 30 crédits.",
       keywords: [
         'générateur vidéo ia',
         'texte en vidéo',
@@ -67,7 +67,7 @@ export async function generateMetadata({
     de: {
       title: 'KI-Videogenerator | Text zu Video & Bild zu Video Kostenlos',
       description:
-        'Erstellen Sie professionelle Produktvideos mit KI. Text-zu-Video- und Bild-zu-Video-Modi. Sora 2 Modelle, 720p/1080p Qualität. Kostenlose Testversion mit 30 Credits.',
+        'Erstellen Sie professionelle Produktvideos mit KI. Text-zu-Video- und Bild-zu-Video-Modi. Sora 2 Modelle, 720p/1080p Qualität. Kostenlose Testversion mit 15 Credits.',
       keywords: [
         'ki videogenerator',
         'text zu video',
@@ -80,13 +80,7 @@ export async function generateMetadata({
       title: 'AI動画生成器 | テキストから動画・画像から動画 無料',
       description:
         'AIでプロフェッショナルな商品動画を作成。テキストから動画、画像から動画モード。Sora 2モデル、720p/1080p品質。30クレジットの無料トライアル。',
-      keywords: [
-        'ai動画生成器',
-        'テキストから動画',
-        '画像から動画',
-        '商品動画生成器',
-        'sora 2',
-      ],
+      keywords: ['ai動画生成器', 'テキストから動画', '画像から動画', '商品動画生成器', 'sora 2'],
     },
   };
 

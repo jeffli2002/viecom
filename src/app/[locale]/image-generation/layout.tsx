@@ -9,13 +9,13 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { locale } = await params;
   const baseMetadata = getSEOMetadata(locale, 'tool', '/image-generation');
-  
+
   // Page-specific overrides
   const pageSpecific: Record<string, Partial<Metadata>> = {
     en: {
       title: 'AI Image Generator | Text to Image & Image to Image Free',
       description:
-        'Generate professional product images with AI. Text-to-image and image-to-image modes. Nano Banana models, multiple styles. Free trial with 30 credits.',
+        'Generate professional product images with AI. Text-to-image and image-to-image modes. Nano Banana models, multiple styles. Free trial with 15 credits.',
       keywords: [
         'ai image generator',
         'text to image',
@@ -53,9 +53,9 @@ export async function generateMetadata({
       ],
     },
     fr: {
-      title: 'Générateur d\'Image IA | Texte en Image et Image en Image Gratuit',
+      title: "Générateur d'Image IA | Texte en Image et Image en Image Gratuit",
       description:
-        'Générez des images de produits professionnelles avec l\'IA. Modes texte vers image et image vers image. Modèles Nano Banana, plusieurs styles. Essai gratuit avec 30 crédits.',
+        "Générez des images de produits professionnelles avec l'IA. Modes texte vers image et image vers image. Modèles Nano Banana, plusieurs styles. Essai gratuit avec 30 crédits.",
       keywords: [
         'générateur image ia',
         'texte en image',
@@ -67,7 +67,7 @@ export async function generateMetadata({
     de: {
       title: 'KI-Bildgenerator | Text zu Bild & Bild zu Bild Kostenlos',
       description:
-        'Generieren Sie professionelle Produktbilder mit KI. Text-zu-Bild- und Bild-zu-Bild-Modi. Nano Banana Modelle, mehrere Stile. Kostenlose Testversion mit 30 Credits.',
+        'Generieren Sie professionelle Produktbilder mit KI. Text-zu-Bild- und Bild-zu-Bild-Modi. Nano Banana Modelle, mehrere Stile. Kostenlose Testversion mit 15 Credits.',
       keywords: [
         'ki bildgenerator',
         'text zu bild',

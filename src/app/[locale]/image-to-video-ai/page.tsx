@@ -1,8 +1,8 @@
 import { Button } from '@/components/ui/button';
 import { creditsConfig } from '@/config/credits.config';
 import { paymentConfig } from '@/config/payment.config';
-import { getImageToVideoFAQSchema, getPricingData } from '@/lib/utils/faq-generator';
 import { buildLocaleCanonicalMetadata } from '@/lib/seo/metadata';
+import { getImageToVideoFAQSchema, getPricingData } from '@/lib/utils/faq-generator';
 import { ArrowRight, Check, Clock, Sparkles, TrendingUp, Zap } from 'lucide-react';
 import type { Metadata } from 'next';
 import Link from 'next/link';
@@ -20,7 +20,7 @@ export async function generateMetadata({
       ...baseMetadata,
       title: 'Image to Video AI Free | Product Photos to Videos in 60 Seconds',
       description:
-        'Transform product images into engaging videos with AI. Upload photos, get professional videos instantly. Sora 2 models, 720p/1080p quality. Free trial with 30 credits sign-up bonus.',
+        'Transform product images into engaging videos with AI. Upload photos, get professional videos instantly. Sora 2 models, 720p/1080p quality. Free trial with 15 credits sign-up bonus.',
       keywords: [
         'image to video',
         'image to video ai',
@@ -32,14 +32,14 @@ export async function generateMetadata({
       openGraph: {
         title: 'Image to Video AI Free | Product Photos to Videos',
         description:
-          'Transform product images into engaging videos with AI. Free trial with 30 credits sign-up bonus.',
+          'Transform product images into engaging videos with AI. Free trial with 15 credits sign-up bonus.',
         type: 'website',
       },
       twitter: {
         card: 'summary_large_image',
         title: 'Image to Video AI Free | Product Photos to Videos',
         description:
-          'Transform product images into engaging videos with AI. Free trial with 30 credits sign-up bonus.',
+          'Transform product images into engaging videos with AI. Free trial with 15 credits sign-up bonus.',
       },
     },
     zh: {
@@ -81,20 +81,22 @@ export async function generateMetadata({
       ],
       openGraph: {
         title: 'Imagen a Video IA Gratis | Fotos de Productos a Videos',
-        description: 'Transforma imágenes de productos en videos atractivos con IA. Prueba gratuita con 30 créditos.',
+        description:
+          'Transforma imágenes de productos en videos atractivos con IA. Prueba gratuita con 30 créditos.',
         type: 'website',
       },
       twitter: {
         card: 'summary_large_image',
         title: 'Imagen a Video IA Gratis | Fotos de Productos a Videos',
-        description: 'Transforma imágenes de productos en videos atractivos con IA. Prueba gratuita con 30 créditos.',
+        description:
+          'Transforma imágenes de productos en videos atractivos con IA. Prueba gratuita con 30 créditos.',
       },
     },
     fr: {
       ...baseMetadata,
       title: 'Image en Vidéo IA Gratuit | Photos Produit en Vidéos en 60 Secondes',
       description:
-        'Transformez des images de produits en vidéos attrayantes avec l\'IA. Téléchargez des photos, obtenez des vidéos professionnelles instantanément. Modèles Sora 2, qualité 720p/1080p. Essai gratuit avec 30 crédits.',
+        "Transformez des images de produits en vidéos attrayantes avec l'IA. Téléchargez des photos, obtenez des vidéos professionnelles instantanément. Modèles Sora 2, qualité 720p/1080p. Essai gratuit avec 30 crédits.",
       keywords: [
         'image en vidéo',
         'image en vidéo ia',
@@ -105,20 +107,22 @@ export async function generateMetadata({
       ],
       openGraph: {
         title: 'Image en Vidéo IA Gratuit | Photos Produit en Vidéos',
-        description: 'Transformez des images de produits en vidéos attrayantes avec l\'IA. Essai gratuit avec 30 crédits.',
+        description:
+          "Transformez des images de produits en vidéos attrayantes avec l'IA. Essai gratuit avec 30 crédits.",
         type: 'website',
       },
       twitter: {
         card: 'summary_large_image',
         title: 'Image en Vidéo IA Gratuit | Photos Produit en Vidéos',
-        description: 'Transformez des images de produits en vidéos attrayantes avec l\'IA. Essai gratuit avec 30 crédits.',
+        description:
+          "Transformez des images de produits en vidéos attrayantes avec l'IA. Essai gratuit avec 30 crédits.",
       },
     },
     de: {
       ...baseMetadata,
       title: 'Bild zu Video KI Kostenlos | Produktfotos zu Videos in 60 Sekunden',
       description:
-        'Verwandeln Sie Produktbilder mit KI in ansprechende Videos. Laden Sie Fotos hoch, erhalten Sie sofort professionelle Videos. Sora 2 Modelle, 720p/1080p Qualität. Kostenlose Testversion mit 30 Credits.',
+        'Verwandeln Sie Produktbilder mit KI in ansprechende Videos. Laden Sie Fotos hoch, erhalten Sie sofort professionelle Videos. Sora 2 Modelle, 720p/1080p Qualität. Kostenlose Testversion mit 15 Credits.',
       keywords: [
         'bild zu video',
         'bild zu video ki',
@@ -129,13 +133,15 @@ export async function generateMetadata({
       ],
       openGraph: {
         title: 'Bild zu Video KI Kostenlos | Produktfotos zu Videos',
-        description: 'Verwandeln Sie Produktbilder mit KI in ansprechende Videos. Kostenlose Testversion mit 30 Credits.',
+        description:
+          'Verwandeln Sie Produktbilder mit KI in ansprechende Videos. Kostenlose Testversion mit 15 Credits.',
         type: 'website',
       },
       twitter: {
         card: 'summary_large_image',
         title: 'Bild zu Video KI Kostenlos | Produktfotos zu Videos',
-        description: 'Verwandeln Sie Produktbilder mit KI in ansprechende Videos. Kostenlose Testversion mit 30 Credits.',
+        description:
+          'Verwandeln Sie Produktbilder mit KI in ansprechende Videos. Kostenlose Testversion mit 15 Credits.',
       },
     },
     ja: {
@@ -210,14 +216,24 @@ const getPricingComparison = () => {
       credits: `${pricing.free.signupCredits} credits (sign-up bonus, one-time)`,
       videos: `Up to 1 video (or ${imageCount} images)`,
       price: '$0',
-      features: ['720p quality', 'Sora 2 model', `${pricing.free.batchSize} video at a time`, 'Watermark'],
+      features: [
+        '720p quality',
+        'Sora 2 model',
+        `${pricing.free.batchSize} video at a time`,
+        'Watermark',
+      ],
     },
     {
       plan: 'Pro',
       credits: `${pricing.pro.monthlyCredits} credits/month`,
       videos: `Up to ${proVideoCount} videos`,
       price: `$${pricing.pro.price}`,
-      features: ['720p/1080p quality', 'Sora 2 & 2 Pro', `${pricing.pro.batchSize} videos at once`, 'No watermark'],
+      features: [
+        '720p/1080p quality',
+        'Sora 2 & 2 Pro',
+        `${pricing.pro.batchSize} videos at once`,
+        'No watermark',
+      ],
       popular: true,
     },
     {
@@ -225,7 +241,12 @@ const getPricingComparison = () => {
       credits: `${pricing.proplus.monthlyCredits} credits/month`,
       videos: `Up to ${proplusVideoCount} videos`,
       price: `$${pricing.proplus.price}`,
-      features: ['720p/1080p quality', 'Priority processing', `${pricing.proplus.batchSize} videos at once`, 'No watermark'],
+      features: [
+        '720p/1080p quality',
+        'Priority processing',
+        `${pricing.proplus.batchSize} videos at once`,
+        'No watermark',
+      ],
     },
   ];
 };
@@ -237,7 +258,7 @@ export default function ImageToVideoAIPage() {
   const sora2Cost = `${pricing.credits.sora2_720p_10s}-${pricing.credits.sora2_720p_15s}`;
   const sora2ProCost = `${pricing.credits.sora2Pro_720p_10s}-${pricing.credits.sora2Pro_1080p_15s}`;
   const imageCount = Math.floor(pricing.free.signupCredits / pricing.credits.imageCostMin);
-  
+
   const howItWorksSchema = {
     '@context': 'https://schema.org',
     '@type': 'HowTo',
@@ -322,7 +343,7 @@ export default function ImageToVideoAIPage() {
 
           <p className="text-xl text-slate-600 dark:text-slate-300 mb-8 leading-relaxed">
             Upload your product images and let AI create professional videos for e-commerce, social
-            media, and ads. No video editing skills required. Free trial with 30 credits sign-up
+            media, and ads. No video editing skills required. Free trial with 15 credits sign-up
             bonus (one-time).
           </p>
 
@@ -511,8 +532,10 @@ export default function ImageToVideoAIPage() {
                 Is there a free trial?
               </h3>
               <p className="text-slate-600 dark:text-slate-300">
-                Yes! Get {pricing.free.signupCredits} free credits on signup (no credit card required). This allows you to
-                generate 1 Sora 2 video (or up to {imageCount} images) to test our platform. Pro plan costs ${pricing.pro.price}/month with {pricing.pro.monthlyCredits} credits.
+                Yes! Get {pricing.free.signupCredits} free credits on signup (no credit card
+                required). This allows you to generate 1 Sora 2 video (or up to {imageCount} images)
+                to test our platform. Pro plan costs ${pricing.pro.price}/month with{' '}
+                {pricing.pro.monthlyCredits} credits.
               </p>
             </div>
             <div>
@@ -520,8 +543,8 @@ export default function ImageToVideoAIPage() {
                 How many credits does image-to-video cost?
               </h3>
               <p className="text-slate-600 dark:text-slate-300">
-                Sora 2 (720p): {sora2Cost} credits per video. Sora 2 Pro (1080p): {sora2ProCost} credits per video
-                depending on duration.
+                Sora 2 (720p): {sora2Cost} credits per video. Sora 2 Pro (1080p): {sora2ProCost}{' '}
+                credits per video depending on duration.
               </p>
             </div>
             <div>
@@ -529,8 +552,9 @@ export default function ImageToVideoAIPage() {
                 Can I generate multiple videos at once?
               </h3>
               <p className="text-slate-600 dark:text-slate-300">
-                Yes! Free users can generate {pricing.free.batchSize} video at a time. Pro users: {pricing.pro.batchSize} videos simultaneously.
-                Pro+ users: {pricing.proplus.batchSize} videos simultaneously.
+                Yes! Free users can generate {pricing.free.batchSize} video at a time. Pro users:{' '}
+                {pricing.pro.batchSize} videos simultaneously. Pro+ users:{' '}
+                {pricing.proplus.batchSize} videos simultaneously.
               </p>
             </div>
           </div>

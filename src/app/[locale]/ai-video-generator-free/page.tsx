@@ -16,7 +16,7 @@ export async function generateMetadata({
 
   // Get config values for metadata
   const freePlan = paymentConfig.plans.find((p) => p.id === 'free');
-  const signupBonus = freePlan?.credits.onSignup || 30;
+  const signupBonus = freePlan?.credits.onSignup || 15;
   const dailyCheckinCredits = creditsConfig.rewards.checkin.dailyCredits;
 
   const translations: Record<string, Metadata> = {
@@ -222,7 +222,7 @@ export default function FreeAIVideoGeneratorPage() {
 
   // Build comparison table dynamically from config
   // All plans get the same sign-up bonus
-  const signupBonus = freePlan?.credits.onSignup || 30;
+  const signupBonus = freePlan?.credits.onSignup || 15;
   const comparisonTable = [
     {
       feature: 'Sign-up Bonus',

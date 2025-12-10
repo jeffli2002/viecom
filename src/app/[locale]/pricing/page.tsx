@@ -25,7 +25,7 @@ export default async function PricingPage() {
   const proplusPlan = paymentConfig.plans.find((p) => p.id === 'proplus');
 
   const faqParams = {
-    signupCredits: freePlan?.credits.onSignup || 30,
+    signupCredits: freePlan?.credits.onSignup || 15,
     proCredits: proPlan?.credits.monthly || 500,
     proPrice: proPlan?.price || 19.9,
     proplusCredits: proplusPlan?.credits.monthly || 900,

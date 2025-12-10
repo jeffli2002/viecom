@@ -9,7 +9,7 @@ export default function TermsPage() {
   const videoCostMin = creditsConfig.consumption.videoGeneration['sora-2-720p-10s'];
   const videoCostMax = creditsConfig.consumption.videoGeneration['sora-2-pro-1080p-15s'];
   const freePlan = paymentConfig.plans.find((p) => p.id === 'free');
-  const freeSignupBonus = freePlan?.credits.onSignup || 30;
+  const freeSignupBonus = freePlan?.credits.onSignup || 15;
   return (
     <div className="container mx-auto px-4 py-12 max-w-4xl">
       <h1 className="mb-8 text-4xl font-bold text-gray-900 dark:text-white">Terms of Service</h1>

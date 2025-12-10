@@ -60,7 +60,7 @@
     "imageToVideoAI": "Image to Video AI",
     "imageToVideoAIDesc": "Transform product photos into engaging videos",
     "freeAIVideoGenerator": "Free AI Video Generator",
-    "freeAIVideoGeneratorDesc": "Start with 30 free credits, no credit card",
+    "freeAIVideoGeneratorDesc": "Start with 15 free credits, no credit card",
     "videoEnhancer": "Video Enhancer",
     "videoEnhancerDesc": "Upscale videos to 4K quality with AI",
     "footerLearn": "Learn",
@@ -630,11 +630,11 @@
     "subtitle": "Everything you need to know about Viecom AI",
     "q1": {
       "question": "How does the credit system work?",
-      "answer": "Credits are used for AI generations. Image generation costs 5-30 credits depending on the model (e.g., Nano Banana 5 credits, Nano Banana Pro 30 credits). Videos cost 15-130 credits depending on model and resolution. Free users get 30 signup credits. Pro plans include 500-900 monthly credits. You can also purchase credit packs starting at $9.90 for 200 credits."
+      "answer": "Credits are used for AI generations. Image generation costs 5-30 credits depending on the model (e.g., Nano Banana 5 credits, Nano Banana Pro 30 credits). Videos cost 15-130 credits depending on model and resolution. Free users get 15 signup credits. Pro plans include 500-900 monthly credits. You can also purchase credit packs starting at $9.90 for 200 credits."
     },
     "q2": {
       "question": "What's included in the Free plan?",
-      "answer": "Free users get 30 credits on signup, daily check-in rewards (2 credits/day), referral rewards (10 credits), and social share rewards (2 credits). You can generate images and videos using these credits, with batch generation support (1 concurrent) and 7-day asset display."
+      "answer": "Free users get 15 credits on signup, daily check-in rewards (2 credits/day), referral rewards (10 credits), and social share rewards (2 credits). You can generate images and videos using these credits, with batch generation support (1 concurrent) and 7-day asset display."
     },
     "q3": {
       "question": "What video models and resolutions are available?",
@@ -684,7 +684,7 @@
     "creditPacksSubtitle": "Need extra credits? Purchase credit packs without a subscription",
     "faqTitle": "Frequently Asked Questions",
     "faqQ1": "Is there a free plan?",
-    "faqA1": "Yes, get 30 free credits on signup. No credit card required. Perfect for trying out our AI video and image generation.",
+    "faqA1": "Yes, get 15 free credits on signup. No credit card required. Perfect for trying out our AI video and image generation.",
     "faqQ2": "How much do credits cost?",
     "faqA2": "Free plan: {signupCredits} credits sign-up bonus (one-time). Pro: {proCredits} credits/month (${proPrice}). Pro+: {proplusCredits} credits/month (${proplusPrice}). Credits cost {minCost}-{maxCost} per generation depending on model and settings.",
     "faqQ3": "Can I upgrade or downgrade anytime?",

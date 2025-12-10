@@ -66,7 +66,7 @@ function baseTemplate(content: string, footerText?: string): string {
  */
 export function getWelcomeEmailTemplate(userName: string, _userEmail: string): string {
   const freePlan = paymentConfig.plans.find((p) => p.id === 'free');
-  const signupCredits = freePlan?.credits.onSignup || 30;
+  const signupCredits = freePlan?.credits.onSignup || 15;
 
   const content = `
     <h2 style="color: #111827; margin: 0 0 20px 0; font-size: 24px;">Welcome to ${APP_NAME}! 🎉</h2>
@@ -409,4 +409,3 @@ export function getCreditPackPurchaseEmailTemplate(
 
   return baseTemplate(content);
 }
-

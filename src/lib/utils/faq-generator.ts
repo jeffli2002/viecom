@@ -6,7 +6,7 @@ export function getPricingFAQSchema() {
   const proPlan = paymentConfig.plans.find((p) => p.id === 'pro');
   const proplusPlan = paymentConfig.plans.find((p) => p.id === 'proplus');
 
-  const signupCredits = freePlan?.credits.onSignup || 30;
+  const signupCredits = freePlan?.credits.onSignup || 15;
   const proCredits = proPlan?.credits.monthly || 500;
   const proPrice = proPlan?.price || 19.9;
   const proplusCredits = proplusPlan?.credits.monthly || 900;
@@ -66,8 +66,8 @@ export function getPricingFAQSchema() {
 export function getImageToVideoFAQSchema() {
   const freePlan = paymentConfig.plans.find((p) => p.id === 'free');
   const proPlan = paymentConfig.plans.find((p) => p.id === 'pro');
-  
-  const signupCredits = freePlan?.credits.onSignup || 30;
+
+  const signupCredits = freePlan?.credits.onSignup || 15;
   const proPrice = proPlan?.price || 19.9;
   const proCredits = proPlan?.credits.monthly || 500;
 

@@ -60,7 +60,7 @@
     "imageToVideoAI": "Bild zu Video KI",
     "imageToVideoAIDesc": "Verwandeln Sie Produktfotos in ansprechende Videos",
     "freeAIVideoGenerator": "Kostenloser KI-Videogenerator",
-    "freeAIVideoGeneratorDesc": "Starten Sie mit 30 kostenlosen Credits, keine Kreditkarte",
+    "freeAIVideoGeneratorDesc": "Starten Sie mit 15 kostenlosen Credits, keine Kreditkarte",
     "videoEnhancer": "Video-Enhancer",
     "videoEnhancerDesc": "Skalieren Sie Videos mit KI auf 4K-Qualität",
     "footerLearn": "Lernen",
@@ -630,11 +630,11 @@
     "subtitle": "Alles, was Sie über Viecom AI wissen müssen",
     "q1": {
       "question": "Wie funktioniert das Credit-System?",
-      "answer": "Credits werden für KI-Generierungen verwendet. Die Bildgenerierung kostet je nach Modell 5-30 Credits (z.B. Nano Banana 5 Credits, Nano Banana Pro 30 Credits). Videos kosten je nach Modell und Auflösung 15-130 Credits. Kostenlose Nutzer erhalten 30 Anmelde-Credits. Pro-Pläne beinhalten 500-900 monatliche Credits. Sie können auch Credit-Pakete ab 9,90 $ für 200 Credits erwerben."
+      "answer": "Credits werden für KI-Generierungen verwendet. Die Bildgenerierung kostet je nach Modell 5-30 Credits (z.B. Nano Banana 5 Credits, Nano Banana Pro 30 Credits). Videos kosten je nach Modell und Auflösung 15-130 Credits. Kostenlose Nutzer erhalten 15 Anmelde-Credits. Pro-Pläne beinhalten 500-900 monatliche Credits. Sie können auch Credit-Pakete ab 9,90 $ für 200 Credits erwerben."
     },
     "q2": {
       "question": "Was ist im kostenlosen Plan enthalten?",
-      "answer": "Kostenlose Nutzer erhalten 30 Credits bei der Anmeldung, tägliche Check-in-Belohnungen (2 Credits/Tag), Empfehlungsbelohnungen (10 Credits) und Social-Share-Belohnungen (2 Credits). Sie können mit diesen Credits Bilder und Videos generieren, mit Stapelgenerierungsunterstützung (1 gleichzeitig) und 7-tägiger Asset-Anzeige."
+      "answer": "Kostenlose Nutzer erhalten 15 Credits bei der Anmeldung, tägliche Check-in-Belohnungen (2 Credits/Tag), Empfehlungsbelohnungen (10 Credits) und Social-Share-Belohnungen (2 Credits). Sie können mit diesen Credits Bilder und Videos generieren, mit Stapelgenerierungsunterstützung (1 gleichzeitig) und 7-tägiger Asset-Anzeige."
     },
     "q3": {
       "question": "Welche Videomodelle und Auflösungen sind verfügbar?",
@@ -684,7 +684,7 @@
     "creditPacksSubtitle": "Benötigen Sie zusätzliche Credits? Credit-Pakete ohne Abonnement kaufen",
     "faqTitle": "Häufig gestellte Fragen",
     "faqQ1": "Gibt es einen kostenlosen Plan?",
-    "faqA1": "Ja, Sie erhalten 30 kostenlose Credits bei der Anmeldung. Keine Kreditkarte erforderlich. Perfekt zum Ausprobieren unserer KI-Video- und Bildgenerierung.",
+    "faqA1": "Ja, Sie erhalten 15 kostenlose Credits bei der Anmeldung. Keine Kreditkarte erforderlich. Perfekt zum Ausprobieren unserer KI-Video- und Bildgenerierung.",
     "faqQ2": "Wie viel kosten Credits?",
     "faqA2": "Kostenloser Plan: {signupCredits} Credits Anmeldebonus (einmalig). Pro: {proCredits} Credits/Monat (${proPrice}). Pro+: {proplusCredits} Credits/Monat (${proplusPrice}). Credits kosten {minCost}-{maxCost} pro Generierung je nach Modell und Einstellungen.",
     "faqQ3": "Kann ich jederzeit upgraden oder downgraden?",

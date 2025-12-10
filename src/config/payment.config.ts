@@ -119,10 +119,10 @@ export const paymentConfig: PaymentConfig = {
       interval: null,
       credits: {
         monthly: 0,
-        onSignup: 30,
+        onSignup: 15,
       },
       features: [
-        '30 credits sign-up bonus (one-time)',
+        '15 credits sign-up bonus (one-time)',
         'Daily check-in rewards (2 credits/day)',
         'Referral rewards (10 credits per referral)',
         `Social share rewards (${creditsConfig.rewards.socialShare.creditsPerShare} credits per share)`,

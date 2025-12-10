@@ -1,6 +1,7 @@
 // @ts-nocheck
 import { Card, CardContent } from '@/components/ui/card';
 import { creditsConfig } from '@/config/credits.config';
+import { paymentConfig } from '@/config/payment.config';
 import { Link } from '@/i18n/navigation';
 import { DEFAULT_SEO_KEYWORDS } from '@/lib/seo/metadata';
 import { AlertCircle } from 'lucide-react';
@@ -19,6 +20,7 @@ export const metadata: Metadata = {
 };
 
 export default function RefundPolicyPage() {
+  const freePlan = paymentConfig.plans.find((p) => p.id === 'free');
   const socialShareCredits = creditsConfig.rewards.socialShare.creditsPerShare;
   return (
     <div className="container mx-auto px-4 py-12 max-w-4xl">
@@ -184,7 +186,8 @@ export default function RefundPolicyPage() {
             </p>
             <ul className="list-disc list-inside space-y-2 ml-4">
               <li>
-                <strong>Free Plan:</strong> All users receive 30 sign-up bonus credits
+                <strong>Free Plan:</strong> All users receive {freePlan?.credits.onSignup || 15}{' '}
+                sign-up bonus credits
               </li>
               <li>
                 <strong>Daily Rewards:</strong> Earn 2 credits per day through check-ins

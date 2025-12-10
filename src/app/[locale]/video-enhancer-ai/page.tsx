@@ -1,4 +1,5 @@
 import { Button } from '@/components/ui/button';
+import { paymentConfig } from '@/config/payment.config';
 import { buildLocaleCanonicalMetadata } from '@/lib/seo/metadata';
 import { ArrowRight, Check, Settings, Sparkles, TrendingUp, Zap } from 'lucide-react';
 import type { Metadata } from 'next';
@@ -78,20 +79,22 @@ export async function generateMetadata({
       ],
       openGraph: {
         title: 'Mejorador de Video IA | Mejora Calidad Video',
-        description: 'Mejora la calidad de videos de productos con IA. Mejora 720p a 1080p/4K, aumenta la claridad, reduce el ruido.',
+        description:
+          'Mejora la calidad de videos de productos con IA. Mejora 720p a 1080p/4K, aumenta la claridad, reduce el ruido.',
         type: 'website',
       },
       twitter: {
         card: 'summary_large_image',
         title: 'Mejorador de Video IA | Mejora Calidad Video',
-        description: 'Mejora la calidad de videos de productos con IA. Mejora 720p a 1080p/4K, aumenta la claridad, reduce el ruido.',
+        description:
+          'Mejora la calidad de videos de productos con IA. Mejora 720p a 1080p/4K, aumenta la claridad, reduce el ruido.',
       },
     },
     fr: {
       ...baseMetadata,
       title: 'Améliorateur de Vidéo IA | Amélioration Qualité 4K Essai Gratuit',
       description:
-        'Améliorez la qualité des vidéos produits avec l\'IA. Améliorez 720p à 1080p/4K, augmentez la clarté, réduisez le bruit. Modèle Nano Banana Pro. Parfait pour l\'e-commerce. Essayez gratuitement !',
+        "Améliorez la qualité des vidéos produits avec l'IA. Améliorez 720p à 1080p/4K, augmentez la clarté, réduisez le bruit. Modèle Nano Banana Pro. Parfait pour l'e-commerce. Essayez gratuitement !",
       keywords: [
         'améliorateur vidéo',
         'améliorateur qualité vidéo',
@@ -102,13 +105,15 @@ export async function generateMetadata({
       ],
       openGraph: {
         title: 'Améliorateur de Vidéo IA | Amélioration Qualité Vidéo',
-        description: 'Améliorez la qualité des vidéos produits avec l\'IA. Améliorez 720p à 1080p/4K, augmentez la clarté, réduisez le bruit.',
+        description:
+          "Améliorez la qualité des vidéos produits avec l'IA. Améliorez 720p à 1080p/4K, augmentez la clarté, réduisez le bruit.",
         type: 'website',
       },
       twitter: {
         card: 'summary_large_image',
         title: 'Améliorateur de Vidéo IA | Amélioration Qualité Vidéo',
-        description: 'Améliorez la qualité des vidéos produits avec l\'IA. Améliorez 720p à 1080p/4K, augmentez la clarté, réduisez le bruit.',
+        description:
+          "Améliorez la qualité des vidéos produits avec l'IA. Améliorez 720p à 1080p/4K, augmentez la clarté, réduisez le bruit.",
       },
     },
     de: {
@@ -126,13 +131,15 @@ export async function generateMetadata({
       ],
       openGraph: {
         title: 'KI-Videoverbesserer | Verbesserung Videoqualität',
-        description: 'Verbessern Sie die Qualität von Produktvideos mit KI. Verbessern Sie 720p auf 1080p/4K, erhöhen Sie die Klarheit, reduzieren Sie Rauschen.',
+        description:
+          'Verbessern Sie die Qualität von Produktvideos mit KI. Verbessern Sie 720p auf 1080p/4K, erhöhen Sie die Klarheit, reduzieren Sie Rauschen.',
         type: 'website',
       },
       twitter: {
         card: 'summary_large_image',
         title: 'KI-Videoverbesserer | Verbesserung Videoqualität',
-        description: 'Verbessern Sie die Qualität von Produktvideos mit KI. Verbessern Sie 720p auf 1080p/4K, erhöhen Sie die Klarheit, reduzieren Sie Rauschen.',
+        description:
+          'Verbessern Sie die Qualität von Produktvideos mit KI. Verbessern Sie 720p auf 1080p/4K, erhöhen Sie die Klarheit, reduzieren Sie Rauschen.',
       },
     },
     ja: {
@@ -150,13 +157,15 @@ export async function generateMetadata({
       ],
       openGraph: {
         title: 'AI動画エンハンサー | 動画品質向上',
-        description: 'AIで商品動画の品質を向上。720pを1080p/4Kにアップスケール、鮮明度向上、ノイズ低減。',
+        description:
+          'AIで商品動画の品質を向上。720pを1080p/4Kにアップスケール、鮮明度向上、ノイズ低減。',
         type: 'website',
       },
       twitter: {
         card: 'summary_large_image',
         title: 'AI動画エンハンサー | 動画品質向上',
-        description: 'AIで商品動画の品質を向上。720pを1080p/4Kにアップスケール、鮮明度向上、ノイズ低減。',
+        description:
+          'AIで商品動画の品質を向上。720pを1080p/4Kにアップスケール、鮮明度向上、ノイズ低減。',
       },
     },
   };
@@ -196,11 +205,13 @@ const useCases = [
   'Create professional-looking content on a budget',
 ];
 
+const freePlan = paymentConfig.plans.find((p) => p.id === 'free');
+
 const pricingTiers = [
   {
     name: 'Free Trial',
     price: '$0',
-    credits: '30 credits (sign-up bonus, one-time)',
+    credits: `${freePlan?.credits.onSignup || 15} credits (sign-up bonus, one-time)`,
     videos: '2-6 enhanced videos',
     features: [
       '720p to 1080p upscaling',
@@ -337,7 +348,7 @@ export default function VideoEnhancerAIPage() {
           <p className="text-xl text-slate-600 dark:text-slate-300 mb-8 leading-relaxed">
             Upscale video resolution, reduce noise, and improve clarity automatically. Perfect for
             e-commerce product videos, social media content, and marketing materials. Try free with
-            30 credits sign-up bonus (one-time).
+            {freePlan?.credits.onSignup || 15} credits sign-up bonus (one-time).
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">

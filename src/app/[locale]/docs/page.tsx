@@ -88,7 +88,7 @@ export default function DocsPage() {
                   <Link href="/signup" className="text-teal-500 hover:underline">
                     viecom.pro/signup
                   </Link>{' '}
-                  and receive {freePlan?.credits.onSignup || 30} free credits immediately. No credit
+                  and receive {freePlan?.credits.onSignup || 15} free credits immediately. No credit
                   card required.
                 </p>
                 <p className="text-gray-600 dark:text-slate-400 text-xs">
@@ -801,23 +801,52 @@ export default function DocsPage() {
                 <table className="w-full text-left border-collapse bg-white dark:bg-slate-800">
                   <thead>
                     <tr className="border-b border-slate-200 dark:border-slate-700">
-                      <th className="py-4 px-4 text-slate-500 font-medium uppercase tracking-wider text-sm">Feature</th>
-                      <th className="py-4 px-4 bg-teal-500/5 text-teal-500 font-bold text-base border-x border-teal-500/10">Viecom</th>
-                      <th className="py-4 px-4 text-slate-900 dark:text-white font-bold opacity-60">Alternative Tools</th>
+                      <th className="py-4 px-4 text-slate-500 font-medium uppercase tracking-wider text-sm">
+                        Feature
+                      </th>
+                      <th className="py-4 px-4 bg-teal-500/5 text-teal-500 font-bold text-base border-x border-teal-500/10">
+                        Viecom
+                      </th>
+                      <th className="py-4 px-4 text-slate-900 dark:text-white font-bold opacity-60">
+                        Alternative Tools
+                      </th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
                     {[
-                      { feature: 'Core Technology', viecom: 'Nano Banana Pro (Proprietary)', alt: 'Generic Models' },
+                      {
+                        feature: 'Core Technology',
+                        viecom: 'Nano Banana Pro (Proprietary)',
+                        alt: 'Generic Models',
+                      },
                       { feature: 'Video Generation', viecom: '✅ Native (Sora 2)', alt: '❌ No' },
-                      { feature: 'Batch Processing', viecom: '✅ Excel/CSV Upload', alt: '⚠️ Limited' },
-                      { feature: 'Product Integrity', viecom: '✅ Geometry Lock', alt: '❌ Hallucination Risk' },
+                      {
+                        feature: 'Batch Processing',
+                        viecom: '✅ Excel/CSV Upload',
+                        alt: '⚠️ Limited',
+                      },
+                      {
+                        feature: 'Product Integrity',
+                        viecom: '✅ Geometry Lock',
+                        alt: '❌ Hallucination Risk',
+                      },
                       { feature: 'Commercial License', viecom: '✅ Included', alt: '✅ Included' },
-                      { feature: 'Platform Compliance', viecom: '✅ Amazon/TikTok/Shopify', alt: '⚠️ Manual' },
-                    ].map((row, i) => (
-                      <tr key={i} className="hover:bg-slate-50 dark:hover:bg-slate-800/50">
-                        <td className="py-3 px-4 font-medium text-sm text-slate-900 dark:text-white">{row.feature}</td>
-                        <td className="py-3 px-4 bg-teal-500/5 font-bold text-sm text-teal-500 border-x border-teal-500/10">{row.viecom}</td>
+                      {
+                        feature: 'Platform Compliance',
+                        viecom: '✅ Amazon/TikTok/Shopify',
+                        alt: '⚠️ Manual',
+                      },
+                    ].map((row) => (
+                      <tr
+                        key={row.feature}
+                        className="hover:bg-slate-50 dark:hover:bg-slate-800/50"
+                      >
+                        <td className="py-3 px-4 font-medium text-sm text-slate-900 dark:text-white">
+                          {row.feature}
+                        </td>
+                        <td className="py-3 px-4 bg-teal-500/5 font-bold text-sm text-teal-500 border-x border-teal-500/10">
+                          {row.viecom}
+                        </td>
                         <td className="py-3 px-4 text-sm text-slate-500">{row.alt}</td>
                       </tr>
                     ))}
@@ -832,7 +861,8 @@ export default function DocsPage() {
                   <BarChart3 className="text-teal-500" /> The Video Advantage
                 </h4>
                 <p className="text-slate-400 mb-4 text-sm">
-                  Most alternatives only give you static JPEGs. In 2024, video ads convert <strong>86% higher</strong> than images.
+                  Most alternatives only give you static JPEGs. In 2024, video ads convert{' '}
+                  <strong>86% higher</strong> than images.
                 </p>
                 <div className="space-y-3">
                   <div className="flex justify-between items-center p-3 bg-slate-800 rounded-lg">
@@ -850,27 +880,35 @@ export default function DocsPage() {
                 <h4 className="text-lg font-bold mb-4 flex items-center gap-2">
                   <Coins className="text-orange-500" /> Cost Analysis
                 </h4>
-                <p className="text-slate-600 dark:text-slate-400 mb-4 text-sm">Cost to produce 10 Product Videos:</p>
+                <p className="text-slate-600 dark:text-slate-400 mb-4 text-sm">
+                  Cost to produce 10 Product Videos:
+                </p>
                 <div className="space-y-3">
                   <div className="flex items-center gap-3">
                     <div className="w-20 text-xs font-bold">Traditional</div>
                     <div className="flex-1 h-6 bg-slate-100 rounded-full overflow-hidden relative">
                       <div className="absolute top-0 left-0 h-full bg-slate-400 w-[100%]" />
-                      <span className="absolute right-2 top-1/2 -translate-y-1/2 text-[10px] font-bold text-white">$2,500+</span>
+                      <span className="absolute right-2 top-1/2 -translate-y-1/2 text-[10px] font-bold text-white">
+                        $2,500+
+                      </span>
                     </div>
                   </div>
                   <div className="flex items-center gap-3">
                     <div className="w-20 text-xs font-bold">Alternatives</div>
                     <div className="flex-1 h-6 bg-slate-100 rounded-full overflow-hidden relative">
                       <div className="absolute top-0 left-0 h-full bg-slate-300 w-[0%]" />
-                      <span className="absolute left-2 top-1/2 -translate-y-1/2 text-[10px] text-slate-500">Not Supported</span>
+                      <span className="absolute left-2 top-1/2 -translate-y-1/2 text-[10px] text-slate-500">
+                        Not Supported
+                      </span>
                     </div>
                   </div>
                   <div className="flex items-center gap-3">
                     <div className="w-20 text-xs font-bold text-teal-500">Viecom</div>
                     <div className="flex-1 h-6 bg-slate-100 rounded-full overflow-hidden relative">
                       <div className="absolute top-0 left-0 h-full bg-teal-500 w-[10%]" />
-                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[10px] font-bold text-white">Competitive</span>
+                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[10px] font-bold text-white">
+                        Competitive
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -878,7 +916,9 @@ export default function DocsPage() {
             </div>
 
             <div className="bg-teal-50 dark:bg-teal-900/20 rounded-lg p-4 border border-teal-200 dark:border-teal-800">
-              <h4 className="font-semibold text-teal-900 dark:text-teal-200 mb-2 text-sm">Key Differentiators:</h4>
+              <h4 className="font-semibold text-teal-900 dark:text-teal-200 mb-2 text-sm">
+                Key Differentiators:
+              </h4>
               <ul className="space-y-1 text-xs text-teal-800 dark:text-teal-200">
                 <li>✓ Native video generation (Sora 2) - most alternatives don't offer this</li>
                 <li>✓ Advanced batch processing with CSV upload for enterprise scale</li>
@@ -887,15 +927,26 @@ export default function DocsPage() {
                 <li>✓ Commercial license included in all plans</li>
               </ul>
               <div className="mt-4 pt-4 border-t border-teal-200 dark:border-teal-800">
-                <p className="text-xs text-teal-700 dark:text-teal-300 mb-2">Platform-Specific Solutions:</p>
+                <p className="text-xs text-teal-700 dark:text-teal-300 mb-2">
+                  Platform-Specific Solutions:
+                </p>
                 <div className="flex flex-wrap gap-2">
-                  <Link href="/solutions/amazon" className="text-xs text-teal-600 dark:text-teal-400 hover:underline">
+                  <Link
+                    href="/solutions/amazon"
+                    className="text-xs text-teal-600 dark:text-teal-400 hover:underline"
+                  >
                     Amazon Solutions →
                   </Link>
-                  <Link href="/solutions/tiktok" className="text-xs text-teal-600 dark:text-teal-400 hover:underline">
+                  <Link
+                    href="/solutions/tiktok"
+                    className="text-xs text-teal-600 dark:text-teal-400 hover:underline"
+                  >
                     TikTok Solutions →
                   </Link>
-                  <Link href="/solutions/shopify" className="text-xs text-teal-600 dark:text-teal-400 hover:underline">
+                  <Link
+                    href="/solutions/shopify"
+                    className="text-xs text-teal-600 dark:text-teal-400 hover:underline"
+                  >
                     Shopify Solutions →
                   </Link>
                 </div>
