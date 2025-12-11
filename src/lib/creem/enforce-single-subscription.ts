@@ -38,7 +38,12 @@ export async function enforceSingleCreemSubscription(
     keepSub = sortedSubs[0];
   }
 
-  const duplicates = sortedSubs.filter((sub) => sub.id !== keepSub?.id);
+  // At this point, keepSub is guaranteed to be defined (either from keepSubscriptionId or sortedSubs[0])
+  if (!keepSub) {
+    return 0;
+  }
+
+  const duplicates = sortedSubs.filter((sub) => sub.id !== keepSub!.id);
   console.warn(
     `[Creem Enforcement] User ${userId} has ${activeSubs.length} active subscriptions. Keeping ${keepSub.subscriptionId || keepSub.id}, canceling ${duplicates.length}.`
   );

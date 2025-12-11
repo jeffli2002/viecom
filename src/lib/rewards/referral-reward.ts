@@ -47,7 +47,10 @@ async function finalizeReferralReward(
         referralRecord.referredUserFirstGenerationCompleted,
     };
 
-    await tx.update(userReferrals).set(referralUpdate).where(eq(userReferrals.id, referralRecord.id));
+    await tx
+      .update(userReferrals)
+      .set(referralUpdate)
+      .where(eq(userReferrals.id, referralRecord.id));
   });
 
   console.log(
@@ -74,6 +77,9 @@ export async function checkAndAwardReferralReward(userId: string): Promise<void>
     }
 
     const referralRecord = referral[0];
+    if (!referralRecord) {
+      return;
+    }
 
     // Check if credits have already been awarded
     if (referralRecord.creditsAwarded) {
@@ -135,6 +141,9 @@ export async function awardReferralForPaidUser(
     }
 
     const referralRecord = referral[0];
+    if (!referralRecord) {
+      return;
+    }
 
     if (referralRecord.creditsAwarded) {
       return;

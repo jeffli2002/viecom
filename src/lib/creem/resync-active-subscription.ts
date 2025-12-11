@@ -30,7 +30,7 @@ export async function resyncActiveCreemSubscription(userId: string) {
 
   for (let i = 0; i < maxChecks; i += 1) {
     const record = candidates[i];
-    if (record.provider !== 'creem' || !record.subscriptionId) {
+    if (!record || record.provider !== 'creem' || !record.subscriptionId) {
       continue;
     }
 
@@ -40,14 +40,23 @@ export async function resyncActiveCreemSubscription(userId: string) {
         continue;
       }
 
-      const remoteSubscription = remote.subscription as Record<string, any>;
+      type RemoteSubscription = {
+        status?: string;
+        product?: { billing_period?: string };
+        interval?: string;
+        billing_period?: string;
+        current_period_start_date?: string;
+        current_period_end_date?: string;
+        cancel_at_period_end?: boolean;
+      };
+
+      const remoteSubscription = (remote.subscription ?? {}) as RemoteSubscription;
       const normalizedStatus = normalizeCreemStatus(remoteSubscription.status);
       if (!normalizedStatus || !ACTIVE_STATUSES.has(normalizedStatus)) {
         continue;
       }
 
-      const productInfo =
-        (remoteSubscription.product as { billing_period?: string } | undefined) || undefined;
+      const productInfo = remoteSubscription.product;
       const interval =
         normalizeInterval(remoteSubscription.interval) ||
         normalizeInterval(remoteSubscription.billing_period) ||
