@@ -947,5 +947,11 @@
     "copyFailed": "Unable to copy. Please try again.",
     "errorTitle": "Unable to load referrals",
     "retry": "Try again"
+  },
+  "terms": {
+    "maliciousRegistration": {
+      "title": "3.1 Interdiction d'enregistrement malveillant",
+      "description": "Il est strictement interdit aux utilisateurs de créer plusieurs comptes ou de s'engager dans toute forme d'enregistrement malveillant pour obtenir des crédits de bonus d'inscription. Si Viecom découvre qu'un utilisateur a enregistré malveillamment plusieurs comptes pour obtenir des crédits de bonus d'inscription, Viecom se réserve le droit d'interdire et de fermer immédiatement ces comptes sans préavis ni consentement de l'utilisateur. Dans de tels cas, toutes les images et vidéos précédemment générées par le compte interdit ne seront plus sauvegardées ou accessibles, et Viecom ne sera pas responsable de toute perte de contenu ou de données résultant d'une telle fermeture de compte."
+    }
   }
 }

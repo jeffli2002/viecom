@@ -1,8 +1,10 @@
 import { Card, CardContent } from '@/components/ui/card';
 import { creditsConfig } from '@/config/credits.config';
 import { paymentConfig } from '@/config/payment.config';
+import { useTranslations } from 'next-intl';
 
 export default function TermsPage() {
+  const t = useTranslations('terms');
   // Get configuration values
   const nanoBananaCost = creditsConfig.consumption.imageGeneration['nano-banana'];
   const nanoBananaProCost = creditsConfig.consumption.imageGeneration['nano-banana-pro'];
@@ -79,6 +81,11 @@ export default function TermsPage() {
             <p className="mt-4">
               You are responsible for all activities that occur under your account.
             </p>
+
+            <h3 className="text-lg font-semibold text-gray-800 dark:text-slate-200 mt-4">
+              {t('maliciousRegistration.title')}
+            </h3>
+            <p>{t('maliciousRegistration.description')}</p>
           </CardContent>
         </Card>
 

@@ -947,5 +947,11 @@
     "copyFailed": "Unable to copy. Please try again.",
     "errorTitle": "Unable to load referrals",
     "retry": "Try again"
+  },
+  "terms": {
+    "maliciousRegistration": {
+      "title": "3.1 Prohibición de Registro Malicioso",
+      "description": "Se prohíbe estrictamente a los usuarios crear múltiples cuentas o participar en cualquier forma de registro malicioso para obtener créditos de bonificación por registro. Si Viecom descubre que un usuario ha registrado maliciosamente múltiples cuentas para obtener créditos de bonificación por registro, Viecom se reserva el derecho de prohibir y cerrar inmediatamente dichas cuentas sin previo aviso o consentimiento del usuario. En tales casos, todas las imágenes y videos generados previamente por la cuenta prohibida ya no se guardarán ni serán accesibles, y Viecom no será responsable de ninguna pérdida de contenido o datos resultante de tal cierre de cuenta."
+    }
   }
 }

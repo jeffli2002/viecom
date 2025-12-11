@@ -947,5 +947,11 @@
     "copyFailed": "Unable to copy. Please try again.",
     "errorTitle": "Unable to load referrals",
     "retry": "Try again"
+  },
+  "terms": {
+    "maliciousRegistration": {
+      "title": "3.1 Verbot böswilliger Registrierung",
+      "description": "Benutzern ist es strengstens untersagt, mehrere Konten zu erstellen oder sich auf irgendeine Form böswilliger Registrierung einzulassen, um Anmelde-Bonus-Guthaben zu erhalten. Wenn Viecom feststellt, dass ein Benutzer böswillig mehrere Konten registriert hat, um Anmelde-Bonus-Guthaben zu erhalten, behält sich Viecom das Recht vor, solche Konten ohne vorherige Ankündigung oder Zustimmung des Benutzers sofort zu sperren und zu schließen. In solchen Fällen werden alle zuvor von dem gesperrten Konto generierten Bilder und Videos nicht mehr gespeichert oder zugänglich sein, und Viecom haftet nicht für Verluste von Inhalten oder Daten, die aus einer solchen Kontoschließung resultieren."
+    }
   }
 }

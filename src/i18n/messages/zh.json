@@ -947,5 +947,11 @@
     "copyFailed": "Unable to copy. Please try again.",
     "errorTitle": "Unable to load referrals",
     "retry": "Try again"
+  },
+  "terms": {
+    "maliciousRegistration": {
+      "title": "3.1 禁止恶意注册",
+      "description": "严格禁止用户创建多个账户或进行任何形式的恶意注册以获取注册奖励积分。如果 Viecom 发现用户恶意注册多个账户以获取注册奖励积分，Viecom 有权立即禁止并关闭此类账户，无需事先通知或用户同意。在此情况下，被禁止账户之前生成的所有图片和视频将不再保存或可访问，Viecom 不对因账户关闭导致的任何内容或数据丢失承担责任。"
+    }
   }
 }
