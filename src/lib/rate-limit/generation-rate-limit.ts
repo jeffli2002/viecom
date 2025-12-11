@@ -52,7 +52,7 @@ export async function checkGenerationRateLimit(
     }
 
     const lastRequest = recentAssets[0];
-    
+
     // CRITICAL: Only enforce cooldown if previous generation is still PROCESSING
     // If it completed or failed, user can start new generation immediately
     if (lastRequest.status === 'completed' || lastRequest.status === 'failed') {
@@ -92,7 +92,6 @@ export async function checkGenerationRateLimit(
 
     // Enough time has passed - allowed
     return { allowed: true };
-
   } catch (error) {
     console.error('[Rate Limit] Error checking generation rate limit:', {
       userId,
@@ -113,8 +112,7 @@ export function getWaitTimeMessage(waitTimeSeconds: number): string {
   if (waitTimeSeconds < 60) {
     return `${waitTimeSeconds} seconds`;
   }
-  
+
   const minutes = Math.ceil(waitTimeSeconds / 60);
   return `${minutes} minute${minutes > 1 ? 's' : ''}`;
 }
-

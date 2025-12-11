@@ -132,6 +132,16 @@ export const useAuthStore = create<AuthState>()(
 
             if (result.data) {
               const user = result.data.user;
+              
+              // Check if user exists and has an id
+              if (!user || !user.id) {
+                set({ isLoading: false, error: 'Invalid user data' });
+                return {
+                  success: false,
+                  error: 'Invalid user data',
+                };
+              }
+
               set({
                 user,
                 isAuthenticated: true,
@@ -173,6 +183,16 @@ export const useAuthStore = create<AuthState>()(
 
             if (result.data) {
               const user = result.data.user;
+              
+              // Check if user exists and has an id
+              if (!user || !user.id) {
+                set({ isLoading: false, error: 'Invalid user data' });
+                return {
+                  success: false,
+                  error: 'Invalid user data',
+                };
+              }
+
               set({
                 user,
                 isAuthenticated: true,
@@ -271,6 +291,17 @@ export const useAuthStore = create<AuthState>()(
 
             if (session.data) {
               const user = session.data.user;
+              
+              // Check if user exists and has an id
+              if (!user || !user.id) {
+                set({
+                  user: null,
+                  isAuthenticated: false,
+                  lastUpdated: Date.now(),
+                });
+                return;
+              }
+
               set({
                 user,
                 isAuthenticated: true,
@@ -328,6 +359,19 @@ export const useAuthStore = create<AuthState>()(
             const session = await authClient.getSession();
             if (session.data) {
               const user = session.data.user;
+              
+              // Check if user exists and has an id
+              if (!user || !user.id) {
+                set({
+                  user: null,
+                  isAuthenticated: false,
+                  isLoading: false,
+                  isInitialized: true,
+                  lastUpdated: Date.now(),
+                });
+                return;
+              }
+
               const isNewUser = !previousUser || previousUser.id !== user.id;
 
               set({
@@ -368,6 +412,26 @@ export const useAuthStore = create<AuthState>()(
                   const retrySession = await authClient.getSession();
                   if (retrySession.data) {
                     const user = retrySession.data.user;
+                    
+                    // Check if user exists and has an id
+                    if (!user || !user.id) {
+                      if (!get().isCacheValid()) {
+                        set({
+                          user: null,
+                          isAuthenticated: false,
+                          isLoading: false,
+                          isInitialized: true,
+                          lastUpdated: Date.now(),
+                        });
+                      } else {
+                        set({
+                          isLoading: false,
+                          isInitialized: true,
+                        });
+                      }
+                      return;
+                    }
+
                     set({
                       user,
                       isAuthenticated: true,

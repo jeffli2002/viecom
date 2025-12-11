@@ -146,7 +146,8 @@ async function runTests() {
 
     assert(parsed.event === 'subscription.created', 'Event type parsed correctly');
 
-    assert((parsed.data as any).id === 'sub_123', 'Event data parsed correctly');
+    const parsedData = parsed.data as { id?: string } | undefined;
+    assert(parsedData?.id === 'sub_123', 'Event data parsed correctly');
 
     let parseError = false;
     try {

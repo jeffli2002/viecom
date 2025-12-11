@@ -64,7 +64,7 @@ export interface VideoObjectSchema {
 export function getSoftwareApplicationSchema(
   name: string,
   features: string[] = [],
-  price: string = '0',
+  price = '0',
   rating?: { value: string; count: string }
 ): SoftwareApplicationSchema {
   const schema: SoftwareApplicationSchema = {
@@ -98,9 +98,7 @@ export function getSoftwareApplicationSchema(
 /**
  * Generate FAQPage schema
  */
-export function getFAQPageSchema(
-  faqs: Array<{ question: string; answer: string }>
-): FAQPageSchema {
+export function getFAQPageSchema(faqs: Array<{ question: string; answer: string }>): FAQPageSchema {
   return {
     '@context': 'https://schema.org',
     '@type': 'FAQPage',
@@ -162,4 +160,3 @@ export function getVideoObjectSchema(
     ...options,
   };
 }
-

@@ -1,9 +1,13 @@
-import { Check, FileSpreadsheet, Layers } from 'lucide-react';
-import Link from 'next/link';
-import { getSEOMetadata } from '@/lib/seo/metadata-translations';
-import { getSoftwareApplicationSchema, getFAQPageSchema, getHowToSchema } from '@/lib/utils/schema-generator';
-import type { Metadata } from 'next';
 import { FAQ } from '@/components/blocks/faq';
+import { getSEOMetadata } from '@/lib/seo/metadata-translations';
+import {
+  getFAQPageSchema,
+  getHowToSchema,
+  getSoftwareApplicationSchema,
+} from '@/lib/utils/schema-generator';
+import { Check, FileSpreadsheet, Layers } from 'lucide-react';
+import type { Metadata } from 'next';
+import Link from 'next/link';
 
 const SHOPIFY_FAQ = [
   {
@@ -24,7 +28,7 @@ const SHOPIFY_FAQ = [
   {
     question: 'How do I integrate generated images into my Shopify store?',
     answer:
-      'After batch generation, you can download all images as a structured ZIP file. The file structure matches Shopify\'s requirements, making it easy to bulk upload to your store.',
+      "After batch generation, you can download all images as a structured ZIP file. The file structure matches Shopify's requirements, making it easy to bulk upload to your store.",
   },
   {
     question: 'Do you support Shopify product video generation?',
@@ -102,10 +106,13 @@ export default function ShopifySolutionPage() {
       <div className="pt-32 pb-16 container-base text-center">
         <h1 className="text-5xl md:text-6xl font-bold mb-6">
           Shopify Product <br />
-          <span className="text-transparent bg-clip-text bg-gradient-to-r from-teal-500 to-blue-500">Image Generator</span>
+          <span className="text-transparent bg-clip-text bg-gradient-to-r from-teal-500 to-blue-500">
+            Image Generator
+          </span>
         </h1>
         <p className="text-xl text-slate-600 dark:text-slate-400 max-w-3xl mx-auto">
-          Generate product images and videos for Shopify stores. Bulk CSV upload for variants, automated optimization, and seamless integration.
+          Generate product images and videos for Shopify stores. Bulk CSV upload for variants,
+          automated optimization, and seamless integration.
         </p>
       </div>
 
@@ -119,7 +126,8 @@ export default function ShopifySolutionPage() {
               </div>
               <h2 className="text-3xl md:text-4xl font-bold mb-4">500 SKUs? No Problem.</h2>
               <p className="text-slate-600 dark:text-slate-400">
-                Stop generating one-by-one. Upload your entire catalog via CSV and let our specialized agents handle the rest.
+                Stop generating one-by-one. Upload your entire catalog via CSV and let our
+                specialized agents handle the rest.
               </p>
             </div>
 
@@ -178,7 +186,8 @@ export default function ShopifySolutionPage() {
           </div>
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-6">Scale Your Store</h2>
           <p className="text-slate-600 dark:text-slate-400 text-center mb-12 max-w-2xl mx-auto">
-            Perfect for scaling your e-commerce store. Generate hundreds of product images in minutes, not weeks.
+            Perfect for scaling your e-commerce store. Generate hundreds of product images in
+            minutes, not weeks.
           </p>
           <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
             <div className="flex items-center gap-3 p-4 bg-slate-50 dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-800">
@@ -187,7 +196,9 @@ export default function ShopifySolutionPage() {
               </div>
               <div>
                 <h4 className="font-bold text-sm mb-1">CSV Upload</h4>
-                <p className="text-xs text-slate-500">Upload your entire product catalog via CSV for batch processing.</p>
+                <p className="text-xs text-slate-500">
+                  Upload your entire product catalog via CSV for batch processing.
+                </p>
               </div>
             </div>
             <div className="flex items-center gap-3 p-4 bg-slate-50 dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-800">
@@ -196,7 +207,9 @@ export default function ShopifySolutionPage() {
               </div>
               <div>
                 <h4 className="font-bold text-sm mb-1">Variant Support</h4>
-                <p className="text-xs text-slate-500">Generate images for multiple product variants automatically.</p>
+                <p className="text-xs text-slate-500">
+                  Generate images for multiple product variants automatically.
+                </p>
               </div>
             </div>
             <div className="flex items-center gap-3 p-4 bg-slate-50 dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-800">
@@ -205,7 +218,9 @@ export default function ShopifySolutionPage() {
               </div>
               <div>
                 <h4 className="font-bold text-sm mb-1">Structured Export</h4>
-                <p className="text-xs text-slate-500">Download images in a structured ZIP file ready for Shopify upload.</p>
+                <p className="text-xs text-slate-500">
+                  Download images in a structured ZIP file ready for Shopify upload.
+                </p>
               </div>
             </div>
             <div className="flex items-center gap-3 p-4 bg-slate-50 dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-800">
@@ -214,14 +229,20 @@ export default function ShopifySolutionPage() {
               </div>
               <div>
                 <h4 className="font-bold text-sm mb-1">Auto-Optimization</h4>
-                <p className="text-xs text-slate-500">Images automatically optimized for web performance and Shopify requirements.</p>
+                <p className="text-xs text-slate-500">
+                  Images automatically optimized for web performance and Shopify requirements.
+                </p>
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      <FAQ items={SHOPIFY_FAQ} title="Shopify Integration FAQ" className="bg-slate-50 dark:bg-slate-900" />
+      <FAQ
+        items={SHOPIFY_FAQ}
+        title="Shopify Integration FAQ"
+        className="bg-slate-50 dark:bg-slate-900"
+      />
 
       <section className="py-20 bg-white dark:bg-slate-950 text-center">
         <h2 className="text-3xl md:text-4xl font-bold mb-8">Ready to Scale Your Shopify Store?</h2>
@@ -254,4 +275,3 @@ export default function ShopifySolutionPage() {
     </div>
   );
 }
-

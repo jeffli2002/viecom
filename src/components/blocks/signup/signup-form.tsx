@@ -15,13 +15,18 @@ import {
   useSetError,
   useSignInWithGoogle,
 } from '@/store/auth-store';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from '@/i18n/navigation';
+import { useSearchParams } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { useCallback, useEffect, useState } from 'react';
+
+const MIN_PASSWORD_LENGTH = 8;
 
 export function SignupForm({ className, ...props }: React.ComponentProps<'div'>) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const toastMessages = useToastMessages();
+  const t = useTranslations('resetPassword');
 
   const isLoading = useAuthLoading();
   const error = useAuthError();
@@ -46,7 +51,7 @@ export function SignupForm({ className, ...props }: React.ComponentProps<'div'>)
   useEffect(() => {
     if (isAuthenticated) {
       const redirectUrl = getRedirectUrl();
-      router.push(redirectUrl);
+      router.replace(redirectUrl);
     }
   }, [isAuthenticated, router, getRedirectUrl]);
 
@@ -74,8 +79,14 @@ export function SignupForm({ className, ...props }: React.ComponentProps<'div'>)
 
     const result = await emailSignup(email, password, name);
     if (result.success) {
+      // Clear form data
+      setName('');
+      setEmail('');
+      setPassword('');
+      setConfirmPassword('');
+      // Redirect immediately after successful signup
       const redirectUrl = getRedirectUrl();
-      router.push(redirectUrl);
+      router.replace(redirectUrl);
     } else {
       if (result.error) {
         setError(result.error);
@@ -144,10 +155,10 @@ export function SignupForm({ className, ...props }: React.ComponentProps<'div'>)
                 </Button>
               </div>
 
-              <div className="relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-border after:border-t">
-                <span className="relative z-10 bg-card px-2 text-muted-foreground">
-                  Or continue with
-                </span>
+              <div className="flex items-center gap-4 text-sm">
+                <div className="flex-1 border-t border-border"></div>
+                <span className="text-muted-foreground">Or continue with</span>
+                <div className="flex-1 border-t border-border"></div>
               </div>
 
               {/* Email password registration */}
@@ -189,10 +200,14 @@ export function SignupForm({ className, ...props }: React.ComponentProps<'div'>)
                     onChange={(e) => setPassword(e.target.value)}
                     required
                     disabled={isLoading}
-                    minLength={6}
+                    minLength={MIN_PASSWORD_LENGTH}
+                    placeholder={`At least ${MIN_PASSWORD_LENGTH} characters`}
                     autoComplete="new-password"
                     data-testid="password-input"
                   />
+                  <p className="text-muted-foreground text-xs">
+                    {t('passwordHint', { count: MIN_PASSWORD_LENGTH })}
+                  </p>
                 </div>
                 <div className="grid gap-3">
                   <Label htmlFor="confirmPassword">Confirm Password</Label>
@@ -203,15 +218,33 @@ export function SignupForm({ className, ...props }: React.ComponentProps<'div'>)
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     required
                     disabled={isLoading}
-                    minLength={6}
+                    minLength={MIN_PASSWORD_LENGTH}
+                    placeholder={`At least ${MIN_PASSWORD_LENGTH} characters`}
                     autoComplete="new-password"
                     data-testid="confirm-password-input"
                   />
                 </div>
                 <Button
                   type="submit"
-                  className="w-full btn-primary"
-                  disabled={isLoading || !email || !password || !name || !confirmPassword}
+                  className={cn(
+                    'w-full',
+                    password.length >= MIN_PASSWORD_LENGTH &&
+                      password === confirmPassword &&
+                      email &&
+                      name &&
+                      !isLoading
+                      ? 'btn-primary'
+                      : 'bg-slate-300 dark:bg-slate-600 text-slate-500 dark:text-slate-400 cursor-not-allowed hover:bg-slate-300 dark:hover:bg-slate-600'
+                  )}
+                  disabled={
+                    isLoading ||
+                    !email ||
+                    !name ||
+                    !password ||
+                    !confirmPassword ||
+                    password.length < MIN_PASSWORD_LENGTH ||
+                    password !== confirmPassword
+                  }
                   data-testid="signup-button"
                 >
                   {isLoading ? 'Signing up...' : 'Sign Up'}

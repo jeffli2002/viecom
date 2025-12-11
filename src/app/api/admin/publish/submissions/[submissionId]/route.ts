@@ -1,11 +1,11 @@
-import { SHOWCASE_CATEGORIES } from '@/config/showcase.config';
+import { randomUUID } from 'node:crypto';
 import { SHARE_REWARD_CONFIG } from '@/config/share.config';
+import { SHOWCASE_CATEGORIES } from '@/config/showcase.config';
 import { requireAdmin } from '@/lib/admin/auth';
 import { creditService } from '@/lib/credits';
 import { db } from '@/server/db';
 import { publishSubmissions, socialShares } from '@/server/db/schema';
 import { and, eq, sql } from 'drizzle-orm';
-import { randomUUID } from 'node:crypto';
 import { type NextRequest, NextResponse } from 'next/server';
 
 export const dynamic = 'force-dynamic';
@@ -21,7 +21,10 @@ async function awardPublishReward(submission: PublishSubmission) {
 
   const referenceId = `publish_submission_${submission.id}`;
   const existingReward = await db.query.socialShares.findFirst({
-    where: and(eq(socialShares.userId, submission.userId), eq(socialShares.referenceId, referenceId)),
+    where: and(
+      eq(socialShares.userId, submission.userId),
+      eq(socialShares.referenceId, referenceId)
+    ),
   });
 
   if (existingReward) {

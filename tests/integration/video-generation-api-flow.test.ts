@@ -1,6 +1,6 @@
 /**
  * Integration Test: Video Generation API Complete Flow
- * 
+ *
  * Tests the complete video generation API flow including:
  * 1. KIE.ai task creation
  * 2. Task status polling
@@ -11,15 +11,15 @@
  * 7. Error handling and recovery
  */
 
-import { describe, it, expect, beforeAll, afterAll } from '@jest/globals';
-import { db } from '@/server/db';
-import { generatedAsset, creditTransactions, userCredits } from '@/server/db/schema';
-import { eq, desc } from 'drizzle-orm';
 import { randomUUID } from 'node:crypto';
+import { db } from '@/server/db';
+import { creditTransactions, generatedAsset, userCredits } from '@/server/db/schema';
+import { afterAll, beforeAll, describe, expect, it } from '@jest/globals';
+import { desc, eq } from 'drizzle-orm';
 
 // Mock data
 const TEST_USER_ID = 'test-video-gen-user';
-const TEST_TASK_ID = randomUUID().replace(/-/g, '').substring(0, 32);
+const _TEST_TASK_ID = randomUUID().replace(/-/g, '').substring(0, 32);
 
 describe('Video Generation API Complete Flow', () => {
   beforeAll(async () => {
@@ -127,5 +127,3 @@ describe('Video Generation API Complete Flow', () => {
     });
   });
 });
-
-

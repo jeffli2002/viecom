@@ -647,7 +647,6 @@ header button[class*="rounded-full"][class*="h-10"][class*="w-10"]:hover,
 header button[class*="rounded-full"][class*="h-10"][class*="w-10"]:focus,
 header button[class*="rounded-full"][class*="h-10"][class*="w-10"]:active {
   background-color: transparent !important;
-  background: transparent !important;
 }
 
 /* Remove any purple/violet backgrounds from header avatar */
@@ -657,7 +656,6 @@ header [data-radix-avatar-root],
 header [data-radix-avatar-image],
 header [data-radix-avatar-fallback] {
   background-color: transparent !important;
-  background: transparent !important;
 }
 
 /* Force teal background only for fallback - strongest possible override */
@@ -671,7 +669,6 @@ header button [class*="AvatarFallback"] {
   position: relative !important;
   z-index: 11 !important;
   background-color: rgb(20, 184, 166) !important; /* teal-500 */
-  background: rgb(20, 184, 166) !important; /* teal-500 */
   background-image: none !important;
   background-size: auto !important;
 }
@@ -686,7 +683,6 @@ header [class*="AvatarFallback"][class*="bg-purple"],
 header button [data-radix-avatar-fallback][class*="bg-primary"],
 header button [class*="AvatarFallback"][class*="bg-primary"] {
   background-color: rgb(20, 184, 166) !important; /* teal-500 */
-  background: rgb(20, 184, 166) !important; /* teal-500 */
 }
 
 /* Nuclear option - override everything that might be purple in header avatar area */
@@ -698,7 +694,6 @@ header [data-header-avatar="true"],
 header .header-avatar-fallback,
 header [class*="header-avatar-fallback"] {
   background-color: rgb(20, 184, 166) !important; /* teal-500 */
-  background: rgb(20, 184, 166) !important; /* teal-500 */
   background-image: none !important;
 }
 
@@ -707,7 +702,6 @@ header [class*="bg-purple"],
 header [class*="bg-violet"],
 header [class*="bg-primary"][class*="Avatar"] {
   background-color: transparent !important;
-  background: transparent !important;
 }
 
 /* Badge - Purple */

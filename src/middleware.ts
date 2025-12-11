@@ -53,15 +53,20 @@ export default async function middleware(request: NextRequest) {
 
   // Redirect root path to default locale
   if (pathname === '/') {
-    return NextResponse.redirect(new URL(`/${routing.defaultLocale}`, request.url), 301);
+    const redirectUrl = new URL(`/${routing.defaultLocale}/signup`, request.url);
+    return NextResponse.redirect(redirectUrl, 301);
   }
 
-  const localePattern = new RegExp(`^/(${routing.locales.join('|')})(/|$)`);
-  if (!localePattern.test(pathname)) {
-    const url = request.nextUrl.clone();
-    const defaultLocale = routing.defaultLocale || 'en';
-    url.pathname = `/${defaultLocale}${pathname}`;
-    return NextResponse.redirect(url, 301);
+  const matchesLocalePrefix = routing.locales.some(
+    (locale) => pathname === `/${locale}` || pathname.startsWith(`/${locale}/`)
+  );
+
+  if (!matchesLocalePrefix) {
+    const redirectUrl = request.nextUrl.clone();
+    redirectUrl.pathname = `/${routing.defaultLocale}${
+      pathname.startsWith('/') ? pathname : `/${pathname}`
+    }`;
+    return NextResponse.redirect(redirectUrl);
   }
 
   // Apply i18n middleware for all other routes (handles locale redirects/detection)

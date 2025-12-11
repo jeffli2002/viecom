@@ -1,9 +1,13 @@
-import { Check, Play, Smartphone, Sparkles, Zap } from 'lucide-react';
-import Link from 'next/link';
-import { getSEOMetadata } from '@/lib/seo/metadata-translations';
-import { getSoftwareApplicationSchema, getFAQPageSchema, getHowToSchema } from '@/lib/utils/schema-generator';
-import type { Metadata } from 'next';
 import { FAQ } from '@/components/blocks/faq';
+import { getSEOMetadata } from '@/lib/seo/metadata-translations';
+import {
+  getFAQPageSchema,
+  getHowToSchema,
+  getSoftwareApplicationSchema,
+} from '@/lib/utils/schema-generator';
+import { Check, Play, Smartphone, Sparkles, Zap } from 'lucide-react';
+import type { Metadata } from 'next';
+import Link from 'next/link';
 
 const TIKTOK_FAQ = [
   {
@@ -102,10 +106,13 @@ export default function TikTokSolutionPage() {
       <div className="pt-32 pb-16 container-base text-center">
         <h1 className="text-5xl md:text-6xl font-bold mb-6">
           TikTok Shop <br />
-          <span className="text-transparent bg-clip-text bg-gradient-to-r from-teal-500 to-blue-500">Video Generator</span>
+          <span className="text-transparent bg-clip-text bg-gradient-to-r from-teal-500 to-blue-500">
+            Video Generator
+          </span>
         </h1>
         <p className="text-xl text-slate-600 dark:text-slate-400 max-w-3xl mx-auto">
-          Create viral 9:16 vertical videos for TikTok Shop. Convert static product images to engaging videos with motion effects.
+          Create viral 9:16 vertical videos for TikTok Shop. Convert static product images to
+          engaging videos with motion effects.
         </p>
       </div>
 
@@ -149,7 +156,9 @@ export default function TikTokSolutionPage() {
                       TikTok 9:16
                     </span>
                   </div>
-                  <p className="text-[11px] text-slate-500">Looping motion video · Tap speaker to enable sound</p>
+                  <p className="text-[11px] text-slate-500">
+                    Looping motion video · Tap speaker to enable sound
+                  </p>
                 </div>
               </div>
 
@@ -178,7 +187,8 @@ export default function TikTokSolutionPage() {
           </div>
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-6">Viral Ready</h2>
           <p className="text-slate-600 dark:text-slate-400 text-center mb-12 max-w-2xl mx-auto">
-            Static images don't convert on TikTok. Our "Still-to-Motion" engine adds physics-based movement to stop the scroll.
+            Static images don't convert on TikTok. Our "Still-to-Motion" engine adds physics-based
+            movement to stop the scroll.
           </p>
           <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
             <div className="flex items-center gap-3 p-4 bg-slate-50 dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-800">
@@ -187,7 +197,9 @@ export default function TikTokSolutionPage() {
               </div>
               <div>
                 <h4 className="font-bold text-sm mb-1">9:16 Outpainting</h4>
-                <p className="text-xs text-slate-500">Extends horizontal photos to vertical video formats seamlessly.</p>
+                <p className="text-xs text-slate-500">
+                  Extends horizontal photos to vertical video formats seamlessly.
+                </p>
               </div>
             </div>
             <div className="flex items-center gap-3 p-4 bg-slate-50 dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-800">
@@ -196,7 +208,9 @@ export default function TikTokSolutionPage() {
               </div>
               <div>
                 <h4 className="font-bold text-sm mb-1">Physics Simulation</h4>
-                <p className="text-xs text-slate-500">Adds water splashes, smoke, or floating effects to static items.</p>
+                <p className="text-xs text-slate-500">
+                  Adds water splashes, smoke, or floating effects to static items.
+                </p>
               </div>
             </div>
             <div className="flex items-center gap-3 p-4 bg-slate-50 dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-800">
@@ -205,7 +219,9 @@ export default function TikTokSolutionPage() {
               </div>
               <div>
                 <h4 className="font-bold text-sm mb-1">Auto-Optimization</h4>
-                <p className="text-xs text-slate-500">Automatically optimizes for TikTok Shop requirements and best practices.</p>
+                <p className="text-xs text-slate-500">
+                  Automatically optimizes for TikTok Shop requirements and best practices.
+                </p>
               </div>
             </div>
             <div className="flex items-center gap-3 p-4 bg-slate-50 dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-800">
@@ -214,17 +230,25 @@ export default function TikTokSolutionPage() {
               </div>
               <div>
                 <h4 className="font-bold text-sm mb-1">Batch Generation</h4>
-                <p className="text-xs text-slate-500">Generate multiple TikTok videos from CSV upload in one go.</p>
+                <p className="text-xs text-slate-500">
+                  Generate multiple TikTok videos from CSV upload in one go.
+                </p>
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      <FAQ items={TIKTOK_FAQ} title="TikTok Video Generation FAQ" className="bg-slate-50 dark:bg-slate-900" />
+      <FAQ
+        items={TIKTOK_FAQ}
+        title="TikTok Video Generation FAQ"
+        className="bg-slate-50 dark:bg-slate-900"
+      />
 
       <section className="py-20 bg-white dark:bg-slate-950 text-center">
-        <h2 className="text-3xl md:text-4xl font-bold mb-8">Ready to Create Viral TikTok Videos?</h2>
+        <h2 className="text-3xl md:text-4xl font-bold mb-8">
+          Ready to Create Viral TikTok Videos?
+        </h2>
         <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
           <Link
             href="/video-generation"
@@ -254,4 +278,3 @@ export default function TikTokSolutionPage() {
     </div>
   );
 }
-

@@ -1,9 +1,9 @@
 import { resolve } from 'node:path';
 import { config } from 'dotenv';
+import { eq, sql } from 'drizzle-orm';
 import { drizzle } from 'drizzle-orm/postgres-js';
 import postgres from 'postgres';
 import { generatedAsset, user } from '../src/server/db/schema';
-import { eq, sql } from 'drizzle-orm';
 
 // Load .env.local file FIRST
 config({ path: resolve(process.cwd(), '.env.local') });
@@ -19,10 +19,7 @@ if (!databaseUrl) {
 const client = postgres(databaseUrl);
 const db = drizzle(client);
 
-const taskIds = [
-  '4e1de0e2442ea7190aa196148834d0be',
-  '5a0d054faafdf3c99bca745d2dd5f1ac',
-];
+const taskIds = ['4e1de0e2442ea7190aa196148834d0be', '5a0d054faafdf3c99bca745d2dd5f1ac'];
 
 async function checkTaskIds() {
   try {
@@ -117,52 +114,57 @@ async function checkTaskIds() {
       console.log(`🎨 Asset Type: ${asset.assetType}`);
       console.log(`📅 Created: ${asset.createdAt.toISOString()}`);
       console.log(`🔗 Public URL: ${asset.publicUrl || 'N/A'}`);
-      console.log(`💬 Prompt: ${asset.prompt?.substring(0, 100)}${asset.prompt && asset.prompt.length > 100 ? '...' : ''}`);
-      
+      console.log(
+        `💬 Prompt: ${asset.prompt?.substring(0, 100)}${asset.prompt && asset.prompt.length > 100 ? '...' : ''}`
+      );
+
       if (asset.errorMessage) {
         console.log(`❌ Error: ${asset.errorMessage}`);
       }
-      
+
       if (asset.status === 'completed') {
-        console.log(`\n✅ Generation was SUCCESSFUL`);
+        console.log('\n✅ Generation was SUCCESSFUL');
       } else if (asset.status === 'failed') {
-        console.log(`\n❌ Generation FAILED`);
+        console.log('\n❌ Generation FAILED');
       } else {
-        console.log(`\n⏳ Generation is still PROCESSING`);
+        console.log('\n⏳ Generation is still PROCESSING');
       }
     });
 
     // Summary
-    console.log('\n' + '='.repeat(80));
+    console.log(`\n${'='.repeat(80)}`);
     console.log('SUMMARY:');
     console.log('='.repeat(80));
-    
-    const successful = foundAssets.filter(a => a.status === 'completed').length;
-    const failed = foundAssets.filter(a => a.status === 'failed').length;
-    const processing = foundAssets.filter(a => a.status === 'processing').length;
-    
+
+    const successful = foundAssets.filter((a) => a.status === 'completed').length;
+    const failed = foundAssets.filter((a) => a.status === 'failed').length;
+    const processing = foundAssets.filter((a) => a.status === 'processing').length;
+
     console.log(`\nTotal found: ${foundAssets.length}/${taskIds.length}`);
     console.log(`✅ Successful: ${successful}`);
     console.log(`❌ Failed: ${failed}`);
     console.log(`⏳ Processing: ${processing}`);
-    
+
     // Group by user
     const userGroups = new Map<string, typeof foundAssets>();
     for (const asset of foundAssets) {
       if (!userGroups.has(asset.userId)) {
         userGroups.set(asset.userId, []);
       }
-      userGroups.get(asset.userId)!.push(asset);
+      userGroups.get(asset.userId)?.push(asset);
     }
-    
+
     console.log(`\nUnique users: ${userGroups.size}`);
     userGroups.forEach((assets, userId) => {
-      const firstAsset = assets[0]!;
+      const firstAsset = assets[0];
+      if (!firstAsset) {
+        return;
+      }
       console.log(`\n  User: ${firstAsset.userEmail || 'N/A'} (${userId})`);
-      console.log(`  Tasks: ${assets.map(a => a.taskId).join(', ')}`);
+      console.log(`  Tasks: ${assets.map((a) => a.taskId).join(', ')}`);
     });
 
-    console.log('\n' + '='.repeat(80));
+    console.log(`\n${'='.repeat(80)}`);
   } catch (error) {
     console.error('Error checking task IDs:', error);
     process.exit(1);
@@ -173,4 +175,3 @@ async function checkTaskIds() {
 }
 
 checkTaskIds();
-

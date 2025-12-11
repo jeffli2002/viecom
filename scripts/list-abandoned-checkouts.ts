@@ -1,10 +1,10 @@
-import { resolve } from 'node:path';
 import { writeFileSync } from 'node:fs';
+import { resolve } from 'node:path';
 import { config } from 'dotenv';
+import { and, eq, inArray, isNull, notInArray, or, sql } from 'drizzle-orm';
 import { drizzle } from 'drizzle-orm/postgres-js';
 import postgres from 'postgres';
-import { user, payment, paymentEvent } from '../src/server/db/schema';
-import { eq, sql, and, isNull, or, inArray, notInArray } from 'drizzle-orm';
+import { payment, paymentEvent, user } from '../src/server/db/schema';
 
 // Load .env.local file FIRST
 config({ path: resolve(process.cwd(), '.env.local') });
@@ -38,7 +38,7 @@ async function findAbandonedCheckouts() {
 
     // Strategy 1: Find users with checkout_complete events but no active payment
     console.log('Strategy 1: Checking payment_event table for checkout events...');
-    
+
     const checkoutEvents = await db
       .select({
         paymentId: paymentEvent.paymentId,
@@ -59,7 +59,7 @@ async function findAbandonedCheckouts() {
 
     // Strategy 2: Find users with customerId but no successful subscription ever
     console.log('Strategy 2: Checking users with customerId but no successful subscription...');
-    
+
     // Get all unique users with customerId
     const usersWithCustomerId = await db
       .select({
@@ -84,21 +84,23 @@ async function findAbandonedCheckouts() {
       )
       .groupBy(payment.userId);
 
-    const successfulUserIds = new Set(usersWithSuccessfulSubscription.map(s => s.userId));
+    const successfulUserIds = new Set(usersWithSuccessfulSubscription.map((s) => s.userId));
 
     // Find users with customerId but never had a successful subscription
     const usersWithCustomerButNoSuccess = usersWithCustomerId.filter(
-      p => !successfulUserIds.has(p.userId)
+      (p) => !successfulUserIds.has(p.userId)
     );
 
-    console.log(`Found ${usersWithCustomerButNoSuccess.length} users with customerId but no successful subscription\n`);
+    console.log(
+      `Found ${usersWithCustomerButNoSuccess.length} users with customerId but no successful subscription\n`
+    );
 
     // Strategy 3: Get all unique user IDs from both strategies
     const allPotentialAbandonedUserIds = new Set<string>();
-    
+
     // From checkout events - get payment records and their user IDs
     if (checkoutEvents.length > 0) {
-      const paymentIds = checkoutEvents.map(e => e.paymentId);
+      const paymentIds = checkoutEvents.map((e) => e.paymentId);
       const paymentsFromEvents = await db
         .select({
           userId: payment.userId,
@@ -107,7 +109,7 @@ async function findAbandonedCheckouts() {
         .from(payment)
         .where(inArray(payment.id, paymentIds));
 
-      paymentsFromEvents.forEach(p => {
+      paymentsFromEvents.forEach((p) => {
         // Only include if payment is not active
         if (p.status !== 'active') {
           allPotentialAbandonedUserIds.add(p.userId);
@@ -116,7 +118,7 @@ async function findAbandonedCheckouts() {
     }
 
     // From users with customer but no successful subscription
-    usersWithCustomerButNoSuccess.forEach(p => {
+    usersWithCustomerButNoSuccess.forEach((p) => {
       allPotentialAbandonedUserIds.add(p.userId);
     });
 
@@ -129,7 +131,7 @@ async function findAbandonedCheckouts() {
 
     // Get user details and payment information
     const userIdsArray = Array.from(allPotentialAbandonedUserIds);
-    
+
     const users = await db
       .select({
         id: user.id,
@@ -155,7 +157,7 @@ async function findAbandonedCheckouts() {
         .orderBy(sql`${payment.createdAt} DESC`);
 
       // Get checkout events for this user's payments
-      const userPaymentIds = userPayments.map(p => p.customerId).filter(Boolean);
+      const userPaymentIds = userPayments.map((p) => p.customerId).filter(Boolean);
       let checkoutEventCount = 0;
       let lastCheckoutEvent: Date | null = null;
 
@@ -167,7 +169,7 @@ async function findAbandonedCheckouts() {
           .where(eq(payment.userId, userRecord.id));
 
         if (paymentIds.length > 0) {
-          const paymentIdList = paymentIds.map(p => p.id);
+          const paymentIdList = paymentIds.map((p) => p.id);
           const userCheckoutEvents = await db
             .select({
               createdAt: paymentEvent.createdAt,
@@ -187,13 +189,13 @@ async function findAbandonedCheckouts() {
 
           checkoutEventCount = userCheckoutEvents.length;
           if (userCheckoutEvents.length > 0) {
-            lastCheckoutEvent = userCheckoutEvents[0]!.createdAt;
+            lastCheckoutEvent = userCheckoutEvents[0]?.createdAt;
           }
         }
       }
 
       const hasActiveSubscription = userPayments.some(
-        p => p.status === 'active' && p.type === 'subscription'
+        (p) => p.status === 'active' && p.type === 'subscription'
       );
       const hasAnyPayment = userPayments.length > 0;
       const latestPayment = userPayments[0];
@@ -240,40 +242,49 @@ async function findAbandonedCheckouts() {
       console.log(`   User ID: ${user.userId}`);
       console.log(`   Customer ID: ${user.customerId || 'N/A'}`);
       console.log(`   Checkout Events: ${user.checkoutEvents}`);
-      console.log(`   Last Checkout Event: ${user.lastCheckoutEvent ? user.lastCheckoutEvent.toISOString() : 'N/A'}`);
+      console.log(
+        `   Last Checkout Event: ${user.lastCheckoutEvent ? user.lastCheckoutEvent.toISOString() : 'N/A'}`
+      );
       console.log(`   Has Any Payment Record: ${user.hasAnyPayment ? 'Yes' : 'No'}`);
       console.log(`   Payment Status: ${user.paymentStatus || 'N/A'}`);
       console.log(`   Has Active Subscription: ${user.hasActiveSubscription ? 'Yes' : 'No'}`);
     });
 
     // Summary statistics
-    console.log('\n' + '='.repeat(80));
+    console.log(`\n${'='.repeat(80)}`);
     console.log('SUMMARY STATISTICS');
     console.log('='.repeat(80));
     console.log(`\nTotal abandoned checkout users: ${abandonedUsers.length}`);
-    console.log(`Users with checkout events: ${abandonedUsers.filter(u => u.checkoutEvents > 0).length}`);
-    console.log(`Users with customerId but no active subscription: ${abandonedUsers.filter(u => u.customerId).length}`);
-    console.log(`Users with payment records (but not active): ${abandonedUsers.filter(u => u.hasAnyPayment).length}`);
+    console.log(
+      `Users with checkout events: ${abandonedUsers.filter((u) => u.checkoutEvents > 0).length}`
+    );
+    console.log(
+      `Users with customerId but no active subscription: ${abandonedUsers.filter((u) => u.customerId).length}`
+    );
+    console.log(
+      `Users with payment records (but not active): ${abandonedUsers.filter((u) => u.hasAnyPayment).length}`
+    );
 
     // Export to CSV format
-    console.log('\n' + '='.repeat(80));
+    console.log(`\n${'='.repeat(80)}`);
     console.log('CSV FORMAT (for export)');
     console.log('='.repeat(80));
-    
-    const csvHeader = 'Email,Name,User ID,Customer ID,Checkout Events,Last Checkout Event,Has Payment Record,Payment Status';
-    const csvRows = abandonedUsers.map(user => {
+
+    const csvHeader =
+      'Email,Name,User ID,Customer ID,Checkout Events,Last Checkout Event,Has Payment Record,Payment Status';
+    const csvRows = abandonedUsers.map((user) => {
       return `"${user.email}","${user.name}","${user.userId}","${user.customerId || ''}",${user.checkoutEvents},"${user.lastCheckoutEvent ? user.lastCheckoutEvent.toISOString() : ''}",${user.hasAnyPayment ? 'Yes' : 'No'},"${user.paymentStatus || ''}"`;
     });
-    
+
     const csvContent = [csvHeader, ...csvRows].join('\n');
-    console.log('\n' + csvContent);
+    console.log(`\n${csvContent}`);
 
     // Save to file
     const outputFile = 'abandoned-checkouts.csv';
     writeFileSync(outputFile, csvContent, 'utf-8');
     console.log(`\n✅ Results saved to ${outputFile}`);
 
-    console.log('\n' + '='.repeat(80));
+    console.log(`\n${'='.repeat(80)}`);
     console.log('NOTE: This script identifies users who:');
     console.log('1. Have checkout events in payment_event table but no active subscription');
     console.log('2. Have customerId but never had a successful subscription');
@@ -289,4 +300,3 @@ async function findAbandonedCheckouts() {
 }
 
 findAbandonedCheckouts();
-

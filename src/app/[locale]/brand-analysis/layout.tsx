@@ -9,7 +9,7 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { locale } = await params;
   const baseMetadata = getSEOMetadata(locale, 'tool', '/brand-analysis');
-  
+
   // Page-specific overrides
   const pageSpecific: Record<string, Partial<Metadata>> = {
     en: {
@@ -28,13 +28,7 @@ export async function generateMetadata({
       title: 'AI品牌分析 | 免费分析品牌调性和风格',
       description:
         '用AI自动分析您的品牌。获取品牌调性、颜色、受众洞察和风格建议。适合一致的电商内容生成。',
-      keywords: [
-        '品牌分析AI',
-        '品牌调性分析',
-        '品牌风格分析器',
-        'AI品牌分析器',
-        '电商品牌分析',
-      ],
+      keywords: ['品牌分析AI', '品牌调性分析', '品牌风格分析器', 'AI品牌分析器', '电商品牌分析'],
     },
     es: {
       title: 'Análisis de Marca IA | Analiza Tono y Estilo de Marca Gratis',
@@ -51,7 +45,7 @@ export async function generateMetadata({
     fr: {
       title: 'Analyse de Marque IA | Analysez Tono et Style de Marque Gratuit',
       description:
-        'Analysez votre marque automatiquement avec l\'IA. Obtenez le tono de marque, les couleurs, les insights d\'audience et les recommandations de style. Parfait pour la génération de contenu e-commerce cohérent.',
+        "Analysez votre marque automatiquement avec l'IA. Obtenez le tono de marque, les couleurs, les insights d'audience et les recommandations de style. Parfait pour la génération de contenu e-commerce cohérent.",
       keywords: [
         'analyse marque ia',
         'analyse tono marque',

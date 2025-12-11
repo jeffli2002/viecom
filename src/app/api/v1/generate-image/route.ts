@@ -94,8 +94,9 @@ export async function POST(request: NextRequest) {
     }
 
     // Extract resolution from request body (for nano-banana-pro)
-    const resolution = (resolutionInput as '1K' | '2K' | '4K' | '1k' | '2k' | '4k' | undefined)
-      ?.toLowerCase() as '1k' | '2k' | '4k' | undefined;
+    const resolution = (
+      resolutionInput as '1K' | '2K' | '4K' | '1k' | '2k' | '4k' | undefined
+    )?.toLowerCase() as '1k' | '2k' | '4k' | undefined;
 
     const creditCost = getModelCost('imageGeneration', model, resolution);
     if (creditCost === 0) {
@@ -106,14 +107,14 @@ export async function POST(request: NextRequest) {
     if (!isTestMode) {
       const { checkGenerationRateLimit } = await import('@/lib/rate-limit/generation-rate-limit');
       const rateLimit = await checkGenerationRateLimit(userId, 'image');
-      
+
       if (!rateLimit.allowed) {
         console.warn('[Image Generation] Rate limited:', {
           userId,
           reason: rateLimit.reason,
           waitTimeSeconds: rateLimit.waitTimeSeconds,
         });
-        
+
         return NextResponse.json(
           {
             error: rateLimit.reason || 'Too many requests. Please wait before trying again.',
@@ -134,7 +135,7 @@ export async function POST(request: NextRequest) {
         const account = await creditService.getCreditAccount(userId);
         const availableBalance = account ? account.balance - account.frozenBalance : 0;
         const frozenBalance = account?.frozenBalance || 0;
-        
+
         console.warn('[Image Generation] Insufficient credits:', {
           userId,
           required: creditCost,
@@ -145,9 +146,10 @@ export async function POST(request: NextRequest) {
 
         return NextResponse.json(
           {
-            error: frozenBalance > 0
-              ? `Insufficient credits. Required: ${creditCost} credits. You have ${availableBalance} available (${frozenBalance} credits reserved for in-progress generations). Please wait for current generations to complete or purchase more credits.`
-              : `Insufficient credits. Required: ${creditCost} credits. Please earn more credits or upgrade your plan.`,
+            error:
+              frozenBalance > 0
+                ? `Insufficient credits. Required: ${creditCost} credits. You have ${availableBalance} available (${frozenBalance} credits reserved for in-progress generations). Please wait for current generations to complete or purchase more credits.`
+                : `Insufficient credits. Required: ${creditCost} credits. Please earn more credits or upgrade your plan.`,
             required: creditCost,
             available: availableBalance,
             frozen: frozenBalance,
@@ -562,18 +564,21 @@ export async function POST(request: NextRequest) {
               });
             } catch (error) {
               console.error('Error spending credits:', error);
-              
+
               // Unfreeze credits on charge failure
               if (creditsFrozen) {
                 try {
                   await creditService.unfreezeCredits(
                     userId,
                     creditCost,
-                    `Image generation charge failed - credits refunded`,
+                    'Image generation charge failed - credits refunded',
                     `image_refund_${taskId}`
                   );
                 } catch (unfreezeError) {
-                  console.error('[Image Generation] Failed to unfreeze after charge error:', unfreezeError);
+                  console.error(
+                    '[Image Generation] Failed to unfreeze after charge error:',
+                    unfreezeError
+                  );
                 }
               }
 
@@ -754,7 +759,7 @@ export async function POST(request: NextRequest) {
         await creditService.unfreezeCredits(
           userId,
           creditCost,
-          `Image generation failed - credits refunded`,
+          'Image generation failed - credits refunded',
           `image_refund_${randomUUID()}`
         );
         console.log('[Image Generation] Credits unfrozen (refunded) after failure:', {
@@ -762,11 +767,15 @@ export async function POST(request: NextRequest) {
           credits: creditCost,
         });
       } catch (unfreezeError) {
-        console.error('[Image Generation] CRITICAL: Failed to unfreeze credits after generation failure:', {
-          userId,
-          credits: creditCost,
-          unfreezeError: unfreezeError instanceof Error ? unfreezeError.message : String(unfreezeError),
-        });
+        console.error(
+          '[Image Generation] CRITICAL: Failed to unfreeze credits after generation failure:',
+          {
+            userId,
+            credits: creditCost,
+            unfreezeError:
+              unfreezeError instanceof Error ? unfreezeError.message : String(unfreezeError),
+          }
+        );
       }
     }
 

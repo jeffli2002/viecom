@@ -39,7 +39,6 @@ const PUBLIC_PATHS: Array<{
   { path: '/about', priority: 0.7, changeFrequency: 'monthly' },
   { path: '/contact', priority: 0.7, changeFrequency: 'monthly' },
 
-
   // Legal pages
   { path: '/terms', priority: 0.5, changeFrequency: 'yearly' },
   { path: '/privacy', priority: 0.5, changeFrequency: 'yearly' },

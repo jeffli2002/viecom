@@ -279,7 +279,7 @@ export class CreditService {
       // CRITICAL: Available balance = total balance - frozen balance
       // Frozen credits are reserved for in-progress generations
       const availableBalance = account.balance - account.frozenBalance;
-      
+
       console.log('[Credit Service] Credit check:', {
         userId,
         totalBalance: account.balance,

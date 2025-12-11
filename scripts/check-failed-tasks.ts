@@ -1,11 +1,11 @@
+import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
+import { join } from 'node:path';
 import { config } from 'dotenv';
+import { eq, or, sql } from 'drizzle-orm';
 import { drizzle } from 'drizzle-orm/postgres-js';
 import postgres from 'postgres';
-import { generatedAsset, creditTransactions } from '../src/server/db/schema';
-import { eq, sql, or } from 'drizzle-orm';
-import { readFileSync } from 'fs';
-import { join } from 'path';
+import { creditTransactions, generatedAsset } from '../src/server/db/schema';
 
 // Load .env.local file FIRST
 config({ path: resolve(process.cwd(), '.env.local') });
@@ -50,12 +50,7 @@ async function checkFailedTasks() {
         metadata: generatedAsset.metadata,
       })
       .from(generatedAsset)
-      .where(
-        or(
-          eq(generatedAsset.status, 'failed'),
-          eq(generatedAsset.status, 'processing')
-        )
-      );
+      .where(or(eq(generatedAsset.status, 'failed'), eq(generatedAsset.status, 'processing')));
 
     const foundFailedAssets: Array<{
       taskId: string;
@@ -87,7 +82,9 @@ async function checkFailedTasks() {
     console.log('='.repeat(80));
 
     if (foundFailedAssets.length > 0) {
-      console.log(`\nFound ${foundFailedAssets.length} failed/processing assets with these task IDs:\n`);
+      console.log(
+        `\nFound ${foundFailedAssets.length} failed/processing assets with these task IDs:\n`
+      );
       foundFailedAssets.forEach((asset, index) => {
         console.log(`${index + 1}. Task ID: ${asset.taskId}`);
         console.log(`   User ID: ${asset.userId}`);
@@ -102,7 +99,7 @@ async function checkFailedTasks() {
     }
 
     // Check credit transactions for these task IDs
-    console.log('\n' + '='.repeat(80));
+    console.log(`\n${'='.repeat(80)}`);
     console.log('CREDIT TRANSACTIONS CHECK:');
     console.log('='.repeat(80));
 
@@ -147,14 +144,16 @@ async function checkFailedTasks() {
               });
             }
           }
-        } catch (error) {
+        } catch (_error) {
           // Skip invalid JSON
         }
       }
     }
 
     if (foundTransactions.length > 0) {
-      console.log(`\n✅ Found ${foundTransactions.length} credit transactions with these task IDs:\n`);
+      console.log(
+        `\n✅ Found ${foundTransactions.length} credit transactions with these task IDs:\n`
+      );
       foundTransactions.forEach((trans, index) => {
         console.log(`${index + 1}. Task ID: ${trans.taskId}`);
         console.log(`   User ID: ${trans.userId}`);
@@ -167,7 +166,7 @@ async function checkFailedTasks() {
     }
 
     // Check log files
-    console.log('\n' + '='.repeat(80));
+    console.log(`\n${'='.repeat(80)}`);
     console.log('LOG FILE CHECK:');
     console.log('='.repeat(80));
 
@@ -178,11 +177,11 @@ async function checkFailedTasks() {
       const logPath = join(process.cwd(), logFile);
       try {
         const logContent = readFileSync(logPath, 'utf-8');
-        
+
         for (const taskId of taskIds) {
           const lines = logContent.split('\n');
           const matchingLines: string[] = [];
-          
+
           lines.forEach((line, index) => {
             if (line.includes(taskId)) {
               // Get context (5 lines before and after)
@@ -213,10 +212,10 @@ async function checkFailedTasks() {
     }
 
     // Summary
-    console.log('\n' + '='.repeat(80));
+    console.log(`\n${'='.repeat(80)}`);
     console.log('SUMMARY:');
     console.log('='.repeat(80));
-    
+
     const foundTaskIds = new Set([
       ...foundFailedAssets.map((a) => a.taskId),
       ...foundTransactions.map((t) => t.taskId),
@@ -234,12 +233,12 @@ async function checkFailedTasks() {
       missingTaskIds.forEach((id, index) => {
         console.log(`  ${index + 1}. ${id}`);
       });
-      
+
       // Check if missing task IDs have credit transactions but no assets
       const missingWithCredits = missingTaskIds.filter((id) =>
         foundTransactions.some((t) => t.taskId === id)
       );
-      
+
       if (missingWithCredits.length > 0) {
         console.log('\n⚠️  CRITICAL: These task IDs have credit transactions but NO asset records:');
         missingWithCredits.forEach((id, index) => {
@@ -248,7 +247,9 @@ async function checkFailedTasks() {
           console.log(`     Credits deducted: ${trans?.amount}`);
           console.log(`     Transaction time: ${trans?.createdAt.toISOString()}`);
         });
-        console.log('\n💡 This suggests the video generation succeeded but failed to save to database!');
+        console.log(
+          '\n💡 This suggests the video generation succeeded but failed to save to database!'
+        );
         console.log('   Possible causes:');
         console.log('   1. Database save error (caught and logged but not thrown)');
         console.log('   2. Network issue during save');
@@ -261,7 +262,7 @@ async function checkFailedTasks() {
       }
     }
 
-    console.log('\n' + '='.repeat(80));
+    console.log(`\n${'='.repeat(80)}`);
   } catch (error) {
     console.error('Error checking failed tasks:', error);
     process.exit(1);
@@ -271,4 +272,3 @@ async function checkFailedTasks() {
 }
 
 checkFailedTasks();
-

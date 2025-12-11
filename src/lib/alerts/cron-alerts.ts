@@ -25,7 +25,7 @@ interface CronAlertData {
  */
 async function sendSlackAlert(data: CronAlertData): Promise<void> {
   const webhookUrl = process.env.SLACK_WEBHOOK_URL;
-  
+
   if (!webhookUrl) {
     console.log('[Alerts] Slack webhook not configured, skipping alert');
     return;
@@ -106,7 +106,7 @@ async function sendSlackAlert(data: CronAlertData): Promise<void> {
  */
 async function sendDiscordAlert(data: CronAlertData): Promise<void> {
   const webhookUrl = process.env.DISCORD_WEBHOOK_URL;
-  
+
   if (!webhookUrl) {
     console.log('[Alerts] Discord webhook not configured, skipping alert');
     return;
@@ -127,7 +127,7 @@ async function sendDiscordAlert(data: CronAlertData): Promise<void> {
       },
       {
         name: 'Execution ID',
-        value: data.executionId.substring(0, 8) + '...',
+        value: `${data.executionId.substring(0, 8)}...`,
         inline: true,
       },
       ...(data.duration
@@ -193,10 +193,7 @@ export async function sendCronAlert(data: CronAlertData): Promise<void> {
   });
 
   // Send to all configured channels in parallel
-  await Promise.allSettled([
-    sendSlackAlert(data),
-    sendDiscordAlert(data),
-  ]);
+  await Promise.allSettled([sendSlackAlert(data), sendDiscordAlert(data)]);
 }
 
 /**
@@ -228,4 +225,3 @@ export function shouldSendAlert(results: {
 
   return false;
 }
-

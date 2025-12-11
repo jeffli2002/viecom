@@ -1,9 +1,9 @@
-import http from 'node:http';
 import fs from 'node:fs';
+import http from 'node:http';
 import path from 'node:path';
 
 const logFile = path.join(process.cwd(), 'next-error.log');
-const server = http.createServer((req, res) => {
+const server = http.createServer((_req, res) => {
   res.writeHead(200, { 'Content-Type': 'text/plain' });
   let contents = '';
   try {
@@ -14,7 +14,7 @@ const server = http.createServer((req, res) => {
   res.end(contents || '[empty log]');
 });
 
-const port = parseInt(process.env.LOG_SERVER_PORT ?? '4545', 10);
+const port = Number.parseInt(process.env.LOG_SERVER_PORT ?? '4545', 10);
 server.listen(port, '127.0.0.1', () => {
   console.log(`[log-server] listening on http://127.0.0.1:${port}`);
 });

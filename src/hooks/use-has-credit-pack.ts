@@ -49,5 +49,3 @@ export function useHasCreditPack(): { hasCreditPack: boolean; loading: boolean }
 
   return { hasCreditPack, loading };
 }
-
-

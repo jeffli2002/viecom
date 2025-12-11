@@ -1,9 +1,9 @@
 import { resolve } from 'node:path';
 import { config } from 'dotenv';
+import { desc, eq, sql } from 'drizzle-orm';
 import { drizzle } from 'drizzle-orm/postgres-js';
 import postgres from 'postgres';
-import { generatedAsset, creditTransactions } from '../src/server/db/schema';
-import { eq, desc, sql } from 'drizzle-orm';
+import { creditTransactions, generatedAsset } from '../src/server/db/schema';
 
 // Load .env.local file FIRST
 config({ path: resolve(process.cwd(), '.env.local') });
@@ -19,10 +19,7 @@ if (!databaseUrl) {
 const client = postgres(databaseUrl);
 const db = drizzle(client);
 
-const taskIds = [
-  'a95feb1376def26a852d48745e2f15ed',
-  'addc39709b0b6dd856b6d6833f3fb228',
-];
+const taskIds = ['a95feb1376def26a852d48745e2f15ed', 'addc39709b0b6dd856b6d6833f3fb228'];
 
 async function checkTaskIds() {
   try {
@@ -104,14 +101,14 @@ async function checkTaskIds() {
       if (!userGroups.has(asset.userId)) {
         userGroups.set(asset.userId, []);
       }
-      userGroups.get(asset.userId)!.push(asset);
+      userGroups.get(asset.userId)?.push(asset);
     }
 
     console.log(`Total unique users: ${userGroups.size}\n`);
 
     if (userGroups.size === 1) {
-      const userId = Array.from(userGroups.keys())[0]!;
-      const userAssets = userGroups.get(userId)!;
+      const userId = Array.from(userGroups.keys())[0];
+      const userAssets = userId ? (userGroups.get(userId) ?? []) : [];
       console.log('✅ ALL TASK IDs ARE FROM THE SAME USER');
       console.log(`\nUser ID: ${userId}`);
       console.log(`Assets found: ${userAssets.length}/${taskIds.length}\n`);
@@ -147,7 +144,7 @@ async function checkTaskIds() {
     }
 
     // Also check credit transactions for task IDs
-    console.log('\n' + '='.repeat(80));
+    console.log(`\n${'='.repeat(80)}`);
     console.log('Checking credit transactions for task IDs...');
     console.log('='.repeat(80));
 
@@ -192,7 +189,7 @@ async function checkTaskIds() {
               });
             }
           }
-        } catch (error) {
+        } catch (_error) {
           // Skip invalid JSON
         }
       }
@@ -206,7 +203,7 @@ async function checkTaskIds() {
         if (!transactionUserGroups.has(trans.userId)) {
           transactionUserGroups.set(trans.userId, []);
         }
-        transactionUserGroups.get(trans.userId)!.push(trans);
+        transactionUserGroups.get(trans.userId)?.push(trans);
       }
 
       transactionUserGroups.forEach((transactions, userId) => {
@@ -219,7 +216,7 @@ async function checkTaskIds() {
         });
       });
     } else {
-      console.log(`\n❌ No task IDs found in credit transactions.`);
+      console.log('\n❌ No task IDs found in credit transactions.');
     }
 
     // Combine results
@@ -233,7 +230,7 @@ async function checkTaskIds() {
       ...foundInTransactions.map((t) => t.userId),
     ]);
 
-    console.log('\n' + '='.repeat(80));
+    console.log(`\n${'='.repeat(80)}`);
     console.log('COMBINED RESULTS:');
     console.log('='.repeat(80));
     console.log(`\nTotal found: ${allFoundTaskIds.size}/${taskIds.length}`);
@@ -241,10 +238,12 @@ async function checkTaskIds() {
 
     if (allFoundTaskIds.size > 0) {
       if (allUserIds.size === 1) {
-        const userId = Array.from(allUserIds)[0]!;
-        console.log(`\n✅ ALL FOUND TASK IDs ARE FROM THE SAME USER: ${userId}`);
+        const userId = Array.from(allUserIds)[0];
+        if (userId) {
+          console.log(`\n✅ ALL FOUND TASK IDs ARE FROM THE SAME USER: ${userId}`);
+        }
       } else {
-        console.log(`\n❌ TASK IDs ARE FROM DIFFERENT USERS`);
+        console.log('\n❌ TASK IDs ARE FROM DIFFERENT USERS');
         allUserIds.forEach((userId) => {
           const assetCount = foundAssets.filter((a) => a.userId === userId).length;
           const transCount = foundInTransactions.filter((t) => t.userId === userId).length;
@@ -257,7 +256,7 @@ async function checkTaskIds() {
     const missingTaskIds = taskIds.filter((id) => !allFoundTaskIds.has(id));
 
     if (missingTaskIds.length > 0) {
-      console.log('\n' + '='.repeat(80));
+      console.log(`\n${'='.repeat(80)}`);
       console.log('MISSING TASK IDs (not found in database):');
       console.log('='.repeat(80));
       missingTaskIds.forEach((id, index) => {
@@ -265,7 +264,7 @@ async function checkTaskIds() {
       });
     }
 
-    console.log('\n' + '='.repeat(80));
+    console.log(`\n${'='.repeat(80)}`);
   } catch (error) {
     console.error('Error checking task IDs:', error);
     process.exit(1);
@@ -275,4 +274,3 @@ async function checkTaskIds() {
 }
 
 checkTaskIds();
-

@@ -13,7 +13,6 @@ import {
 } from '@/lib/creem/plan-utils';
 import { normalizeCreemStatus } from '@/lib/creem/status-utils';
 import { grantSubscriptionCredits } from '@/lib/creem/subscription-credits';
-import { awardReferralForPaidUser } from '@/lib/rewards/referral-reward';
 import {
   sendCreditPackPurchaseEmail,
   sendSubscriptionCancelledEmail,
@@ -22,6 +21,7 @@ import {
   sendSubscriptionUpgradedEmail,
 } from '@/lib/email';
 import { getUserInfo } from '@/lib/email/user-helper';
+import { awardReferralForPaidUser } from '@/lib/rewards/referral-reward';
 import { db } from '@/server/db';
 import { paymentRepository } from '@/server/db/repositories/payment-repository';
 import { creditPackPurchase, creditTransactions, userCredits } from '@/server/db/schema';

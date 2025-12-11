@@ -176,14 +176,17 @@ export function ShowcaseGallery() {
         const data = await response.json();
 
         if (data.success && Array.isArray(data.items) && data.items.length > 0) {
-          const parsedItems: GalleryItem[] = data.items.map((item: any) => ({
-            id: item.id,
-            type: item.type === 'video' ? 'video' : 'image',
-            url: item.url,
-            category: item.category || 'Showcase',
-            title: item.title || 'Showcase Item',
-            filename: item.filename,
-          }));
+          const parsedItems: GalleryItem[] = data.items.map((item) => {
+            const record = item as Record<string, unknown>;
+            return {
+              id: String(record.id ?? crypto.randomUUID()),
+              type: record.type === 'video' ? 'video' : 'image',
+              url: String(record.url ?? ''),
+              category: String(record.category ?? 'Showcase'),
+              title: String(record.title ?? 'Showcase Item'),
+              filename: typeof record.filename === 'string' ? record.filename : undefined,
+            };
+          });
           const merged: GalleryItem[] = [...DEFAULT_ITEMS];
           for (const item of parsedItems) {
             if (!merged.some((existing) => existing.id === item.id)) {
@@ -393,10 +396,10 @@ export function ShowcaseGallery() {
 
               {galleryItems.length > 0 && (
                 <div className="flex justify-center gap-2 mt-4">
-                  {galleryItems.map((_, idx) => (
+                  {galleryItems.map((item, idx) => (
                     <button
                       type="button"
-                      key={idx}
+                      key={item.id}
                       onClick={() => scrollToItem(idx)}
                       className={`transition-all duration-300 rounded-full ${
                         activeIndex === idx

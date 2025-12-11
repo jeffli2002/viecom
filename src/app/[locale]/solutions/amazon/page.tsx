@@ -1,9 +1,13 @@
-import { Check, CheckCircle2, ShoppingBag, Sparkles } from 'lucide-react';
-import Link from 'next/link';
-import { getSEOMetadata } from '@/lib/seo/metadata-translations';
-import { getSoftwareApplicationSchema, getFAQPageSchema, getHowToSchema } from '@/lib/utils/schema-generator';
-import type { Metadata } from 'next';
 import { FAQ } from '@/components/blocks/faq';
+import { getSEOMetadata } from '@/lib/seo/metadata-translations';
+import {
+  getFAQPageSchema,
+  getHowToSchema,
+  getSoftwareApplicationSchema,
+} from '@/lib/utils/schema-generator';
+import { Check, CheckCircle2, ShoppingBag, Sparkles } from 'lucide-react';
+import type { Metadata } from 'next';
+import Link from 'next/link';
 
 const AMAZON_FAQ = [
   {
@@ -102,10 +106,13 @@ export default function AmazonSolutionPage() {
       <div className="pt-32 pb-16 container-base text-center">
         <h1 className="text-5xl md:text-6xl font-bold mb-6">
           Amazon-Compliant <br />
-          <span className="text-transparent bg-clip-text bg-gradient-to-r from-teal-500 to-blue-500">Product Images</span>
+          <span className="text-transparent bg-clip-text bg-gradient-to-r from-teal-500 to-blue-500">
+            Product Images
+          </span>
         </h1>
         <p className="text-xl text-slate-600 dark:text-slate-400 max-w-3xl mx-auto">
-          Generate Amazon-ready product images with pure white backgrounds. Automated compliance ensures your listings stay ranked.
+          Generate Amazon-ready product images with pure white backgrounds. Automated compliance
+          ensures your listings stay ranked.
         </p>
       </div>
 
@@ -149,7 +156,9 @@ export default function AmazonSolutionPage() {
                       Amazon Main
                     </span>
                   </div>
-                  <p className="text-[11px] text-slate-500">Pure White (255,255,255) compliant output</p>
+                  <p className="text-[11px] text-slate-500">
+                    Pure White (255,255,255) compliant output
+                  </p>
                 </div>
               </div>
 
@@ -178,7 +187,8 @@ export default function AmazonSolutionPage() {
           </div>
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-6">Marketplace Safe</h2>
           <p className="text-slate-600 dark:text-slate-400 text-center mb-12 max-w-2xl mx-auto">
-            Amazon and eBay algorithms will suppress listings with non-compliant images. We automate the boring stuff so you stay ranked.
+            Amazon and eBay algorithms will suppress listings with non-compliant images. We automate
+            the boring stuff so you stay ranked.
           </p>
           <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
             <div className="flex items-center gap-3 p-4 bg-slate-50 dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-800">
@@ -187,7 +197,9 @@ export default function AmazonSolutionPage() {
               </div>
               <div>
                 <h4 className="font-bold text-sm mb-1">Pure White BG (RGB 255)</h4>
-                <p className="text-xs text-slate-500">Automated removal of all background pixels.</p>
+                <p className="text-xs text-slate-500">
+                  Automated removal of all background pixels.
+                </p>
               </div>
             </div>
             <div className="flex items-center gap-3 p-4 bg-slate-50 dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-800">
@@ -196,7 +208,9 @@ export default function AmazonSolutionPage() {
               </div>
               <div>
                 <h4 className="font-bold text-sm mb-1">85% Frame Fill</h4>
-                <p className="text-xs text-slate-500">Auto-crop and zoom to maximize product visibility.</p>
+                <p className="text-xs text-slate-500">
+                  Auto-crop and zoom to maximize product visibility.
+                </p>
               </div>
             </div>
             <div className="flex items-center gap-3 p-4 bg-slate-50 dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-800">
@@ -205,7 +219,9 @@ export default function AmazonSolutionPage() {
               </div>
               <div>
                 <h4 className="font-bold text-sm mb-1">No Text Overlays</h4>
-                <p className="text-xs text-slate-500">Automatic removal of unauthorized text and graphics.</p>
+                <p className="text-xs text-slate-500">
+                  Automatic removal of unauthorized text and graphics.
+                </p>
               </div>
             </div>
             <div className="flex items-center gap-3 p-4 bg-slate-50 dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-800">
@@ -214,17 +230,25 @@ export default function AmazonSolutionPage() {
               </div>
               <div>
                 <h4 className="font-bold text-sm mb-1">Batch Processing</h4>
-                <p className="text-xs text-slate-500">Process hundreds of products via CSV upload.</p>
+                <p className="text-xs text-slate-500">
+                  Process hundreds of products via CSV upload.
+                </p>
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      <FAQ items={AMAZON_FAQ} title="Amazon Compliance FAQ" className="bg-slate-50 dark:bg-slate-900" />
+      <FAQ
+        items={AMAZON_FAQ}
+        title="Amazon Compliance FAQ"
+        className="bg-slate-50 dark:bg-slate-900"
+      />
 
       <section className="py-20 bg-white dark:bg-slate-950 text-center">
-        <h2 className="text-3xl md:text-4xl font-bold mb-8">Ready to Generate Amazon-Compliant Images?</h2>
+        <h2 className="text-3xl md:text-4xl font-bold mb-8">
+          Ready to Generate Amazon-Compliant Images?
+        </h2>
         <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
           <Link
             href="/image-generation"
@@ -254,4 +278,3 @@ export default function AmazonSolutionPage() {
     </div>
   );
 }
-

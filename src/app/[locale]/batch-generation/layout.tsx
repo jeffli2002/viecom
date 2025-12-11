@@ -9,7 +9,7 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { locale } = await params;
   const baseMetadata = getSEOMetadata(locale, 'tool', '/batch-generation');
-  
+
   // Page-specific overrides
   const pageSpecific: Record<string, Partial<Metadata>> = {
     en: {
@@ -54,7 +54,7 @@ export async function generateMetadata({
     fr: {
       title: 'Génération par Lots | Générez Plusieurs Images et Vidéos à la Fois',
       description:
-        'Téléchargez des fichiers Excel/CSV pour générer plusieurs images et vidéos de produits simultanément. Traitement par lots pour l\'e-commerce. Plans Gratuit, Pro et Pro+ disponibles.',
+        "Téléchargez des fichiers Excel/CSV pour générer plusieurs images et vidéos de produits simultanément. Traitement par lots pour l'e-commerce. Plans Gratuit, Pro et Pro+ disponibles.",
       keywords: [
         'génération par lots',
         'génération image par lots',

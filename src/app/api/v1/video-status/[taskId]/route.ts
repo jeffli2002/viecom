@@ -1,12 +1,17 @@
+import { randomUUID } from 'node:crypto';
 import { auth } from '@/lib/auth/auth';
-import { type NextRequest, NextResponse } from 'next/server';
 import { db } from '@/server/db';
 import { generatedAsset, userCredits } from '@/server/db/schema';
 import { eq } from 'drizzle-orm';
-import { randomUUID } from 'crypto';
+import { type NextRequest, NextResponse } from 'next/server';
 
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60; // Allow up to 60 seconds for processing
+
+type AssetMetadata = Record<string, unknown> & { taskId?: string; previewUrl?: string };
+
+const toMetadata = (value: unknown): AssetMetadata =>
+  typeof value === 'object' && value !== null ? { ...(value as Record<string, unknown>) } : {};
 
 interface RouteParams {
   params: Promise<{
@@ -28,10 +33,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     });
 
     if (!session?.user?.id) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const userId = session.user.id;
@@ -43,16 +45,10 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       .where(eq(generatedAsset.userId, userId))
       .orderBy(generatedAsset.createdAt);
 
-    const asset = assets.find((a) => {
-      const metadata = a.metadata as any;
-      return metadata?.taskId === taskId;
-    });
+    const asset = assets.find((a) => toMetadata(a.metadata).taskId === taskId);
 
     if (!asset) {
-      return NextResponse.json(
-        { error: 'Task not found' },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: 'Task not found' }, { status: 404 });
     }
 
     // If already completed or failed, return immediately
@@ -61,7 +57,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
         status: 'completed',
         progress: 100,
         videoUrl: asset.publicUrl,
-        previewUrl: (asset.metadata as any)?.previewUrl,
+        previewUrl: toMetadata(asset.metadata).previewUrl,
         assetId: asset.id,
         creditsSpent: asset.creditsSpent,
       });
@@ -85,7 +81,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     try {
       const { getKieApiService } = await import('@/lib/kie/kie-api');
       const kieApiService = getKieApiService();
-      
+
       const kieStatus = await kieApiService.getTaskStatus(taskId);
 
       // Still processing in KIE.ai
@@ -100,7 +96,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       // Failed in KIE.ai
       if (kieStatus.data?.status === 'failed' || kieStatus.data?.state === 'fail') {
         const errorMsg = kieStatus.data?.error || kieStatus.data?.failMsg || 'Generation failed';
-        
+
         // Update database
         await db
           .update(generatedAsset)
@@ -114,12 +110,12 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
         // Unfreeze credits (refund)
         const { CreditService } = await import('@/lib/credits/credit-service');
         const creditService = new CreditService();
-        
+
         try {
           await creditService.unfreezeCredits(
             userId,
             asset.creditsSpent || 0,
-            `Video generation failed - credits refunded`,
+            'Video generation failed - credits refunded',
             `video_refund_${taskId}`
           );
         } catch (unfreezeError) {
@@ -140,7 +136,8 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
           userId,
         });
 
-        const videoUrl = kieStatus.data?.result?.videoUrl || kieStatus.data?.result?.resultUrls?.[0];
+        const videoUrl =
+          kieStatus.data?.result?.videoUrl || kieStatus.data?.result?.resultUrls?.[0];
 
         if (!videoUrl) {
           throw new Error('Video URL not found in KIE.ai response');
@@ -175,7 +172,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
             publicUrl: r2Result.url,
             fileSize,
             metadata: {
-              ...(asset.metadata as any),
+              ...toMetadata(asset.metadata),
               previewUrl,
               completedAt: new Date().toISOString(),
             },
@@ -188,13 +185,13 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
         const creditService = new CreditService();
 
         const creditCost = asset.creditsSpent || 0;
-        
+
         // Unfreeze
         try {
           await creditService.unfreezeCredits(
             userId,
             creditCost,
-            `Video generation completed`,
+            'Video generation completed',
             `video_unfreeze_${taskId}`
           );
         } catch (unfreezeError) {
@@ -243,7 +240,6 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
         progress: 30,
         message: 'Processing... Please wait',
       });
-
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
       console.error('[Video Status] Error checking KIE.ai status:', {
@@ -259,7 +255,6 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
         message: 'Still processing... This may take a few minutes',
       });
     }
-
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     console.error('[Video Status] Error:', {
@@ -275,4 +270,3 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     );
   }
 }
-

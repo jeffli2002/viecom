@@ -203,8 +203,7 @@ export default function ImageGenerator() {
     creditBalance?.availableBalance !== undefined
       ? creditBalance.availableBalance - pendingCreditCost
       : null;
-  const hasSufficientCredits =
-    effectiveCredits === null || effectiveCredits >= imageCreditCost;
+  const hasSufficientCredits = effectiveCredits === null || effectiveCredits >= imageCreditCost;
 
   // User is already available from useAuthStore, no need to fetch separately
 

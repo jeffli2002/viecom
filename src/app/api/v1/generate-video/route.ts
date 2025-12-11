@@ -38,10 +38,10 @@ const isR2Configured = () =>
 
 export async function POST(request: NextRequest) {
   // Declare variables in outer scope for error handling
-  let userId: string = 'unknown';
+  let userId = 'unknown';
   let taskId: string | undefined;
   let generationMode: 't2v' | 'i2v' = 't2v';
-  let prompt: string = '';
+  let prompt = '';
 
   try {
     const isTestMode =
@@ -116,14 +116,14 @@ export async function POST(request: NextRequest) {
     if (!isTestMode) {
       const { checkGenerationRateLimit } = await import('@/lib/rate-limit/generation-rate-limit');
       const rateLimit = await checkGenerationRateLimit(userId, 'video');
-      
+
       if (!rateLimit.allowed) {
         console.warn('[Video Generation] Rate limited:', {
           userId,
           reason: rateLimit.reason,
           waitTimeSeconds: rateLimit.waitTimeSeconds,
         });
-        
+
         return NextResponse.json(
           {
             error: rateLimit.reason || 'Too many requests. Please wait before trying again.',
@@ -144,7 +144,7 @@ export async function POST(request: NextRequest) {
         const account = await creditService.getCreditAccount(userId);
         const availableBalance = account ? account.balance - account.frozenBalance : 0;
         const frozenBalance = account?.frozenBalance || 0;
-        
+
         console.warn('[Video Generation] Insufficient credits:', {
           userId,
           required: creditCost,
@@ -155,9 +155,10 @@ export async function POST(request: NextRequest) {
 
         return NextResponse.json(
           {
-            error: frozenBalance > 0
-              ? `Insufficient credits. Required: ${creditCost} credits. You have ${availableBalance} available (${frozenBalance} credits reserved for in-progress generations). Please wait for current generations to complete or purchase more credits.`
-              : `Insufficient credits. Required: ${creditCost} credits. Please earn more credits or upgrade your plan.`,
+            error:
+              frozenBalance > 0
+                ? `Insufficient credits. Required: ${creditCost} credits. You have ${availableBalance} available (${frozenBalance} credits reserved for in-progress generations). Please wait for current generations to complete or purchase more credits.`
+                : `Insufficient credits. Required: ${creditCost} credits. Please earn more credits or upgrade your plan.`,
             required: creditCost,
             available: availableBalance,
             frozen: frozenBalance,
@@ -334,12 +335,15 @@ export async function POST(request: NextRequest) {
           await creditService.unfreezeCredits(
             userId,
             creditCost,
-            `Task creation failed - credits refunded`,
+            'Task creation failed - credits refunded',
             `video_refund_creation_${randomUUID()}`
           );
           console.log('[Video Generation] Credits unfrozen after task creation failure');
         } catch (unfreezeError) {
-          console.error('[Video Generation] Failed to unfreeze credits after creation failure:', unfreezeError);
+          console.error(
+            '[Video Generation] Failed to unfreeze credits after creation failure:',
+            unfreezeError
+          );
         }
       }
 
@@ -395,27 +399,27 @@ export async function POST(request: NextRequest) {
           taskId,
           assetId,
           status: 'processing',
-          message: 'Video generation started. This may take 5-20 minutes depending on model and duration.',
+          message:
+            'Video generation started. This may take 5-20 minutes depending on model and duration.',
           estimatedTime: normalizedModel === 'sora-2-pro' ? '10-20 minutes' : '5-10 minutes',
         });
-
       } catch (saveError) {
         console.error('[Video Generation] Failed to save task record:', saveError);
-        
+
         // Unfreeze credits
         if (creditsFrozen) {
           try {
             await creditService.unfreezeCredits(
               userId,
               creditCost,
-              `Failed to save task - credits refunded`,
+              'Failed to save task - credits refunded',
               `video_refund_save_${taskId}`
             );
           } catch (unfreezeError) {
             console.error('[Video Generation] Failed to unfreeze after save error:', unfreezeError);
           }
         }
-        
+
         throw saveError;
       }
     }
@@ -565,10 +569,7 @@ export async function POST(request: NextRequest) {
         }
       }
 
-      return NextResponse.json(
-        { error: errorMsg, taskId },
-        { status: 500 }
-      );
+      return NextResponse.json({ error: errorMsg, taskId }, { status: 500 });
     }
 
     let videoBuffer: Buffer;
@@ -577,7 +578,7 @@ export async function POST(request: NextRequest) {
       console.log('[Video Generation] Downloading video from KIE:', {
         taskId,
         userId,
-        videoUrl: videoResult.videoUrl.substring(0, 100) + '...',
+        videoUrl: `${videoResult.videoUrl.substring(0, 100)}...`,
       });
 
       const videoResponse = await fetch(videoResult.videoUrl);
@@ -632,10 +633,7 @@ export async function POST(request: NextRequest) {
           }
         }
 
-        return NextResponse.json(
-          { error: errorMsg, taskId },
-          { status: 500 }
-        );
+        return NextResponse.json({ error: errorMsg, taskId }, { status: 500 });
       }
 
       videoBuffer = Buffer.from(await videoResponse.arrayBuffer());
@@ -849,18 +847,21 @@ export async function POST(request: NextRequest) {
           break;
         } catch (saveError) {
           lastSaveError = saveError instanceof Error ? saveError : new Error(String(saveError));
-          console.error(`[Video Generation] Database save attempt ${saveAttempt}/${MAX_SAVE_RETRIES} failed:`, {
-            taskId,
-            userId,
-            error: lastSaveError.message,
-            stack: lastSaveError.stack,
-            r2Key: r2Result.key,
-            r2Url: r2Result.url,
-          });
+          console.error(
+            `[Video Generation] Database save attempt ${saveAttempt}/${MAX_SAVE_RETRIES} failed:`,
+            {
+              taskId,
+              userId,
+              error: lastSaveError.message,
+              stack: lastSaveError.stack,
+              r2Key: r2Result.key,
+              r2Url: r2Result.url,
+            }
+          );
 
           // Wait before retry (exponential backoff)
           if (saveAttempt < MAX_SAVE_RETRIES) {
-            const waitTime = Math.min(1000 * Math.pow(2, saveAttempt - 1), 5000);
+            const waitTime = Math.min(1000 * 2 ** (saveAttempt - 1), 5000);
             await new Promise((resolve) => setTimeout(resolve, waitTime));
           }
         }
@@ -870,13 +871,16 @@ export async function POST(request: NextRequest) {
       // because KIE.ai has already successfully generated the video
       // The video is available at r2Result.url, so user should get it
       if (!saveSuccess) {
-        console.error('[Video Generation] CRITICAL: All database save attempts failed, but KIE.ai succeeded:', {
-          taskId,
-          userId,
-          r2Key: r2Result.key,
-          r2Url: r2Result.url,
-          error: lastSaveError?.message,
-        });
+        console.error(
+          '[Video Generation] CRITICAL: All database save attempts failed, but KIE.ai succeeded:',
+          {
+            taskId,
+            userId,
+            r2Key: r2Result.key,
+            r2Url: r2Result.url,
+            error: lastSaveError?.message,
+          }
+        );
 
         // Try to create a minimal record to track this issue
         try {
@@ -1028,32 +1032,44 @@ export async function POST(request: NextRequest) {
                 })
                 .where(eq(generatedAsset.id, savedAssetId));
             } catch (updateError) {
-              console.warn('[Video Generation] Failed to update asset with credit transaction ID (non-critical):', {
-                taskId,
-                assetId: savedAssetId,
-                error: updateError instanceof Error ? updateError.message : String(updateError),
-              });
+              console.warn(
+                '[Video Generation] Failed to update asset with credit transaction ID (non-critical):',
+                {
+                  taskId,
+                  assetId: savedAssetId,
+                  error: updateError instanceof Error ? updateError.message : String(updateError),
+                }
+              );
             }
           }
 
           break;
         } catch (error) {
           lastCreditError = error instanceof Error ? error : new Error(String(error));
-          console.error(`[Video Generation] Credit charge attempt ${creditAttempt}/${MAX_CREDIT_RETRIES} failed:`, {
-            taskId,
-            userId,
-            credits: creditCost,
-            error: lastCreditError.message,
-            stack: lastCreditError.stack,
-            assetId: savedAssetId,
-          });
-
-          // Check if it's an idempotency issue (already charged)
-          if (lastCreditError.message.includes('referenceId') || lastCreditError.message.includes('unique')) {
-            console.log('[Video Generation] Credits may have already been charged (idempotency check):', {
+          console.error(
+            `[Video Generation] Credit charge attempt ${creditAttempt}/${MAX_CREDIT_RETRIES} failed:`,
+            {
               taskId,
               userId,
-            });
+              credits: creditCost,
+              error: lastCreditError.message,
+              stack: lastCreditError.stack,
+              assetId: savedAssetId,
+            }
+          );
+
+          // Check if it's an idempotency issue (already charged)
+          if (
+            lastCreditError.message.includes('referenceId') ||
+            lastCreditError.message.includes('unique')
+          ) {
+            console.log(
+              '[Video Generation] Credits may have already been charged (idempotency check):',
+              {
+                taskId,
+                userId,
+              }
+            );
             // Try to verify if credits were actually charged
             // If referenceId exists, credits were likely already charged
             creditChargeSuccess = true; // Assume success for idempotency
@@ -1062,7 +1078,7 @@ export async function POST(request: NextRequest) {
 
           // Wait before retry (exponential backoff)
           if (creditAttempt < MAX_CREDIT_RETRIES) {
-            const waitTime = Math.min(1000 * Math.pow(2, creditAttempt - 1), 5000);
+            const waitTime = Math.min(1000 * 2 ** (creditAttempt - 1), 5000);
             await new Promise((resolve) => setTimeout(resolve, waitTime));
           }
         }
@@ -1071,15 +1087,18 @@ export async function POST(request: NextRequest) {
       // CRITICAL: If credit charge fails after all retries, we still need to return the video
       // because KIE.ai has already generated it. Log this as a critical issue for manual review.
       if (!creditChargeSuccess) {
-        console.error('[Video Generation] CRITICAL: All credit charge attempts failed, but video was generated:', {
-          taskId,
-          userId,
-          credits: creditCost,
-          r2Key: r2Result.key,
-          r2Url: r2Result.url,
-          assetId: savedAssetId,
-          error: lastCreditError?.message,
-        });
+        console.error(
+          '[Video Generation] CRITICAL: All credit charge attempts failed, but video was generated:',
+          {
+            taskId,
+            userId,
+            credits: creditCost,
+            r2Key: r2Result.key,
+            r2Url: r2Result.url,
+            assetId: savedAssetId,
+            error: lastCreditError?.message,
+          }
+        );
 
         // Update asset record to mark credit charge failure
         if (savedAssetId) {
@@ -1110,11 +1129,14 @@ export async function POST(request: NextRequest) {
         // CRITICAL: Still return success with video URL
         // This ensures user gets the video even if credit charge failed
         // The credit charge failure will be logged and can be manually reviewed/fixed
-        console.warn('[Video Generation] Returning video URL despite credit charge failure - requires manual review:', {
-          taskId,
-          userId,
-          credits: creditCost,
-        });
+        console.warn(
+          '[Video Generation] Returning video URL despite credit charge failure - requires manual review:',
+          {
+            taskId,
+            userId,
+            credits: creditCost,
+          }
+        );
       }
     }
 
@@ -1151,7 +1173,9 @@ export async function POST(request: NextRequest) {
     }
 
     if (!creditTransactionId && !isTestMode) {
-      response.warnings.push('Video generated but credit charge may have failed - requires manual review');
+      response.warnings.push(
+        'Video generated but credit charge may have failed - requires manual review'
+      );
     }
 
     console.log('[Video Generation] Returning success response:', {
@@ -1188,7 +1212,7 @@ export async function POST(request: NextRequest) {
         await creditService.unfreezeCredits(
           userId,
           creditCost,
-          `Video generation failed - credits refunded`,
+          'Video generation failed - credits refunded',
           `video_refund_${taskId || randomUUID()}`
         );
         console.log('[Video Generation] Credits unfrozen (refunded) after failure:', {
@@ -1197,12 +1221,16 @@ export async function POST(request: NextRequest) {
           error: errorMessage,
         });
       } catch (unfreezeError) {
-        console.error('[Video Generation] CRITICAL: Failed to unfreeze credits after generation failure:', {
-          userId,
-          credits: creditCost,
-          unfreezeError: unfreezeError instanceof Error ? unfreezeError.message : String(unfreezeError),
-          originalError: errorMessage,
-        });
+        console.error(
+          '[Video Generation] CRITICAL: Failed to unfreeze credits after generation failure:',
+          {
+            userId,
+            credits: creditCost,
+            unfreezeError:
+              unfreezeError instanceof Error ? unfreezeError.message : String(unfreezeError),
+            originalError: errorMessage,
+          }
+        );
         // This is a critical issue - credits are frozen but generation failed
         // Need manual intervention to unfreeze
       }

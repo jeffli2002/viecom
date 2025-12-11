@@ -30,9 +30,7 @@ export default function ImageGenerationPage() {
         <h2 className="h2-section mb-3 text-slate-900 dark:text-white">
           {t('videoPromotionTitle')}
         </h2>
-        <p className="text-body mb-6 max-w-2xl mx-auto">
-          {t('videoPromotionDescription')}
-        </p>
+        <p className="text-body mb-6 max-w-2xl mx-auto">{t('videoPromotionDescription')}</p>
         <div className="flex justify-center gap-4">
           <Link href="/image-to-video-ai">
             <Button size="lg" className="btn-primary group">

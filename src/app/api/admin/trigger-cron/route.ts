@@ -1,5 +1,5 @@
-import { requireAdmin } from '@/lib/admin/auth';
 import { env } from '@/env';
+import { requireAdmin } from '@/lib/admin/auth';
 import { NextResponse } from 'next/server';
 
 /**
@@ -12,21 +12,18 @@ export async function POST() {
     await requireAdmin();
 
     if (!env.CRON_SECRET) {
-      return NextResponse.json(
-        { error: 'CRON_SECRET not configured' },
-        { status: 500 }
-      );
+      return NextResponse.json({ error: 'CRON_SECRET not configured' }, { status: 500 });
     }
 
     console.log('[Admin] Manually triggering cron job...');
 
     // Call the cron endpoint with proper authorization
     const cronUrl = `${env.NEXT_PUBLIC_APP_URL}/api/cron/process-stuck-tasks`;
-    
+
     const response = await fetch(cronUrl, {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${env.CRON_SECRET}`,
+        Authorization: `Bearer ${env.CRON_SECRET}`,
         'Content-Type': 'application/json',
       },
     });
@@ -46,7 +43,6 @@ export async function POST() {
       duration: data.duration,
       executionId: data.executionId,
     });
-
   } catch (error: unknown) {
     console.error('Admin trigger cron error:', error);
 
@@ -63,4 +59,3 @@ export async function POST() {
     );
   }
 }
-

@@ -1,25 +1,25 @@
+import { randomUUID } from 'node:crypto';
 import { env } from '@/env';
 import { db } from '@/server/db';
 import { generatedAsset } from '@/server/db/schema';
 import { and, eq, lt } from 'drizzle-orm';
 import { type NextRequest, NextResponse } from 'next/server';
-import { randomUUID } from 'crypto';
 
 export const dynamic = 'force-dynamic';
 export const maxDuration = 300; // 5 minutes max for cron job
 
 /**
  * Cron job to process stuck video/image generation tasks
- * 
+ *
  * This endpoint is called periodically (every 10 minutes) by Vercel Cron
- * 
+ *
  * What it does:
  * 1. Find all tasks with status="processing" older than 10 minutes
  * 2. Check KIE.ai for completion status
  * 3. If completed: Download video/image, upload to R2, unfreeze & charge credits
  * 4. If failed: Unfreeze credits (refund user)
  * 5. If still processing: Leave it alone (wait for next cron run)
- * 
+ *
  * This prevents:
  * - Frozen credits forever
  * - Financial losses (KIE.ai paid but user not charged)
@@ -38,7 +38,7 @@ async function processStuckTasks(request: NextRequest) {
 
   const startTime = Date.now();
   const executionId = randomUUID();
-  
+
   // PHASE 2: Log cron execution start
   const { cronJobExecutions } = await import('@/server/db/schema');
   await db.insert(cronJobExecutions).values({
@@ -53,15 +53,12 @@ async function processStuckTasks(request: NextRequest) {
   try {
     // Find stuck tasks (processing for more than 10 minutes)
     const tenMinutesAgo = new Date(Date.now() - 10 * 60 * 1000);
-    
+
     const stuckTasks = await db
       .select()
       .from(generatedAsset)
       .where(
-        and(
-          eq(generatedAsset.status, 'processing'),
-          lt(generatedAsset.createdAt, tenMinutesAgo)
-        )
+        and(eq(generatedAsset.status, 'processing'), lt(generatedAsset.createdAt, tenMinutesAgo))
       )
       .limit(50); // Process up to 50 stuck tasks per run
 
@@ -85,8 +82,8 @@ async function processStuckTasks(request: NextRequest) {
 
     // Process each stuck task
     for (const task of stuckTasks) {
-      const metadata = task.metadata as any;
-      const taskId = metadata?.taskId;
+      const metadata = task.metadata as Record<string, unknown> | null;
+      const taskId = typeof metadata?.taskId === 'string' ? metadata.taskId : undefined;
 
       if (!taskId) {
         console.warn('[Cron] Task has no taskId in metadata:', task.id);
@@ -100,17 +97,18 @@ async function processStuckTasks(request: NextRequest) {
         // Check KIE.ai status
         const { getKieApiService } = await import('@/lib/kie/kie-api');
         const kieApiService = getKieApiService();
-        
+
         const kieStatus = await kieApiService.getTaskStatus(taskId);
         const state = kieStatus.data?.state || kieStatus.data?.status;
 
         if (state === 'success' || state === 'completed') {
           // Video is ready - process it!
           console.log(`[Cron] Task ${taskId} completed in KIE.ai, processing...`);
-          
-          const resultUrl = kieStatus.data?.result?.videoUrl || 
-                           kieStatus.data?.result?.imageUrl ||
-                           kieStatus.data?.result?.resultUrls?.[0];
+
+          const resultUrl =
+            kieStatus.data?.result?.videoUrl ||
+            kieStatus.data?.result?.imageUrl ||
+            kieStatus.data?.result?.resultUrls?.[0];
 
           if (!resultUrl) {
             throw new Error('No result URL in KIE.ai response');
@@ -129,7 +127,7 @@ async function processStuckTasks(request: NextRequest) {
           const { r2StorageService } = await import('@/lib/storage/r2');
           const extension = task.assetType === 'video' ? 'mp4' : 'png';
           const contentType = task.assetType === 'video' ? 'video/mp4' : 'image/png';
-          
+
           const r2Result = await r2StorageService.uploadAsset(
             buffer,
             `${task.assetType}-${randomUUID()}.${extension}`,
@@ -210,7 +208,7 @@ async function processStuckTasks(request: NextRequest) {
 
             if (userRecord) {
               const { sendEmail } = await import('@/lib/email/email-service');
-              
+
               const assetTypeName = task.assetType === 'video' ? 'Video' : 'Image';
               const emailHtml = `
                 <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; padding: 40px 20px;">
@@ -264,11 +262,10 @@ async function processStuckTasks(request: NextRequest) {
             console.error('[Cron] Failed to send notification email (non-critical):', emailError);
             // Don't fail the recovery if email fails
           }
-
         } else if (state === 'fail' || state === 'failed') {
           // Generation failed - refund credits
           console.log(`[Cron] Task ${taskId} failed in KIE.ai, refunding credits...`);
-          
+
           const errorMsg = kieStatus.data?.error || kieStatus.data?.failMsg || 'Generation failed';
 
           // Update database
@@ -306,13 +303,11 @@ async function processStuckTasks(request: NextRequest) {
           }
 
           results.failed++;
-
         } else {
           // Still processing in KIE.ai - leave it alone
           console.log(`[Cron] Task ${taskId} still processing in KIE.ai (state: ${state})`);
           results.stillProcessing++;
         }
-
       } catch (error) {
         console.error(`[Cron] Error processing task ${taskId}:`, {
           error: error instanceof Error ? error.message : String(error),
@@ -348,7 +343,7 @@ async function processStuckTasks(request: NextRequest) {
     // PHASE 2: Send alerts if there are issues
     try {
       const { sendCronAlert, shouldSendAlert } = await import('@/lib/alerts/cron-alerts');
-      
+
       if (shouldSendAlert(finalResults)) {
         await sendCronAlert({
           jobName: 'process-stuck-tasks',
@@ -371,11 +366,10 @@ async function processStuckTasks(request: NextRequest) {
       totalFound: stuckTasks.length,
       executionId,
     });
-
   } catch (error) {
     const duration = Date.now() - startTime;
     const errorMessage = error instanceof Error ? error.message : String(error);
-    
+
     console.error('[Cron] Error in stuck task processor:', {
       error: errorMessage,
       stack: error instanceof Error ? error.stack : undefined,

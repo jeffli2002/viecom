@@ -1,9 +1,9 @@
 import { resolve } from 'node:path';
 import { config } from 'dotenv';
+import { desc, eq, inArray } from 'drizzle-orm';
 import { drizzle } from 'drizzle-orm/postgres-js';
 import postgres from 'postgres';
 import { generatedAsset } from '../src/server/db/schema';
-import { inArray, eq, desc } from 'drizzle-orm';
 
 // Load .env.local file FIRST
 config({ path: resolve(process.cwd(), '.env.local') });
@@ -33,7 +33,7 @@ async function checkVideoUsers() {
     console.log('Checking video URLs...\n');
 
     // First, try exact match on publicUrl
-    let assets = await db
+    const assets = await db
       .select({
         id: generatedAsset.id,
         userId: generatedAsset.userId,
@@ -49,16 +49,18 @@ async function checkVideoUsers() {
     // If not found, try searching by UUID in the URL
     if (assets.length === 0) {
       console.log('Not found in publicUrl, searching by UUID in URL...\n');
-      
+
       // Extract UUIDs from URLs (format: .../uuid.mp4)
-      const uuids = videoUrls.map((url) => {
-        const match = url.match(/([a-f0-9-]{36})\.mp4$/i);
-        return match ? match[1] : null;
-      }).filter((uuid): uuid is string => uuid !== null);
+      const uuids = videoUrls
+        .map((url) => {
+          const match = url.match(/([a-f0-9-]{36})\.mp4$/i);
+          return match ? match[1] : null;
+        })
+        .filter((uuid): uuid is string => uuid !== null);
 
       if (uuids.length > 0) {
         console.log(`Extracted UUIDs: ${uuids.join(', ')}\n`);
-        
+
         // Search in publicUrl, r2Key, or metadata
         const allVideos = await db
           .select({
@@ -77,7 +79,7 @@ async function checkVideoUsers() {
         // Check if any UUID appears in publicUrl, r2Key, or metadata
         for (const video of allVideos) {
           const urlToCheck = video.publicUrl || video.r2Key || '';
-          
+
           // Check if any UUID from our list appears in the URL
           for (const uuid of uuids) {
             if (urlToCheck.includes(uuid)) {
@@ -97,7 +99,7 @@ async function checkVideoUsers() {
           if (video.metadata && typeof video.metadata === 'object') {
             const metadata = video.metadata as Record<string, unknown>;
             const previewUrl = metadata.previewUrl;
-            
+
             if (typeof previewUrl === 'string') {
               for (const uuid of uuids) {
                 if (previewUrl.includes(uuid)) {
@@ -134,7 +136,7 @@ async function checkVideoUsers() {
       if (!userGroups.has(asset.userId)) {
         userGroups.set(asset.userId, []);
       }
-      userGroups.get(asset.userId)!.push(asset);
+      userGroups.get(asset.userId)?.push(asset);
     }
 
     console.log('='.repeat(80));
@@ -143,12 +145,12 @@ async function checkVideoUsers() {
     console.log(`\nTotal unique users: ${userGroups.size}\n`);
 
     if (userGroups.size === 1) {
-      const userId = Array.from(userGroups.keys())[0]!;
-      const userAssets = userGroups.get(userId)!;
+      const userId = Array.from(userGroups.keys())[0];
+      const userAssets = userId ? (userGroups.get(userId) ?? []) : [];
       console.log('✅ ALL VIDEOS ARE FROM THE SAME USER');
       console.log(`\nUser ID: ${userId}`);
       console.log(`Videos found: ${userAssets.length}/${videoUrls.length}\n`);
-      
+
       console.log('Video details:');
       userAssets.forEach((asset, index) => {
         console.log(`\n${index + 1}. ${asset.publicUrl}`);
@@ -158,7 +160,7 @@ async function checkVideoUsers() {
       });
     } else {
       console.log('❌ VIDEOS ARE FROM DIFFERENT USERS\n');
-      
+
       userGroups.forEach((userAssets, userId) => {
         console.log(`\nUser ID: ${userId}`);
         console.log(`Videos: ${userAssets.length}`);
@@ -172,9 +174,9 @@ async function checkVideoUsers() {
     // Show missing URLs
     const foundUrls = new Set(assets.map((a) => a.publicUrl));
     const missingUrls = videoUrls.filter((url) => !foundUrls.has(url));
-    
+
     if (missingUrls.length > 0) {
-      console.log('\n' + '='.repeat(80));
+      console.log(`\n${'='.repeat(80)}`);
       console.log('MISSING VIDEOS (not found in database):');
       console.log('='.repeat(80));
       missingUrls.forEach((url, index) => {
@@ -184,10 +186,10 @@ async function checkVideoUsers() {
 
     // Show sample of recent video URLs in database for comparison
     if (assets.length === 0) {
-      console.log('\n' + '='.repeat(80));
+      console.log(`\n${'='.repeat(80)}`);
       console.log('SAMPLE: Recent video URLs in database (for comparison):');
       console.log('='.repeat(80));
-      
+
       const recentVideos = await db
         .select({
           publicUrl: generatedAsset.publicUrl,
@@ -210,7 +212,7 @@ async function checkVideoUsers() {
       }
     }
 
-    console.log('\n' + '='.repeat(80));
+    console.log(`\n${'='.repeat(80)}`);
   } catch (error) {
     console.error('Error checking video users:', error);
     process.exit(1);
@@ -220,4 +222,3 @@ async function checkVideoUsers() {
 }
 
 checkVideoUsers();
-

@@ -1,8 +1,8 @@
 import { auth } from '@/lib/auth/auth';
 import { db } from '@/server/db';
 import { creditPackPurchase } from '@/server/db/schema';
-import { type NextRequest, NextResponse } from 'next/server';
 import { eq } from 'drizzle-orm';
+import { type NextRequest, NextResponse } from 'next/server';
 
 export async function GET(request: NextRequest) {
   try {
@@ -37,5 +37,3 @@ export async function GET(request: NextRequest) {
     );
   }
 }
-
-

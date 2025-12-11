@@ -1,16 +1,16 @@
 /**
  * Manual Test Script: Video Generation Complete Flow
- * 
+ *
  * This script helps test the complete video generation flow
  * Run with: pnpm tsx scripts/test-video-generation-flow.ts
  */
 
 import { resolve } from 'node:path';
 import { config } from 'dotenv';
+import { and, desc, eq, sql } from 'drizzle-orm';
 import { drizzle } from 'drizzle-orm/postgres-js';
 import postgres from 'postgres';
-import { generatedAsset, creditTransactions, userCredits } from '../src/server/db/schema';
-import { eq, desc, and, sql } from 'drizzle-orm';
+import { creditTransactions, generatedAsset, userCredits } from '../src/server/db/schema';
 
 // Load .env.local file FIRST
 config({ path: resolve(process.cwd(), '.env.local') });
@@ -55,7 +55,7 @@ async function testVideoGenerationFlow(userId: string, taskId?: string) {
 
   try {
     // Get recent video assets for this user
-    let assets;
+    let assets: Array<typeof generatedAsset.$inferSelect> = [];
     if (taskId) {
       assets = await db
         .select()
@@ -86,9 +86,10 @@ async function testVideoGenerationFlow(userId: string, taskId?: string) {
     const results: TestResult[] = [];
 
     for (const asset of assets) {
-      const metadata = asset.metadata && typeof asset.metadata === 'object'
-        ? asset.metadata as Record<string, unknown>
-        : {};
+      const metadata =
+        asset.metadata && typeof asset.metadata === 'object'
+          ? (asset.metadata as Record<string, unknown>)
+          : {};
       const assetTaskId = metadata.taskId as string | undefined;
 
       if (!assetTaskId) {
@@ -146,9 +147,9 @@ async function testVideoGenerationFlow(userId: string, taskId?: string) {
 
       // Check 1: Asset record exists
       if (result.hasAssetRecord) {
-        console.log(`   ✅ Asset record exists`);
+        console.log('   ✅ Asset record exists');
       } else {
-        console.log(`   ❌ Asset record missing`);
+        console.log('   ❌ Asset record missing');
         allPassed = false;
       }
 
@@ -156,13 +157,13 @@ async function testVideoGenerationFlow(userId: string, taskId?: string) {
       if (result.hasCreditTransaction) {
         console.log(`   ✅ Credit transaction exists (ID: ${result.creditTransactionId})`);
       } else {
-        console.log(`   ❌ Credit transaction missing`);
+        console.log('   ❌ Credit transaction missing');
         allPassed = false;
       }
 
       // Check 3: Status is completed
       if (result.status === 'completed') {
-        console.log(`   ✅ Status is completed`);
+        console.log('   ✅ Status is completed');
       } else {
         console.log(`   ⚠️  Status is ${result.status}`);
         if (result.status === 'failed') {
@@ -171,10 +172,10 @@ async function testVideoGenerationFlow(userId: string, taskId?: string) {
       }
 
       // Check 4: Video URL exists
-      if (result.videoUrl && result.videoUrl.startsWith('http')) {
-        console.log(`   ✅ Video URL is valid`);
+      if (result.videoUrl?.startsWith('http')) {
+        console.log('   ✅ Video URL is valid');
       } else {
-        console.log(`   ❌ Video URL is missing or invalid`);
+        console.log('   ❌ Video URL is missing or invalid');
         allPassed = false;
       }
 
@@ -191,13 +192,15 @@ async function testVideoGenerationFlow(userId: string, taskId?: string) {
           if (tx.amount === result.creditsSpent) {
             console.log(`   ✅ Credits match (${tx.amount})`);
           } else {
-            console.log(`   ⚠️  Credits mismatch: asset=${result.creditsSpent}, transaction=${tx.amount}`);
+            console.log(
+              `   ⚠️  Credits mismatch: asset=${result.creditsSpent}, transaction=${tx.amount}`
+            );
           }
         }
       }
     }
 
-    console.log('\n' + '='.repeat(80));
+    console.log(`\n${'='.repeat(80)}`);
     if (allPassed) {
       console.log('✅ All checks passed!');
     } else {
@@ -219,10 +222,10 @@ const taskId = args[1];
 
 if (!userId) {
   console.error('Usage: pnpm tsx scripts/test-video-generation-flow.ts <userId> [taskId]');
-  console.error('Example: pnpm tsx scripts/test-video-generation-flow.ts 2YmBeot0u8jbw1CU0P7dRdDtQDXw4CIY');
+  console.error(
+    'Example: pnpm tsx scripts/test-video-generation-flow.ts 2YmBeot0u8jbw1CU0P7dRdDtQDXw4CIY'
+  );
   process.exit(1);
 }
 
 testVideoGenerationFlow(userId, taskId);
-
-

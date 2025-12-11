@@ -87,15 +87,14 @@ export function LandingHeader() {
               // Show default state during SSR to prevent hydration mismatch
               <>
                 <LanguageSwitcher />
-                <Button variant="ghost" size="sm" className="hidden sm:inline-flex" asChild>
-                  <Link href="/login">{t('login')}</Link>
-                </Button>
                 <Button
-                  className="bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-700 hover:to-fuchsia-700 text-white shadow-lg shadow-violet-500/25"
+                  variant="outline"
+                  size="sm"
+                  className="hidden sm:inline-flex"
                   asChild
                 >
-                  <Link href="/signup">
-                    {t('getStarted')}
+                  <Link href="/login">
+                    {t('signup')}
                     <ArrowRight className="size-4 ml-2" />
                   </Link>
                 </Button>
@@ -114,15 +113,14 @@ export function LandingHeader() {
             ) : (
               <>
                 <LanguageSwitcher />
-                <Button variant="ghost" size="sm" className="hidden sm:inline-flex" asChild>
-                  <Link href="/login">{t('login')}</Link>
-                </Button>
                 <Button
-                  className="bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-700 hover:to-fuchsia-700 text-white shadow-lg shadow-violet-500/25"
+                  variant="outline"
+                  size="sm"
+                  className="hidden sm:inline-flex"
                   asChild
                 >
-                  <Link href="/signup">
-                    {t('getStarted')}
+                  <Link href="/login">
+                    {t('signup')}
                     <ArrowRight className="size-4 ml-2" />
                   </Link>
                 </Button>
@@ -191,7 +189,7 @@ export function LandingHeader() {
                   className="px-3 py-2 rounded-md text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-colors"
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
-                  {t('login') || '登录'}
+                  {t('signup') || '注册'}
                 </Link>
               )}
             </div>

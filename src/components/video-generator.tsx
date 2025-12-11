@@ -132,8 +132,7 @@ export default function VideoGenerator() {
     creditBalance?.availableBalance !== undefined
       ? creditBalance.availableBalance - pendingCreditCost
       : null;
-  const hasSufficientCredits =
-    effectiveCredits === null || effectiveCredits >= videoCreditCost;
+  const hasSufficientCredits = effectiveCredits === null || effectiveCredits >= videoCreditCost;
 
   useEffect(() => {
     if (searchParams?.get('mode')) {
@@ -415,10 +414,10 @@ export default function VideoGenerator() {
         // Poll for status until complete
         const pollInterval = 5000; // Poll every 5 seconds
         const maxPolls = 300; // 25 minutes max (300 * 5s = 1500s)
-        
+
         for (let pollCount = 0; pollCount < maxPolls; pollCount++) {
-          await new Promise(resolve => setTimeout(resolve, pollInterval));
-          
+          await new Promise((resolve) => setTimeout(resolve, pollInterval));
+
           try {
             const statusResponse = await fetch(`/api/v1/video-status/${taskId}`);
             const statusData = await statusResponse.json();
@@ -427,18 +426,18 @@ export default function VideoGenerator() {
               // Video is ready!
               advanceProgress(100, t('progressReady'));
               completeProgress(t('progressReady'));
-              
+
               setResult({
                 videoUrl: statusData.videoUrl,
                 prompt: prompt,
                 model: model,
               });
-              
+
               console.log('[Video Generator] Video generation completed:', {
                 taskId,
                 videoUrl: statusData.videoUrl,
               });
-              
+
               return; // Exit the function successfully
             }
 
@@ -449,8 +448,10 @@ export default function VideoGenerator() {
             // Still processing - update progress
             const progress = Math.min(30 + Math.floor((pollCount / maxPolls) * 60), 90);
             const elapsed = Math.floor((pollCount * pollInterval) / 1000 / 60);
-            advanceProgress(progress, `${t('progressRendering')} (${elapsed}/${data.estimatedTime || '20'} min)`);
-            
+            advanceProgress(
+              progress,
+              `${t('progressRendering')} (${elapsed}/${data.estimatedTime || '20'} min)`
+            );
           } catch (pollError) {
             console.error('[Video Generator] Error polling status:', pollError);
             // Continue polling - transient errors shouldn't stop us
@@ -458,7 +459,9 @@ export default function VideoGenerator() {
         }
 
         // If we got here, polling timed out
-        throw new Error('Video generation is taking longer than expected. Please check your Assets page in a few minutes.');
+        throw new Error(
+          'Video generation is taking longer than expected. Please check your Assets page in a few minutes.'
+        );
       }
 
       // OLD SYNC FLOW: Backend returns video directly (test mode or legacy)
@@ -680,9 +683,7 @@ export default function VideoGenerator() {
   };
 
   const canGenerate =
-    prompt.trim().length > 0 &&
-    (mode === 'text-to-video' || imagePreview) &&
-    hasSufficientCredits;
+    prompt.trim().length > 0 && (mode === 'text-to-video' || imagePreview) && hasSufficientCredits;
 
   return (
     <>
@@ -1174,23 +1175,21 @@ export default function VideoGenerator() {
               )}
 
               {isGenerating && (
-                <>
-                  <div className="flex aspect-video flex-col items-center justify-center rounded-xl bg-slate-100 dark:bg-slate-800 p-6 text-center">
-                    <Loader2 className="mb-4 h-12 w-12 animate-spin text-teal-500" />
-                    <p className="font-medium text-slate-700 dark:text-slate-300">
-                      {progressMessage || t('generatingVideo')}
-                    </p>
-                    <div className="mt-4 w-full max-w-md space-y-2">
-                      <GenerationProgressBar value={progressValue} />
-                      <p className="text-xs font-medium text-slate-500 dark:text-slate-400">
-                        {Math.round(progressValue)}%
-                      </p>
-                    </div>
-                    <p className="mt-3 font-light text-slate-500 dark:text-slate-400 text-sm">
-                      {t('generatingTakeMinutes')}
+                <div className="flex aspect-video flex-col items-center justify-center rounded-xl bg-slate-100 dark:bg-slate-800 p-6 text-center">
+                  <Loader2 className="mb-4 h-12 w-12 animate-spin text-teal-500" />
+                  <p className="font-medium text-slate-700 dark:text-slate-300">
+                    {progressMessage || t('generatingVideo')}
+                  </p>
+                  <div className="mt-4 w-full max-w-md space-y-2">
+                    <GenerationProgressBar value={progressValue} />
+                    <p className="text-xs font-medium text-slate-500 dark:text-slate-400">
+                      {Math.round(progressValue)}%
                     </p>
                   </div>
-                </>
+                  <p className="mt-3 font-light text-slate-500 dark:text-slate-400 text-sm">
+                    {t('generatingTakeMinutes')}
+                  </p>
+                </div>
               )}
 
               {result?.error && (

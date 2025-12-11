@@ -18,23 +18,17 @@ export async function GET() {
       .limit(50);
 
     // Calculate stats
-    const completedExecutions = executions.filter(e => e.status === 'completed');
-    const successRate = executions.length > 0
-      ? (completedExecutions.length / executions.length) * 100
-      : 0;
+    const completedExecutions = executions.filter((e) => e.status === 'completed');
+    const successRate =
+      executions.length > 0 ? (completedExecutions.length / executions.length) * 100 : 0;
 
     const totalDuration = completedExecutions.reduce((sum, e) => sum + (e.duration || 0), 0);
-    const avgDuration = completedExecutions.length > 0
-      ? totalDuration / completedExecutions.length
-      : 0;
+    const avgDuration =
+      completedExecutions.length > 0 ? totalDuration / completedExecutions.length : 0;
 
-    const totalTasksRecovered = executions.reduce((sum, e) => 
-      sum + (e.results?.completed || 0), 0
-    );
+    const totalTasksRecovered = executions.reduce((sum, e) => sum + (e.results?.completed || 0), 0);
 
-    const totalTasksFailed = executions.reduce((sum, e) => 
-      sum + (e.results?.failed || 0), 0
-    );
+    const totalTasksFailed = executions.reduce((sum, e) => sum + (e.results?.failed || 0), 0);
 
     const stats = {
       totalExecutions: executions.length,
@@ -54,7 +48,6 @@ export async function GET() {
     response.headers.set('Pragma', 'no-cache');
 
     return response;
-
   } catch (error: unknown) {
     console.error('Admin cron jobs list error:', error);
 
@@ -62,10 +55,6 @@ export async function GET() {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    return NextResponse.json(
-      { error: 'Failed to fetch cron job data' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Failed to fetch cron job data' }, { status: 500 });
   }
 }
-

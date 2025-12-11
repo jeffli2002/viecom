@@ -3,8 +3,8 @@
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { RefreshCw, Play } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { Play, RefreshCw } from 'lucide-react';
+import { useCallback, useEffect, useState } from 'react';
 
 interface CronExecution {
   id: string;
@@ -37,7 +37,7 @@ export default function CronJobsPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [isTriggering, setIsTriggering] = useState(false);
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     setIsLoading(true);
     try {
       const response = await fetch('/api/admin/cron-jobs', {
@@ -55,11 +55,11 @@ export default function CronJobsPage() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     void fetchData();
-  }, []);
+  }, [fetchData]);
 
   const triggerCronJob = async () => {
     setIsTriggering(true);
@@ -67,10 +67,12 @@ export default function CronJobsPage() {
       const response = await fetch('/api/admin/trigger-cron', {
         method: 'POST',
       });
-      
+
       if (response.ok) {
         const data = await response.json();
-        alert(`Cron job triggered successfully!\n\nResults:\n- Completed: ${data.results?.completed || 0}\n- Failed: ${data.results?.failed || 0}\n- Still Processing: ${data.results?.stillProcessing || 0}\n- Errors: ${data.results?.errors || 0}`);
+        alert(
+          `Cron job triggered successfully!\n\nResults:\n- Completed: ${data.results?.completed || 0}\n- Failed: ${data.results?.failed || 0}\n- Still Processing: ${data.results?.stillProcessing || 0}\n- Errors: ${data.results?.errors || 0}`
+        );
         await fetchData(); // Refresh data
       } else {
         alert('Failed to trigger cron job');
@@ -129,20 +131,16 @@ export default function CronJobsPage() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <Card>
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-gray-500">
-                Total Executions
-              </CardTitle>
+              <CardTitle className="text-sm font-medium text-gray-500">Total Executions</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{stats.totalExecutions}</div>
             </CardContent>
           </Card>
-          
+
           <Card>
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-gray-500">
-                Success Rate
-              </CardTitle>
+              <CardTitle className="text-sm font-medium text-gray-500">Success Rate</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-green-600">
@@ -150,30 +148,22 @@ export default function CronJobsPage() {
               </div>
             </CardContent>
           </Card>
-          
+
           <Card>
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-gray-500">
-                Avg Duration
-              </CardTitle>
+              <CardTitle className="text-sm font-medium text-gray-500">Avg Duration</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">
-                {formatDuration(stats.avgDuration)}
-              </div>
+              <div className="text-2xl font-bold">{formatDuration(stats.avgDuration)}</div>
             </CardContent>
           </Card>
-          
+
           <Card>
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-gray-500">
-                Tasks Recovered
-              </CardTitle>
+              <CardTitle className="text-sm font-medium text-gray-500">Tasks Recovered</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-teal-600">
-                {stats.totalTasksRecovered}
-              </div>
+              <div className="text-2xl font-bold text-teal-600">{stats.totalTasksRecovered}</div>
             </CardContent>
           </Card>
         </div>
@@ -204,17 +194,16 @@ export default function CronJobsPage() {
                 </thead>
                 <tbody>
                   {executions.map((exec) => (
-                    <tr key={exec.id} className="border-b hover:bg-slate-50 dark:hover:bg-slate-900">
+                    <tr
+                      key={exec.id}
+                      className="border-b hover:bg-slate-50 dark:hover:bg-slate-900"
+                    >
                       <td className="py-3 px-4 text-sm">
                         {new Date(exec.startedAt).toLocaleString()}
                       </td>
-                      <td className="py-3 px-4 text-sm">
-                        {formatDuration(exec.duration)}
-                      </td>
+                      <td className="py-3 px-4 text-sm">{formatDuration(exec.duration)}</td>
                       <td className="py-3 px-4">
-                        <Badge className={getStatusColor(exec.status)}>
-                          {exec.status}
-                        </Badge>
+                        <Badge className={getStatusColor(exec.status)}>{exec.status}</Badge>
                       </td>
                       <td className="py-3 px-4 text-sm text-center">
                         {exec.results?.totalFound || 0}
@@ -228,9 +217,7 @@ export default function CronJobsPage() {
                       <td className="py-3 px-4 text-sm text-center text-yellow-600">
                         {exec.results?.stillProcessing || 0}
                       </td>
-                      <td className="py-3 px-4 text-sm text-center">
-                        {exec.results?.errors || 0}
-                      </td>
+                      <td className="py-3 px-4 text-sm text-center">{exec.results?.errors || 0}</td>
                     </tr>
                   ))}
                   {executions.length === 0 && (
@@ -277,4 +264,3 @@ export default function CronJobsPage() {
     </div>
   );
 }
-

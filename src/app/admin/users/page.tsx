@@ -65,11 +65,6 @@ export default function AdminUsersPage() {
     void fetchUsers();
   }, [fetchUsers]);
 
-  // Reset to page 1 when search or range changes
-  useEffect(() => {
-    setPage(1);
-  }, [search, range]);
-
   const totalPages = Math.ceil(total / pageSize);
   const startItem = total === 0 ? 0 : (page - 1) * pageSize + 1;
   const endItem = Math.min(page * pageSize, total);
@@ -112,7 +107,13 @@ export default function AdminUsersPage() {
           </p>
         </div>
         <div className="flex items-center gap-3 flex-wrap">
-          <Select value={range} onValueChange={setRange}>
+          <Select
+            value={range}
+            onValueChange={(value) => {
+              setRange(value);
+              setPage(1);
+            }}
+          >
             <SelectTrigger className="w-[180px]">
               <SelectValue />
             </SelectTrigger>
@@ -148,7 +149,10 @@ export default function AdminUsersPage() {
           type="text"
           placeholder="Search by email..."
           value={search}
-          onChange={(e) => setSearch(e.target.value)}
+          onChange={(e) => {
+            setSearch(e.target.value);
+            setPage(1);
+          }}
           className="pl-10"
         />
       </div>
@@ -223,14 +227,14 @@ export default function AdminUsersPage() {
               </table>
             </div>
           )}
-          
+
           {/* Pagination */}
           {!isLoading && total > 0 && totalPages > 1 && (
             <div className="flex items-center justify-between mt-6 pt-4 border-t">
               <div className="text-sm text-gray-500">
                 Showing {startItem} to {endItem} of {total} users
               </div>
-              
+
               <div className="flex items-center gap-2">
                 <Button
                   variant="outline"
@@ -240,7 +244,7 @@ export default function AdminUsersPage() {
                 >
                   Previous
                 </Button>
-                
+
                 <div className="flex items-center gap-1">
                   {/* First page */}
                   {page > 3 && (
@@ -253,20 +257,19 @@ export default function AdminUsersPage() {
                       >
                         1
                       </Button>
-                      {page > 4 && (
-                        <span className="px-2 text-gray-400">...</span>
-                      )}
+                      {page > 4 && <span className="px-2 text-gray-400">...</span>}
                     </>
                   )}
-                  
+
                   {/* Pages around current page */}
                   {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
                     const pageNum = Math.max(1, page - 2) + i;
                     if (pageNum > totalPages) return null;
                     if (pageNum < 1) return null;
                     if (totalPages > 5 && page > 3 && pageNum === 1) return null;
-                    if (totalPages > 5 && page < totalPages - 2 && pageNum === totalPages) return null;
-                    
+                    if (totalPages > 5 && page < totalPages - 2 && pageNum === totalPages)
+                      return null;
+
                     return (
                       <Button
                         key={pageNum}
@@ -279,13 +282,11 @@ export default function AdminUsersPage() {
                       </Button>
                     );
                   })}
-                  
+
                   {/* Last page */}
                   {page < totalPages - 2 && totalPages > 5 && (
                     <>
-                      {page < totalPages - 3 && (
-                        <span className="px-2 text-gray-400">...</span>
-                      )}
+                      {page < totalPages - 3 && <span className="px-2 text-gray-400">...</span>}
                       <Button
                         variant={page === totalPages ? 'default' : 'outline'}
                         size="sm"
@@ -297,7 +298,7 @@ export default function AdminUsersPage() {
                     </>
                   )}
                 </div>
-                
+
                 <Button
                   variant="outline"
                   size="sm"

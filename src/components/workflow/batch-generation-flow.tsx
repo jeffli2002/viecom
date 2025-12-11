@@ -149,7 +149,7 @@ export function BatchGenerationFlow({ generationType }: BatchGenerationFlowProps
     values?: Record<string, unknown>
   ) => {
     try {
-      return t(key as any, values);
+      return t(key, values);
     } catch (error) {
       console.warn(`[batch-generation][i18n] missing key ${String(key)}:`, error);
       return fallback;

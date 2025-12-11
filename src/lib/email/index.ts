@@ -144,4 +144,3 @@ export async function sendCreditPackPurchaseEmail(
     html: getCreditPackPurchaseEmailTemplate(userName, packName, credits, price),
   });
 }
-

@@ -18,7 +18,7 @@ import {
   Wand2,
 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 // 视频演示项类型
 type VideoDemo = {
@@ -113,86 +113,89 @@ export function VideoGenerationShowcase() {
       setActiveDemo(veoDemos[0]);
       setActiveCategory(veoDemos[0]?.category || 'Apparel');
     }
-  }, [veoDemos]);
+  }, [activeDemo.id, veoDemos]);
 
   // 截取视频第一帧作为缩略图
-  const captureVideoThumbnail = (video: HTMLVideoElement, demoId: string): void => {
-    // 如果已经有缩略图，直接返回
-    if (videoThumbnails[demoId]) {
-      return;
-    }
-
-    const captureThumbnail = () => {
-      try {
-        // 确保视频已加载并可以绘制
-        if (!video.videoWidth || !video.videoHeight) {
-          console.warn(`Video ${demoId} dimensions not available`);
-          return;
-        }
-
-        const canvas = document.createElement('canvas');
-        const ctx = canvas.getContext('2d');
-
-        if (!ctx) {
-          console.error('Failed to get canvas context');
-          return;
-        }
-
-        canvas.width = video.videoWidth;
-        canvas.height = video.videoHeight;
-
-        // 将视频当前帧（第一帧）绘制到 canvas
-        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-
-        // 转换为 base64 图片
-        const thumbnailUrl = canvas.toDataURL('image/jpeg', 0.8);
-        setVideoThumbnails((prev) => {
-          const updated = { ...prev, [demoId]: thumbnailUrl };
-          console.log(`Thumbnail captured for demo ${demoId}`, updated);
-          return updated;
-        });
-      } catch (error) {
-        console.error(`Failed to capture video thumbnail for demo ${demoId}:`, error);
+  const captureVideoThumbnail = useCallback(
+    (video: HTMLVideoElement, demoId: string): void => {
+      // 如果已经有缩略图，直接返回
+      if (videoThumbnails[demoId]) {
+        return;
       }
-    };
 
-    // 确保视频在第一帧
-    video.currentTime = 0;
+      const captureThumbnail = () => {
+        try {
+          // 确保视频已加载并可以绘制
+          if (!video.videoWidth || !video.videoHeight) {
+            console.warn(`Video ${demoId} dimensions not available`);
+            return;
+          }
 
-    // 如果视频已经可以播放，立即截取
-    if (video.readyState >= 2 && video.videoWidth && video.videoHeight) {
-      // 等待视频帧渲染
-      requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-          captureThumbnail();
-        });
-      });
-    } else {
-      // 等待视频可以播放
-      const handleCanPlay = () => {
-        video.currentTime = 0;
+          const canvas = document.createElement('canvas');
+          const ctx = canvas.getContext('2d');
+
+          if (!ctx) {
+            console.error('Failed to get canvas context');
+            return;
+          }
+
+          canvas.width = video.videoWidth;
+          canvas.height = video.videoHeight;
+
+          // 将视频当前帧（第一帧）绘制到 canvas
+          ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+          // 转换为 base64 图片
+          const thumbnailUrl = canvas.toDataURL('image/jpeg', 0.8);
+          setVideoThumbnails((prev) => {
+            const updated = { ...prev, [demoId]: thumbnailUrl };
+            console.log(`Thumbnail captured for demo ${demoId}`, updated);
+            return updated;
+          });
+        } catch (error) {
+          console.error(`Failed to capture video thumbnail for demo ${demoId}:`, error);
+        }
+      };
+
+      // 确保视频在第一帧
+      video.currentTime = 0;
+
+      // 如果视频已经可以播放，立即截取
+      if (video.readyState >= 2 && video.videoWidth && video.videoHeight) {
+        // 等待视频帧渲染
         requestAnimationFrame(() => {
           requestAnimationFrame(() => {
             captureThumbnail();
           });
         });
-        video.removeEventListener('canplay', handleCanPlay);
-      };
-
-      const handleLoadedData = () => {
-        video.currentTime = 0;
-        requestAnimationFrame(() => {
+      } else {
+        // 等待视频可以播放
+        const handleCanPlay = () => {
+          video.currentTime = 0;
           requestAnimationFrame(() => {
-            captureThumbnail();
+            requestAnimationFrame(() => {
+              captureThumbnail();
+            });
           });
-        });
-        video.removeEventListener('loadeddata', handleLoadedData);
-      };
+          video.removeEventListener('canplay', handleCanPlay);
+        };
 
-      video.addEventListener('canplay', handleCanPlay);
-      video.addEventListener('loadeddata', handleLoadedData);
-    }
-  };
+        const handleLoadedData = () => {
+          video.currentTime = 0;
+          requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+              captureThumbnail();
+            });
+          });
+          video.removeEventListener('loadeddata', handleLoadedData);
+        };
+
+        video.addEventListener('canplay', handleCanPlay);
+        video.addEventListener('loadeddata', handleLoadedData);
+      }
+    },
+    [videoThumbnails]
+  );
 
   const handleDemoChange = (demo: VideoDemo) => {
     setActiveDemo(demo);
@@ -437,7 +440,7 @@ export function VideoGenerationShowcase() {
         }
       }, 5000);
     });
-  }, [veoDemos, isLoadingVideos]); // 移除 videoThumbnails 从依赖项，使用 ref 来跟踪处理状态
+  }, [isLoadingVideos, veoDemos, videoThumbnails]); // 包含 videoThumbnails 以满足依赖检查
 
   // 当当前视频加载完成时，为其截取缩略图
   useEffect(() => {
@@ -462,7 +465,7 @@ export function VideoGenerationShowcase() {
         video.removeEventListener('canplay', handleCanPlay);
       };
     }
-  }, [activeDemo.id, isMuted]);
+  }, [activeDemo.id, captureVideoThumbnail, isMuted]);
 
   const handleCategoryChange = (cat: string) => {
     setActiveCategory(cat);

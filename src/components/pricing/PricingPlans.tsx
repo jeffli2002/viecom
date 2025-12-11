@@ -89,7 +89,9 @@ export function PricingPlans({ plans, creditPacks }: PricingPlansProps) {
           >
             {t('yearly')}
             {resolvedPlans.some((p) => p.yearlyPrice) && (
-              <Badge className="ml-2 bg-teal-500 text-white border-0 text-xs px-2">{t('savePercentage')}</Badge>
+              <Badge className="ml-2 bg-teal-500 text-white border-0 text-xs px-2">
+                {t('savePercentage')}
+              </Badge>
             )}
           </Button>
         </div>
@@ -157,11 +159,14 @@ export function PricingPlans({ plans, creditPacks }: PricingPlansProps) {
                             </span>
                           )}
                         </div>
-                        <span className="text-slate-600 dark:text-slate-400 text-sm">{t('perMonth')}</span>
+                        <span className="text-slate-600 dark:text-slate-400 text-sm">
+                          {t('perMonth')}
+                        </span>
                         {billingInterval === 'year' && (
                           <>
                             <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
-                              ${displayPrice}{t('perYear')}
+                              ${displayPrice}
+                              {t('perYear')}
                             </p>
                             <Badge className="mt-2 bg-teal-500 text-white border-0 text-xs px-2">
                               {t('save', { percentage: savings?.percentage || 0 })}
@@ -230,9 +235,7 @@ export function PricingPlans({ plans, creditPacks }: PricingPlansProps) {
           <h2 className="text-3xl font-bold text-slate-900 dark:text-white mb-2">
             {t('creditPacksTitle')}
           </h2>
-          <p className="text-slate-600 dark:text-slate-400">
-            {t('creditPacksSubtitle')}
-          </p>
+          <p className="text-slate-600 dark:text-slate-400">{t('creditPacksSubtitle')}</p>
         </div>
 
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-5">

@@ -22,4 +22,3 @@ export async function getUserInfo(userId: string): Promise<{ email: string; name
     return null;
   }
 }
-

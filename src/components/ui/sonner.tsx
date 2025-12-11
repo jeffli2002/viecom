@@ -5,10 +5,10 @@ import type { Toaster as SonnerToaster } from 'sonner';
 
 type ToasterProps = React.ComponentProps<typeof SonnerToaster>;
 
-const DynamicToaster = dynamic(
-  () => import('sonner').then((mod) => mod.Toaster),
-  { ssr: false, loading: () => null }
-);
+const DynamicToaster = dynamic(() => import('sonner').then((mod) => mod.Toaster), {
+  ssr: false,
+  loading: () => null,
+});
 
 const Toaster = ({ ...props }: ToasterProps) => {
   return (
