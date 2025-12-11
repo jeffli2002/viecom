@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import {
   Box,
   Camera,
@@ -145,10 +146,13 @@ export function TransformationShowcase() {
                         {t(`scenarios.${activeScenario.id}.input1Label`)}
                       </span>
                       <div className="aspect-[3/4] rounded-2xl overflow-hidden bg-slate-100 dark:bg-slate-800 border-2 border-slate-200 dark:border-slate-700 relative group/input cursor-zoom-in shadow-inner">
-                        <img
+                        <Image
                           src={activeScenario.input1.image}
-                          className="w-full h-full object-cover transition-transform duration-500 group-hover/input:scale-110"
                           alt="Input 1"
+                          fill
+                          sizes="(max-width: 768px) 45vw, 240px"
+                          className="object-cover transition-transform duration-500 group-hover/input:scale-110"
+                          loading="lazy"
                         />
                       </div>
                     </div>
@@ -157,10 +161,13 @@ export function TransformationShowcase() {
                         {t(`scenarios.${activeScenario.id}.input2Label`)}
                       </span>
                       <div className="aspect-[3/4] rounded-2xl overflow-hidden bg-slate-100 dark:bg-slate-800 border-2 border-slate-200 dark:border-slate-700 relative group/input cursor-zoom-in shadow-inner">
-                        <img
+                        <Image
                           src={activeScenario.input2.image}
-                          className="w-full h-full object-cover transition-transform duration-500 group-hover/input:scale-110"
                           alt="Input 2"
+                          fill
+                          sizes="(max-width: 768px) 45vw, 240px"
+                          className="object-cover transition-transform duration-500 group-hover/input:scale-110"
+                          loading="lazy"
                         />
                       </div>
                     </div>
@@ -192,10 +199,13 @@ export function TransformationShowcase() {
             <div className="lg:col-span-5 lg:col-start-8 flex items-center justify-center z-10">
               <div className="relative w-full max-w-[380px] aspect-[4/5] group/result cursor-pointer">
                 <div className="relative w-full h-full rounded-2xl overflow-hidden shadow-2xl border-2 border-teal-500/50 transition-all duration-500 group-hover/result:shadow-teal-500/50 group-hover/result:shadow-2xl group-hover/result:scale-105 group-hover/result:border-teal-500">
-                  <img
+                  <Image
                     src={activeScenario.result}
-                    className="w-full h-full object-cover transition-transform duration-500 group-hover/result:scale-110"
                     alt={t(`scenarios.${activeScenario.id}.title`)}
+                    fill
+                    priority
+                    sizes="(max-width: 1024px) 70vw, 380px"
+                    className="object-cover transition-transform duration-500 group-hover/result:scale-110"
                   />
 
                   <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent p-8 pt-32 transition-all duration-500">

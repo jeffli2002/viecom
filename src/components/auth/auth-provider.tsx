@@ -4,33 +4,25 @@ import { useAuthStore } from '@/store/auth-store';
 import { useSearchParams } from 'next/navigation';
 import { Suspense, useEffect } from 'react';
 
-/**
- * AuthProviderContent - Internal component that uses useSearchParams
- */
-function AuthProviderContent({ children }: { children: React.ReactNode }) {
+function AuthProviderContent() {
   const initialize = useAuthStore((state) => state.initialize);
   const refreshSession = useAuthStore((state) => state.refreshSession);
   const isInitialized = useAuthStore((state) => state.isInitialized);
   const searchParams = useSearchParams();
 
   useEffect(() => {
-    // Initialize auth state on mount
     if (!isInitialized) {
       initialize();
     }
   }, [initialize, isInitialized]);
 
   useEffect(() => {
-    // Check if we're returning from OAuth callback
-    // Better Auth redirects to callbackURL with code/state params
     const code = searchParams.get('code');
     const state = searchParams.get('state');
 
     if (code || state) {
-      // OAuth callback detected, wait for session cookie then refresh
       const timer = setTimeout(async () => {
         await refreshSession();
-        // After refreshing, clean up URL params
         if (window.history.replaceState) {
           const url = new URL(window.location.href);
           url.searchParams.delete('code');
@@ -43,16 +35,16 @@ function AuthProviderContent({ children }: { children: React.ReactNode }) {
     }
   }, [searchParams, refreshSession]);
 
-  return <>{children}</>;
+  return null;
 }
 
 /**
- * AuthProvider - Wrapper component that provides Suspense boundary
+ * Hydrates auth state from the client without forcing the full layout to be a client component.
  */
-export function AuthProvider({ children }: { children: React.ReactNode }) {
+export function AuthProvider() {
   return (
-    <Suspense fallback={children}>
-      <AuthProviderContent>{children}</AuthProviderContent>
+    <Suspense fallback={null}>
+      <AuthProviderContent />
     </Suspense>
   );
 }

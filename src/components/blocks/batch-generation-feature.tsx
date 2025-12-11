@@ -1,10 +1,9 @@
-'use client';
-
+import Image from 'next/image';
+import { getTranslations } from 'next-intl/server';
 import { FileSpreadsheet, Layers, Target } from 'lucide-react';
-import { useTranslations } from 'next-intl';
 
-export function BatchGenerationFeature() {
-  const t = useTranslations('batchGenerationFeature');
+export async function BatchGenerationFeature() {
+  const t = await getTranslations('batchGenerationFeature');
 
   return (
     <section className="section-base bg-alt">
@@ -55,16 +54,19 @@ export function BatchGenerationFeature() {
                 { image: '/batch/skincare.jpg', ratio: '9:16' },
                 { image: '/batch/sweater.png', ratio: '16:9' },
                 { image: '/batch/lotionmodel.png', ratio: '4:5' },
-              ].map((item) => (
+              ].map((item, index) => (
                 <div
                   key={item.image}
                   className="aspect-square rounded-2xl overflow-hidden shadow-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 transform transition-transform hover:scale-105"
                 >
                   <div className="h-2/3 bg-slate-100 dark:bg-slate-800 relative overflow-hidden group">
-                    <img
+                    <Image
                       src={item.image}
-                      className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity"
-                      alt="Batch item"
+                      alt="Batch item preview"
+                      fill
+                      sizes="(max-width: 768px) 45vw, 200px"
+                      priority={index === 0}
+                      className="object-cover opacity-80 group-hover:opacity-100 transition-opacity"
                     />
                     <div className="absolute top-2 right-2 px-2 py-0.5 bg-black/50 backdrop-blur rounded text-[10px] text-white font-bold">
                       {item.ratio}

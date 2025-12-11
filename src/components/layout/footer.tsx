@@ -1,11 +1,9 @@
-'use client';
-
 import { Link } from '@/i18n/navigation';
 import { Mail, Twitter } from 'lucide-react';
-import { useTranslations } from 'next-intl';
+import { getTranslations } from 'next-intl/server';
 
-export function Footer() {
-  const t = useTranslations('nav');
+export async function Footer() {
+  const t = await getTranslations('nav');
 
   return (
     <footer className="bg-main pt-20 pb-10 border-t border-slate-200 dark:border-white/5 transition-colors duration-300">

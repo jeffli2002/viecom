@@ -1,10 +1,8 @@
-'use client';
-
 import { Check, Globe, Shield, Sparkles } from 'lucide-react';
-import { useTranslations } from 'next-intl';
+import { getTranslations } from 'next-intl/server';
 
-export function BrandAnalysis() {
-  const t = useTranslations('brandAnalysis');
+export async function BrandAnalysis() {
+  const t = await getTranslations('brandAnalysis');
   return (
     <section className="section-base bg-alt">
       <div className="container-base">

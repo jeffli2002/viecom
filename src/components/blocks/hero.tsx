@@ -1,104 +1,65 @@
-'use client';
-
 import { Link } from '@/i18n/navigation';
-import { useIsAuthenticated } from '@/store/auth-store';
+import { getSessionWithAuthBypass } from '@/lib/auth/auth-utils';
+import Image from 'next/image';
+import { getTranslations } from 'next-intl/server';
 import { Play, Sparkles, Zap } from 'lucide-react';
-import { useTranslations } from 'next-intl';
-import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
+
+const HERO_BACKGROUND =
+  'https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?auto=format&fit=crop&q=80&w=1600';
 
 const PLATFORMS = [
   {
     name: 'Amazon',
     logo: 'https://upload.wikimedia.org/wikipedia/commons/a/a9/Amazon_logo.svg',
-    width: 'w-24',
+    width: 96,
+    height: 32,
   },
   {
     name: 'TikTok',
     logo: 'https://upload.wikimedia.org/wikipedia/en/a/a9/TikTok_logo.svg',
-    width: 'w-24',
+    width: 96,
+    height: 32,
   },
   {
     name: 'Shopee',
     logo: 'https://upload.wikimedia.org/wikipedia/commons/f/fe/Shopee.svg',
-    width: 'w-24',
+    width: 96,
+    height: 32,
   },
   {
     name: 'eBay',
     logo: 'https://upload.wikimedia.org/wikipedia/commons/1/1b/EBay_logo.svg',
-    width: 'w-20',
+    width: 80,
+    height: 32,
   },
   {
     name: 'Etsy',
     logo: 'https://upload.wikimedia.org/wikipedia/commons/8/89/Etsy_logo.svg',
-    width: 'w-16',
+    width: 64,
+    height: 32,
   },
 ];
 
-export function Hero() {
-  const t = useTranslations('hero');
-  const isAuthenticated = useIsAuthenticated();
-  const [textColor, setTextColor] = useState('rgb(15 23 42)'); // Light mode default
-  const h1Ref = useRef<HTMLHeadingElement>(null);
-  const headingFontSize = '5rem';
-
-  // Determine the link based on authentication status
+export async function Hero() {
+  const t = await getTranslations('hero');
+  const session = await getSessionWithAuthBypass();
+  const isAuthenticated = Boolean(session?.user);
   const ctaHref = isAuthenticated
     ? '/image-generation'
     : `/signup?callbackUrl=${encodeURIComponent('/image-generation')}`;
 
-  const updateHeadingColor = useCallback(() => {
-    const htmlElement = document.documentElement;
-    const hasDarkClass = htmlElement.classList.contains('dark');
-    const hasDarkTheme = htmlElement.getAttribute('data-theme') === 'dark';
-    const isDarkMode = hasDarkClass || hasDarkTheme;
-    const nextColor = isDarkMode ? 'rgb(255 255 255)' : 'rgb(15 23 42)';
-
-    setTextColor((prev) => (prev === nextColor ? prev : nextColor));
-  }, []);
-
-  // Initialize color based on dark mode before paint
-  useLayoutEffect(() => {
-    updateHeadingColor();
-  }, [updateHeadingColor]);
-
-  // React to theme toggles by observing the html element
-  useEffect(() => {
-    updateHeadingColor();
-
-    const observer = new MutationObserver(() => {
-      updateHeadingColor();
-    });
-
-    observer.observe(document.documentElement, {
-      attributes: true,
-      attributeFilter: ['class', 'data-theme'],
-    });
-
-    return () => observer.disconnect();
-  }, [updateHeadingColor]);
-
-  // Clean up any legacy color classes once on mount
-  useEffect(() => {
-    if (!h1Ref.current) return;
-    const colorAffectingClasses = [
-      'text-white',
-      'text-slate-900',
-      'text-slate-50',
-      'text-slate-100',
-      'text-slate-800',
-      'text-slate-700',
-      'text-gray-900',
-      'text-gray-50',
-      'dark:text-white',
-      'dark:text-slate-900',
-    ];
-    colorAffectingClasses.forEach((cls) => h1Ref.current?.classList.remove(cls));
-  }, []);
-
   return (
     <header className="relative pt-32 pb-20 overflow-hidden bg-main border-b border-slate-200 dark:border-white/5">
       <div className="absolute inset-0">
-        <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?auto=format&fit=crop&q=80&w=2000')] opacity-5 dark:opacity-10 bg-cover bg-center mix-blend-overlay" />
+        <Image
+          src={HERO_BACKGROUND}
+          alt=""
+          fill
+          priority
+          sizes="100vw"
+          quality={70}
+          className="object-cover opacity-5 dark:opacity-10 mix-blend-overlay"
+        />
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-white/90 to-white dark:via-slate-900/90 dark:to-slate-900" />
       </div>
 
@@ -108,19 +69,7 @@ export function Hero() {
           <span className="text-sm font-medium">{t('badge')}</span>
         </div>
 
-        <h1
-          ref={h1Ref}
-          style={{
-            fontSize: headingFontSize,
-            letterSpacing: '-0.025em',
-            lineHeight: '1.25',
-            fontWeight: 600,
-            color: textColor,
-            marginBottom: '1.5rem',
-            textAlign: 'center',
-            fontFamily: 'inherit',
-          }}
-        >
+        <h1 className="text-[clamp(2.75rem,6vw,5rem)] font-semibold tracking-tight leading-tight text-slate-900 dark:text-white mb-6">
           {t('titleLine1')} <br />
           <span className="text-gradient">{t('titleLine2')}</span>
         </h1>
@@ -148,10 +97,13 @@ export function Hero() {
           <div className="flex flex-wrap justify-center gap-8 md:gap-16 items-center opacity-60">
             {PLATFORMS.map((platform) => (
               <div key={platform.name} className="group relative">
-                <img
+                <Image
                   src={platform.logo}
                   alt={platform.name}
+                  width={platform.width}
+                  height={platform.height}
                   className="h-8 md:h-10 w-auto object-contain dark:brightness-0 dark:invert transition-all duration-300 opacity-60 group-hover:opacity-100 filter grayscale hover:grayscale-0"
+                  loading="lazy"
                 />
               </div>
             ))}

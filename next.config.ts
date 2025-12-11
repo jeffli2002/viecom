@@ -27,6 +27,21 @@ const config: NextConfig = {
       },
       {
         protocol: 'https',
+        hostname: 'images.unsplash.com',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'images.pexels.com',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'upload.wikimedia.org',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
         hostname: '**.r2.cloudflarestorage.com',
         pathname: '/**',
       },
@@ -77,4 +92,3 @@ const config: NextConfig = {
 };
 
 export default withBundleAnalyzer(withNextIntl(config));
-
