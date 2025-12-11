@@ -122,6 +122,7 @@ export const useAuthStore = create<AuthState>()(
         },
         signIn: async (email, password) => {
           set({ isLoading: true, error: null });
+          const previousUser = get().user;
 
           try {
             const result = await authClient.signIn.email({
@@ -137,6 +138,11 @@ export const useAuthStore = create<AuthState>()(
                 isLoading: false,
                 lastUpdated: Date.now(),
               });
+
+              if (!previousUser || previousUser.id !== user.id) {
+                await initializeUserCredits(user.id);
+              }
+
               return { success: true };
             }
 
@@ -258,6 +264,8 @@ export const useAuthStore = create<AuthState>()(
         },
 
         refreshSession: async () => {
+          const previousUser = get().user;
+
           try {
             const session = await authClient.getSession();
 
@@ -268,6 +276,10 @@ export const useAuthStore = create<AuthState>()(
                 isAuthenticated: true,
                 lastUpdated: Date.now(),
               });
+
+              if (!previousUser || previousUser.id !== user.id) {
+                await initializeUserCredits(user.id);
+              }
             } else {
               set({
                 user: null,
