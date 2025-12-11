@@ -88,9 +88,8 @@ export function LandingHeader() {
               <>
                 <LanguageSwitcher />
                 <Button
-                  variant="outline"
                   size="sm"
-                  className="hidden sm:inline-flex"
+                  className="hidden sm:inline-flex bg-teal-500 hover:bg-teal-600 text-white"
                   asChild
                 >
                   <Link href="/login">
@@ -114,9 +113,8 @@ export function LandingHeader() {
               <>
                 <LanguageSwitcher />
                 <Button
-                  variant="outline"
                   size="sm"
-                  className="hidden sm:inline-flex"
+                  className="hidden sm:inline-flex bg-teal-500 hover:bg-teal-600 text-white"
                   asChild
                 >
                   <Link href="/login">
