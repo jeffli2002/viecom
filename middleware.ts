@@ -65,6 +65,16 @@ export default async function middleware(request: NextRequest) {
     return NextResponse.redirect(redirectUrl, 301);
   }
 
+  const matchesLocalePrefix = routing.locales.some(
+    (locale) => pathname === `/${locale}` || pathname.startsWith(`/${locale}/`)
+  );
+
+  if (!matchesLocalePrefix) {
+    const redirectUrl = request.nextUrl.clone();
+    redirectUrl.pathname = `/${routing.defaultLocale}${pathname.startsWith('/') ? pathname : `/${pathname}`}`;
+    return NextResponse.redirect(redirectUrl);
+  }
+
   // Apply i18n middleware for all other routes
   // This handles locale validation, routing, and redirects
   const response = intlMiddleware(request);
@@ -88,4 +98,3 @@ export const config = {
     '/((?!api|_next|_vercel|.*\\..*).*)',
   ],
 };
-
