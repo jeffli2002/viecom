@@ -15,6 +15,7 @@
 - [ ] `KIE_API_KEY` - AI 生成 API
 - [ ] `NEXT_PUBLIC_APP_URL` - 应用 URL (https://www.viecom.pro)
 - [ ] **`ADMIN_JWT_SECRET`** - **管理员 JWT 密钥（最重要！）**
+- [ ] **`CRON_SECRET`** - **Cron Jobs 安全密钥（用于定时任务）**
 
 ### 🔑 ADMIN_JWT_SECRET 设置
 
@@ -68,5 +69,34 @@ KIE_API_KEY=...
 
 # Admin (Critical for /admin/*)
 ADMIN_JWT_SECRET=7SK/V+UVLCE+xTlvGBoAuwXpxcW/k62o0LBWdLWDKnA=
+
+# Cron Jobs (Required for /api/cron/* endpoints)
+CRON_SECRET=your-generated-secret-here
+```
+
+### 🔑 CRON_SECRET 设置
+
+**CRON_SECRET** 用于保护 cron job 端点，防止未授权访问。
+
+**生成密钥**：
+```bash
+# 在本地运行
+pnpm tsx scripts/generate-cron-secret.ts
+```
+
+**在 Vercel 中设置**：
+1. 访问：https://vercel.com/your-username/viecom/settings/environment-variables
+2. 点击 "Add New"
+3. Name: `CRON_SECRET`
+4. Value: 粘贴生成的密钥
+5. Environment: 选择 **Production**, **Preview**, **Development**
+6. 点击 "Save"
+
+**重要提示**：
+- Vercel 会自动在调用 cron 端点时传递这个密钥
+- 确保密钥足够长（至少 32 字符）
+- 不要将密钥提交到 Git 仓库
+
+**详细配置指南**：查看 [VERCEL_CRON_SETUP.md](./VERCEL_CRON_SETUP.md)
 ```
 

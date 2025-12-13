@@ -84,10 +84,48 @@ curl -X POST http://localhost:3000/api/cron/check-missing-signup-credits \
 
 ## Configuration
 
-Set `CRON_SECRET` in your `.env.local`:
+### Generate CRON_SECRET
+
+**CRON_SECRET** 是一个用于保护 cron job 端点的密钥。你需要自己生成一个安全的随机字符串。
+
+#### 方法 1: 使用提供的脚本（推荐）
+```bash
+pnpm tsx scripts/generate-cron-secret.ts
 ```
-CRON_SECRET=your-secret-key-here
+
+这会生成一个安全的随机密钥，例如：
 ```
+CRON_SECRET="STARokuG3a1LzsvB5g2ci7mjFA9Z5yfheyRojgP8/Zw="
+```
+
+#### 方法 2: 使用 Node.js 命令行
+```bash
+node -e "console.log(require('crypto').randomBytes(32).toString('base64'))"
+```
+
+#### 方法 3: 使用 OpenSSL
+```bash
+openssl rand -base64 32
+```
+
+### 配置环境变量
+
+#### 本地开发环境 (`.env.local`)
+```bash
+CRON_SECRET="your-generated-secret-here"
+```
+
+#### 生产环境 (Vercel/Railway/etc.)
+在部署平台的环境变量设置中添加：
+```
+CRON_SECRET=your-generated-secret-here
+```
+
+**重要提示**：
+- 使用强随机字符串（至少 32 字符）
+- 不要将密钥提交到 Git 仓库
+- 生产环境使用与开发环境不同的密钥
+- 确保在调用 cron 端点时使用相同的密钥
 
 ## Testing
 
