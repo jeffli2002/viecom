@@ -5,23 +5,48 @@ import type { User } from 'better-auth/types';
 import { create } from 'zustand';
 import { createJSONStorage, persist, subscribeWithSelector } from 'zustand/middleware';
 
-// Helper function to initialize user credits
-const initializeUserCredits = async (userId: string): Promise<void> => {
-  try {
-    const response = await fetch('/api/credits/initialize', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ userId }),
-      credentials: 'include',
-    });
+// Helper function to initialize user credits with retry mechanism
+const initializeUserCredits = async (userId: string, retries = 3): Promise<void> => {
+  for (let attempt = 1; attempt <= retries; attempt++) {
+    try {
+      const response = await fetch('/api/credits/initialize', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ userId }),
+        credentials: 'include',
+      });
 
-    if (!response.ok) {
-      console.warn('Failed to initialize user credits:', await response.text());
+      if (response.ok) {
+        const data = await response.json();
+        if (data.success && data.data?.signupCreditsGranted > 0) {
+          console.log(`✅ Successfully initialized credits (attempt ${attempt})`);
+          return;
+        }
+        console.log(`✅ Credits initialized (attempt ${attempt}), signup bonus: ${data.data?.signupCreditsGranted || 0}`);
+        return;
+      }
+
+      const errorText = await response.text();
+      console.warn(`⚠️ Failed to initialize user credits (attempt ${attempt}/${retries}):`, errorText);
+
+      // If it's the last attempt, log the error but don't throw
+      if (attempt === retries) {
+        console.error(`❌ Failed to initialize user credits after ${retries} attempts`);
+        // Don't throw - we'll retry in initialize() method as fallback
+      } else {
+        // Wait before retrying (exponential backoff)
+        await new Promise((resolve) => setTimeout(resolve, 1000 * attempt));
+      }
+    } catch (error) {
+      console.warn(`⚠️ Error initializing user credits (attempt ${attempt}/${retries}):`, error);
+      if (attempt === retries) {
+        console.error(`❌ Failed to initialize user credits after ${retries} attempts`);
+      } else {
+        await new Promise((resolve) => setTimeout(resolve, 1000 * attempt));
+      }
     }
-  } catch (error) {
-    console.warn('Error initializing user credits:', error);
   }
 };
 
@@ -150,7 +175,7 @@ export const useAuthStore = create<AuthState>()(
               });
 
               if (!previousUser || previousUser.id !== user.id) {
-                await initializeUserCredits(user.id);
+                await initializeUserCredits(user.id, 3);
               }
 
               return { success: true };
@@ -201,7 +226,11 @@ export const useAuthStore = create<AuthState>()(
               });
 
               // Initialize user credits after successful registration
-              await initializeUserCredits(user.id);
+              // Use fire-and-forget to not block the signup flow, but with retry mechanism
+              initializeUserCredits(user.id, 3).catch((err) => {
+                console.error('Failed to initialize credits during signup:', err);
+                // Will be retried in initialize() method as fallback
+              });
 
               return { success: true };
             }
@@ -309,7 +338,7 @@ export const useAuthStore = create<AuthState>()(
               });
 
               if (!previousUser || previousUser.id !== user.id) {
-                await initializeUserCredits(user.id);
+                await initializeUserCredits(user.id, 3);
               }
             } else {
               set({
@@ -382,9 +411,34 @@ export const useAuthStore = create<AuthState>()(
                 lastUpdated: Date.now(),
               });
 
-              // Initialize credits for new users
+              // Initialize credits for new users or if credits haven't been initialized
+              // This serves as a fallback if signup initialization failed
               if (isNewUser) {
-                await initializeUserCredits(user.id);
+                await initializeUserCredits(user.id, 3);
+              } else {
+                // Check if user has credit account, if not, try to initialize
+                // This handles cases where signup initialization failed
+                try {
+                  const checkResponse = await fetch('/api/credits/check', {
+                    method: 'POST',
+                    headers: {
+                      'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ userId: user.id }),
+                    credentials: 'include',
+                  });
+                  
+                  if (checkResponse.ok) {
+                    const checkData = await checkResponse.json();
+                    if (!checkData.hasAccount) {
+                      console.log(`⚠️ User ${user.email} has no credit account, initializing...`);
+                      await initializeUserCredits(user.id, 3);
+                    }
+                  }
+                } catch (checkError) {
+                  // Silently fail - we'll rely on background task to fix this
+                  console.warn('Failed to check credit account:', checkError);
+                }
               }
             } else {
               if (!get().isCacheValid()) {
