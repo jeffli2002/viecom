@@ -221,16 +221,18 @@ export const useAuthStore = create<AuthState>()(
               set({
                 user,
                 isAuthenticated: true,
-                isLoading: false,
                 lastUpdated: Date.now(),
               });
 
-              // Initialize user credits after successful registration
-              // Use fire-and-forget to not block the signup flow, but with retry mechanism
-              initializeUserCredits(user.id, 3).catch((err) => {
+              // Initialize user credits after successful registration and wait for completion
+              try {
+                await initializeUserCredits(user.id, 3);
+              } catch (err) {
                 console.error('Failed to initialize credits during signup:', err);
-                // Will be retried in initialize() method as fallback
-              });
+                // Allow signup to succeed even if credit initialization fails
+              } finally {
+                set({ isLoading: false });
+              }
 
               return { success: true };
             }
