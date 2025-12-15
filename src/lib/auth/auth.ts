@@ -1,8 +1,12 @@
+import { paymentConfig } from '@/config/payment.config';
 import { env } from '@/env';
+import { creditService } from '@/lib/credits';
 import { db } from '@/server/db';
+import { creditTransactions } from '@/server/db/schema';
 import { betterAuth } from 'better-auth';
 import { drizzleAdapter } from 'better-auth/adapters/drizzle';
 import { admin, apiKey } from 'better-auth/plugins';
+import { eq } from 'drizzle-orm';
 
 const createTrustedOrigins = (): string[] => {
   const origins = new Set<string>();
@@ -52,6 +56,51 @@ export const auth = betterAuth({
   baseURL: env.NEXT_PUBLIC_APP_URL,
   secret: env.BETTER_AUTH_SECRET,
   trustedOrigins: createTrustedOrigins(),
+  databaseHooks: {
+    user: {
+      create: {
+        after: async (newUser) => {
+          try {
+            const freePlan = paymentConfig.plans.find((plan) => plan.id === 'free');
+            const signupCredits = freePlan?.credits?.onSignup ?? 0;
+
+            if (!signupCredits || signupCredits <= 0) {
+              return;
+            }
+
+            const signupReferenceId = `signup_${newUser.id}`;
+
+            const [existingSignupTx] = await db
+              .select({ id: creditTransactions.id })
+              .from(creditTransactions)
+              .where(eq(creditTransactions.referenceId, signupReferenceId))
+              .limit(1);
+
+            if (existingSignupTx) {
+              return;
+            }
+
+            await creditService.getOrCreateCreditAccount(newUser.id);
+
+            await creditService.earnCredits({
+              userId: newUser.id,
+              amount: signupCredits,
+              source: 'bonus',
+              description: 'Welcome bonus - thank you for signing up!',
+              referenceId: signupReferenceId,
+            });
+
+            console.log(`[auth] Granted signup credits to ${newUser.email}`);
+          } catch (error) {
+            console.error(
+              `[auth] Failed to grant signup credits for ${newUser?.email ?? 'unknown user'}:`,
+              error
+            );
+          }
+        },
+      },
+    },
+  },
   emailAndPassword: {
     enabled: true,
     async sendResetPassword({ user, url }) {
