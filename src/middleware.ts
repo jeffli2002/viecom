@@ -53,7 +53,7 @@ export default async function middleware(request: NextRequest) {
 
   // Redirect root path to default locale
   if (pathname === '/') {
-    const redirectUrl = new URL(`/${routing.defaultLocale}/signup`, request.url);
+    const redirectUrl = new URL(`/${routing.defaultLocale}`, request.url);
     return NextResponse.redirect(redirectUrl, 301);
   }
 
