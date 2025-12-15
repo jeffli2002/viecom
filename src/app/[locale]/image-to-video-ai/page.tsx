@@ -225,7 +225,7 @@ const getPricingComparison = () => {
         '720p quality',
         'Sora 2 model',
         `${pricing.free.batchSize} video at a time`,
-        'Watermark',
+        'No watermark',
       ],
     },
     {
