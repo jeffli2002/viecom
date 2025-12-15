@@ -69,7 +69,7 @@ export async function Hero() {
           <span className="text-sm font-medium">{t('badge')}</span>
         </div>
 
-        <h1 className="text-[clamp(3.5rem,8vw,6.5rem)] font-semibold tracking-tight leading-tight text-slate-900 dark:text-white mb-6">
+        <h1 className="text-[clamp(4rem,9vw,7.5rem)] font-semibold tracking-tight leading-tight text-slate-900 dark:text-white mb-6">
           <span className="text-gradient">{t('titleHighlight')}</span> {t('titleRest')}
         </h1>
 
