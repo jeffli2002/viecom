@@ -6,7 +6,7 @@
     },
     {
       "path": "/api/cron/check-missing-signup-credits",
-      "schedule": "0 */6 * * *"
+      "schedule": "0 2 * * *"
     }
   ]
 }
