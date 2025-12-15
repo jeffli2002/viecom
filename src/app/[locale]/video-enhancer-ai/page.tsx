@@ -206,13 +206,21 @@ const useCases = [
 ];
 
 const freePlan = paymentConfig.plans.find((p) => p.id === 'free');
+const proPlan = paymentConfig.plans.find((p) => p.id === 'pro');
+const proplusPlan = paymentConfig.plans.find((p) => p.id === 'proplus');
+
+// Use the cheapest video generation cost as capacity baseline
+const baseVideoCreditCost = creditsConfig.consumption.videoGeneration['sora-2-720p-10s'];
 
 const pricingTiers = [
   {
     name: 'Free Trial',
     price: '$0',
-    credits: `${freePlan?.credits.onSignup || 15} credits (sign-up bonus, one-time)`,
-    videos: '2-6 enhanced videos',
+    credits: `${freePlan?.credits.onSignup ?? 0} credits (sign-up bonus, one-time)`,
+    videos:
+      freePlan && baseVideoCreditCost
+        ? `Up to ${Math.max(1, Math.floor((freePlan.credits.onSignup ?? 0) / baseVideoCreditCost))} enhanced videos`
+        : undefined,
     features: [
       '720p to 1080p upscaling',
       'Basic noise reduction',
@@ -222,9 +230,12 @@ const pricingTiers = [
   },
   {
     name: 'Pro',
-    price: '$14.9',
-    credits: '500 credits/month',
-    videos: 'Up to 100 videos',
+    price: proPlan?.price ? `$${proPlan.price}` : '$0',
+    credits: proPlan ? `${proPlan.credits.monthly} credits/month` : '',
+    videos:
+      proPlan && baseVideoCreditCost
+        ? `Up to ${Math.max(1, Math.floor(proPlan.credits.monthly / baseVideoCreditCost))} videos`
+        : undefined,
     features: [
       '720p to 4K upscaling',
       'Advanced noise reduction',
@@ -235,9 +246,12 @@ const pricingTiers = [
   },
   {
     name: 'Pro+',
-    price: '$24.9',
-    credits: '900 credits/month',
-    videos: 'Up to 180 videos',
+    price: proplusPlan?.price ? `$${proplusPlan.price}` : '$0',
+    credits: proplusPlan ? `${proplusPlan.credits.monthly} credits/month` : '',
+    videos:
+      proplusPlan && baseVideoCreditCost
+        ? `Up to ${Math.max(1, Math.floor(proplusPlan.credits.monthly / baseVideoCreditCost))} videos`
+        : undefined,
     features: [
       'All Pro features',
       'Priority processing queue',
