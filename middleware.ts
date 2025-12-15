@@ -56,9 +56,9 @@ export default async function middleware(request: NextRequest) {
     }
   }
 
-  // Redirect root path directly to localized signup page
+  // Redirect root path to default locale home
   if (pathname === '/') {
-    const redirectUrl = new URL(`/${routing.defaultLocale}/signup`, request.url);
+    const redirectUrl = new URL(`/${routing.defaultLocale}`, request.url);
     if (process.env.NODE_ENV === 'development') {
       console.log('[Middleware] Redirecting / to:', redirectUrl.pathname);
     }
