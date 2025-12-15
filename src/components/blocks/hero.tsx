@@ -70,13 +70,7 @@ export async function Hero() {
         </div>
 
         <h1 className="text-[clamp(3.5rem,8vw,6.5rem)] font-semibold tracking-tight leading-tight text-slate-900 dark:text-white mb-6">
-          {t('titleLine1')}
-          {t('titleLine2') && (
-            <>
-              {' '}
-              <span className="text-gradient">{t('titleLine2')}</span>
-            </>
-          )}
+          <span className="text-gradient">{t('titleHighlight')}</span> {t('titleRest')}
         </h1>
 
         <p className="text-xl text-body mb-10 max-w-2xl mx-auto leading-relaxed">{t('subtitle')}</p>
