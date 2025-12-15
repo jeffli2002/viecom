@@ -29,21 +29,26 @@ Some newly registered users were not receiving their signup bonus credits (15 cr
 - Used in `initialize()` method as a fallback check
 - Helps identify users who need credit initialization
 
-### 3. Background Cron Task
+### 3. Background Cron Task (Optional)
 **File**: `src/app/api/cron/check-missing-signup-credits/route.ts`
 
 - Automatically checks users registered in the last 24 hours
 - Identifies users without credit accounts or signup bonus transactions
 - Automatically grants missing signup bonuses
-- Should be called periodically (e.g., every hour) via cron job
+- **Note**: Cron job is optional and removed from `vercel.json` due to Vercel Hobby plan limitations (max 2 cron jobs)
+- The endpoint still exists and can be called manually or via external cron service if needed
 
-**Setup**:
+**Manual Execution**:
 ```bash
-# Add to your cron job configuration
-# Run every hour
-0 * * * * curl -X POST https://your-domain.com/api/cron/check-missing-signup-credits \
+# Can be called manually or via external cron service
+curl -X POST https://your-domain.com/api/cron/check-missing-signup-credits \
   -H "Authorization: Bearer YOUR_CRON_SECRET"
 ```
+
+**Why Removed from Vercel Cron**:
+- Vercel Hobby plan limits to 2 cron jobs
+- Primary mechanisms (databaseHooks + client retries) are sufficient
+- Manual scripts available for ad-hoc fixes
 
 ### 4. Improved Error Handling
 - Better logging at each step
@@ -60,9 +65,11 @@ Some newly registered users were not receiving their signup bonus credits (15 cr
 5. **Fallback 2**: Background cron task checks and fixes within 24 hours
 
 ### Multiple Safety Nets:
-1. ✅ **Primary**: Retry during signup (3 attempts)
-2. ✅ **Fallback 1**: Check and initialize during app initialization
-3. ✅ **Fallback 2**: Background cron task fixes missing credits
+1. ✅ **Primary**: Database hook automatically grants credits on user creation (`databaseHooks.user.create.after`)
+2. ✅ **Fallback 1**: Client-side retry during signup (3 attempts with exponential backoff)
+3. ✅ **Fallback 2**: Check and initialize during app initialization/login
+4. ✅ **Fallback 3**: Manual scripts available for ad-hoc fixes
+5. ⚠️ **Optional**: Background cron task endpoint exists but not scheduled (due to Vercel plan limits)
 
 ## Monitoring
 

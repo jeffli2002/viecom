@@ -3,10 +3,6 @@
     {
       "path": "/api/cron/process-stuck-tasks",
       "schedule": "0 0 * * *"
-    },
-    {
-      "path": "/api/cron/check-missing-signup-credits",
-      "schedule": "0 2 * * *"
     }
   ]
 }
