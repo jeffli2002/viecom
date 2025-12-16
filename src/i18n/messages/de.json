@@ -500,7 +500,7 @@
       },
       "q2": {
         "question": "Wie verwende ich die Prompt-Verbesserungsfunktion?",
-        "answer": "Nach dem Hochladen Ihrer Datei können Sie die Schaltfläche 'Alle Prompts verbessern" verwenden, um alle Prompts automatisch mit KI zu verbessern. Diese Funktion analysiert Ihre Prompts und fügt relevante Details, Stil-Schlüsselwörter und technische Spezifikationen hinzu, um bessere Ergebnisse zu erzielen. Sie können auch einzelne Prompts verbessern, indem Sie auf die Verbesserungsschaltfläche neben jeder Zeile klicken."
+        "answer": "Nach dem Hochladen Ihrer Datei können Sie die Schaltfläche \"Alle Prompts verbessern\" verwenden, um alle Prompts automatisch mit KI zu verbessern. Diese Funktion analysiert Ihre Prompts und fügt relevante Details, Stil-Schlüsselwörter und technische Spezifikationen hinzu, um bessere Ergebnisse zu erzielen. Sie können auch einzelne Prompts verbessern, indem Sie auf die Verbesserungsschaltfläche neben jeder Zeile klicken."
       },
       "q3": {
         "question": "Wie lange dauert die Batch-Bildgenerierung?",
@@ -508,7 +508,7 @@
       },
       "q4": {
         "question": "Wie lade ich alle generierten Bilder auf einmal herunter?",
-        "answer": "Sobald die Batch-Generierung abgeschlossen ist, sehen Sie eine Schaltfläche 'Alle Ergebnisse herunterladen" im Abschnitt Generierungszusammenfassung. Dies lädt eine ZIP-Datei herunter, die alle generierten Bilder enthält. Alternativ können Sie einzelne Bilder herunterladen, indem Sie auf das Download-Symbol neben jeder Vorschau klicken, oder eine aktualisierte Vorlagendatei mit allen Bild-URLs herunterladen."
+        "answer": "Sobald die Batch-Generierung abgeschlossen ist, sehen Sie eine Schaltfläche \"Alle Ergebnisse herunterladen\" im Abschnitt Generierungszusammenfassung. Dies lädt eine ZIP-Datei herunter, die alle generierten Bilder enthält. Alternativ können Sie einzelne Bilder herunterladen, indem Sie auf das Download-Symbol neben jeder Vorschau klicken, oder eine aktualisierte Vorlagendatei mit allen Bild-URLs herunterladen."
       },
       "q5": {
         "question": "Wie gehe ich mit fehlgeschlagenen Generierungen in meinem Batch um?",
