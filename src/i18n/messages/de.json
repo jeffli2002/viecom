@@ -491,7 +491,34 @@
     "instruction3": "Produktinformationen ausfüllen (bei Auswahl des Produktveröffentlichungsmodus)",
     "instruction4": "Veröffentlichungsplattformen angeben (publishPlatforms-Feld, durch Komma getrennt, optional)",
     "instruction5": "Ausgefüllte Datei hochladen, System generiert automatisch",
-    "instruction6": "Nach der Generierung können Sie eine Vorschau anzeigen, herunterladen oder eine aktualisierte Vorlage mit URLs herunterladen"
+    "instruction6": "Nach der Generierung können Sie eine Vorschau anzeigen, herunterladen oder eine aktualisierte Vorlage mit URLs herunterladen",
+    "faq": {
+      "title": "Häufig Gestellte Fragen",
+      "q1": {
+        "question": "Wie bereite ich meine Excel/CSV-Datei für die Batch-Bildgenerierung vor?",
+        "answer": "Laden Sie unsere Vorlagendatei (Excel- oder CSV-Format) von der Seite herunter. Füllen Sie die erforderlichen Spalten aus: prompt (Beschreibung des Bildes, das Sie generieren möchten), generationMode (Text-zu-Bild oder Bild-zu-Bild), aspectRatio, imageStyle und model. Für den Bild-zu-Bild-Modus fügen Sie die Spalte sourceImageUrl hinzu. Speichern Sie die Datei und laden Sie sie hoch, um die Batch-Generierung zu starten."
+      },
+      "q2": {
+        "question": "Wie verwende ich die Prompt-Verbesserungsfunktion?",
+        "answer": "Nach dem Hochladen Ihrer Datei können Sie die Schaltfläche 'Alle Prompts verbessern" verwenden, um alle Prompts automatisch mit KI zu verbessern. Diese Funktion analysiert Ihre Prompts und fügt relevante Details, Stil-Schlüsselwörter und technische Spezifikationen hinzu, um bessere Ergebnisse zu erzielen. Sie können auch einzelne Prompts verbessern, indem Sie auf die Verbesserungsschaltfläche neben jeder Zeile klicken."
+      },
+      "q3": {
+        "question": "Wie lange dauert die Batch-Bildgenerierung?",
+        "answer": "Die Generierungszeit hängt von den Parallelitätsgrenzen Ihres Plans und der Anzahl der Bilder ab. Der kostenlose Plan verarbeitet 1 Bild gleichzeitig, der Pro-Plan verarbeitet 5 gleichzeitig und Pro+ verarbeitet 10 gleichzeitig. Jedes Bild benötigt normalerweise 30-60 Sekunden zur Generierung. Für einen Batch von 50 Bildern benötigt der kostenlose Plan etwa 25-50 Minuten, während der Pro-Plan etwa 5-10 Minuten benötigt."
+      },
+      "q4": {
+        "question": "Wie lade ich alle generierten Bilder auf einmal herunter?",
+        "answer": "Sobald die Batch-Generierung abgeschlossen ist, sehen Sie eine Schaltfläche 'Alle Ergebnisse herunterladen" im Abschnitt Generierungszusammenfassung. Dies lädt eine ZIP-Datei herunter, die alle generierten Bilder enthält. Alternativ können Sie einzelne Bilder herunterladen, indem Sie auf das Download-Symbol neben jeder Vorschau klicken, oder eine aktualisierte Vorlagendatei mit allen Bild-URLs herunterladen."
+      },
+      "q5": {
+        "question": "Wie gehe ich mit fehlgeschlagenen Generierungen in meinem Batch um?",
+        "answer": "Fehlgeschlagene Generierungen sind in der Statusverteilung klar markiert. Sie können fehlgeschlagene Elemente in der Vorschau anzeigen, um Fehlermeldungen zu sehen. Häufige Ursachen sind ungültige Prompts, unzureichende Credits oder nicht unterstützte Bildformate. Beheben Sie die Probleme in Ihrer Datei und laden Sie sie erneut hoch, oder generieren Sie manuell bestimmte fehlgeschlagene Elemente mit der individuellen Generierungsfunktion neu."
+      },
+      "q6": {
+        "question": "Wie erhöhe ich meine Batch-Größe und Parallelitätsgrenzen?",
+        "answer": "Der kostenlose Plan unterstützt 3 Zeilen pro Batch mit 1 gleichzeitiger Ausgabe. Der Pro-Plan unterstützt größere Batches mit 5 gleichzeitigen Ausgaben, und der Pro+-Plan unterstützt die größten Batches mit 10 gleichzeitigen Ausgaben. Aktualisieren Sie Ihren Plan auf der Preisseite, um höhere Durchsatzgrenzen freizuschalten und mehr Bilder gleichzeitig zu verarbeiten."
+      }
+    }
   },
   "dashboard": {
     "title": "Dashboard",

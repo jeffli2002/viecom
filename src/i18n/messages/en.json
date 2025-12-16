@@ -491,7 +491,34 @@
     "instruction3": "Fill in product information (if selecting product publishing mode)",
     "instruction4": "Specify publishing platforms (publishPlatforms field, comma-separated, optional)",
     "instruction5": "Upload the filled file, system will automatically generate",
-    "instruction6": "After generation, you can preview, download, or download updated template with URLs"
+    "instruction6": "After generation, you can preview, download, or download updated template with URLs",
+    "faq": {
+      "title": "Frequently Asked Questions",
+      "q1": {
+        "question": "How to prepare my Excel/CSV file for batch image generation?",
+        "answer": "Download our template file (Excel or CSV format) from the page. Fill in the required columns: prompt (description of the image you want to generate), generationMode (text-to-image or image-to-image), aspectRatio, imageStyle, and model. For image-to-image mode, include the sourceImageUrl column. Save the file and upload it to start batch generation."
+      },
+      "q2": {
+        "question": "How to use the prompt enhancement feature?",
+        "answer": "After uploading your file, you can use the 'Enhance All Prompts' button to automatically improve all prompts using AI. This feature analyzes your prompts and adds relevant details, style keywords, and technical specifications to produce better results. You can also enhance individual prompts by clicking the enhance button next to each row."
+      },
+      "q3": {
+        "question": "How long does batch image generation take?",
+        "answer": "Generation time depends on your plan's concurrency limits and the number of images. Free plan processes 1 image at a time, Pro plan processes 5 concurrently, and Pro+ processes 10 concurrently. Each image typically takes 30-60 seconds to generate. For a batch of 50 images, Free plan takes about 25-50 minutes, while Pro plan takes about 5-10 minutes."
+      },
+      "q4": {
+        "question": "How to download all generated images at once?",
+        "answer": "Once batch generation is complete, you'll see a 'Download All Results' button in the Generation Summary section. This will download a ZIP file containing all generated images. Alternatively, you can download individual images by clicking the download icon next to each preview, or download an updated template file with all image URLs included."
+      },
+      "q5": {
+        "question": "How to handle failed generations in my batch?",
+        "answer": "Failed generations are clearly marked in the status distribution. You can preview failed items to see error messages. Common causes include invalid prompts, insufficient credits, or unsupported image formats. Fix the issues in your file and re-upload, or manually regenerate specific failed items using the individual generation feature."
+      },
+      "q6": {
+        "question": "How to increase my batch size and concurrency limits?",
+        "answer": "Free plan supports 3 rows per batch with 1 concurrent output. Pro plan supports larger batches with 5 concurrent outputs, and Pro+ plan supports the largest batches with 10 concurrent outputs. Upgrade your plan from the Pricing page to unlock higher throughput limits and process more images simultaneously."
+      }
+    }
   },
   "dashboard": {
     "title": "Dashboard",

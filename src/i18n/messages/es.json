@@ -491,7 +491,34 @@
     "instruction3": "Completa la información del producto (si seleccionas el modo de publicación de producto)",
     "instruction4": "Especifica las plataformas de publicación (campo publishPlatforms, separado por comas, opcional)",
     "instruction5": "Carga el archivo completado, el sistema generará automáticamente",
-    "instruction6": "Después de la generación, puedes previsualizar, descargar o descargar plantilla actualizada con URLs"
+    "instruction6": "Después de la generación, puedes previsualizar, descargar o descargar plantilla actualizada con URLs",
+    "faq": {
+      "title": "Preguntas Frecuentes",
+      "q1": {
+        "question": "¿Cómo preparar mi archivo Excel/CSV para generación de imágenes por lotes?",
+        "answer": "Descarga nuestro archivo de plantilla (formato Excel o CSV) desde la página. Completa las columnas requeridas: prompt (descripción de la imagen que deseas generar), generationMode (texto a imagen o imagen a imagen), aspectRatio, imageStyle y model. Para el modo imagen a imagen, incluye la columna sourceImageUrl. Guarda el archivo y súbelo para comenzar la generación por lotes."
+      },
+      "q2": {
+        "question": "¿Cómo usar la función de mejora de prompts?",
+        "answer": "Después de subir tu archivo, puedes usar el botón 'Mejorar Todos los Prompts' para mejorar automáticamente todos los prompts usando IA. Esta función analiza tus prompts y agrega detalles relevantes, palabras clave de estilo y especificaciones técnicas para producir mejores resultados. También puedes mejorar prompts individuales haciendo clic en el botón de mejora junto a cada fila."
+      },
+      "q3": {
+        "question": "¿Cuánto tiempo tarda la generación de imágenes por lotes?",
+        "answer": "El tiempo de generación depende de los límites de concurrencia de tu plan y la cantidad de imágenes. El plan gratuito procesa 1 imagen a la vez, el plan Pro procesa 5 simultáneamente y Pro+ procesa 10 simultáneamente. Cada imagen típicamente toma 30-60 segundos en generarse. Para un lote de 50 imágenes, el plan gratuito toma aproximadamente 25-50 minutos, mientras que el plan Pro toma aproximadamente 5-10 minutos."
+      },
+      "q4": {
+        "question": "¿Cómo descargar todas las imágenes generadas a la vez?",
+        "answer": "Una vez que la generación por lotes esté completa, verás un botón 'Descargar Todos los Resultados' en la sección de Resumen de Generación. Esto descargará un archivo ZIP que contiene todas las imágenes generadas. Alternativamente, puedes descargar imágenes individuales haciendo clic en el icono de descarga junto a cada vista previa, o descargar un archivo de plantilla actualizado con todas las URLs de imágenes incluidas."
+      },
+      "q5": {
+        "question": "¿Cómo manejar generaciones fallidas en mi lote?",
+        "answer": "Las generaciones fallidas están claramente marcadas en la distribución de estado. Puedes previsualizar elementos fallidos para ver mensajes de error. Las causas comunes incluyen prompts inválidos, créditos insuficientes o formatos de imagen no compatibles. Corrige los problemas en tu archivo y vuelve a subirlo, o regenera manualmente elementos específicos fallidos usando la función de generación individual."
+      },
+      "q6": {
+        "question": "¿Cómo aumentar el tamaño de mi lote y los límites de concurrencia?",
+        "answer": "El plan gratuito admite 3 filas por lote con 1 salida concurrente. El plan Pro admite lotes más grandes con 5 salidas concurrentes, y el plan Pro+ admite los lotes más grandes con 10 salidas concurrentes. Actualiza tu plan desde la página de Precios para desbloquear límites de rendimiento más altos y procesar más imágenes simultáneamente."
+      }
+    }
   },
   "dashboard": {
     "title": "Panel",

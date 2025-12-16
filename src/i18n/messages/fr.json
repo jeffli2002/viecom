@@ -491,7 +491,34 @@
     "instruction3": "Remplissez les informations produit (si vous sélectionnez le mode de publication de produit)",
     "instruction4": "Spécifiez les plateformes de publication (champ publishPlatforms, séparé par des virgules, facultatif)",
     "instruction5": "Téléchargez le fichier rempli, le système génèrera automatiquement",
-    "instruction6": "Après génération, vous pouvez prévisualiser, télécharger ou télécharger le modèle mis à jour avec les URL"
+    "instruction6": "Après génération, vous pouvez prévisualiser, télécharger ou télécharger le modèle mis à jour avec les URL",
+    "faq": {
+      "title": "Questions Fréquemment Posées",
+      "q1": {
+        "question": "Comment préparer mon fichier Excel/CSV pour la génération d'images par lot ?",
+        "answer": "Téléchargez notre fichier de modèle (format Excel ou CSV) depuis la page. Remplissez les colonnes requises : prompt (description de l'image que vous souhaitez générer), generationMode (texte vers image ou image vers image), aspectRatio, imageStyle et model. Pour le mode image vers image, incluez la colonne sourceImageUrl. Enregistrez le fichier et téléchargez-le pour commencer la génération par lot."
+      },
+      "q2": {
+        "question": "Comment utiliser la fonctionnalité d'amélioration de prompt ?",
+        "answer": "Après avoir téléchargé votre fichier, vous pouvez utiliser le bouton 'Améliorer Tous les Prompts' pour améliorer automatiquement tous les prompts à l'aide de l'IA. Cette fonctionnalité analyse vos prompts et ajoute des détails pertinents, des mots-clés de style et des spécifications techniques pour produire de meilleurs résultats. Vous pouvez également améliorer des prompts individuels en cliquant sur le bouton d'amélioration à côté de chaque ligne."
+      },
+      "q3": {
+        "question": "Combien de temps prend la génération d'images par lot ?",
+        "answer": "Le temps de génération dépend des limites de concurrence de votre plan et du nombre d'images. Le plan gratuit traite 1 image à la fois, le plan Pro traite 5 simultanément et Pro+ traite 10 simultanément. Chaque image prend généralement 30 à 60 secondes à générer. Pour un lot de 50 images, le plan gratuit prend environ 25 à 50 minutes, tandis que le plan Pro prend environ 5 à 10 minutes."
+      },
+      "q4": {
+        "question": "Comment télécharger toutes les images générées en une seule fois ?",
+        "answer": "Une fois la génération par lot terminée, vous verrez un bouton 'Télécharger Tous les Résultats' dans la section Résumé de Génération. Cela téléchargera un fichier ZIP contenant toutes les images générées. Alternativement, vous pouvez télécharger des images individuelles en cliquant sur l'icône de téléchargement à côté de chaque aperçu, ou télécharger un fichier de modèle mis à jour avec toutes les URL d'images incluses."
+      },
+      "q5": {
+        "question": "Comment gérer les générations échouées dans mon lot ?",
+        "answer": "Les générations échouées sont clairement marquées dans la distribution de statut. Vous pouvez prévisualiser les éléments échoués pour voir les messages d'erreur. Les causes courantes incluent des prompts invalides, des crédits insuffisants ou des formats d'image non pris en charge. Corrigez les problèmes dans votre fichier et téléchargez-le à nouveau, ou régénérez manuellement des éléments spécifiques échoués en utilisant la fonctionnalité de génération individuelle."
+      },
+      "q6": {
+        "question": "Comment augmenter la taille de mon lot et les limites de concurrence ?",
+        "answer": "Le plan gratuit prend en charge 3 lignes par lot avec 1 sortie simultanée. Le plan Pro prend en charge des lots plus importants avec 5 sorties simultanées, et le plan Pro+ prend en charge les lots les plus importants avec 10 sorties simultanées. Mettez à niveau votre plan depuis la page Tarifs pour débloquer des limites de débit plus élevées et traiter plus d'images simultanément."
+      }
+    }
   },
   "dashboard": {
     "title": "Tableau de bord",
