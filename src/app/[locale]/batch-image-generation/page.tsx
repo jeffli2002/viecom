@@ -1,10 +1,28 @@
-'use client';
-
 import { BatchImageUpload } from '@/components/workflow/batch-image-upload';
-import { useTranslations } from 'next-intl';
+import { getTranslations } from 'next-intl/server';
 
-export default function BatchImageGenerationPage() {
-  const t = useTranslations('batchGeneration');
+const FAQ_KEYS = ['q1', 'q2', 'q3', 'q4', 'q5', 'q6'] as const;
+
+export default async function BatchImageGenerationPage() {
+  const t = await getTranslations('batchGeneration');
+  const faqItems = FAQ_KEYS.map((key) => ({
+    key,
+    question: t(`faq.${key}.question`),
+    answer: t(`faq.${key}.answer`),
+  }));
+
+  const faqSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: faqItems.map((item) => ({
+      '@type': 'Question',
+      name: item.question,
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: item.answer,
+      },
+    })),
+  };
 
   return (
     <div className="container-base py-12">
@@ -13,6 +31,25 @@ export default function BatchImageGenerationPage() {
         <p className="text-body">{t('subtitleImage')}</p>
       </div>
       <BatchImageUpload />
+
+      <div className="max-w-3xl mx-auto mt-20 mb-12">
+        <h2 className="h2-section text-center mb-12">{t('faq.title')}</h2>
+        <div className="space-y-8">
+          {faqItems.map((item) => (
+            <div key={item.key}>
+              <h3 className="text-xl font-semibold mb-3 text-slate-900 dark:text-white">
+                {item.question}
+              </h3>
+              <p className="text-slate-600 dark:text-slate-300">{item.answer}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
+      />
     </div>
   );
 }
