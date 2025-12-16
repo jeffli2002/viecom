@@ -1,4 +1,5 @@
 import { Button } from '@/components/ui/button';
+import { creditsConfig } from '@/config/credits.config';
 import { paymentConfig } from '@/config/payment.config';
 import { buildLocaleCanonicalMetadata } from '@/lib/seo/metadata';
 import { ArrowRight, Check, Settings, Sparkles, TrendingUp, Zap } from 'lucide-react';
