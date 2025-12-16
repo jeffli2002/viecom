@@ -191,7 +191,9 @@ export async function POST(request: NextRequest) {
     const dailyPeriod = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
     const monthlyPeriod = new Date().toISOString().substring(0, 7); // YYYY-MM
 
-    const isNanoBanana = model === 'nano-banana' || model === 'nano-banana-pro';
+    const isNanoBananaPro = model === 'nano-banana-pro';
+    const isClassicNanoBanana = model === 'nano-banana';
+    const isNanoBanana = isClassicNanoBanana || isNanoBananaPro;
     if (isNanoBanana) {
       // Use KIE API for nano-banana image generation
       let kieApiService: KieApiService | undefined;
@@ -226,13 +228,26 @@ export async function POST(request: NextRequest) {
       };
       const kieImageSize = aspectRatioMap[aspect_ratio || '1:1'] || '1:1';
 
-      // Map output format
-      const outputFormatMap: Record<string, 'png' | 'jpeg'> = {
-        png: 'png',
-        jpeg: 'jpeg',
-        jpg: 'jpeg',
-      };
-      const kieOutputFormat = outputFormatMap[output_format || 'jpeg'] || 'jpeg';
+      const normalizedOutputFormat: 'png' | 'jpeg' = (() => {
+        const requestedFormat = typeof output_format === 'string' ? output_format.toLowerCase() : '';
+        if (requestedFormat === 'png') {
+          return 'png';
+        }
+        if (requestedFormat === 'jpg' || requestedFormat === 'jpeg') {
+          return 'jpeg';
+        }
+        return 'jpeg';
+      })();
+      // Nano Banana Pro must send 'jpg' to KIE, while classic Nano Banana stays on jpeg for compatibility.
+      const kieOutputFormat: 'png' | 'jpeg' | 'jpg' = (() => {
+        if (isNanoBananaPro) {
+          return 'jpg';
+        }
+        if (isClassicNanoBanana) {
+          return normalizedOutputFormat === 'png' ? 'png' : 'jpeg';
+        }
+        return normalizedOutputFormat;
+      })();
 
       // Process image URLs for I2I: convert base64/blob to HTTP URLs if needed
       const sourceImagePublicUrls: string[] = [];

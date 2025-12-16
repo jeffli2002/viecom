@@ -36,7 +36,7 @@ export interface KIEImageGenerationParams {
     | 'auto';
   aspect_ratio?: string; // For nano-banana-pro, use aspect_ratio instead of image_size
   resolution?: '1K' | '2K' | '4K'; // Resolution for nano-banana-pro
-  outputFormat?: 'png' | 'jpeg';
+  outputFormat?: 'png' | 'jpeg' | 'jpg';
   imageUrl?: string; // For I2I - single image URL (will be converted to image_urls array)
   imageUrls?: string[]; // For I2I - array of image URLs (up to 10 images)
   callBackUrl?: string; // Optional callback URL for task completion notifications
