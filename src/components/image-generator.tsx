@@ -1475,12 +1475,11 @@ export default function ImageGenerator() {
                               setResolution(res);
                             }
                           }}
-                          disabled={isDisabled}
                           className={`flex flex-col items-center justify-center rounded-lg border-2 py-3 px-4 text-sm font-medium transition-all ${
                             resolution === res
                               ? 'border-teal-500 bg-teal-50 dark:bg-teal-900/20 text-slate-700 dark:text-slate-300'
                               : isDisabled
-                                ? 'border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-800 text-slate-400 cursor-not-allowed opacity-50'
+                                ? 'border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-800 text-slate-500 hover:border-teal-500'
                                 : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-gray-700 hover:border-teal-500'
                           }`}
                         >
