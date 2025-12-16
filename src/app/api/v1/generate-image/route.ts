@@ -228,25 +228,29 @@ export async function POST(request: NextRequest) {
       };
       const kieImageSize = aspectRatioMap[aspect_ratio || '1:1'] || '1:1';
 
-      const normalizedOutputFormat: 'png' | 'jpeg' = (() => {
+      const normalizedOutputFormat: 'png' | 'jpeg' | 'jpg' = (() => {
         const requestedFormat = typeof output_format === 'string' ? output_format.toLowerCase() : '';
         if (requestedFormat === 'png') {
           return 'png';
         }
-        if (requestedFormat === 'jpg' || requestedFormat === 'jpeg') {
+        if (requestedFormat === 'jpg') {
+          return 'jpg';
+        }
+        if (requestedFormat === 'jpeg') {
           return 'jpeg';
         }
-        return 'jpeg';
+        return isNanoBananaPro ? 'jpg' : 'jpeg';
       })();
-      // Nano Banana Pro must send 'jpg' to KIE, while classic Nano Banana stays on jpeg for compatibility.
+
+      // Nano Banana Pro supports jpg/png, classic Nano Banana supports jpeg/png.
       const kieOutputFormat: 'png' | 'jpeg' | 'jpg' = (() => {
         if (isNanoBananaPro) {
-          return 'jpg';
+          return normalizedOutputFormat === 'png' ? 'png' : 'jpg';
         }
         if (isClassicNanoBanana) {
           return normalizedOutputFormat === 'png' ? 'png' : 'jpeg';
         }
-        return normalizedOutputFormat;
+        return normalizedOutputFormat === 'jpg' ? 'jpeg' : normalizedOutputFormat;
       })();
 
       // Process image URLs for I2I: convert base64/blob to HTTP URLs if needed
