@@ -109,6 +109,13 @@ export default function VideoGenerator() {
   );
   const socialShareReward = SHARE_REWARD_CONFIG.socialShare.credits;
   const publishShareReward = SHARE_REWARD_CONFIG.publishViecom.credits;
+  const getInFlightMessage = (waitTimeSeconds?: number) => {
+    if (typeof waitTimeSeconds === 'number' && waitTimeSeconds > 0) {
+      const waitMinutes = Math.max(1, Math.ceil(waitTimeSeconds / 60));
+      return t('generationInFlightWithWait', { minutes: waitMinutes });
+    }
+    return t('generationInFlight');
+  };
 
   // Brand analysis data (loaded from sessionStorage, no UI)
   const [brandAnalysis, setBrandAnalysis] = useState<BrandToneAnalysis | null>(null);
@@ -393,7 +400,16 @@ export default function VideoGenerator() {
       const data = await response.json();
 
       if (!response.ok) {
-        if (response.status === 429 || response.status === 402) {
+        if (response.status === 429) {
+          if (data?.currentTaskId || typeof data?.waitTimeSeconds === 'number') {
+            const message = getInFlightMessage(data?.waitTimeSeconds);
+            toast.error(message);
+            throw new Error(message);
+          }
+          openUpgradePrompt();
+          throw new Error(data.error || 'Video generation limit reached');
+        }
+        if (response.status === 402) {
           openUpgradePrompt();
           throw new Error(data.error || 'Video generation limit reached');
         }
