@@ -219,7 +219,8 @@ export const useAuthStore = create<AuthState>()(
           clearError: () => {
             set({ error: null });
           },
-        signIn: async (email, password) => {
+
+          signIn: async (email, password) => {
           set({ isLoading: true, error: null });
           const previousUser = get().user;
 
@@ -619,7 +620,7 @@ export const useAuthStore = create<AuthState>()(
             lastUpdated: 0,
           });
         },
-      }),
+      },
       {
         name: 'ecommerce-ai-auth',
         storage: createJSONStorage(() => localStorage),
