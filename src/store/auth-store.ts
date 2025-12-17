@@ -77,6 +77,25 @@ const appendOAuthCallbackParam = (url?: string, provider = 'google') => {
   return withHash;
 };
 
+const fetchSessionUser = async (): Promise<User | null> => {
+  try {
+    const response = await fetch('/api/auth/get-session', {
+      credentials: 'include',
+    });
+    if (!response.ok) {
+      return null;
+    }
+    const data = await response.json();
+    const sessionUser = data?.session?.user ?? data?.user ?? null;
+    if (sessionUser?.id) {
+      return sessionUser;
+    }
+  } catch (error) {
+    console.warn('[Auth] Failed to fetch session via REST endpoint:', error);
+  }
+  return null;
+};
+
 interface AuthState {
   // Persistent state
   user: User | null;
@@ -347,20 +366,13 @@ export const useAuthStore = create<AuthState>()(
 
           try {
             const session = await authClient.getSession();
+            let user = session.data?.user;
 
-            if (session.data) {
-              const user = session.data.user;
+            if (!user || !user.id) {
+              user = await fetchSessionUser();
+            }
 
-              // Check if user exists and has an id
-              if (!user || !user.id) {
-                set({
-                  user: null,
-                  isAuthenticated: false,
-                  lastUpdated: Date.now(),
-                });
-                return;
-              }
-
+            if (user?.id) {
               set({
                 user,
                 isAuthenticated: true,
@@ -416,21 +428,13 @@ export const useAuthStore = create<AuthState>()(
 
           try {
             const session = await authClient.getSession();
-            if (session.data) {
-              const user = session.data.user;
+            let user = session.data?.user;
 
-              // Check if user exists and has an id
-              if (!user || !user.id) {
-                set({
-                  user: null,
-                  isAuthenticated: false,
-                  isLoading: false,
-                  isInitialized: true,
-                  lastUpdated: Date.now(),
-                });
-                return;
-              }
+            if (!user || !user.id) {
+              user = await fetchSessionUser();
+            }
 
+            if (user?.id) {
               const isNewUser = !previousUser || previousUser.id !== user.id;
 
               set({
@@ -441,13 +445,9 @@ export const useAuthStore = create<AuthState>()(
                 lastUpdated: Date.now(),
               });
 
-              // Initialize credits for new users or if credits haven't been initialized
-              // This serves as a fallback if signup initialization failed
               if (isNewUser) {
                 await initializeUserCredits(user.id, 3);
               } else {
-                // Check if user has credit account, if not, try to initialize
-                // This handles cases where signup initialization failed
                 try {
                   const checkResponse = await fetch('/api/credits/check', {
                     method: 'POST',
@@ -466,7 +466,6 @@ export const useAuthStore = create<AuthState>()(
                     }
                   }
                 } catch (checkError) {
-                  // Silently fail - we'll rely on background task to fix this
                   console.warn('Failed to check credit account:', checkError);
                 }
               }
