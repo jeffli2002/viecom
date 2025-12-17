@@ -1,17 +1,51 @@
 import { randomUUID } from 'node:crypto';
 import { auth } from '@/lib/auth/auth';
+import { releaseGenerationLock } from '@/lib/generation/generation-lock';
 import { db } from '@/server/db';
-import { generatedAsset, userCredits } from '@/server/db/schema';
+import { generatedAsset } from '@/server/db/schema';
 import { eq } from 'drizzle-orm';
 import { type NextRequest, NextResponse } from 'next/server';
 
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60; // Allow up to 60 seconds for processing
 
-type AssetMetadata = Record<string, unknown> & { taskId?: string; previewUrl?: string };
+type AssetMetadata = Record<string, unknown> & {
+  taskId?: string;
+  previewUrl?: string;
+  generationLockId?: string;
+};
 
 const toMetadata = (value: unknown): AssetMetadata =>
   typeof value === 'object' && value !== null ? { ...(value as Record<string, unknown>) } : {};
+
+const releaseLockIfPresent = async (
+  metadata: AssetMetadata,
+  context: { taskId: string; userId: string }
+) => {
+  const lockId =
+    typeof metadata.generationLockId === 'string' && metadata.generationLockId.length > 0
+      ? metadata.generationLockId
+      : null;
+  if (!lockId) {
+    return;
+  }
+
+  try {
+    await releaseGenerationLock(lockId);
+    console.log('[Video Status] Released generation lock:', {
+      lockId,
+      taskId: context.taskId,
+      userId: context.userId,
+    });
+  } catch (error) {
+    console.error('[Video Status] Failed to release generation lock:', {
+      lockId,
+      taskId: context.taskId,
+      userId: context.userId,
+      error: error instanceof Error ? error.message : String(error),
+    });
+  }
+};
 
 interface RouteParams {
   params: Promise<{
@@ -51,19 +85,23 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       return NextResponse.json({ error: 'Task not found' }, { status: 404 });
     }
 
+    const assetMetadata = toMetadata(asset.metadata);
+
     // If already completed or failed, return immediately
     if (asset.status === 'completed') {
+      await releaseLockIfPresent(assetMetadata, { taskId, userId });
       return NextResponse.json({
         status: 'completed',
         progress: 100,
         videoUrl: asset.publicUrl,
-        previewUrl: toMetadata(asset.metadata).previewUrl,
+        previewUrl: assetMetadata.previewUrl,
         assetId: asset.id,
         creditsSpent: asset.creditsSpent,
       });
     }
 
     if (asset.status === 'failed') {
+      await releaseLockIfPresent(assetMetadata, { taskId, userId });
       return NextResponse.json({
         status: 'failed',
         progress: 0,
@@ -98,12 +136,20 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
         const errorMsg = kieStatus.data?.error || kieStatus.data?.failMsg || 'Generation failed';
 
         // Update database
+        const metadataWithoutLock = { ...assetMetadata };
+        delete metadataWithoutLock.generationLockId;
+
         await db
           .update(generatedAsset)
           .set({
             status: 'failed',
             errorMessage: errorMsg,
             updatedAt: new Date(),
+            metadata: {
+              ...metadataWithoutLock,
+              failedAt: new Date().toISOString(),
+              kieError: errorMsg,
+            },
           })
           .where(eq(generatedAsset.id, asset.id));
 
@@ -121,6 +167,8 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
         } catch (unfreezeError) {
           console.error('[Video Status] Failed to unfreeze credits:', unfreezeError);
         }
+
+        await releaseLockIfPresent(assetMetadata, { taskId, userId });
 
         return NextResponse.json({
           status: 'failed',
@@ -162,6 +210,8 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
         );
 
         const previewUrl = `/api/v1/media?key=${encodeURIComponent(r2Result.key)}`;
+        const metadataWithoutLock = { ...assetMetadata };
+        delete metadataWithoutLock.generationLockId;
 
         // Update database with completed status
         await db
@@ -172,7 +222,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
             publicUrl: r2Result.url,
             fileSize,
             metadata: {
-              ...toMetadata(asset.metadata),
+              ...metadataWithoutLock,
               previewUrl,
               completedAt: new Date().toISOString(),
             },
@@ -223,6 +273,8 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
           assetId: asset.id,
           r2Key: r2Result.key,
         });
+
+        await releaseLockIfPresent(assetMetadata, { taskId, userId });
 
         return NextResponse.json({
           status: 'completed',

@@ -3,6 +3,11 @@ import { getVideoModelInfo } from '@/config/credits.config';
 import { env } from '@/env';
 import { auth } from '@/lib/auth/auth';
 import { creditService } from '@/lib/credits';
+import {
+  acquireGenerationLock,
+  releaseGenerationLock,
+  updateGenerationLock,
+} from '@/lib/generation/generation-lock';
 import { getKieApiService } from '@/lib/kie/kie-api';
 import { updateQuotaUsage } from '@/lib/quota/quota-service';
 import { checkAndAwardReferralReward } from '@/lib/rewards/referral-reward';
@@ -16,6 +21,7 @@ export const dynamic = 'force-dynamic';
 export const fetchCache = 'force-no-store';
 // Allow long-running polling (large models can take a few minutes)
 export const maxDuration = 300;
+const VIDEO_GENERATION_LOCK_TTL_MS = 45 * 60 * 1000; // 45 minutes gives enough headroom
 
 // Map aspect ratio to KIE format
 function mapAspectRatio(ratio: string): 'square' | 'portrait' | 'landscape' {
@@ -42,6 +48,8 @@ export async function POST(request: NextRequest) {
   let taskId: string | undefined;
   let generationMode: 't2v' | 'i2v' = 't2v';
   let prompt = '';
+  let generationLockId: string | null = null;
+  let releaseLockOnExit = true;
 
   try {
     const isTestMode =
@@ -152,6 +160,44 @@ export async function POST(request: NextRequest) {
           { status: 429 }
         );
       }
+    }
+
+    if (!isTestMode) {
+      const lockResult = await acquireGenerationLock({
+        userId,
+        assetType: 'video',
+        metadata: {
+          model: normalizedModel,
+          generationMode,
+          duration: normalizedDuration,
+          quality: normalizedQuality,
+          resolution,
+        },
+        ttlMs: VIDEO_GENERATION_LOCK_TTL_MS,
+      });
+
+      if (!lockResult.acquired || !lockResult.lockId) {
+        const lock = lockResult.existingLock;
+        const waitTimeSeconds =
+          lock && lock.expiresAt
+            ? Math.max(1, Math.ceil((lock.expiresAt.getTime() - Date.now()) / 1000))
+            : undefined;
+
+        return NextResponse.json(
+          {
+            error:
+              'Another video generation request is already running. Please wait for it to finish before starting a new one.',
+            ...(lock?.taskId ? { currentTaskId: lock.taskId } : {}),
+            ...(lock?.requestId ? { currentRequestId: lock.requestId } : {}),
+            ...(lock?.createdAt ? { lockedAt: lock.createdAt.toISOString() } : {}),
+            ...(lock?.expiresAt ? { expectedReleaseAt: lock.expiresAt.toISOString() } : {}),
+            ...(waitTimeSeconds ? { waitTimeSeconds } : {}),
+          },
+          { status: 429 }
+        );
+      }
+
+      generationLockId = lockResult.lockId;
     }
 
     // CRITICAL OPTIMIZATION 2: Check credits and FREEZE immediately to prevent race conditions
@@ -339,6 +385,33 @@ export async function POST(request: NextRequest) {
         mode: generationMode,
         prompt: prompt.substring(0, 100),
       });
+
+      if (generationLockId) {
+        try {
+          await updateGenerationLock(generationLockId, {
+            taskId,
+            metadata: {
+              taskId,
+              model: normalizedModel,
+              generationMode,
+              duration: normalizedDuration,
+              quality: normalizedQuality,
+              resolution,
+              startedAt: new Date().toISOString(),
+            },
+            extendMs: VIDEO_GENERATION_LOCK_TTL_MS,
+          });
+        } catch (lockUpdateError) {
+          console.error('[Video Generation] Failed to update generation lock metadata:', {
+            lockId: generationLockId,
+            taskId,
+            error:
+              lockUpdateError instanceof Error
+                ? lockUpdateError.message
+                : String(lockUpdateError),
+          });
+        }
+      }
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
       console.error('[Video Generation] Failed to create task:', {
@@ -403,6 +476,7 @@ export async function POST(request: NextRequest) {
             generationMode,
             startedAt: new Date().toISOString(),
             creditsFrozen: true,
+            ...(generationLockId ? { generationLockId } : {}),
           },
           createdAt: new Date(),
           updatedAt: new Date(),
@@ -414,6 +488,8 @@ export async function POST(request: NextRequest) {
           assetId,
           creditsReserved: creditCost,
         });
+
+        releaseLockOnExit = false;
 
         return NextResponse.json({
           taskId,
@@ -1295,5 +1371,20 @@ export async function POST(request: NextRequest) {
       },
       { status: 500 }
     );
+  } finally {
+    if (generationLockId && releaseLockOnExit) {
+      try {
+        await releaseGenerationLock(generationLockId);
+      } catch (lockReleaseError) {
+        console.error('[Video Generation] Failed to release generation lock:', {
+          lockId: generationLockId,
+          error:
+            lockReleaseError instanceof Error
+              ? lockReleaseError.message
+              : String(lockReleaseError),
+        });
+      }
+      generationLockId = null;
+    }
   }
 }

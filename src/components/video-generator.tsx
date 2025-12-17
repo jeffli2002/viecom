@@ -429,10 +429,11 @@ export default function VideoGenerator() {
 
         // Poll for status until complete
         const pollInterval = 5000; // Poll every 5 seconds
-        const maxPolls = 300; // 25 minutes max (300 * 5s = 1500s)
+        let pollCount = 0;
 
-        for (let pollCount = 0; pollCount < maxPolls; pollCount++) {
+        while (true) {
           await new Promise((resolve) => setTimeout(resolve, pollInterval));
+          pollCount += 1;
 
           try {
             const statusResponse = await fetch(`/api/v1/video-status/${taskId}`);
@@ -462,22 +463,17 @@ export default function VideoGenerator() {
             }
 
             // Still processing - update progress
-            const progress = Math.min(30 + Math.floor((pollCount / maxPolls) * 60), 90);
-            const elapsed = Math.floor((pollCount * pollInterval) / 1000 / 60);
+            const elapsedMinutes = Math.max(1, Math.floor((pollCount * pollInterval) / 60000));
+            const progress = Math.min(30 + elapsedMinutes * 2, 95);
             advanceProgress(
               progress,
-              `${t('progressRendering')} (${elapsed}/${data.estimatedTime || '20'} min)`
+              `${t('progressRendering')} (${data.estimatedTime || '10-20 minutes'})`
             );
           } catch (pollError) {
             console.error('[Video Generator] Error polling status:', pollError);
             // Continue polling - transient errors shouldn't stop us
           }
         }
-
-        // If we got here, polling timed out
-        throw new Error(
-          'Video generation is taking longer than expected. Please check your Assets page in a few minutes.'
-        );
       }
 
       // OLD SYNC FLOW: Backend returns video directly (test mode or legacy)
