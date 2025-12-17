@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToastMessages } from '@/hooks/use-toast-messages';
 import { useRouter } from '@/i18n/navigation';
+import { routing } from '@/i18n/routing';
 import { cn } from '@/lib/utils';
 import {
   useAuthError,
@@ -42,11 +43,35 @@ export function SignupForm({ className, ...props }: React.ComponentProps<'div'>)
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
 
+  const locale = router.locale ?? routing.defaultLocale;
+
+  const withLocalePrefix = useCallback(
+    (url?: string | null) => {
+      if (!url || url === '' || url === '/') {
+        return `/${locale}`;
+      }
+      if (/^https?:\/\//.test(url)) {
+        return url;
+      }
+      if (!url.startsWith('/')) {
+        return `/${locale}/${url}`;
+      }
+      const hasLocalePrefix = routing.locales.some(
+        (loc) => url === `/${loc}` || url.startsWith(`/${loc}/`)
+      );
+      if (hasLocalePrefix) {
+        return url;
+      }
+      return `/${locale}${url}`;
+    },
+    [locale]
+  );
+
   // Get callback URL
   const getRedirectUrl = useCallback(() => {
     const callbackUrl = searchParams.get('callbackUrl');
-    return callbackUrl || '/';
-  }, [searchParams]);
+    return withLocalePrefix(callbackUrl);
+  }, [searchParams, withLocalePrefix]);
 
   useEffect(() => {
     if (isAuthenticated) {
