@@ -1,0 +1,1 @@
+ALTER TABLE "credit_pack_purchase" ADD COLUMN "test_mode" boolean DEFAULT false NOT NULL;

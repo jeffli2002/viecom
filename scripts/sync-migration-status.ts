@@ -105,10 +105,11 @@ async function syncMigrationStatus() {
 
     for (const entry of entries) {
       const tag = entry.tag as string;
-      const filePath = `./drizzle/${tag}.sql`;
+      const candidatePaths = [`./drizzle/${tag}.sql`, `./drizzle/archive/${tag}.sql`];
+      const filePath = candidatePaths.find((p) => fs.existsSync(p));
       try {
-        if (!fs.existsSync(filePath)) {
-          console.warn(`   ⚠️  Missing migration file for ${tag}, skipping`);
+        if (!filePath) {
+          console.warn(`   ⚠️  Missing migration file for ${tag} (checked drizzle/ and drizzle/archive/), skipping`);
           continue;
         }
 

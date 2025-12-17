@@ -23,7 +23,7 @@ async function applyMigration0004() {
 
     // Read the migration SQL
     const { readFileSync } = await import('node:fs');
-    const migrationSQL = readFileSync('./drizzle/0004_credit_pack_purchase_source.sql', 'utf-8');
+    const migrationSQL = readFileSync('./drizzle/archive/0004_credit_pack_purchase_source.sql', 'utf-8');
 
     // Execute the migration
     await pool.query(migrationSQL);

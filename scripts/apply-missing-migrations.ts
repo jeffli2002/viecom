@@ -39,7 +39,7 @@ async function applyMissingMigrations() {
     console.log('📋 Applying migration 0007 to create credit_pack_purchase table...\n');
 
     // Read and execute migration file
-    const migrationSql = readFileSync('./drizzle/0007_numerous_silver_centurion.sql', 'utf-8');
+    const migrationSql = readFileSync('./drizzle/archive/0007_numerous_silver_centurion.sql', 'utf-8');
 
     await pool.query(migrationSql);
 
