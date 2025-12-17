@@ -91,6 +91,9 @@ export async function POST(request: NextRequest) {
     const sourceImageInputs = incomingImages.slice(0, MAX_SOURCE_IMAGES);
 
     const generationMode = sourceImageInputs.length > 0 ? 'i2i' : 't2i';
+    const isNanoBananaPro = model === 'nano-banana-pro';
+    const isClassicNanoBanana = model === 'nano-banana';
+    const isNanoBanana = isClassicNanoBanana || isNanoBananaPro;
 
     if (!prompt || typeof prompt !== 'string') {
       return NextResponse.json(
@@ -231,10 +234,6 @@ export async function POST(request: NextRequest) {
     // Track usage for analytics only (not for quota enforcement)
     const dailyPeriod = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
     const monthlyPeriod = new Date().toISOString().substring(0, 7); // YYYY-MM
-
-    const isNanoBananaPro = model === 'nano-banana-pro';
-    const isClassicNanoBanana = model === 'nano-banana';
-    const isNanoBanana = isClassicNanoBanana || isNanoBananaPro;
     if (isNanoBanana) {
       // Use KIE API for nano-banana image generation
       let kieApiService: KieApiService | undefined;
