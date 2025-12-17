@@ -26,9 +26,8 @@ import {
   TrendingUp,
   Video,
 } from 'lucide-react';
-import { useLocale, useTranslations } from 'next-intl';
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { Link, useRouter } from '@/i18n/navigation';
+import { useTranslations } from 'next-intl';
 import { Suspense, useCallback, useEffect, useMemo, useState } from 'react';
 
 export const dynamic = 'force-dynamic';
@@ -108,7 +107,8 @@ const formatDateDisplay = (value?: string | null) => {
 
 function DashboardPageContent() {
   const t = useTranslations('dashboard');
-  const { isAuthenticated, user, isLoading: authLoading } = useAuthStore();
+  const { isAuthenticated, user, isInitialized: authInitialized, isLoading: authLoading } =
+    useAuthStore();
   const router = useRouter();
   const [creditBalance, setCreditBalance] = useState<CreditBalance | null>(null);
   const [quotaUsage, setQuotaUsage] = useState<QuotaUsage | null>(null);
@@ -183,15 +183,17 @@ function DashboardPageContent() {
   }, []);
 
   useEffect(() => {
-    if (!authLoading && !isAuthenticated) {
+    if (!authInitialized) {
+      return;
+    }
+
+    if (!isAuthenticated) {
       router.push('/login');
       return;
     }
 
-    if (isAuthenticated) {
-      fetchDashboardData();
-    }
-  }, [isAuthenticated, authLoading, router, fetchDashboardData]);
+    fetchDashboardData();
+  }, [authInitialized, isAuthenticated, router, fetchDashboardData]);
 
   const handleRefresh = async () => {
     setIsRefreshing(true);

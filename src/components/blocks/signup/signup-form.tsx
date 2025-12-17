@@ -7,6 +7,7 @@ import { Label } from '@/components/ui/label';
 import { useToastMessages } from '@/hooks/use-toast-messages';
 import { useRouter } from '@/i18n/navigation';
 import { routing } from '@/i18n/routing';
+import { resolveRedirectTarget } from '@/lib/routing/redirect-target';
 import { cn } from '@/lib/utils';
 import {
   useAuthError,
@@ -45,46 +46,23 @@ export function SignupForm({ className, ...props }: React.ComponentProps<'div'>)
 
   const locale = router.locale ?? routing.defaultLocale;
 
-  const withLocalePrefix = useCallback(
-    (url?: string | null) => {
-      if (!url || url === '' || url === '/') {
-        return `/${locale}`;
-      }
-      if (/^https?:\/\//.test(url)) {
-        return url;
-      }
-      if (!url.startsWith('/')) {
-        return `/${locale}/${url}`;
-      }
-      const hasLocalePrefix = routing.locales.some(
-        (loc) => url === `/${loc}` || url.startsWith(`/${loc}/`)
-      );
-      if (hasLocalePrefix) {
-        return url;
-      }
-      return `/${locale}${url}`;
-    },
-    [locale]
-  );
-
-  // Get callback URL
-  const getRedirectUrl = useCallback(() => {
+  const getRedirectTarget = useCallback(() => {
     const callbackUrl = searchParams.get('callbackUrl');
-    return withLocalePrefix(callbackUrl);
-  }, [searchParams, withLocalePrefix]);
+    return resolveRedirectTarget(locale, callbackUrl);
+  }, [locale, searchParams]);
 
   useEffect(() => {
     if (isAuthenticated) {
-      const redirectUrl = getRedirectUrl();
-      router.replace(redirectUrl);
+      const { relative } = getRedirectTarget();
+      router.replace(relative);
     }
-  }, [isAuthenticated, router, getRedirectUrl]);
+  }, [isAuthenticated, router, getRedirectTarget]);
 
   const handleSocialLogin = async (_provider: 'google') => {
     try {
       clearError();
-      const redirectUrl = getRedirectUrl();
-      await signInWithGoogle(redirectUrl);
+      const { localized } = getRedirectTarget();
+      await signInWithGoogle(localized);
     } catch (error) {
       console.error('Social login error:', error);
       toastMessages.error.socialLoginFailed();
@@ -110,8 +88,8 @@ export function SignupForm({ className, ...props }: React.ComponentProps<'div'>)
       setPassword('');
       setConfirmPassword('');
       // Redirect immediately after successful signup
-      const redirectUrl = getRedirectUrl();
-      router.replace(redirectUrl);
+      const { relative } = getRedirectTarget();
+      router.replace(relative);
     } else {
       if (result.error) {
         setError(result.error);

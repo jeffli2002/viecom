@@ -1,5 +1,6 @@
 import { useRouter } from '@/i18n/navigation';
 import { routing } from '@/i18n/routing';
+import { resolveRedirectTarget } from '@/lib/routing/redirect-target';
 import {
   useAuthError,
   useAuthLoading,
@@ -31,48 +32,25 @@ export function useLogin(): UseLoginReturn {
   // Get callback URL
   const locale = router.locale ?? routing.defaultLocale;
 
-  const withLocalePrefix = useCallback(
-    (url?: string | null) => {
-      if (!url || url === '' || url === '/') {
-        return `/${locale}`;
-      }
-      // Leave absolute URLs untouched
-      if (/^https?:\/\//.test(url)) {
-        return url;
-      }
-      if (!url.startsWith('/')) {
-        return `/${locale}/${url}`;
-      }
-      const hasLocalePrefix = routing.locales.some(
-        (loc) => url === `/${loc}` || url.startsWith(`/${loc}/`)
-      );
-      if (hasLocalePrefix) {
-        return url;
-      }
-      return `/${locale}${url}`;
-    },
-    [locale]
-  );
-
-  const getRedirectUrl = useCallback(() => {
+  const getRedirectTarget = useCallback(() => {
     const callbackUrl = searchParams.get('callbackUrl');
-    return withLocalePrefix(callbackUrl);
-  }, [searchParams, withLocalePrefix]);
+    return resolveRedirectTarget(locale, callbackUrl);
+  }, [locale, searchParams]);
 
   // Auto redirect after successful login
   useEffect(() => {
     if (isAuthenticated) {
-      const redirectUrl = getRedirectUrl();
-      router.push(redirectUrl);
+      const { relative } = getRedirectTarget();
+      router.push(relative);
     }
-  }, [isAuthenticated, router, getRedirectUrl]);
+  }, [isAuthenticated, router, getRedirectTarget]);
 
   // Handle social login
   const handleSocialLogin = async (_provider: 'google') => {
     try {
       clearError();
-      const redirectUrl = getRedirectUrl();
-      await signInWithGoogle(redirectUrl);
+      const { localized } = getRedirectTarget();
+      await signInWithGoogle(localized);
     } catch (error) {
       console.error('Social login error:', error);
     }
@@ -85,8 +63,8 @@ export function useLogin(): UseLoginReturn {
 
     const result = await emailLogin(formData.email, formData.password);
     if (result.success) {
-      const redirectUrl = getRedirectUrl();
-      router.push(redirectUrl);
+      const { relative } = getRedirectTarget();
+      router.push(relative);
     }
   };
 
@@ -104,6 +82,6 @@ export function useLogin(): UseLoginReturn {
     handleEmailLogin,
     handleSocialLogin,
     handleClearError,
-    getRedirectUrl,
+    getRedirectUrl: () => getRedirectTarget().localized,
   };
 }
