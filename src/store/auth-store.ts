@@ -5,6 +5,16 @@ import type { User } from 'better-auth/types';
 import { create } from 'zustand';
 import { createJSONStorage, persist, subscribeWithSelector } from 'zustand/middleware';
 
+type ExtendedUser = User & {
+  banned?: boolean | null;
+  banReason?: string | null;
+};
+
+const ACCOUNT_DISABLED_ERROR =
+  'Your account has been disabled. Please contact support if you believe this is a mistake.';
+
+const isUserBanned = (user: ExtendedUser | null | undefined): boolean => Boolean(user?.banned);
+
 // Helper function to initialize user credits with retry mechanism
 const initializeUserCredits = async (userId: string, retries = 3): Promise<void> => {
   for (let attempt = 1; attempt <= retries; attempt++) {
@@ -77,7 +87,7 @@ const appendOAuthCallbackParam = (url?: string, provider = 'google') => {
   return withHash;
 };
 
-const fetchSessionUser = async (): Promise<User | null> => {
+const fetchSessionUser = async (): Promise<ExtendedUser | null> => {
   try {
     const response = await fetch('/api/auth/get-session', {
       credentials: 'include',
@@ -86,7 +96,7 @@ const fetchSessionUser = async (): Promise<User | null> => {
       return null;
     }
     const data = await response.json();
-    const sessionUser = data?.session?.user ?? data?.user ?? null;
+    const sessionUser = (data?.session?.user ?? data?.user ?? null) as ExtendedUser | null;
     if (sessionUser?.id) {
       return sessionUser;
     }
@@ -145,7 +155,25 @@ interface AuthState {
 export const useAuthStore = create<AuthState>()(
   subscribeWithSelector(
     persist(
-      (set, get): AuthState => ({
+      (set, get): AuthState => {
+        const handleDisabledUser = async (options: { markInitialized?: boolean } = {}) => {
+          try {
+            await authClient.signOut();
+          } catch (error) {
+            console.warn('[Auth] Failed to terminate session for disabled user:', error);
+          }
+
+          set({
+            user: null,
+            isAuthenticated: false,
+            isLoading: false,
+            lastUpdated: Date.now(),
+            error: ACCOUNT_DISABLED_ERROR,
+            ...(options.markInitialized ? { isInitialized: true } : {}),
+          });
+        };
+
+        return {
         // Persistent state
         user: null,
         isAuthenticated: false,
@@ -202,7 +230,7 @@ export const useAuthStore = create<AuthState>()(
             });
 
             if (result.data) {
-              const user = result.data.user;
+              const user = result.data.user as ExtendedUser | null;
 
               // Check if user exists and has an id
               if (!user || !user.id) {
@@ -210,6 +238,14 @@ export const useAuthStore = create<AuthState>()(
                 return {
                   success: false,
                   error: 'Invalid user data',
+                };
+              }
+
+              if (isUserBanned(user)) {
+                await handleDisabledUser();
+                return {
+                  success: false,
+                  error: ACCOUNT_DISABLED_ERROR,
                 };
               }
 
@@ -366,13 +402,17 @@ export const useAuthStore = create<AuthState>()(
 
           try {
             const session = await authClient.getSession();
-            let user = session.data?.user;
+            let user = (session.data?.user ?? null) as ExtendedUser | null;
 
             if (!user || !user.id) {
               user = await fetchSessionUser();
             }
 
             if (user?.id) {
+              if (isUserBanned(user)) {
+                await handleDisabledUser();
+                return;
+              }
               set({
                 user,
                 isAuthenticated: true,
@@ -428,13 +468,17 @@ export const useAuthStore = create<AuthState>()(
 
           try {
             const session = await authClient.getSession();
-            let user = session.data?.user;
+            let user = (session.data?.user ?? null) as ExtendedUser | null;
 
             if (!user || !user.id) {
               user = await fetchSessionUser();
             }
 
             if (user?.id) {
+              if (isUserBanned(user)) {
+                await handleDisabledUser({ markInitialized: true });
+                return;
+              }
               const isNewUser = !previousUser || previousUser.id !== user.id;
 
               set({
@@ -494,7 +538,7 @@ export const useAuthStore = create<AuthState>()(
                 try {
                   const retrySession = await authClient.getSession();
                   if (retrySession.data) {
-                    const user = retrySession.data.user;
+                    const user = (retrySession.data.user ?? null) as ExtendedUser | null;
 
                     // Check if user exists and has an id
                     if (!user || !user.id) {
@@ -512,6 +556,11 @@ export const useAuthStore = create<AuthState>()(
                           isInitialized: true,
                         });
                       }
+                      return;
+                    }
+
+                    if (isUserBanned(user)) {
+                      await handleDisabledUser({ markInitialized: true });
                       return;
                     }
 
@@ -570,7 +619,7 @@ export const useAuthStore = create<AuthState>()(
             lastUpdated: 0,
           });
         },
-      }),
+      };
       {
         name: 'ecommerce-ai-auth',
         storage: createJSONStorage(() => localStorage),

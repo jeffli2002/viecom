@@ -8,7 +8,7 @@ import { updateQuotaUsage } from '@/lib/quota/quota-service';
 import { checkAndAwardReferralReward } from '@/lib/rewards/referral-reward';
 import { r2StorageService } from '@/lib/storage/r2';
 import { db } from '@/server/db';
-import { generatedAsset } from '@/server/db/schema';
+import { generatedAsset, user as userTable } from '@/server/db/schema';
 import { eq, sql } from 'drizzle-orm';
 import { type NextRequest, NextResponse } from 'next/server';
 
@@ -61,6 +61,26 @@ export async function POST(request: NextRequest) {
       }
 
       userId = session.user.id;
+
+      const [userStatus] = await db
+        .select({
+          banned: userTable.banned,
+          banReason: userTable.banReason,
+        })
+        .from(userTable)
+        .where(eq(userTable.id, userId))
+        .limit(1);
+
+      if (userStatus?.banned) {
+        return NextResponse.json(
+          {
+            error:
+              userStatus.banReason ||
+              'Your account has been disabled. Please contact support to regain access.',
+          },
+          { status: 403 }
+        );
+      }
     }
 
     const requestBody = await request.json();

@@ -19,6 +19,8 @@ interface User {
   email: string;
   name: string | null;
   createdAt: Date;
+  banned: boolean | null;
+  banReason: string | null;
   plan: string | null;
   subscriptionStatus: string | null;
   availableBalance: number;
@@ -202,15 +204,25 @@ export default function AdminUsersPage() {
                         </span>
                       </td>
                       <td className="py-3 px-4">
-                        <span
-                          className={`px-2 py-1 rounded text-xs font-medium ${
-                            user.subscriptionStatus === 'active'
-                              ? 'bg-green-100 text-green-700'
-                              : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300'
-                          }`}
-                        >
-                          {user.subscriptionStatus || 'inactive'}
-                        </span>
+                        <div className="flex flex-col gap-1">
+                          <span
+                            className={`px-2 py-1 rounded text-xs font-medium ${
+                              user.subscriptionStatus === 'active'
+                                ? 'bg-green-100 text-green-700'
+                                : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300'
+                            }`}
+                          >
+                            {user.subscriptionStatus || 'inactive'}
+                          </span>
+                          {user.banned ? (
+                            <span
+                              className="px-2 py-1 rounded text-xs font-medium bg-red-100 text-red-700"
+                              title={user.banReason || undefined}
+                            >
+                              Disabled
+                            </span>
+                          ) : null}
+                        </div>
                       </td>
                       <td className="py-3 px-4 text-sm font-medium">
                         {user.availableBalance?.toLocaleString() || 0}

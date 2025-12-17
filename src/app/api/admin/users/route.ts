@@ -33,6 +33,8 @@ export async function GET(request: Request) {
         email: user.email,
         name: user.name,
         createdAt: user.createdAt,
+        banned: user.banned,
+        banReason: user.banReason,
         plan: subscription.planType,
         subscriptionStatus: subscription.status,
         availableBalance: sql<number>`COALESCE(${userCredits.balance} - ${userCredits.frozenBalance}, 0)`,
