@@ -66,8 +66,15 @@ const appendOAuthCallbackParam = (url?: string, provider = 'google') => {
   const [pathWithQuery, hash] = target.split('#', 2);
   const separator = pathWithQuery.includes('?') ? '&' : '?';
   const updatedPath = `${pathWithQuery}${separator}authCallback=${provider}`;
+  const withHash = hash ? `${updatedPath}#${hash}` : updatedPath;
 
-  return hash ? `${updatedPath}#${hash}` : updatedPath;
+  // Better Auth expects absolute callback URLs in some deployments
+  if (typeof window !== 'undefined' && !withHash.startsWith('http')) {
+    const absolute = new URL(withHash, window.location.origin);
+    return absolute.toString();
+  }
+
+  return withHash;
 };
 
 interface AuthState {
