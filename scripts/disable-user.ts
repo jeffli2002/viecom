@@ -65,7 +65,7 @@ async function disableUser(email: string, reason?: string) {
       .where(eq(user.id, userRecord.id));
 
     console.log('✅ Account disabled successfully!');
-    console.log(`   Banned: true`);
+    console.log('   Banned: true');
     console.log(`   Reason: ${reason || 'Account disabled by admin'}`);
 
     // Step 3: Verify the update
@@ -116,4 +116,3 @@ disableUser(email, reason)
     console.error('Fatal error:', error);
     process.exit(1);
   });
-

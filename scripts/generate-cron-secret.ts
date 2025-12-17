@@ -16,5 +16,4 @@ console.log(`CRON_SECRET="${secret}"\n`);
 console.log('💡 This secret is used to secure cron job endpoints.');
 console.log('   Make sure to use the same value when calling cron endpoints:\n');
 console.log('   curl -X POST https://your-domain.com/api/cron/check-missing-signup-credits \\');
-console.log('     -H "Authorization: Bearer ' + secret + '"\n');
-
+console.log(`     -H "Authorization: Bearer ${secret}"\n`);

@@ -23,8 +23,8 @@ if (!databaseUrl) {
 import { creditTransactions, user, userCredits } from '@/server/db/schema';
 import { neon } from '@neondatabase/serverless';
 import { and, eq, like, or } from 'drizzle-orm';
-import { drizzle } from 'drizzle-orm/neon-http';
 import { desc } from 'drizzle-orm';
+import { drizzle } from 'drizzle-orm/neon-http';
 
 const sql = neon(databaseUrl);
 const db = drizzle(sql);
@@ -75,11 +75,11 @@ async function checkUserSignupCredits(emails: string[]) {
         .limit(1);
 
       if (!creditAccount) {
-        console.log(`⚠️  No credit account found for this user`);
+        console.log('⚠️  No credit account found for this user');
         continue;
       }
 
-      console.log(`\n💰 Credit Account:`);
+      console.log('\n💰 Credit Account:');
       console.log(`   Balance: ${creditAccount.balance}`);
       console.log(`   Total Earned: ${creditAccount.totalEarned}`);
       console.log(`   Total Spent: ${creditAccount.totalSpent}`);
@@ -102,7 +102,7 @@ async function checkUserSignupCredits(emails: string[]) {
             eq(creditTransactions.userId, userRecord.id),
             or(
               eq(creditTransactions.referenceId, signupReferenceId),
-              like(creditTransactions.referenceId, `signup_%`),
+              like(creditTransactions.referenceId, 'signup_%'),
               and(
                 eq(creditTransactions.source, 'bonus'),
                 like(creditTransactions.description, '%sign%')
@@ -112,9 +112,9 @@ async function checkUserSignupCredits(emails: string[]) {
         )
         .orderBy(creditTransactions.createdAt);
 
-      console.log(`\n📝 Signup Bonus Transactions:`);
+      console.log('\n📝 Signup Bonus Transactions:');
       if (signupTransactions.length === 0) {
-        console.log(`   ❌ No signup bonus transaction found!`);
+        console.log('   ❌ No signup bonus transaction found!');
         console.log(`   Expected referenceId: ${signupReferenceId}`);
       } else {
         signupTransactions.forEach((tx, index) => {
@@ -139,15 +139,12 @@ async function checkUserSignupCredits(emails: string[]) {
         })
         .from(creditTransactions)
         .where(
-          and(
-            eq(creditTransactions.userId, userRecord.id),
-            eq(creditTransactions.source, 'bonus')
-          )
+          and(eq(creditTransactions.userId, userRecord.id), eq(creditTransactions.source, 'bonus'))
         )
         .orderBy(creditTransactions.createdAt);
 
       if (allBonusTransactions.length > 0) {
-        console.log(`\n🎁 All Bonus Transactions:`);
+        console.log('\n🎁 All Bonus Transactions:');
         allBonusTransactions.forEach((tx, index) => {
           console.log(`   ${index + 1}. ${tx.description} - ${tx.amount} credits`);
           console.log(`      Reference: ${tx.referenceId}`);
@@ -172,7 +169,7 @@ async function checkUserSignupCredits(emails: string[]) {
         .limit(10);
 
       if (allTransactions.length > 0) {
-        console.log(`\n📊 Recent Transactions (first 10):`);
+        console.log('\n📊 Recent Transactions (first 10):');
         allTransactions.forEach((tx, index) => {
           console.log(`   ${index + 1}. [${tx.type}] ${tx.description} - ${tx.amount} credits`);
           console.log(`      Source: ${tx.source}, Ref: ${tx.referenceId || 'N/A'}`);
@@ -212,4 +209,3 @@ checkUserSignupCredits(emails)
     console.error('Fatal error:', error);
     process.exit(1);
   });
-

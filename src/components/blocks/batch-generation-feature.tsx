@@ -1,6 +1,6 @@
-import Image from 'next/image';
-import { getTranslations } from 'next-intl/server';
 import { FileSpreadsheet, Layers, Target } from 'lucide-react';
+import { getTranslations } from 'next-intl/server';
+import Image from 'next/image';
 
 export async function BatchGenerationFeature() {
   const t = await getTranslations('batchGenerationFeature');

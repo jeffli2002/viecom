@@ -1,8 +1,8 @@
 import { Link } from '@/i18n/navigation';
 import { getSessionWithAuthBypass } from '@/lib/auth/auth-utils';
-import Image from 'next/image';
-import { getTranslations } from 'next-intl/server';
 import { Play, Sparkles, Zap } from 'lucide-react';
+import { getTranslations } from 'next-intl/server';
+import Image from 'next/image';
 
 const HERO_BACKGROUND =
   'https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?auto=format&fit=crop&q=80&w=1600';

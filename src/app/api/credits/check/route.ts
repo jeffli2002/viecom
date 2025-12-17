@@ -32,7 +32,7 @@ export async function POST(request: NextRequest) {
         hasAccount: true,
         balance: creditAccount.balance,
       });
-    } catch (error) {
+    } catch (_error) {
       return NextResponse.json({
         success: true,
         hasAccount: false,
@@ -49,4 +49,3 @@ export async function POST(request: NextRequest) {
     );
   }
 }
-

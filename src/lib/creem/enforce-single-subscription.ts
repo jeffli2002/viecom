@@ -43,7 +43,7 @@ export async function enforceSingleCreemSubscription(
     return 0;
   }
 
-  const duplicates = sortedSubs.filter((sub) => sub.id !== keepSub!.id);
+  const duplicates = sortedSubs.filter((sub) => sub.id !== keepSub?.id);
   console.warn(
     `[Creem Enforcement] User ${userId} has ${activeSubs.length} active subscriptions. Keeping ${keepSub.subscriptionId || keepSub.id}, canceling ${duplicates.length}.`
   );

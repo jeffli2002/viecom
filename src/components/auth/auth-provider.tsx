@@ -19,14 +19,16 @@ function AuthProviderContent() {
   useEffect(() => {
     const code = searchParams.get('code');
     const state = searchParams.get('state');
+    const authCallback = searchParams.get('authCallback');
 
-    if (code || state) {
+    if (code || state || authCallback) {
       const timer = setTimeout(async () => {
         await refreshSession();
         if (window.history.replaceState) {
           const url = new URL(window.location.href);
           url.searchParams.delete('code');
           url.searchParams.delete('state');
+          url.searchParams.delete('authCallback');
           window.history.replaceState({}, '', url.toString());
         }
       }, 1000);

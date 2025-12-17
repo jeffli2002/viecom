@@ -88,9 +88,11 @@ async function fixMissingSignupCredits(emails: string[]) {
       if (existingAccount) {
         currentBalance = existingAccount.balance || 0;
         totalEarned = existingAccount.totalEarned || 0;
-        console.log(`   Existing account found - Balance: ${currentBalance}, Total Earned: ${totalEarned}`);
+        console.log(
+          `   Existing account found - Balance: ${currentBalance}, Total Earned: ${totalEarned}`
+        );
       } else {
-        console.log(`   Creating new credit account...`);
+        console.log('   Creating new credit account...');
       }
 
       const newBalance = currentBalance + signupCredits;
@@ -134,7 +136,7 @@ async function fixMissingSignupCredits(emails: string[]) {
         }),
       });
 
-      console.log(`✅ Fixed!`);
+      console.log('✅ Fixed!');
       console.log(`   Granted: ${signupCredits} credits`);
       console.log(`   New balance: ${newBalance}`);
       console.log(`   Transaction ID: ${transactionId}`);
@@ -172,4 +174,3 @@ fixMissingSignupCredits(emails)
     console.error('Fatal error:', error);
     process.exit(1);
   });
-

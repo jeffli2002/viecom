@@ -1,6 +1,5 @@
 'use client';
 
-import Image from 'next/image';
 import {
   Box,
   Camera,
@@ -13,6 +12,7 @@ import {
   Sparkles,
 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
+import Image from 'next/image';
 import { useState } from 'react';
 
 type ScenarioId =

@@ -229,7 +229,8 @@ export async function POST(request: NextRequest) {
       const kieImageSize = aspectRatioMap[aspect_ratio || '1:1'] || '1:1';
 
       const normalizedOutputFormat: 'png' | 'jpeg' | 'jpg' = (() => {
-        const requestedFormat = typeof output_format === 'string' ? output_format.toLowerCase() : '';
+        const requestedFormat =
+          typeof output_format === 'string' ? output_format.toLowerCase() : '';
         if (requestedFormat === 'png') {
           return 'png';
         }

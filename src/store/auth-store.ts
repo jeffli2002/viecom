@@ -24,12 +24,17 @@ const initializeUserCredits = async (userId: string, retries = 3): Promise<void>
           console.log(`✅ Successfully initialized credits (attempt ${attempt})`);
           return;
         }
-        console.log(`✅ Credits initialized (attempt ${attempt}), signup bonus: ${data.data?.signupCreditsGranted || 0}`);
+        console.log(
+          `✅ Credits initialized (attempt ${attempt}), signup bonus: ${data.data?.signupCreditsGranted || 0}`
+        );
         return;
       }
 
       const errorText = await response.text();
-      console.warn(`⚠️ Failed to initialize user credits (attempt ${attempt}/${retries}):`, errorText);
+      console.warn(
+        `⚠️ Failed to initialize user credits (attempt ${attempt}/${retries}):`,
+        errorText
+      );
 
       // If it's the last attempt, log the error but don't throw
       if (attempt === retries) {
@@ -48,6 +53,21 @@ const initializeUserCredits = async (userId: string, retries = 3): Promise<void>
       }
     }
   }
+};
+
+// Ensure OAuth callback URLs retain a flag we can detect after redirect
+const appendOAuthCallbackParam = (url?: string, provider = 'google') => {
+  const target = url && url.trim().length > 0 ? url : '/';
+
+  if (target.includes('authCallback=')) {
+    return target;
+  }
+
+  const [pathWithQuery, hash] = target.split('#', 2);
+  const separator = pathWithQuery.includes('?') ? '&' : '?';
+  const updatedPath = `${pathWithQuery}${separator}authCallback=${provider}`;
+
+  return hash ? `${updatedPath}#${hash}` : updatedPath;
 };
 
 interface AuthState {
@@ -157,7 +177,7 @@ export const useAuthStore = create<AuthState>()(
 
             if (result.data) {
               const user = result.data.user;
-              
+
               // Check if user exists and has an id
               if (!user || !user.id) {
                 set({ isLoading: false, error: 'Invalid user data' });
@@ -208,7 +228,7 @@ export const useAuthStore = create<AuthState>()(
 
             if (result.data) {
               const user = result.data.user;
-              
+
               // Check if user exists and has an id
               if (!user || !user.id) {
                 set({ isLoading: false, error: 'Invalid user data' });
@@ -277,9 +297,10 @@ export const useAuthStore = create<AuthState>()(
           set({ error: null });
 
           try {
+            const callbackWithFlag = appendOAuthCallbackParam(callbackUrl, 'google');
             await authClient.signIn.social({
               provider: 'google',
-              callbackURL: callbackUrl || '/',
+              callbackURL: callbackWithFlag,
             });
           } catch (error) {
             console.error('Google sign in error:', error);
@@ -322,7 +343,7 @@ export const useAuthStore = create<AuthState>()(
 
             if (session.data) {
               const user = session.data.user;
-              
+
               // Check if user exists and has an id
               if (!user || !user.id) {
                 set({
@@ -390,7 +411,7 @@ export const useAuthStore = create<AuthState>()(
             const session = await authClient.getSession();
             if (session.data) {
               const user = session.data.user;
-              
+
               // Check if user exists and has an id
               if (!user || !user.id) {
                 set({
@@ -429,7 +450,7 @@ export const useAuthStore = create<AuthState>()(
                     body: JSON.stringify({ userId: user.id }),
                     credentials: 'include',
                   });
-                  
+
                   if (checkResponse.ok) {
                     const checkData = await checkResponse.json();
                     if (!checkData.hasAccount) {
@@ -468,7 +489,7 @@ export const useAuthStore = create<AuthState>()(
                   const retrySession = await authClient.getSession();
                   if (retrySession.data) {
                     const user = retrySession.data.user;
-                    
+
                     // Check if user exists and has an id
                     if (!user || !user.id) {
                       if (!get().isCacheValid()) {

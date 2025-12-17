@@ -295,11 +295,7 @@ export function Header() {
           ) : (
             <>
               <LanguageSwitcher />
-              <Button
-                size="sm"
-                asChild
-                className="bg-teal-500 hover:bg-teal-600 text-white"
-              >
+              <Button size="sm" asChild className="bg-teal-500 hover:bg-teal-600 text-white">
                 <Link href="/login">{t('signup')}</Link>
               </Button>
             </>

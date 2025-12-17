@@ -24,6 +24,8 @@ export default async function BatchImageGenerationPage() {
     })),
   };
 
+  const faqJson = JSON.stringify(faqSchema);
+
   return (
     <div className="container-base py-12">
       <div className="mb-8 text-center">
@@ -46,10 +48,9 @@ export default async function BatchImageGenerationPage() {
         </div>
       </div>
 
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
-      />
+      <script type="application/ld+json" suppressHydrationWarning>
+        {faqJson}
+      </script>
     </div>
   );
 }

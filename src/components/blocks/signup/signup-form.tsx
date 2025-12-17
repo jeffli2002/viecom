@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToastMessages } from '@/hooks/use-toast-messages';
+import { useRouter } from '@/i18n/navigation';
 import { cn } from '@/lib/utils';
 import {
   useAuthError,
@@ -15,9 +16,8 @@ import {
   useSetError,
   useSignInWithGoogle,
 } from '@/store/auth-store';
-import { useRouter } from '@/i18n/navigation';
-import { useSearchParams } from 'next/navigation';
 import { useTranslations } from 'next-intl';
+import { useSearchParams } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
 
 const MIN_PASSWORD_LENGTH = 8;
@@ -156,9 +156,9 @@ export function SignupForm({ className, ...props }: React.ComponentProps<'div'>)
               </div>
 
               <div className="flex items-center gap-4 text-sm">
-                <div className="flex-1 border-t border-border"></div>
+                <div className="flex-1 border-t border-border" />
                 <span className="text-muted-foreground">Or continue with</span>
-                <div className="flex-1 border-t border-border"></div>
+                <div className="flex-1 border-t border-border" />
               </div>
 
               {/* Email password registration */}
