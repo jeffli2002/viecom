@@ -133,6 +133,33 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: `Invalid model: ${model}` }, { status: 400 });
     }
 
+    const unfreezeCreditsIfNeeded = async (reason: string, referenceId?: string) => {
+      if (!creditsFrozen || isTestMode) {
+        return;
+      }
+
+      const operationRef = referenceId ?? `image_refund_${randomUUID()}`;
+
+      try {
+        await creditService.unfreezeCredits(userId, creditCost, reason, operationRef);
+        creditsFrozen = false;
+        console.log('[Image Generation] Credits unfrozen:', {
+          userId,
+          credits: creditCost,
+          reason,
+          reference: operationRef,
+        });
+      } catch (unfreezeError) {
+        console.error('[Image Generation] Failed to unfreeze credits:', {
+          userId,
+          credits: creditCost,
+          reason,
+          reference: operationRef,
+          error: unfreezeError instanceof Error ? unfreezeError.message : String(unfreezeError),
+        });
+      }
+    };
+
     // CRITICAL OPTIMIZATION 1: Rate limiting - prevent too frequent requests (3-minute cooldown)
     if (!isTestMode) {
       const { checkGenerationRateLimit } = await import('@/lib/rate-limit/generation-rate-limit');
@@ -642,18 +669,10 @@ export async function POST(request: NextRequest) {
               }
 
               // Unfreeze credits first
-              if (creditsFrozen) {
-                try {
-                  await creditService.unfreezeCredits(
-                    userId,
-                    creditCost,
-                    `Image generation completed (${model})`,
-                    `image_unfreeze_${taskId}`
-                  );
-                } catch (unfreezeError) {
-                  console.error('[Image Generation] Failed to unfreeze credits:', unfreezeError);
-                }
-              }
+              await unfreezeCreditsIfNeeded(
+                `Image generation completed (${model})`,
+                `image_unfreeze_${taskId}`
+              );
 
               // Then charge credits
               await creditService.spendCredits({
@@ -798,6 +817,11 @@ export async function POST(request: NextRequest) {
             fullResponse: JSON.stringify(statusResponse.data, null, 2),
           });
 
+          await unfreezeCreditsIfNeeded(
+            'Image generation failed - credits refunded',
+            `image_refund_${taskId}`
+          );
+
           return NextResponse.json({ error: errorMsg }, { status: 500 });
         }
 
@@ -818,6 +842,12 @@ export async function POST(request: NextRequest) {
               `[Image Generation] Task ${taskId} timed out after ${maxAttempts} attempts`
             );
           }
+
+          await unfreezeCreditsIfNeeded(
+            'Image generation timed out - credits refunded',
+            `image_refund_${taskId}`
+          );
+
           return NextResponse.json(
             {
               error:
