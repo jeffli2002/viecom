@@ -7,14 +7,11 @@ import { Suspense, useEffect } from 'react';
 function AuthProviderContent() {
   const initialize = useAuthStore((state) => state.initialize);
   const refreshSession = useAuthStore((state) => state.refreshSession);
-  const isInitialized = useAuthStore((state) => state.isInitialized);
   const searchParams = useSearchParams();
 
   useEffect(() => {
-    if (!isInitialized) {
-      initialize();
-    }
-  }, [initialize, isInitialized]);
+    initialize(true);
+  }, [initialize]);
 
   useEffect(() => {
     const code = searchParams.get('code');

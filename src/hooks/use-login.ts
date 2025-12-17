@@ -1,4 +1,5 @@
 import { useRouter } from '@/i18n/navigation';
+import { routing } from '@/i18n/routing';
 import {
   useAuthError,
   useAuthLoading,
@@ -28,10 +29,35 @@ export function useLogin(): UseLoginReturn {
   });
 
   // Get callback URL
+  const locale = router.locale ?? routing.defaultLocale;
+
+  const withLocalePrefix = useCallback(
+    (url?: string | null) => {
+      if (!url || url === '' || url === '/') {
+        return `/${locale}`;
+      }
+      // Leave absolute URLs untouched
+      if (/^https?:\/\//.test(url)) {
+        return url;
+      }
+      if (!url.startsWith('/')) {
+        return `/${locale}/${url}`;
+      }
+      const hasLocalePrefix = routing.locales.some(
+        (loc) => url === `/${loc}` || url.startsWith(`/${loc}/`)
+      );
+      if (hasLocalePrefix) {
+        return url;
+      }
+      return `/${locale}${url}`;
+    },
+    [locale]
+  );
+
   const getRedirectUrl = useCallback(() => {
     const callbackUrl = searchParams.get('callbackUrl');
-    return callbackUrl || '/';
-  }, [searchParams]);
+    return withLocalePrefix(callbackUrl);
+  }, [searchParams, withLocalePrefix]);
 
   // Auto redirect after successful login
   useEffect(() => {

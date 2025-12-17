@@ -106,7 +106,7 @@ interface AuthState {
     error?: string;
   }>;
 
-  initialize: () => Promise<void>;
+  initialize: (force?: boolean) => Promise<void>;
   refreshSession: () => Promise<void>;
   clearAuth: () => void;
 
@@ -380,8 +380,8 @@ export const useAuthStore = create<AuthState>()(
           }
         },
 
-        initialize: async () => {
-          if (get().isInitialized) return;
+        initialize: async (force = false) => {
+          if (get().isInitialized && !force) return;
 
           set({ isLoading: true });
           const previousUser = get().user;
