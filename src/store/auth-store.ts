@@ -619,7 +619,7 @@ export const useAuthStore = create<AuthState>()(
             lastUpdated: 0,
           });
         },
-      };
+      },
       {
         name: 'ecommerce-ai-auth',
         storage: createJSONStorage(() => localStorage),
