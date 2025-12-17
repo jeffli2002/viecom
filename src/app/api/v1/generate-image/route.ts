@@ -3,6 +3,11 @@ import { creditsConfig, getModelCost } from '@/config/credits.config';
 import { MAX_SOURCE_IMAGES } from '@/config/image-upload.config';
 import { auth } from '@/lib/auth/auth';
 import { creditService } from '@/lib/credits';
+import {
+  acquireGenerationLock,
+  releaseGenerationLock,
+  updateGenerationLock,
+} from '@/lib/generation/generation-lock';
 import { getQuotaUsageByService, updateQuotaUsage } from '@/lib/quota/quota-service';
 import { checkAndAwardReferralReward } from '@/lib/rewards/referral-reward';
 import { db } from '@/server/db';
@@ -28,6 +33,7 @@ const MODEL_ENDPOINTS: Record<string, string> = {
 };
 
 export async function POST(request: NextRequest) {
+  let generationLockId: string | null = null;
   try {
     const isTestMode =
       process.env.NODE_ENV === 'test' ||
@@ -123,6 +129,41 @@ export async function POST(request: NextRequest) {
           { status: 429 }
         );
       }
+    }
+
+    if (isNanoBanana) {
+      const lockResult = await acquireGenerationLock({
+        userId,
+        assetType: 'image',
+        requestId,
+        metadata: {
+          model,
+          generationMode,
+        },
+      });
+
+      if (!lockResult.acquired || !lockResult.lockId) {
+        const lock = lockResult.existingLock;
+        const waitTimeSeconds =
+          lock && lock.expiresAt
+            ? Math.max(1, Math.ceil((lock.expiresAt.getTime() - Date.now()) / 1000))
+            : undefined;
+
+        return NextResponse.json(
+          {
+            error:
+              'An image generation request is already running. Please wait for it to finish before starting another to avoid duplicate charges.',
+            ...(lock?.taskId ? { currentTaskId: lock.taskId } : {}),
+            ...(lock?.requestId ? { currentRequestId: lock.requestId } : {}),
+            ...(lock?.createdAt ? { lockedAt: lock.createdAt.toISOString() } : {}),
+            ...(lock?.expiresAt ? { expectedReleaseAt: lock.expiresAt.toISOString() } : {}),
+            ...(waitTimeSeconds ? { waitTimeSeconds } : {}),
+          },
+          { status: 429 }
+        );
+      }
+
+      generationLockId = lockResult.lockId;
     }
 
     // CRITICAL OPTIMIZATION 2: Check credits and FREEZE immediately to prevent race conditions
@@ -441,11 +482,34 @@ export async function POST(request: NextRequest) {
       }
 
       const taskId = taskResponse.data.taskId;
+      if (generationLockId) {
+        try {
+          await updateGenerationLock(generationLockId, {
+            taskId,
+            metadata: {
+              model,
+              generationMode,
+              creditCost,
+            },
+            extendMs: 10 * 60 * 1000, // extend lock to cover full polling window
+          });
+        } catch (lockUpdateError) {
+          console.error('[Image Generation] Failed to update generation lock metadata:', {
+            lockId: generationLockId,
+            taskId,
+            error:
+              lockUpdateError instanceof Error
+                ? lockUpdateError.message
+                : String(lockUpdateError),
+          });
+        }
+      }
 
       // Poll for task completion
       let state: string | undefined = undefined;
       let attempts = 0;
       const maxAttempts = 60; // Wait up to 5 minutes
+      let lastStatusError: string | undefined;
 
       while (
         state !== 'success' &&
@@ -460,6 +524,7 @@ export async function POST(request: NextRequest) {
           statusResponse = await kieApiService.getTaskStatus(taskId);
           // Use 'state' field (KIE API format) or fallback to 'status'
           state = statusResponse.data.state || statusResponse.data.status;
+          lastStatusError = undefined;
           console.log(`Task ${taskId} status: ${state} (attempt ${attempts + 1}/${maxAttempts})`);
         } catch (error) {
           console.error(`[Image Generation] KIE API getTaskStatus error for task ${taskId}:`, {
@@ -467,13 +532,9 @@ export async function POST(request: NextRequest) {
             error: error instanceof Error ? error.message : String(error),
             stack: error instanceof Error ? error.stack : undefined,
           });
-          return NextResponse.json(
-            {
-              error: 'Failed to check task status',
-              details: error instanceof Error ? error.message : String(error),
-            },
-            { status: 500 }
-          );
+          lastStatusError = error instanceof Error ? error.message : String(error);
+          attempts++;
+          continue; // Retry until we either succeed, fail, or hit the max attempts
         }
 
         if (state === 'success' || state === 'completed') {
@@ -727,15 +788,23 @@ export async function POST(request: NextRequest) {
       if (state !== 'success' && state !== 'completed') {
         // If we've exhausted all attempts, return timeout error
         if (attempts >= maxAttempts) {
-          console.error(
-            `[Image Generation] Task ${taskId} timed out after ${maxAttempts} attempts`
-          );
+          if (lastStatusError) {
+            console.error(
+              `[Image Generation] Task ${taskId} timed out after ${maxAttempts} attempts`,
+              { lastStatusError }
+            );
+          } else {
+            console.error(
+              `[Image Generation] Task ${taskId} timed out after ${maxAttempts} attempts`
+            );
+          }
           return NextResponse.json(
             {
               error:
                 'Image generation timeout. The task is still processing. Please try again later or contact support.',
               taskId,
               status: state || 'processing',
+              ...(lastStatusError ? { lastStatusError } : {}),
             },
             { status: 504 } // Gateway Timeout
           );
@@ -809,5 +878,18 @@ export async function POST(request: NextRequest) {
       },
       { status: 500 }
     );
+  } finally {
+    if (generationLockId) {
+      try {
+        await releaseGenerationLock(generationLockId);
+      } catch (lockReleaseError) {
+        console.error('[Image Generation] Failed to release generation lock:', {
+          lockId: generationLockId,
+          error:
+            lockReleaseError instanceof Error ? lockReleaseError.message : String(lockReleaseError),
+        });
+      }
+      generationLockId = null;
+    }
   }
 }

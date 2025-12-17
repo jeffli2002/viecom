@@ -1,4 +1,13 @@
-import { boolean, decimal, integer, jsonb, pgTable, text, timestamp } from 'drizzle-orm/pg-core';
+import {
+  boolean,
+  decimal,
+  integer,
+  jsonb,
+  pgTable,
+  text,
+  timestamp,
+  uniqueIndex,
+} from 'drizzle-orm/pg-core';
 
 // User and Auth tables (from Better Auth)
 export const user = pgTable('user', {
@@ -332,6 +341,34 @@ export const batchGenerationJob = pgTable('batch_generation_job', {
     .notNull(),
   completedAt: timestamp('completed_at'),
 });
+
+export const generationLock = pgTable(
+  'generation_lock',
+  {
+    id: text('id').primaryKey(),
+    userId: text('user_id')
+      .notNull()
+      .references(() => user.id, { onDelete: 'cascade' }),
+    assetType: text('asset_type', {
+      enum: ['image', 'video'],
+    }).notNull(),
+    requestId: text('request_id'),
+    taskId: text('task_id'),
+    metadata: jsonb('metadata').$type<Record<string, unknown> | null>(),
+    expiresAt: timestamp('expires_at')
+      .$defaultFn(() => new Date())
+      .notNull(),
+    createdAt: timestamp('created_at')
+      .$defaultFn(() => new Date())
+      .notNull(),
+    updatedAt: timestamp('updated_at')
+      .$defaultFn(() => new Date())
+      .notNull(),
+  },
+  (table) => ({
+    userAssetUnique: uniqueIndex('generation_lock_user_asset_idx').on(table.userId, table.assetType),
+  })
+);
 
 // Generated Assets (Images and Videos)
 export const generatedAsset = pgTable('generated_asset', {

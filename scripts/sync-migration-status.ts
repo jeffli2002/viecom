@@ -100,56 +100,38 @@ async function syncMigrationStatus() {
     // Get migration file hashes by reading the SQL files
     const { createHash } = await import('node:crypto');
 
-    const migrationFiles = [
-      '0000_little_puff_adder.sql',
-      '0001_add_reward_tables.sql',
-      '0002_glamorous_the_watchers.sql',
-      '0003_lethal_menace.sql',
-      '0004_credit_pack_purchase_source.sql',
-    ];
-
-    // Insert migration records for applied migrations
+    const entries = migrations.filter((entry) => typeof entry.tag === 'string');
     let inserted = 0;
-    for (const fileName of migrationFiles) {
+
+    for (const entry of entries) {
+      const tag = entry.tag as string;
+      const filePath = `./drizzle/${tag}.sql`;
       try {
-        const filePath = `./drizzle/${fileName}`;
+        if (!fs.existsSync(filePath)) {
+          console.warn(`   ⚠️  Missing migration file for ${tag}, skipping`);
+          continue;
+        }
+
         const content = fs.readFileSync(filePath, 'utf-8');
         const hash = createHash('sha256').update(content).digest('hex').substring(0, 16);
 
-        // Check if already recorded
         const existing = await pool.query('SELECT id FROM __drizzle_migrations WHERE hash = $1', [
           hash,
         ]);
 
-        if (existing.rows.length === 0) {
-          // Determine if this migration should be marked as applied
-          let shouldMarkAsApplied = false;
-
-          if (fileName.includes('0000') && hasAccountTable && hasUserTable) {
-            shouldMarkAsApplied = true;
-          } else if (fileName.includes('0001') && hasRewardTables) {
-            shouldMarkAsApplied = true;
-          } else if (fileName.includes('0002')) {
-            // Migration 0002 - assume applied if we got this far
-            shouldMarkAsApplied = true;
-          } else if (fileName.includes('0003') && hasScheduledColumns) {
-            shouldMarkAsApplied = true;
-          } else if (fileName.includes('0004') && hasPurchaseSource) {
-            shouldMarkAsApplied = true;
-          }
-
-          if (shouldMarkAsApplied) {
-            await pool.query(
-              'INSERT INTO __drizzle_migrations (hash, created_at) VALUES ($1, $2)',
-              [hash, Date.now()]
-            );
-            console.log(`   ✅ Marked ${fileName} as applied`);
-            inserted++;
-          }
+        if (existing.rows.length > 0) {
+          continue;
         }
+
+        await pool.query('INSERT INTO __drizzle_migrations (hash, created_at) VALUES ($1, $2)', [
+          hash,
+          Date.now(),
+        ]);
+        console.log(`   ✅ Marked ${tag} as applied`);
+        inserted++;
       } catch (error) {
         console.warn(
-          `   ⚠️  Could not process ${fileName}:`,
+          `   ⚠️  Could not process ${tag}:`,
           error instanceof Error ? error.message : String(error)
         );
       }
