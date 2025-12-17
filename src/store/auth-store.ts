@@ -174,51 +174,51 @@ export const useAuthStore = create<AuthState>()(
         };
 
         return {
-        // Persistent state
-        user: null,
-        isAuthenticated: false,
-        lastUpdated: 0,
+          // Persistent state
+          user: null,
+          isAuthenticated: false,
+          lastUpdated: 0,
 
-        // Temporary state
-        isLoading: false,
-        error: null,
-        isInitialized: false,
-        cacheExpiry: 10 * 60 * 1000, // 10 minutes
+          // Temporary state
+          isLoading: false,
+          error: null,
+          isInitialized: false,
+          cacheExpiry: 10 * 60 * 1000, // 10 minutes
 
-        // Cache methods
-        isCacheValid: () => {
-          const { lastUpdated, cacheExpiry } = get();
-          return lastUpdated > 0 && Date.now() - lastUpdated < cacheExpiry;
-        },
+          // Cache methods
+          isCacheValid: () => {
+            const { lastUpdated, cacheExpiry } = get();
+            return lastUpdated > 0 && Date.now() - lastUpdated < cacheExpiry;
+          },
 
-        invalidateCache: () => set({ lastUpdated: 0 }),
+          invalidateCache: () => set({ lastUpdated: 0 }),
 
-        setCacheExpiry: (expiry: number) => set({ cacheExpiry: expiry }),
+          setCacheExpiry: (expiry: number) => set({ cacheExpiry: expiry }),
 
-        // Actions
-        setUser: (user) => {
-          set({
-            user,
-            isAuthenticated: !!user,
-            lastUpdated: Date.now(),
-          });
-        },
+          // Actions
+          setUser: (user) => {
+            set({
+              user,
+              isAuthenticated: !!user,
+              lastUpdated: Date.now(),
+            });
+          },
 
-        setLoading: (loading) => {
-          set({ isLoading: loading });
-        },
+          setLoading: (loading) => {
+            set({ isLoading: loading });
+          },
 
-        setInitialized: (initialized) => {
-          set({ isInitialized: initialized });
-        },
+          setInitialized: (initialized) => {
+            set({ isInitialized: initialized });
+          },
 
-        setError: (error) => {
-          set({ error });
-        },
+          setError: (error) => {
+            set({ error });
+          },
 
-        clearError: () => {
-          set({ error: null });
-        },
+          clearError: () => {
+            set({ error: null });
+          },
         signIn: async (email, password) => {
           set({ isLoading: true, error: null });
           const previousUser = get().user;
