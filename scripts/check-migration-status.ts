@@ -21,23 +21,23 @@ async function checkMigrationStatus() {
   try {
     console.log('🔍 Checking migration status...\n');
 
-    // Check if __drizzle_migrations table exists
+    // Check if _drizzle_migrations table exists
     const tableCheck = await pool.query(`
       SELECT EXISTS (
         SELECT FROM information_schema.tables 
         WHERE table_schema = 'public' 
-        AND table_name = '__drizzle_migrations'
+        AND table_name = '_drizzle_migrations'
       );
     `);
 
     if (!tableCheck.rows[0]?.exists) {
-      console.log('⚠️  __drizzle_migrations table does not exist');
+      console.log('⚠️  _drizzle_migrations table does not exist');
       console.log('   This means no migrations have been tracked yet.\n');
     } else {
       // Get applied migrations
       const migrations = await pool.query(`
         SELECT id, hash, created_at 
-        FROM __drizzle_migrations 
+        FROM _drizzle_migrations 
         ORDER BY created_at;
       `);
 
