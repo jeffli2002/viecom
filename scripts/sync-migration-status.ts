@@ -21,15 +21,15 @@ async function syncMigrationStatus() {
   try {
     console.log('🔄 Syncing migration status...\n');
 
-    // Create _drizzle_migrations table if it doesn't exist
+    // Create __drizzle_migrations table if it doesn't exist
     await pool.query(`
-      CREATE TABLE IF NOT EXISTS _drizzle_migrations (
+      CREATE TABLE IF NOT EXISTS __drizzle_migrations (
         id SERIAL PRIMARY KEY,
         hash text NOT NULL,
         created_at bigint
       );
     `);
-    console.log('✅ Created _drizzle_migrations table\n');
+    console.log('✅ Created __drizzle_migrations table\n');
 
     // Get migration hashes from journal
     const fs = await import('node:fs');
@@ -115,7 +115,7 @@ async function syncMigrationStatus() {
         const content = fs.readFileSync(filePath, 'utf-8');
         const hash = createHash('sha256').update(content).digest('hex').substring(0, 16);
 
-        const existing = await pool.query('SELECT id FROM _drizzle_migrations WHERE hash = $1', [
+        const existing = await pool.query('SELECT id FROM __drizzle_migrations WHERE hash = $1', [
           hash,
         ]);
 
@@ -123,7 +123,7 @@ async function syncMigrationStatus() {
           continue;
         }
 
-        await pool.query('INSERT INTO _drizzle_migrations (hash, created_at) VALUES ($1, $2)', [
+        await pool.query('INSERT INTO __drizzle_migrations (hash, created_at) VALUES ($1, $2)', [
           hash,
           Date.now(),
         ]);
