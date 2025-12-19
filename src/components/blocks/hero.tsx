@@ -1,40 +1,6 @@
 import { Link } from '@/i18n/navigation';
 import { Play, Sparkles, Zap } from 'lucide-react';
 import { getTranslations } from 'next-intl/server';
-import Image from 'next/image';
-
-const PLATFORMS = [
-  {
-    name: 'Amazon',
-    logo: 'https://upload.wikimedia.org/wikipedia/commons/a/a9/Amazon_logo.svg',
-    width: 96,
-    height: 32,
-  },
-  {
-    name: 'TikTok',
-    logo: 'https://upload.wikimedia.org/wikipedia/en/a/a9/TikTok_logo.svg',
-    width: 96,
-    height: 32,
-  },
-  {
-    name: 'Shopee',
-    logo: 'https://upload.wikimedia.org/wikipedia/commons/f/fe/Shopee.svg',
-    width: 96,
-    height: 32,
-  },
-  {
-    name: 'eBay',
-    logo: 'https://upload.wikimedia.org/wikipedia/commons/1/1b/EBay_logo.svg',
-    width: 80,
-    height: 32,
-  },
-  {
-    name: 'Etsy',
-    logo: 'https://upload.wikimedia.org/wikipedia/commons/8/89/Etsy_logo.svg',
-    width: 64,
-    height: 32,
-  },
-];
 
 export async function Hero() {
   const t = await getTranslations('hero');
@@ -76,18 +42,14 @@ export async function Hero() {
           <p className="text-slate-500 text-sm font-medium mb-6 uppercase tracking-widest">
             {t('trustedBy')}
           </p>
-          <div className="flex flex-wrap justify-center gap-8 md:gap-16 items-center opacity-60">
-            {PLATFORMS.map((platform) => (
-              <div key={platform.name} className="group relative">
-                <Image
-                  src={platform.logo}
-                  alt={platform.name}
-                  width={platform.width}
-                  height={platform.height}
-                  className="h-8 md:h-10 w-auto object-contain dark:brightness-0 dark:invert transition-all duration-300 opacity-60 group-hover:opacity-100 filter grayscale hover:grayscale-0"
-                  loading="lazy"
-                />
-              </div>
+          <div className="flex flex-wrap justify-center gap-3 md:gap-4 items-center opacity-80 text-xs font-semibold uppercase tracking-wider">
+            {['Amazon', 'TikTok', 'Shopee', 'eBay', 'Etsy'].map((name) => (
+              <span
+                key={name}
+                className="px-3 py-2 rounded-full bg-white/70 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-200 shadow-sm"
+              >
+                {name}
+              </span>
             ))}
           </div>
         </div>
