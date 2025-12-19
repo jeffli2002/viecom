@@ -56,6 +56,7 @@ const config: NextConfig = {
     serverActions: {
       bodySizeLimit: '50mb',
     },
+    optimizeCss: true,
   },
   serverExternalPackages: ['@aws-sdk/client-s3'],
   // Note: standalone output requires admin privileges on Windows for symlinks

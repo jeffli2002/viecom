@@ -9,7 +9,10 @@ interface MainLayoutProps {
 export async function MainLayout({ children }: MainLayoutProps) {
   return (
     <div className="flex min-h-screen flex-col">
-      <AuthProvider />
+      <div className="sr-only" aria-hidden>
+        {/* prevent layout shift */}
+        <AuthProvider />
+      </div>
       <Header />
       <main className="flex-1">{children}</main>
       <Footer />

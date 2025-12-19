@@ -1,4 +1,5 @@
 import { HeaderAuthControls } from '@/components/layout/header-auth-controls';
+import { Deferred } from '@/components/performance/deferred';
 import { LanguageSwitcherNative } from '@/components/widget/language-switcher-native';
 import { ThemeToggle } from '@/components/widget/theme-toggle';
 import { Link } from '@/i18n/navigation';
@@ -42,9 +43,15 @@ export async function Header() {
         </nav>
 
         <div className="hidden md:flex items-center gap-3">
-          <ThemeToggle />
-          <LanguageSwitcherNative />
-          <HeaderAuthControls />
+          <Deferred>
+            <ThemeToggle />
+          </Deferred>
+          <Deferred timeoutMs={1400}>
+            <LanguageSwitcherNative />
+          </Deferred>
+          <Deferred timeoutMs={1600}>
+            <HeaderAuthControls />
+          </Deferred>
         </div>
 
         <details className="md:hidden">
@@ -80,11 +87,15 @@ export async function Header() {
                 </Link>
               ))}
               <div className="pt-3 border-t border-slate-200 dark:border-white/10 flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <ThemeToggle />
-                  <LanguageSwitcherNative />
-                </div>
-                <HeaderAuthControls />
+                <Deferred>
+                  <div className="flex items-center gap-3">
+                    <ThemeToggle />
+                    <LanguageSwitcherNative />
+                  </div>
+                </Deferred>
+                <Deferred timeoutMs={1600}>
+                  <HeaderAuthControls />
+                </Deferred>
               </div>
             </div>
           </div>
