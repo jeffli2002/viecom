@@ -1,18 +1,9 @@
 import { LazySection } from '@/components/performance/lazy-section';
+import { ClientImageGenerator } from '@/components/performance/client-image-generator';
 import { Button } from '@/components/ui/button';
 import { Link } from '@/i18n/navigation';
-import { ArrowRight, Loader2 } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import { getTranslations } from 'next-intl/server';
-import dynamic from 'next/dynamic';
-
-const ImageGenerator = dynamic(() => import('@/components/image-generator'), {
-  ssr: false,
-  loading: () => (
-    <div className="flex items-center justify-center py-12">
-      <Loader2 className="h-8 w-8 animate-spin text-primary" />
-    </div>
-  ),
-});
 
 export default async function ImageGenerationPage() {
   const t = await getTranslations('imageGeneration');
@@ -33,7 +24,7 @@ export default async function ImageGenerationPage() {
         }
         rootMargin="1200px"
       >
-        <ImageGenerator />
+        <ClientImageGenerator />
       </LazySection>
 
       <div className="mt-12 bg-gradient-to-br from-teal-50 to-blue-50 dark:from-teal-900/20 dark:to-blue-900/20 rounded-xl p-8 border border-teal-200 dark:border-teal-800 text-center">

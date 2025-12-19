@@ -4,21 +4,14 @@ import { FAQ } from '@/components/blocks/faq';
 import { Hero } from '@/components/blocks/hero';
 import { TransformationShowcase } from '@/components/blocks/transformation-showcase';
 import { LazySection } from '@/components/performance/lazy-section';
+import {
+  ClientShowcaseGallery,
+  ClientVideoGenerationShowcase,
+} from '@/components/performance/client-showcases';
 import { getSEOMetadata } from '@/lib/seo/metadata-translations';
 import type { Metadata } from 'next';
-import dynamic from 'next/dynamic';
 
 const GALLERY_SKELETON_KEYS = ['g1', 'g2', 'g3', 'g4', 'g5', 'g6'];
-
-const VideoGenerationShowcase = dynamic(
-  () =>
-    import('@/components/blocks/video-generation-showcase').then((m) => m.VideoGenerationShowcase),
-  { ssr: false }
-);
-const ShowcaseGallery = dynamic(
-  () => import('@/components/blocks/showcase-gallery').then((m) => m.ShowcaseGallery),
-  { ssr: false }
-);
 
 export async function generateMetadata({
   params,
@@ -47,7 +40,7 @@ export default function HomePage() {
           </section>
         }
       >
-        <VideoGenerationShowcase />
+        <ClientVideoGenerationShowcase />
       </LazySection>
       <LazySection
         placeholder={
@@ -66,7 +59,7 @@ export default function HomePage() {
           </section>
         }
       >
-        <ShowcaseGallery />
+        <ClientShowcaseGallery />
       </LazySection>
       <FAQ />
     </div>

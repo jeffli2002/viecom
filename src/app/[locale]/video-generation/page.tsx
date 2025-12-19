@@ -1,17 +1,7 @@
 import { LazySection } from '@/components/performance/lazy-section';
+import { ClientVideoGenerator } from '@/components/performance/client-video-generator';
 import { Link } from '@/i18n/navigation';
-import { Loader2 } from 'lucide-react';
 import { getTranslations } from 'next-intl/server';
-import dynamic from 'next/dynamic';
-
-const VideoGenerator = dynamic(() => import('@/components/video-generator'), {
-  ssr: false,
-  loading: () => (
-    <div className="flex items-center justify-center py-12">
-      <Loader2 className="h-8 w-8 animate-spin text-primary" />
-    </div>
-  ),
-});
 
 export default async function VideoGenerationPage() {
   const t = await getTranslations('videoGeneration');
@@ -40,7 +30,7 @@ export default async function VideoGenerationPage() {
         }
         rootMargin="1200px"
       >
-        <VideoGenerator />
+        <ClientVideoGenerator />
       </LazySection>
     </div>
   );
