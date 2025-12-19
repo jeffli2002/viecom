@@ -3,9 +3,6 @@ import { Play, Sparkles, Zap } from 'lucide-react';
 import { getTranslations } from 'next-intl/server';
 import Image from 'next/image';
 
-const HERO_BACKGROUND =
-  'https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?auto=format&fit=crop&q=60&w=900';
-
 const PLATFORMS = [
   {
     name: 'Amazon',
@@ -45,19 +42,9 @@ export async function Hero() {
 
   return (
     <header className="relative pt-32 pb-20 overflow-hidden bg-main border-b border-slate-200 dark:border-white/5">
-      <div className="absolute inset-0">
-        <Image
-          src={HERO_BACKGROUND}
-          alt=""
-          fill
-          sizes="100vw"
-          quality={60}
-          loading="lazy"
-          fetchPriority="low"
-          className="object-cover opacity-5 dark:opacity-10 mix-blend-overlay"
-        />
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-white/90 to-white dark:via-slate-900/90 dark:to-slate-900" />
-      </div>
+      <div className="absolute inset-0 bg-gradient-to-b from-white via-white to-slate-50 dark:from-slate-900 dark:via-slate-900/95 dark:to-slate-900" />
+      <div className="absolute -left-24 -top-24 w-96 h-96 bg-teal-100/50 dark:bg-teal-900/20 blur-3xl rounded-full" />
+      <div className="absolute right-0 top-10 w-[520px] h-[520px] bg-blue-100/40 dark:bg-blue-900/10 blur-[120px] rounded-full" />
 
       <div className="container-base relative z-10 text-center">
         <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-teal-500/10 border border-teal-500/20 text-teal-500 dark:text-teal-400 mb-8 backdrop-blur-sm">

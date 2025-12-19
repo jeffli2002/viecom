@@ -3,6 +3,10 @@
 import Script from 'next/script';
 
 export function GoogleAnalytics() {
+  if (process.env.NEXT_PUBLIC_ENABLE_ANALYTICS !== 'true') {
+    return null;
+  }
+
   return (
     <>
       <Script
