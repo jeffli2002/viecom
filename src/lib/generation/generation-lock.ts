@@ -73,12 +73,14 @@ export async function acquireGenerationLock(
       metadata: generationLock.metadata,
     })
     .from(generationLock)
-    .where(and(eq(generationLock.userId, params.userId), eq(generationLock.assetType, params.assetType)))
+    .where(
+      and(eq(generationLock.userId, params.userId), eq(generationLock.assetType, params.assetType))
+    )
     .limit(1);
 
   const activeLock = existing[0];
 
-  if (activeLock && activeLock.expiresAt && activeLock.expiresAt.getTime() <= now) {
+  if (activeLock?.expiresAt && activeLock.expiresAt.getTime() <= now) {
     // Expired lock - remove and retry acquisition once
     await db.delete(generationLock).where(eq(generationLock.id, activeLock.id));
     return acquireGenerationLock(params);

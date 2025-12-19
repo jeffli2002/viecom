@@ -136,8 +136,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
         const errorMsg = kieStatus.data?.error || kieStatus.data?.failMsg || 'Generation failed';
 
         // Update database
-        const metadataWithoutLock = { ...assetMetadata };
-        delete metadataWithoutLock.generationLockId;
+        const metadataWithoutLock = { ...assetMetadata, generationLockId: undefined };
 
         await db
           .update(generatedAsset)
@@ -210,8 +209,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
         );
 
         const previewUrl = `/api/v1/media?key=${encodeURIComponent(r2Result.key)}`;
-        const metadataWithoutLock = { ...assetMetadata };
-        delete metadataWithoutLock.generationLockId;
+        const metadataWithoutLock = { ...assetMetadata, generationLockId: undefined };
 
         // Update database with completed status
         await db

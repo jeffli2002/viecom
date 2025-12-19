@@ -12,8 +12,8 @@ import { getQuotaUsageByService, updateQuotaUsage } from '@/lib/quota/quota-serv
 import { checkAndAwardReferralReward } from '@/lib/rewards/referral-reward';
 import { db } from '@/server/db';
 import { generatedAsset, user as userTable } from '@/server/db/schema';
-import { type NextRequest, NextResponse } from 'next/server';
 import { eq } from 'drizzle-orm';
+import { type NextRequest, NextResponse } from 'next/server';
 
 export const dynamic = 'force-dynamic';
 export const fetchCache = 'force-no-store';
@@ -195,10 +195,9 @@ export async function POST(request: NextRequest) {
 
       if (!lockResult.acquired || !lockResult.lockId) {
         const lock = lockResult.existingLock;
-        const waitTimeSeconds =
-          lock && lock.expiresAt
-            ? Math.max(1, Math.ceil((lock.expiresAt.getTime() - Date.now()) / 1000))
-            : undefined;
+        const waitTimeSeconds = lock?.expiresAt
+          ? Math.max(1, Math.ceil((lock.expiresAt.getTime() - Date.now()) / 1000))
+          : undefined;
 
         return NextResponse.json(
           {
@@ -545,9 +544,7 @@ export async function POST(request: NextRequest) {
             lockId: generationLockId,
             taskId,
             error:
-              lockUpdateError instanceof Error
-                ? lockUpdateError.message
-                : String(lockUpdateError),
+              lockUpdateError instanceof Error ? lockUpdateError.message : String(lockUpdateError),
           });
         }
       }

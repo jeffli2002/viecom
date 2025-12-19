@@ -366,7 +366,10 @@ export const generationLock = pgTable(
       .notNull(),
   },
   (table) => ({
-    userAssetUnique: uniqueIndex('generation_lock_user_asset_idx').on(table.userId, table.assetType),
+    userAssetUnique: uniqueIndex('generation_lock_user_asset_idx').on(
+      table.userId,
+      table.assetType
+    ),
   })
 );
 

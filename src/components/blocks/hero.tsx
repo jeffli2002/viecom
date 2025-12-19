@@ -1,11 +1,10 @@
 import { Link } from '@/i18n/navigation';
-import { getSessionWithAuthBypass } from '@/lib/auth/auth-utils';
 import { Play, Sparkles, Zap } from 'lucide-react';
 import { getTranslations } from 'next-intl/server';
 import Image from 'next/image';
 
 const HERO_BACKGROUND =
-  'https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?auto=format&fit=crop&q=80&w=1600';
+  'https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?auto=format&fit=crop&q=60&w=900';
 
 const PLATFORMS = [
   {
@@ -42,11 +41,7 @@ const PLATFORMS = [
 
 export async function Hero() {
   const t = await getTranslations('hero');
-  const session = await getSessionWithAuthBypass();
-  const isAuthenticated = Boolean(session?.user);
-  const ctaHref = isAuthenticated
-    ? '/image-generation'
-    : `/signup?callbackUrl=${encodeURIComponent('/image-generation')}`;
+  const ctaHref = '/image-generation';
 
   return (
     <header className="relative pt-32 pb-20 overflow-hidden bg-main border-b border-slate-200 dark:border-white/5">
@@ -55,9 +50,10 @@ export async function Hero() {
           src={HERO_BACKGROUND}
           alt=""
           fill
-          priority
           sizes="100vw"
-          quality={70}
+          quality={60}
+          loading="lazy"
+          fetchPriority="low"
           className="object-cover opacity-5 dark:opacity-10 mix-blend-overlay"
         />
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-white/90 to-white dark:via-slate-900/90 dark:to-slate-900" />

@@ -20,9 +20,7 @@ const splitPathAndSuffix = (path: string) => {
 };
 
 const findLocalePrefix = (pathname: string) =>
-  routing.locales.find(
-    (locale) => pathname === `/${locale}` || pathname.startsWith(`/${locale}/`)
-  );
+  routing.locales.find((locale) => pathname === `/${locale}` || pathname.startsWith(`/${locale}/`));
 
 export interface RedirectTarget {
   localized: string;

@@ -54,7 +54,7 @@ export async function BatchGenerationFeature() {
                 { image: '/batch/skincare.jpg', ratio: '9:16' },
                 { image: '/batch/sweater.png', ratio: '16:9' },
                 { image: '/batch/lotionmodel.png', ratio: '4:5' },
-              ].map((item, index) => (
+              ].map((item, _index) => (
                 <div
                   key={item.image}
                   className="aspect-square rounded-2xl overflow-hidden shadow-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 transform transition-transform hover:scale-105"
@@ -65,7 +65,7 @@ export async function BatchGenerationFeature() {
                       alt="Batch item preview"
                       fill
                       sizes="(max-width: 768px) 45vw, 200px"
-                      priority={index === 0}
+                      loading="lazy"
                       className="object-cover opacity-80 group-hover:opacity-100 transition-opacity"
                     />
                     <div className="absolute top-2 right-2 px-2 py-0.5 bg-black/50 backdrop-blur rounded text-[10px] text-white font-bold">

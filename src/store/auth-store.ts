@@ -221,300 +221,381 @@ export const useAuthStore = create<AuthState>()(
           },
 
           signIn: async (email, password) => {
-          set({ isLoading: true, error: null });
-          const previousUser = get().user;
+            set({ isLoading: true, error: null });
+            const previousUser = get().user;
 
-          try {
-            const result = await authClient.signIn.email({
-              email,
-              password,
-            });
-
-            if (result.data) {
-              const user = result.data.user as ExtendedUser | null;
-
-              // Check if user exists and has an id
-              if (!user || !user.id) {
-                set({ isLoading: false, error: 'Invalid user data' });
-                return {
-                  success: false,
-                  error: 'Invalid user data',
-                };
-              }
-
-              if (isUserBanned(user)) {
-                await handleDisabledUser();
-                return {
-                  success: false,
-                  error: ACCOUNT_DISABLED_ERROR,
-                };
-              }
-
-              set({
-                user,
-                isAuthenticated: true,
-                isLoading: false,
-                lastUpdated: Date.now(),
+            try {
+              const result = await authClient.signIn.email({
+                email,
+                password,
               });
 
-              if (!previousUser || previousUser.id !== user.id) {
-                await initializeUserCredits(user.id, 3);
+              if (result.data) {
+                const user = result.data.user as ExtendedUser | null;
+
+                // Check if user exists and has an id
+                if (!user || !user.id) {
+                  set({ isLoading: false, error: 'Invalid user data' });
+                  return {
+                    success: false,
+                    error: 'Invalid user data',
+                  };
+                }
+
+                if (isUserBanned(user)) {
+                  await handleDisabledUser();
+                  return {
+                    success: false,
+                    error: ACCOUNT_DISABLED_ERROR,
+                  };
+                }
+
+                set({
+                  user,
+                  isAuthenticated: true,
+                  isLoading: false,
+                  lastUpdated: Date.now(),
+                });
+
+                if (!previousUser || previousUser.id !== user.id) {
+                  await initializeUserCredits(user.id, 3);
+                }
+
+                return { success: true };
               }
 
-              return { success: true };
+              const message = result.error?.message || 'Invalid email or password';
+              set({ isLoading: false, error: message });
+              return {
+                success: false,
+                error: message,
+              };
+            } catch (error) {
+              const errorMessage = error instanceof Error ? error.message : 'signIn error';
+              set({ error: errorMessage, isLoading: false });
+              return {
+                success: false,
+                error: errorMessage,
+              };
             }
+          },
+          signUp: async (email, password, name) => {
+            set({ isLoading: true, error: null });
 
-            const message = result.error?.message || 'Invalid email or password';
-            set({ isLoading: false, error: message });
-            return {
-              success: false,
-              error: message,
-            };
-          } catch (error) {
-            const errorMessage = error instanceof Error ? error.message : 'signIn error';
-            set({ error: errorMessage, isLoading: false });
-            return {
-              success: false,
-              error: errorMessage,
-            };
-          }
-        },
-        signUp: async (email, password, name) => {
-          set({ isLoading: true, error: null });
-
-          try {
-            const result = await authClient.signUp.email({
-              email: email,
-              password,
-              name: name || '',
-            });
-
-            if (result.data) {
-              const user = result.data.user;
-
-              // Check if user exists and has an id
-              if (!user || !user.id) {
-                set({ isLoading: false, error: 'Invalid user data' });
-                return {
-                  success: false,
-                  error: 'Invalid user data',
-                };
-              }
-
-              set({
-                user,
-                isAuthenticated: true,
-                lastUpdated: Date.now(),
+            try {
+              const result = await authClient.signUp.email({
+                email: email,
+                password,
+                name: name || '',
               });
 
-              // Initialize user credits after successful registration and wait for completion
-              try {
-                await initializeUserCredits(user.id, 3);
-              } catch (err) {
-                console.error('Failed to initialize credits during signup:', err);
-                // Allow signup to succeed even if credit initialization fails
-              } finally {
-                set({ isLoading: false });
+              if (result.data) {
+                const user = result.data.user;
+
+                // Check if user exists and has an id
+                if (!user || !user.id) {
+                  set({ isLoading: false, error: 'Invalid user data' });
+                  return {
+                    success: false,
+                    error: 'Invalid user data',
+                  };
+                }
+
+                set({
+                  user,
+                  isAuthenticated: true,
+                  lastUpdated: Date.now(),
+                });
+
+                // Initialize user credits after successful registration and wait for completion
+                try {
+                  await initializeUserCredits(user.id, 3);
+                } catch (err) {
+                  console.error('Failed to initialize credits during signup:', err);
+                  // Allow signup to succeed even if credit initialization fails
+                } finally {
+                  set({ isLoading: false });
+                }
+
+                return { success: true };
               }
-
-              return { success: true };
-            }
-            set({ isLoading: false });
-            return {
-              success: false,
-              error: result.error?.message || 'signUp error',
-            };
-          } catch (error) {
-            const errorMessage = error instanceof Error ? error.message : 'signUp error';
-            set({ error: errorMessage, isLoading: false });
-            return {
-              success: false,
-              error: errorMessage,
-            };
-          }
-        },
-
-        signOut: async () => {
-          set({ isLoading: true });
-
-          try {
-            await authClient.signOut();
-            set({
-              user: null,
-              isAuthenticated: false,
-              isLoading: false,
-              lastUpdated: 0,
-            });
-          } catch (error) {
-            console.error('Sign out error:', error);
-            set({
-              user: null,
-              isAuthenticated: false,
-              isLoading: false,
-              lastUpdated: 0,
-            });
-          }
-        },
-
-        signInWithGoogle: async (callbackUrl?: string) => {
-          set({ error: null });
-
-          try {
-            const callbackWithFlag = appendOAuthCallbackParam(callbackUrl, 'google');
-            await authClient.signIn.social({
-              provider: 'google',
-              callbackURL: callbackWithFlag,
-            });
-          } catch (error) {
-            console.error('Google sign in error:', error);
-            set({ error: 'Failed to sign in with Google' });
-          }
-        },
-
-        updateUser: async (data) => {
-          set({ isLoading: true, error: null });
-
-          try {
-            const result = await authClient.updateUser(data);
-
-            if (result.data?.status) {
-              await get().refreshSession();
               set({ isLoading: false });
-              return { success: true };
+              return {
+                success: false,
+                error: result.error?.message || 'signUp error',
+              };
+            } catch (error) {
+              const errorMessage = error instanceof Error ? error.message : 'signUp error';
+              set({ error: errorMessage, isLoading: false });
+              return {
+                success: false,
+                error: errorMessage,
+              };
             }
+          },
 
-            set({ isLoading: false });
-            return {
-              success: false,
-              error: result.error?.message || 'updateUser error',
-            };
-          } catch (error) {
-            const errorMessage = error instanceof Error ? error.message : 'updateUser error';
-            set({ error: errorMessage, isLoading: false });
-            return {
-              success: false,
-              error: errorMessage,
-            };
-          }
-        },
+          signOut: async () => {
+            set({ isLoading: true });
 
-        refreshSession: async () => {
-          const previousUser = get().user;
-
-          try {
-            const session = await authClient.getSession();
-            let user = (session.data?.user ?? null) as ExtendedUser | null;
-
-            if (!user || !user.id) {
-              user = await fetchSessionUser();
-            }
-
-            if (user?.id) {
-              if (isUserBanned(user)) {
-                await handleDisabledUser();
-                return;
-              }
+            try {
+              await authClient.signOut();
               set({
-                user,
-                isAuthenticated: true,
-                lastUpdated: Date.now(),
+                user: null,
+                isAuthenticated: false,
+                isLoading: false,
+                lastUpdated: 0,
               });
+            } catch (error) {
+              console.error('Sign out error:', error);
+              set({
+                user: null,
+                isAuthenticated: false,
+                isLoading: false,
+                lastUpdated: 0,
+              });
+            }
+          },
 
-              if (!previousUser || previousUser.id !== user.id) {
-                await initializeUserCredits(user.id, 3);
+          signInWithGoogle: async (callbackUrl?: string) => {
+            set({ error: null });
+
+            try {
+              const callbackWithFlag = appendOAuthCallbackParam(callbackUrl, 'google');
+              await authClient.signIn.social({
+                provider: 'google',
+                callbackURL: callbackWithFlag,
+              });
+            } catch (error) {
+              console.error('Google sign in error:', error);
+              set({ error: 'Failed to sign in with Google' });
+            }
+          },
+
+          updateUser: async (data) => {
+            set({ isLoading: true, error: null });
+
+            try {
+              const result = await authClient.updateUser(data);
+
+              if (result.data?.status) {
+                await get().refreshSession();
+                set({ isLoading: false });
+                return { success: true };
               }
-            } else {
+
+              set({ isLoading: false });
+              return {
+                success: false,
+                error: result.error?.message || 'updateUser error',
+              };
+            } catch (error) {
+              const errorMessage = error instanceof Error ? error.message : 'updateUser error';
+              set({ error: errorMessage, isLoading: false });
+              return {
+                success: false,
+                error: errorMessage,
+              };
+            }
+          },
+
+          refreshSession: async () => {
+            const previousUser = get().user;
+
+            try {
+              const session = await authClient.getSession();
+              let user = (session.data?.user ?? null) as ExtendedUser | null;
+
+              if (!user || !user.id) {
+                user = await fetchSessionUser();
+              }
+
+              if (user?.id) {
+                if (isUserBanned(user)) {
+                  await handleDisabledUser();
+                  return;
+                }
+                set({
+                  user,
+                  isAuthenticated: true,
+                  lastUpdated: Date.now(),
+                });
+
+                if (!previousUser || previousUser.id !== user.id) {
+                  await initializeUserCredits(user.id, 3);
+                }
+              } else {
+                set({
+                  user: null,
+                  isAuthenticated: false,
+                  lastUpdated: Date.now(),
+                });
+              }
+            } catch (error) {
+              console.error('Refresh session error:', error);
               set({
                 user: null,
                 isAuthenticated: false,
                 lastUpdated: Date.now(),
               });
             }
-          } catch (error) {
-            console.error('Refresh session error:', error);
-            set({
-              user: null,
-              isAuthenticated: false,
-              lastUpdated: Date.now(),
-            });
-          }
-        },
+          },
 
-        initialize: async (force = false) => {
-          if (get().isInitialized && !force) return;
+          initialize: async (force = false) => {
+            if (get().isInitialized && !force) return;
 
-          set({ isLoading: true });
-          const previousUser = get().user;
+            set({ isLoading: true });
+            const previousUser = get().user;
 
-          // Check if auth is disabled via environment variable
-          if (process.env.NEXT_PUBLIC_DISABLE_AUTH === 'true') {
-            const mockUser: User = {
-              id: 'dev-user',
-              email: 'dev@example.com',
-              name: 'Dev User',
-              emailVerified: true,
-              image: null,
-              createdAt: new Date(),
-              updatedAt: new Date(),
-            };
-            set({
-              user: mockUser,
-              isAuthenticated: true,
-              isLoading: false,
-              isInitialized: true,
-              lastUpdated: Date.now(),
-            });
-            return;
-          }
-
-          try {
-            const session = await authClient.getSession();
-            let user = (session.data?.user ?? null) as ExtendedUser | null;
-
-            if (!user || !user.id) {
-              user = await fetchSessionUser();
-            }
-
-            if (user?.id) {
-              if (isUserBanned(user)) {
-                await handleDisabledUser({ markInitialized: true });
-                return;
-              }
-              const isNewUser = !previousUser || previousUser.id !== user.id;
-
+            // Check if auth is disabled via environment variable
+            if (process.env.NEXT_PUBLIC_DISABLE_AUTH === 'true') {
+              const mockUser: User = {
+                id: 'dev-user',
+                email: 'dev@example.com',
+                name: 'Dev User',
+                emailVerified: true,
+                image: null,
+                createdAt: new Date(),
+                updatedAt: new Date(),
+              };
               set({
-                user,
+                user: mockUser,
                 isAuthenticated: true,
                 isLoading: false,
                 isInitialized: true,
                 lastUpdated: Date.now(),
               });
+              return;
+            }
 
-              if (isNewUser) {
-                await initializeUserCredits(user.id, 3);
-              } else {
-                try {
-                  const checkResponse = await fetch('/api/credits/check', {
-                    method: 'POST',
-                    headers: {
-                      'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ userId: user.id }),
-                    credentials: 'include',
-                  });
+            try {
+              const session = await authClient.getSession();
+              let user = (session.data?.user ?? null) as ExtendedUser | null;
 
-                  if (checkResponse.ok) {
-                    const checkData = await checkResponse.json();
-                    if (!checkData.hasAccount) {
-                      console.log(`⚠️ User ${user.email} has no credit account, initializing...`);
-                      await initializeUserCredits(user.id, 3);
+              if (!user || !user.id) {
+                user = await fetchSessionUser();
+              }
+
+              if (user?.id) {
+                if (isUserBanned(user)) {
+                  await handleDisabledUser({ markInitialized: true });
+                  return;
+                }
+                const isNewUser = !previousUser || previousUser.id !== user.id;
+
+                set({
+                  user,
+                  isAuthenticated: true,
+                  isLoading: false,
+                  isInitialized: true,
+                  lastUpdated: Date.now(),
+                });
+
+                if (isNewUser) {
+                  await initializeUserCredits(user.id, 3);
+                } else {
+                  try {
+                    const checkResponse = await fetch('/api/credits/check', {
+                      method: 'POST',
+                      headers: {
+                        'Content-Type': 'application/json',
+                      },
+                      body: JSON.stringify({ userId: user.id }),
+                      credentials: 'include',
+                    });
+
+                    if (checkResponse.ok) {
+                      const checkData = await checkResponse.json();
+                      if (!checkData.hasAccount) {
+                        console.log(`⚠️ User ${user.email} has no credit account, initializing...`);
+                        await initializeUserCredits(user.id, 3);
+                      }
                     }
+                  } catch (checkError) {
+                    console.warn('Failed to check credit account:', checkError);
                   }
-                } catch (checkError) {
-                  console.warn('Failed to check credit account:', checkError);
+                }
+              } else {
+                if (!get().isCacheValid()) {
+                  set({
+                    user: null,
+                    isAuthenticated: false,
+                    isLoading: false,
+                    isInitialized: true,
+                    lastUpdated: Date.now(),
+                  });
+                } else {
+                  set({
+                    isLoading: false,
+                    isInitialized: true,
+                  });
                 }
               }
-            } else {
+            } catch (error) {
+              console.error('Initialize error:', error);
+              // If it's a network error, retry once after a short delay
+              if (error instanceof TypeError && error.message.includes('fetch')) {
+                console.log('[Auth] Network error detected, retrying in 1 second...');
+                setTimeout(async () => {
+                  try {
+                    const retrySession = await authClient.getSession();
+                    if (retrySession.data) {
+                      const user = (retrySession.data.user ?? null) as ExtendedUser | null;
+
+                      // Check if user exists and has an id
+                      if (!user || !user.id) {
+                        if (!get().isCacheValid()) {
+                          set({
+                            user: null,
+                            isAuthenticated: false,
+                            isLoading: false,
+                            isInitialized: true,
+                            lastUpdated: Date.now(),
+                          });
+                        } else {
+                          set({
+                            isLoading: false,
+                            isInitialized: true,
+                          });
+                        }
+                        return;
+                      }
+
+                      if (isUserBanned(user)) {
+                        await handleDisabledUser({ markInitialized: true });
+                        return;
+                      }
+
+                      set({
+                        user,
+                        isAuthenticated: true,
+                        isLoading: false,
+                        isInitialized: true,
+                        lastUpdated: Date.now(),
+                      });
+                      return;
+                    }
+                  } catch (retryError) {
+                    console.error('[Auth] Retry failed:', retryError);
+                  }
+                  // If retry also fails, fall through to normal error handling
+                  if (!get().isCacheValid()) {
+                    set({
+                      user: null,
+                      isAuthenticated: false,
+                      isLoading: false,
+                      isInitialized: true,
+                      lastUpdated: Date.now(),
+                    });
+                  } else {
+                    set({
+                      isLoading: false,
+                      isInitialized: true,
+                    });
+                  }
+                }, 1000);
+                return;
+              }
+              // Normal error handling for non-network errors
               if (!get().isCacheValid()) {
                 set({
                   user: null,
@@ -530,99 +611,18 @@ export const useAuthStore = create<AuthState>()(
                 });
               }
             }
-          } catch (error) {
-            console.error('Initialize error:', error);
-            // If it's a network error, retry once after a short delay
-            if (error instanceof TypeError && error.message.includes('fetch')) {
-              console.log('[Auth] Network error detected, retrying in 1 second...');
-              setTimeout(async () => {
-                try {
-                  const retrySession = await authClient.getSession();
-                  if (retrySession.data) {
-                    const user = (retrySession.data.user ?? null) as ExtendedUser | null;
-
-                    // Check if user exists and has an id
-                    if (!user || !user.id) {
-                      if (!get().isCacheValid()) {
-                        set({
-                          user: null,
-                          isAuthenticated: false,
-                          isLoading: false,
-                          isInitialized: true,
-                          lastUpdated: Date.now(),
-                        });
-                      } else {
-                        set({
-                          isLoading: false,
-                          isInitialized: true,
-                        });
-                      }
-                      return;
-                    }
-
-                    if (isUserBanned(user)) {
-                      await handleDisabledUser({ markInitialized: true });
-                      return;
-                    }
-
-                    set({
-                      user,
-                      isAuthenticated: true,
-                      isLoading: false,
-                      isInitialized: true,
-                      lastUpdated: Date.now(),
-                    });
-                    return;
-                  }
-                } catch (retryError) {
-                  console.error('[Auth] Retry failed:', retryError);
-                }
-                // If retry also fails, fall through to normal error handling
-                if (!get().isCacheValid()) {
-                  set({
-                    user: null,
-                    isAuthenticated: false,
-                    isLoading: false,
-                    isInitialized: true,
-                    lastUpdated: Date.now(),
-                  });
-                } else {
-                  set({
-                    isLoading: false,
-                    isInitialized: true,
-                  });
-                }
-              }, 1000);
-              return;
-            }
-            // Normal error handling for non-network errors
-            if (!get().isCacheValid()) {
-              set({
-                user: null,
-                isAuthenticated: false,
-                isLoading: false,
-                isInitialized: true,
-                lastUpdated: Date.now(),
-              });
-            } else {
-              set({
-                isLoading: false,
-                isInitialized: true,
-              });
-            }
-          }
-        },
-        clearAuth: () => {
-          set({
-            user: null,
-            isAuthenticated: false,
-            isLoading: false,
-            lastUpdated: 0,
-          });
-        },
-      };
-    },
-    {
+          },
+          clearAuth: () => {
+            set({
+              user: null,
+              isAuthenticated: false,
+              isLoading: false,
+              lastUpdated: 0,
+            });
+          },
+        };
+      },
+      {
         name: 'ecommerce-ai-auth',
         storage: createJSONStorage(() => localStorage),
         partialize: (state) => ({

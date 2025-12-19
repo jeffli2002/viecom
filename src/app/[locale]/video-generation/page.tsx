@@ -1,13 +1,20 @@
-'use client';
-
-import VideoGenerator from '@/components/video-generator';
+import { LazySection } from '@/components/performance/lazy-section';
+import { Link } from '@/i18n/navigation';
 import { Loader2 } from 'lucide-react';
-import { useTranslations } from 'next-intl';
-import Link from 'next/link';
-import { Suspense } from 'react';
+import { getTranslations } from 'next-intl/server';
+import dynamic from 'next/dynamic';
 
-export default function VideoGenerationPage() {
-  const t = useTranslations('videoGeneration');
+const VideoGenerator = dynamic(() => import('@/components/video-generator'), {
+  ssr: false,
+  loading: () => (
+    <div className="flex items-center justify-center py-12">
+      <Loader2 className="h-8 w-8 animate-spin text-primary" />
+    </div>
+  ),
+});
+
+export default async function VideoGenerationPage() {
+  const t = await getTranslations('videoGeneration');
 
   return (
     <div className="container-base py-12">
@@ -23,15 +30,18 @@ export default function VideoGenerationPage() {
           </Link>
         </div>
       </div>
-      <Suspense
-        fallback={
-          <div className="flex items-center justify-center py-12">
-            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      <LazySection
+        placeholder={
+          <div className="rounded-2xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-slate-900/30 p-8">
+            <div className="h-8 w-56 bg-slate-200/60 dark:bg-slate-800/60 rounded mb-4" />
+            <div className="h-5 w-full max-w-2xl bg-slate-200/40 dark:bg-slate-800/40 rounded" />
+            <div className="mt-8 h-[520px] rounded-xl bg-white/70 dark:bg-slate-900/40 border border-slate-200 dark:border-white/10" />
           </div>
         }
+        rootMargin="1200px"
       >
         <VideoGenerator />
-      </Suspense>
+      </LazySection>
     </div>
   );
 }

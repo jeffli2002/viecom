@@ -178,10 +178,9 @@ export async function POST(request: NextRequest) {
 
       if (!lockResult.acquired || !lockResult.lockId) {
         const lock = lockResult.existingLock;
-        const waitTimeSeconds =
-          lock && lock.expiresAt
-            ? Math.max(1, Math.ceil((lock.expiresAt.getTime() - Date.now()) / 1000))
-            : undefined;
+        const waitTimeSeconds = lock?.expiresAt
+          ? Math.max(1, Math.ceil((lock.expiresAt.getTime() - Date.now()) / 1000))
+          : undefined;
 
         return NextResponse.json(
           {
@@ -406,9 +405,7 @@ export async function POST(request: NextRequest) {
             lockId: generationLockId,
             taskId,
             error:
-              lockUpdateError instanceof Error
-                ? lockUpdateError.message
-                : String(lockUpdateError),
+              lockUpdateError instanceof Error ? lockUpdateError.message : String(lockUpdateError),
           });
         }
       }
@@ -1379,9 +1376,7 @@ export async function POST(request: NextRequest) {
         console.error('[Video Generation] Failed to release generation lock:', {
           lockId: generationLockId,
           error:
-            lockReleaseError instanceof Error
-              ? lockReleaseError.message
-              : String(lockReleaseError),
+            lockReleaseError instanceof Error ? lockReleaseError.message : String(lockReleaseError),
         });
       }
       generationLockId = null;
