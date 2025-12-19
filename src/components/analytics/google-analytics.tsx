@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 
 const analyticsEnabled = process.env.NEXT_PUBLIC_ENABLE_ANALYTICS === 'true';
 const measurementId = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID || 'G-6NFEHPLFFL';
-const sampleRateEnv = Number.parseFloat(process.env.NEXT_PUBLIC_ANALYTICS_SAMPLE_RATE || '1');
+const sampleRateEnv = Number.parseFloat(process.env.NEXT_PUBLIC_ANALYTICS_SAMPLE_RATE || '0.25');
 const sampleRate = Number.isFinite(sampleRateEnv) && sampleRateEnv > 0 && sampleRateEnv <= 1 ? sampleRateEnv : 1;
 
 export function GoogleAnalytics() {
@@ -50,9 +50,9 @@ export function GoogleAnalytics() {
     <>
       <Script
         src={`https://www.googletagmanager.com/gtag/js?id=${encodeURIComponent(measurementId)}`}
-        strategy="afterInteractive"
+        strategy="lazyOnload"
       />
-      <Script id="google-analytics" strategy="afterInteractive">
+      <Script id="google-analytics" strategy="lazyOnload">
         {`
           window.dataLayer = window.dataLayer || [];
           function gtag(){dataLayer.push(arguments);}
