@@ -24,22 +24,8 @@ export default async function LocaleLayout({
   setRequestLocale(locale);
   const messages = await getMessages();
 
-  const themeScript = `
-    (function() {
-      try {
-        var t = localStorage.getItem('theme');
-        if (t === 'dark') document.documentElement.classList.add('dark');
-        if (t === 'light') document.documentElement.classList.remove('dark');
-      } catch (e) {}
-    })();
-  `;
-
   return (
     <NextIntlClientProvider messages={messages as Record<string, unknown>} locale={locale}>
-      <script
-        // biome-ignore lint/security/noDangerouslySetInnerHtml: tiny inline bootstrap for theme
-        dangerouslySetInnerHTML={{ __html: themeScript }}
-      />
       <MainLayout>{children}</MainLayout>
       <Toaster />
     </NextIntlClientProvider>

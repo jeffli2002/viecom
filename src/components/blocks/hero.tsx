@@ -1,16 +1,67 @@
 import { Link } from '@/i18n/navigation';
+import { getSessionWithAuthBypass } from '@/lib/auth/auth-utils';
 import { Play, Sparkles, Zap } from 'lucide-react';
 import { getTranslations } from 'next-intl/server';
+import Image from 'next/image';
+
+const HERO_BACKGROUND =
+  'https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?auto=format&fit=crop&q=80&w=1600';
+
+const PLATFORMS = [
+  {
+    name: 'Amazon',
+    logo: 'https://upload.wikimedia.org/wikipedia/commons/a/a9/Amazon_logo.svg',
+    width: 96,
+    height: 32,
+  },
+  {
+    name: 'TikTok',
+    logo: 'https://upload.wikimedia.org/wikipedia/en/a/a9/TikTok_logo.svg',
+    width: 96,
+    height: 32,
+  },
+  {
+    name: 'Shopee',
+    logo: 'https://upload.wikimedia.org/wikipedia/commons/f/fe/Shopee.svg',
+    width: 96,
+    height: 32,
+  },
+  {
+    name: 'eBay',
+    logo: 'https://upload.wikimedia.org/wikipedia/commons/1/1b/EBay_logo.svg',
+    width: 80,
+    height: 32,
+  },
+  {
+    name: 'Etsy',
+    logo: 'https://upload.wikimedia.org/wikipedia/commons/8/89/Etsy_logo.svg',
+    width: 64,
+    height: 32,
+  },
+];
 
 export async function Hero() {
   const t = await getTranslations('hero');
-  const ctaHref = '/image-generation';
+  const session = await getSessionWithAuthBypass();
+  const isAuthenticated = Boolean(session?.user);
+  const ctaHref = isAuthenticated
+    ? '/image-generation'
+    : `/signup?callbackUrl=${encodeURIComponent('/image-generation')}`;
 
   return (
     <header className="relative pt-32 pb-20 overflow-hidden bg-main border-b border-slate-200 dark:border-white/5">
-      <div className="absolute inset-0 bg-gradient-to-b from-white via-white to-slate-50 dark:from-slate-900 dark:via-slate-900/95 dark:to-slate-900" />
-      <div className="absolute -left-24 -top-24 w-96 h-96 bg-teal-100/50 dark:bg-teal-900/20 blur-3xl rounded-full" />
-      <div className="absolute right-0 top-10 w-[520px] h-[520px] bg-blue-100/40 dark:bg-blue-900/10 blur-[120px] rounded-full" />
+      <div className="absolute inset-0">
+        <Image
+          src={HERO_BACKGROUND}
+          alt=""
+          fill
+          priority
+          sizes="100vw"
+          quality={70}
+          className="object-cover opacity-5 dark:opacity-10 mix-blend-overlay"
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-white/90 to-white dark:via-slate-900/90 dark:to-slate-900" />
+      </div>
 
       <div className="container-base relative z-10 text-center">
         <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-teal-500/10 border border-teal-500/20 text-teal-500 dark:text-teal-400 mb-8 backdrop-blur-sm">
@@ -42,14 +93,18 @@ export async function Hero() {
           <p className="text-slate-500 text-sm font-medium mb-6 uppercase tracking-widest">
             {t('trustedBy')}
           </p>
-          <div className="flex flex-wrap justify-center gap-3 md:gap-4 items-center opacity-80 text-xs font-semibold uppercase tracking-wider">
-            {['Amazon', 'TikTok', 'Shopee', 'eBay', 'Etsy'].map((name) => (
-              <span
-                key={name}
-                className="px-3 py-2 rounded-full bg-white/70 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-200 shadow-sm"
-              >
-                {name}
-              </span>
+          <div className="flex flex-wrap justify-center gap-8 md:gap-16 items-center opacity-60">
+            {PLATFORMS.map((platform) => (
+              <div key={platform.name} className="group relative">
+                <Image
+                  src={platform.logo}
+                  alt={platform.name}
+                  width={platform.width}
+                  height={platform.height}
+                  className="h-8 md:h-10 w-auto object-contain dark:brightness-0 dark:invert transition-all duration-300 opacity-60 group-hover:opacity-100 filter grayscale hover:grayscale-0"
+                  loading="lazy"
+                />
+              </div>
             ))}
           </div>
         </div>

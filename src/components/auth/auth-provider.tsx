@@ -10,27 +10,7 @@ function AuthProviderContent() {
   const searchParams = useSearchParams();
 
   useEffect(() => {
-    const schedule = (cb: () => void) => {
-      if (typeof window === 'undefined') return;
-      if ('requestIdleCallback' in window) {
-        // @ts-expect-error - requestIdleCallback is not in the TS lib by default
-        return window.requestIdleCallback(cb, { timeout: 2000 });
-      }
-      return window.setTimeout(cb, 250);
-    };
-
-    const cancel = (handle: number | undefined) => {
-      if (!handle) return;
-      // @ts-expect-error - cancelIdleCallback is not in the TS lib by default
-      if ('cancelIdleCallback' in window) window.cancelIdleCallback(handle);
-      else window.clearTimeout(handle);
-    };
-
-    const handle = schedule(() => {
-      void initialize(true);
-    });
-
-    return () => cancel(handle);
+    initialize(true);
   }, [initialize]);
 
   useEffect(() => {

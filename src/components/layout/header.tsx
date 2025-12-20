@@ -1,106 +1,392 @@
-import { HeaderAuthControls } from '@/components/layout/header-auth-controls';
-import { Deferred } from '@/components/performance/deferred';
-import { LanguageSwitcherNative } from '@/components/widget/language-switcher-native';
-import { ThemeToggle } from '@/components/widget/theme-toggle';
-import { Link } from '@/i18n/navigation';
-import { getTranslations } from 'next-intl/server';
-import Image from 'next/image';
+'use client';
 
-const NAV_LINKS = [
-  { href: '/', key: 'home' },
-  { href: '/image-generation', key: 'imageGeneration' },
-  { href: '/video-generation', key: 'videoGeneration' },
-  { href: '/pricing', key: 'pricing' },
-  { href: '/docs', key: 'documentation' },
-] as const;
+import { CheckinDropdown } from '@/components/rewards/checkin-dropdown';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Button } from '@/components/ui/button';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import {
+  NavigationMenu,
+  NavigationMenuContent,
+  NavigationMenuItem,
+  NavigationMenuLink,
+  NavigationMenuList,
+  NavigationMenuTrigger,
+} from '@/components/ui/navigation-menu';
+import { LanguageSwitcher } from '@/components/widget/language-switcher';
+import { Link, usePathname } from '@/i18n/navigation';
+import { routing } from '@/i18n/routing';
+import { useAuthStore } from '@/store/auth-store';
+import {
+  BookOpen,
+  FileSpreadsheet,
+  Image as ImageIcon,
+  LogOut,
+  Menu,
+  Moon,
+  ShoppingBag,
+  Sparkles,
+  Sun,
+  User,
+  Video,
+  X,
+} from 'lucide-react';
+import { useTranslations } from 'next-intl';
+import { useEffect, useState } from 'react';
 
-export async function Header() {
-  const t = await getTranslations('nav');
+export function Header() {
+  const t = useTranslations('nav');
+  const pathname = usePathname();
+  const { user, isAuthenticated, signOut } = useAuthStore();
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [darkMode, setDarkMode] = useState(false);
+
+  useEffect(() => {
+    const isDark = document.documentElement.classList.contains('dark');
+    setDarkMode(isDark);
+  }, []);
+
+  useEffect(() => {
+    if (darkMode) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  }, [darkMode]);
+
+  const handleSignOut = async () => {
+    await signOut();
+    window.location.href = '/';
+  };
+
+  const navItems = [
+    {
+      title: t('generationTools'),
+      items: [
+        {
+          title: t('imageGeneration'),
+          href: '/image-generation',
+          description: t('imageGenerationDesc'),
+          icon: ImageIcon,
+        },
+        {
+          title: t('videoGeneration'),
+          href: '/video-generation',
+          description: t('videoGenerationDesc'),
+          icon: Video,
+        },
+        {
+          title: t('batchImageGeneration'),
+          href: '/batch-image-generation',
+          description: t('batchImageGenerationDesc'),
+          icon: FileSpreadsheet,
+        },
+        {
+          title: t('batchVideoGeneration'),
+          href: '/batch-video-generation',
+          description: t('batchVideoGenerationDesc'),
+          icon: FileSpreadsheet,
+        },
+        {
+          title: t('brandAnalysis'),
+          href: '/brand-analysis',
+          description: t('brandAnalysisDesc'),
+          icon: Sparkles,
+        },
+      ],
+    },
+    {
+      title: t('learn'),
+      items: [
+        {
+          title: t('documentation'),
+          href: '/docs',
+          description: t('documentationDesc'),
+          icon: BookOpen,
+        },
+        {
+          title: t('imageToVideoAI'),
+          href: '/image-to-video-ai',
+          description: t('imageToVideoAIDesc'),
+          icon: Video,
+        },
+        {
+          title: t('freeAIVideoGenerator'),
+          href: '/ai-video-generator-free',
+          description: t('freeAIVideoGeneratorDesc'),
+          icon: Sparkles,
+        },
+        {
+          title: t('videoEnhancer'),
+          href: '/video-enhancer-ai',
+          description: t('videoEnhancerDesc'),
+          icon: Sparkles,
+        },
+        {
+          title: t('nanoBananaPro'),
+          href: '/models/nano-banana',
+          description: t('nanoBananaProDesc'),
+          icon: Sparkles,
+        },
+      ],
+    },
+    {
+      title: t('solutions'),
+      items: [
+        {
+          title: t('amazonSolutions'),
+          href: '/solutions/amazon',
+          description: t('amazonSolutionsDesc'),
+          icon: ShoppingBag,
+        },
+        {
+          title: t('tiktokSolutions'),
+          href: '/solutions/tiktok',
+          description: t('tiktokSolutionsDesc'),
+          icon: Video,
+        },
+        {
+          title: t('shopifySolutions'),
+          href: '/solutions/shopify',
+          description: t('shopifySolutionsDesc'),
+          icon: ShoppingBag,
+        },
+      ],
+    },
+  ];
 
   return (
-    <header className="sticky top-0 z-50 bg-main/80 backdrop-blur border-b border-slate-200 dark:border-white/5">
-      <div className="container-base h-16 flex items-center justify-between gap-4">
-        <Link href="/" className="flex items-center gap-3 shrink-0">
-          <Image
+    <header className="sticky top-0 z-50 w-full border-b border-slate-200/50 bg-white/80 backdrop-blur-xl supports-[backdrop-filter]:bg-white/60 dark:border-white/10 dark:bg-slate-900/80 dark:supports-[backdrop-filter]:bg-slate-900/60">
+      <div className="container flex h-16 items-center justify-between">
+        {/* Logo */}
+        <Link href="/" className="flex items-center">
+          <img
             src="/ViecomLogoV6.png"
-            alt="Viecom"
-            width={140}
-            height={38}
-            className="h-8 w-auto"
+            alt="Viecom Logo"
+            style={{ height: '56px', width: '210px', objectFit: 'contain' }}
           />
         </Link>
 
-        <nav className="hidden md:flex items-center gap-6">
-          {NAV_LINKS.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              className="text-sm font-medium text-slate-700 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white transition-colors"
-            >
-              {t(link.key)}
-            </Link>
-          ))}
+        {/* Desktop Navigation */}
+        <nav className="hidden md:flex items-center space-x-6" suppressHydrationWarning>
+          <NavigationMenu>
+            <NavigationMenuList>
+              {navItems.map((item) => (
+                <NavigationMenuItem key={item.title}>
+                  <NavigationMenuTrigger className="text-slate-600 dark:text-slate-300">
+                    {item.title}
+                  </NavigationMenuTrigger>
+                  <NavigationMenuContent>
+                    <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px]">
+                      {item.items.map((subItem) => (
+                        <li key={subItem.title}>
+                          <NavigationMenuLink asChild>
+                            <Link
+                              href={subItem.href}
+                              className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
+                            >
+                              <div className="flex items-center space-x-2">
+                                <subItem.icon className="h-4 w-4" />
+                                <div className="text-sm font-medium leading-none">
+                                  {subItem.title}
+                                </div>
+                              </div>
+                              <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+                                {subItem.description}
+                              </p>
+                            </Link>
+                          </NavigationMenuLink>
+                        </li>
+                      ))}
+                    </ul>
+                  </NavigationMenuContent>
+                </NavigationMenuItem>
+              ))}
+            </NavigationMenuList>
+          </NavigationMenu>
+
+          <Link
+            href="/assets"
+            className={`text-sm font-medium transition-colors hover:text-teal-500 dark:hover:text-white ${
+              pathname?.includes('/assets') ? 'text-teal-500' : 'text-slate-600 dark:text-slate-300'
+            }`}
+          >
+            {t('assets')}
+          </Link>
+          <Link
+            href="/pricing"
+            className={`text-sm font-medium transition-colors hover:text-teal-500 dark:hover:text-white ${
+              pathname?.includes('/pricing')
+                ? 'text-teal-500'
+                : 'text-slate-600 dark:text-slate-300'
+            }`}
+          >
+            {t('pricing')}
+          </Link>
         </nav>
 
-        <div className="hidden md:flex items-center gap-3">
-          <Deferred>
-            <ThemeToggle />
-          </Deferred>
-          <Deferred timeoutMs={1400}>
-            <LanguageSwitcherNative />
-          </Deferred>
-          <Deferred timeoutMs={1600}>
-            <HeaderAuthControls />
-          </Deferred>
-        </div>
+        {/* User Menu / Auth Buttons */}
+        <div className="flex items-center space-x-4">
+          <button
+            type="button"
+            onClick={() => setDarkMode(!darkMode)}
+            className="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400 transition-colors"
+          >
+            {darkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+          </button>
+          {isAuthenticated && user ? (
+            <>
+              <CheckinDropdown />
+              <LanguageSwitcher />
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    className="relative h-10 w-10 rounded-full p-0 !bg-transparent hover:!bg-transparent dark:!bg-transparent dark:hover:!bg-transparent focus:!bg-transparent active:!bg-transparent"
+                    style={{ backgroundColor: 'transparent' }}
+                  >
+                    <Avatar className="h-10 w-10 avatar-teal z-10 relative bg-transparent">
+                      <AvatarImage
+                        src={user.image || ''}
+                        alt={user.name || ''}
+                        className="rounded-full !bg-transparent"
+                        style={{ backgroundColor: 'transparent' }}
+                      />
+                      <AvatarFallback
+                        className="text-white rounded-full avatar-teal-fallback header-avatar-fallback"
+                        data-header-avatar="true"
+                      >
+                        {user.name?.charAt(0).toUpperCase() || <User className="h-4 w-4" />}
+                      </AvatarFallback>
+                    </Avatar>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="w-56" align="end" forceMount>
+                  <DropdownMenuLabel className="font-normal">
+                    <div className="flex flex-col space-y-1">
+                      <p className="text-sm font-medium leading-none">{user.name}</p>
+                      <p className="text-xs leading-none text-muted-foreground">{user.email}</p>
+                    </div>
+                  </DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem asChild>
+                    <Link href="/dashboard">{t('dashboard')}</Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link href="/referrals">{t('referrals')}</Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link href="/settings">{t('settings')}</Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={handleSignOut}>
+                    <LogOut className="mr-2 h-4 w-4" />
+                    {t('logout')}
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </>
+          ) : (
+            <>
+              <LanguageSwitcher />
+              <Button size="sm" asChild className="bg-teal-500 hover:bg-teal-600 text-white">
+                <Link href="/login">{t('signup')}</Link>
+              </Button>
+            </>
+          )}
 
-        <details className="md:hidden">
-          <summary className="list-none cursor-pointer p-2 rounded-lg border border-slate-200 dark:border-white/10 bg-white/60 dark:bg-slate-900/40">
-            <span className="sr-only">Menu</span>
-            <svg
-              width="20"
-              height="20"
-              viewBox="0 0 24 24"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-              role="img"
-              aria-label="Open menu"
-              className="text-slate-700 dark:text-slate-200"
-            >
-              <path
-                d="M4 6h16M4 12h16M4 18h16"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-              />
-            </svg>
-          </summary>
-          <div className="absolute left-0 right-0 top-16 bg-main border-b border-slate-200 dark:border-white/5">
-            <div className="container-base py-4 flex flex-col gap-3">
-              {NAV_LINKS.map((link) => (
+          {/* Mobile Menu Button */}
+          <Button
+            variant="ghost"
+            size="icon"
+            className="md:hidden"
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          >
+            {isMobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+          </Button>
+        </div>
+      </div>
+
+      {/* Mobile Menu */}
+      {isMobileMenuOpen && (
+        <div className="border-t md:hidden">
+          <div className="container py-4 space-y-4">
+            {/* Generation Tools */}
+            <div>
+              <h3 className="px-3 py-2 text-xs font-semibold text-slate-500 uppercase">
+                {t('generationTools')}
+              </h3>
+              {navItems[0]?.items.map((item) => (
                 <Link
-                  key={link.href}
-                  href={link.href}
-                  className="py-2 text-sm font-medium text-slate-700 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white"
+                  key={item.title}
+                  href={item.href}
+                  className="flex items-center space-x-2 px-3 py-2 rounded-md hover:bg-accent"
+                  onClick={() => setIsMobileMenuOpen(false)}
                 >
-                  {t(link.key)}
+                  <item.icon className="h-4 w-4" />
+                  <span>{item.title}</span>
                 </Link>
               ))}
-              <div className="pt-3 border-t border-slate-200 dark:border-white/10 flex items-center justify-between">
-                <Deferred>
-                  <div className="flex items-center gap-3">
-                    <ThemeToggle />
-                    <LanguageSwitcherNative />
-                  </div>
-                </Deferred>
-                <Deferred timeoutMs={1600}>
-                  <HeaderAuthControls />
-                </Deferred>
-              </div>
             </div>
+            {/* Learn */}
+            <div>
+              <h3 className="px-3 py-2 text-xs font-semibold text-slate-500 uppercase">
+                {t('learn')}
+              </h3>
+              {navItems[1]?.items.map((item) => (
+                <Link
+                  key={item.title}
+                  href={item.href}
+                  className="flex items-center space-x-2 px-3 py-2 rounded-md hover:bg-accent"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  <item.icon className="h-4 w-4" />
+                  <span>{item.title}</span>
+                </Link>
+              ))}
+            </div>
+            {/* Solutions */}
+            {navItems[2] && (
+              <div>
+                <h3 className="px-3 py-2 text-xs font-semibold text-slate-500 uppercase">
+                  {t('solutions')}
+                </h3>
+                {navItems[2]?.items.map((item) => (
+                  <Link
+                    key={item.title}
+                    href={item.href}
+                    className="flex items-center space-x-2 px-3 py-2 rounded-md hover:bg-accent"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    <item.icon className="h-4 w-4" />
+                    <span>{item.title}</span>
+                  </Link>
+                ))}
+              </div>
+            )}
+            <Link
+              href="/assets"
+              className="block px-3 py-2 rounded-md hover:bg-accent"
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              {t('assets')}
+            </Link>
+            <Link
+              href="/pricing"
+              className="block px-3 py-2 rounded-md hover:bg-accent"
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              {t('pricing')}
+            </Link>
           </div>
-        </details>
-      </div>
+        </div>
+      )}
     </header>
   );
 }

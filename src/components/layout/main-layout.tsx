@@ -6,13 +6,10 @@ interface MainLayoutProps {
   children: React.ReactNode;
 }
 
-export async function MainLayout({ children }: MainLayoutProps) {
+export function MainLayout({ children }: MainLayoutProps) {
   return (
     <div className="flex min-h-screen flex-col">
-      <div className="sr-only" aria-hidden>
-        {/* prevent layout shift */}
-        <AuthProvider />
-      </div>
+      <AuthProvider />
       <Header />
       <main className="flex-1">{children}</main>
       <Footer />
