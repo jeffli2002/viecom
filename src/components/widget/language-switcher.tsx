@@ -26,7 +26,7 @@ export function LanguageSwitcher() {
   return (
     <div suppressHydrationWarning>
       <Select value={locale} onValueChange={handleLanguageChange}>
-        <SelectTrigger className="language-switcher-trigger">
+        <SelectTrigger className="language-switcher-trigger" aria-label="Select language">
           <Globe className="mr-2 h-4 w-4" />
           <SelectValue />
         </SelectTrigger>

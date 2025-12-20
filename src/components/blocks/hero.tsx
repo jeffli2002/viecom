@@ -64,7 +64,7 @@ export async function Hero() {
       </div>
 
       <div className="container-base relative z-10 text-center">
-        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-teal-500/10 border border-teal-500/20 text-teal-500 dark:text-teal-400 mb-8 backdrop-blur-sm">
+        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-teal-500/10 border border-teal-500/20 text-teal-700 dark:text-teal-300 mb-8 backdrop-blur-sm">
           <Sparkles className="w-4 h-4" />
           <span className="text-sm font-medium">{t('badge')}</span>
         </div>
@@ -90,7 +90,7 @@ export async function Hero() {
         </div>
 
         <div className="pt-8 border-t border-slate-200 dark:border-white/10">
-          <p className="text-slate-500 text-sm font-medium mb-6 uppercase tracking-widest">
+          <p className="text-slate-700 dark:text-slate-300 text-sm font-medium mb-6 uppercase tracking-widest">
             {t('trustedBy')}
           </p>
           <div className="flex flex-wrap justify-center gap-8 md:gap-16 items-center opacity-60">

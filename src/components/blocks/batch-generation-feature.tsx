@@ -10,7 +10,7 @@ export async function BatchGenerationFeature() {
       <div className="container-base">
         <div className="grid lg:grid-cols-2 gap-16 items-center">
           <div>
-            <div className="tag-pill bg-blue-500/10 text-blue-500 dark:text-blue-400 mb-6">
+            <div className="tag-pill bg-blue-500/10 text-blue-700 dark:text-blue-300 mb-6">
               <Layers className="w-4 h-4" /> {t('badge')}
             </div>
             <h2 className="h2-section">
@@ -23,23 +23,23 @@ export async function BatchGenerationFeature() {
 
             <div className="flex flex-col gap-4">
               <div className="flex items-start gap-4 p-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm">
-                <div className="p-3 rounded-lg bg-teal-100 dark:bg-teal-900/30 text-teal-500 dark:text-teal-400">
+                <div className="p-3 rounded-lg bg-teal-100 dark:bg-teal-900/30 text-teal-700 dark:text-teal-300">
                   <Target className="w-6 h-6" />
                 </div>
                 <div>
-                  <h4 className="font-bold text-slate-900 dark:text-white">{t('feature1Title')}</h4>
-                  <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
+                  <h3 className="font-bold text-slate-900 dark:text-white">{t('feature1Title')}</h3>
+                  <p className="text-sm text-slate-600 dark:text-slate-300 mt-1">
                     {t('feature1Desc')}
                   </p>
                 </div>
               </div>
               <div className="flex items-start gap-4 p-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm">
-                <div className="p-3 rounded-lg bg-blue-100 dark:bg-blue-900/30 text-blue-500 dark:text-blue-400">
+                <div className="p-3 rounded-lg bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300">
                   <FileSpreadsheet className="w-6 h-6" />
                 </div>
                 <div>
-                  <h4 className="font-bold text-slate-900 dark:text-white">{t('feature2Title')}</h4>
-                  <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
+                  <h3 className="font-bold text-slate-900 dark:text-white">{t('feature2Title')}</h3>
+                  <p className="text-sm text-slate-600 dark:text-slate-300 mt-1">
                     {t('feature2Desc')}
                   </p>
                 </div>

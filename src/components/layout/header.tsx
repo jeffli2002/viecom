@@ -237,6 +237,7 @@ export function Header() {
             type="button"
             onClick={() => setDarkMode(!darkMode)}
             className="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400 transition-colors"
+            aria-label={darkMode ? 'Switch to light mode' : 'Switch to dark mode'}
           >
             {darkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
           </button>
@@ -250,6 +251,7 @@ export function Header() {
                     variant="ghost"
                     className="relative h-10 w-10 rounded-full p-0 !bg-transparent hover:!bg-transparent dark:!bg-transparent dark:hover:!bg-transparent focus:!bg-transparent active:!bg-transparent"
                     style={{ backgroundColor: 'transparent' }}
+                    aria-label="Open user menu"
                   >
                     <Avatar className="h-10 w-10 avatar-teal z-10 relative bg-transparent">
                       <AvatarImage
@@ -307,6 +309,7 @@ export function Header() {
             size="icon"
             className="md:hidden"
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            aria-label={isMobileMenuOpen ? 'Close menu' : 'Open menu'}
           >
             {isMobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </Button>

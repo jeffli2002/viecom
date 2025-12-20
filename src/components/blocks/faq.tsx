@@ -25,7 +25,8 @@ export function FAQ() {
       <div className="container-base max-w-3xl">
         <div className="text-center mb-16">
           <h2 className="h2-section">
-            {t('title')} <span className="text-teal-500">{t('titleHighlight')}</span>
+            {t('title')}{' '}
+            <span className="text-teal-700 dark:text-teal-300">{t('titleHighlight')}</span>
           </h2>
           <p className="text-lg text-body">{t('subtitle')}</p>
         </div>

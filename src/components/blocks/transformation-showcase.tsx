@@ -77,7 +77,7 @@ export function TransformationShowcase() {
     <section id="studio" className="section-base bg-main overflow-hidden">
       <div className="container-base relative z-10">
         <div className="text-center mb-16">
-          <span className="text-teal-500 font-medium tracking-wider text-sm uppercase mb-2 block">
+          <span className="text-teal-700 dark:text-teal-300 font-medium tracking-wider text-sm uppercase mb-2 block">
             {t('badge')}
           </span>
           <h2 className="h2-section">
@@ -114,6 +114,7 @@ export function TransformationShowcase() {
             type="button"
             onClick={handlePrev}
             className="absolute left-0 lg:-left-12 top-1/2 -translate-y-1/2 z-40 p-4 rounded-full glass-card shadow-xl text-slate-600 dark:text-slate-300 transition-all hover:scale-110 active:scale-95"
+            aria-label="Previous scenario"
           >
             <ChevronLeft className="w-6 h-6" />
           </button>
@@ -122,6 +123,7 @@ export function TransformationShowcase() {
             type="button"
             onClick={handleNext}
             className="absolute right-0 lg:-right-12 top-1/2 -translate-y-1/2 z-40 p-4 rounded-full glass-card shadow-xl text-slate-600 dark:text-slate-300 transition-all hover:scale-110 active:scale-95"
+            aria-label="Next scenario"
           >
             <ChevronRight className="w-6 h-6" />
           </button>
@@ -132,7 +134,7 @@ export function TransformationShowcase() {
                 <div className="absolute -inset-1 bg-gradient-to-r from-teal-500 to-blue-600 rounded-2xl opacity-20 blur transition duration-500 group-hover:opacity-40" />
                 <div className="glass-card p-8 rounded-2xl relative shadow-2xl">
                   <div className="flex gap-4 items-center mb-8">
-                    <div className="w-10 h-10 rounded-full bg-teal-500/10 flex items-center justify-center text-teal-500 font-bold text-lg">
+                    <div className="w-10 h-10 rounded-full bg-teal-500/10 flex items-center justify-center text-teal-700 dark:text-teal-300 font-bold text-lg">
                       1
                     </div>
                     <h3 className="text-2xl font-bold text-slate-900 dark:text-white">
@@ -142,7 +144,7 @@ export function TransformationShowcase() {
 
                   <div key={activeScenario.id} className="grid grid-cols-2 gap-6">
                     <div className="space-y-3">
-                      <span className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+                      <span className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">
                         {t(`scenarios.${activeScenario.id}.input1Label`)}
                       </span>
                       <div className="aspect-[3/4] rounded-2xl overflow-hidden bg-slate-100 dark:bg-slate-800 border-2 border-slate-200 dark:border-slate-700 relative group/input cursor-zoom-in shadow-inner">
@@ -157,7 +159,7 @@ export function TransformationShowcase() {
                       </div>
                     </div>
                     <div className="space-y-3">
-                      <span className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+                      <span className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">
                         {t(`scenarios.${activeScenario.id}.input2Label`)}
                       </span>
                       <div className="aspect-[3/4] rounded-2xl overflow-hidden bg-slate-100 dark:bg-slate-800 border-2 border-slate-200 dark:border-slate-700 relative group/input cursor-zoom-in shadow-inner">
@@ -173,7 +175,7 @@ export function TransformationShowcase() {
                     </div>
                   </div>
 
-                  <div className="mt-8 flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 border-t border-slate-200 dark:border-white/5 pt-6">
+                  <div className="mt-8 flex items-center justify-between text-xs text-slate-700 dark:text-slate-300 border-t border-slate-200 dark:border-white/5 pt-6">
                     <span>{t('supportedFormats')}</span>
                     <span className="flex items-center gap-1">
                       <Maximize2 className="w-3 h-3" /> {t('highResReady')}
@@ -184,15 +186,17 @@ export function TransformationShowcase() {
             </div>
 
             <div className="absolute left-[50%] top-1/2 -translate-x-1/2 -translate-y-1/2 z-30 hidden lg:flex flex-col items-center justify-center pointer-events-none">
-              <div className="bg-white dark:bg-slate-800 p-4 rounded-full shadow-2xl border border-teal-500/20 text-teal-500 relative">
+              <div className="bg-white dark:bg-slate-800 p-4 rounded-full shadow-2xl border border-teal-500/20 text-teal-700 dark:text-teal-300 relative">
                 <Sparkles className="w-8 h-8" />
                 <div className="absolute -inset-1 bg-teal-500/20 rounded-full blur animate-ping opacity-20" />
               </div>
               <div className="mt-4 bg-white/90 dark:bg-slate-900/90 backdrop-blur px-3 py-1 rounded-lg border border-teal-500/20 shadow-lg">
-                <span className="text-[10px] font-bold text-teal-500 uppercase tracking-widest">
+                <span className="text-[10px] font-bold text-teal-700 dark:text-teal-300 uppercase tracking-widest">
                   {t('aiProcessing')}
                 </span>
-                <div className="text-[10px] text-slate-400 text-center">{t('modelName')}</div>
+                <div className="text-[10px] text-slate-600 dark:text-slate-300 text-center">
+                  {t('modelName')}
+                </div>
               </div>
             </div>
 

@@ -19,14 +19,14 @@ export async function BrandAnalysis() {
                     <div className="h-2 w-32 bg-slate-200 dark:bg-slate-700 rounded mb-2" />
                     <div className="h-2 w-20 bg-slate-200 dark:bg-slate-700 rounded" />
                   </div>
-                  <div className="px-3 py-1 bg-green-500/10 text-green-500 text-xs font-bold rounded-full border border-green-500/20">
+                  <div className="px-3 py-1 bg-green-500/10 text-green-700 dark:text-green-300 text-xs font-bold rounded-full border border-green-500/20">
                     {t('verified')}
                   </div>
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="bg-slate-50 dark:bg-slate-800 p-4 rounded-lg border border-slate-200 dark:border-slate-700">
-                    <span className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 block">
+                    <span className="text-xs font-bold text-slate-600 dark:text-slate-300 uppercase tracking-wider mb-2 block">
                       {t('colorPalette')}
                     </span>
                     <div className="flex gap-2">
@@ -36,19 +36,19 @@ export async function BrandAnalysis() {
                     </div>
                   </div>
                   <div className="bg-slate-50 dark:bg-slate-800 p-4 rounded-lg border border-slate-200 dark:border-slate-700">
-                    <span className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 block">
+                    <span className="text-xs font-bold text-slate-600 dark:text-slate-300 uppercase tracking-wider mb-2 block">
                       {t('typography')}
                     </span>
                     <div className="text-2xl font-semibold text-slate-900 dark:text-white">Aa</div>
-                    <div className="text-xs text-slate-500">Space Grotesk</div>
+                    <div className="text-xs text-slate-600 dark:text-slate-300">Space Grotesk</div>
                   </div>
                 </div>
 
                 <div className="mt-4 bg-teal-500/5 border border-teal-500/10 p-4 rounded-lg">
-                  <div className="flex items-center gap-2 text-teal-500 dark:text-teal-400 text-sm font-medium mb-1">
+                  <div className="flex items-center gap-2 text-teal-700 dark:text-teal-300 text-sm font-medium mb-1">
                     <Sparkles className="w-4 h-4" /> {t('brandVoiceDetected')}
                   </div>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
+                  <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
                     {t('brandVoiceExample')}
                   </p>
                 </div>
@@ -57,7 +57,7 @@ export async function BrandAnalysis() {
           </div>
 
           <div className="order-1 lg:order-2">
-            <div className="tag-pill bg-blue-500/10 text-blue-500 dark:text-blue-400 mb-6">
+            <div className="tag-pill bg-blue-500/10 text-blue-700 dark:text-blue-300 mb-6">
               <Shield className="w-4 h-4" /> {t('badge')}
             </div>
             <h2 className="h2-section">
@@ -71,9 +71,9 @@ export async function BrandAnalysis() {
               {[t('feature1'), t('feature2'), t('feature3')].map((item) => (
                 <li
                   key={item}
-                  className="flex items-center gap-3 text-slate-600 dark:text-slate-400"
+                  className="flex items-center gap-3 text-slate-700 dark:text-slate-300"
                 >
-                  <div className="w-6 h-6 rounded-full bg-blue-500/20 flex items-center justify-center text-blue-500">
+                  <div className="w-6 h-6 rounded-full bg-blue-500/20 flex items-center justify-center text-blue-700 dark:text-blue-300">
                     <Check className="w-3.5 h-3.5" />
                   </div>
                   {item}

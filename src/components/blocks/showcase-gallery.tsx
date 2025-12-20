@@ -317,7 +317,8 @@ export function ShowcaseGallery() {
         <div className="flex justify-between items-end mb-8">
           <div>
             <h2 className="h2-section">
-              {t('title')} <span className="text-teal-500">{t('titleHighlight')}</span>
+              {t('title')}{' '}
+              <span className="text-teal-700 dark:text-teal-300">{t('titleHighlight')}</span>
             </h2>
             <p className="text-sm text-body">{t('description')}</p>
           </div>
@@ -401,13 +402,18 @@ export function ShowcaseGallery() {
                       type="button"
                       key={item.id}
                       onClick={() => scrollToItem(idx)}
-                      className={`transition-all duration-300 rounded-full ${
-                        activeIndex === idx
-                          ? 'w-8 h-2 bg-teal-500'
-                          : 'w-2 h-2 bg-slate-300 dark:bg-slate-700 hover:bg-teal-500/50'
-                      }`}
+                      className="group h-8 w-8 flex items-center justify-center rounded-full transition-all duration-300"
                       aria-label={`Go to item ${idx + 1}`}
-                    />
+                      aria-current={activeIndex === idx ? 'true' : undefined}
+                    >
+                      <span
+                        className={`block rounded-full transition-all duration-300 ${
+                          activeIndex === idx
+                            ? 'w-8 h-2 bg-teal-500'
+                            : 'w-2 h-2 bg-slate-300 dark:bg-slate-700 group-hover:bg-teal-500/50'
+                        }`}
+                      />
+                    </button>
                   ))}
                 </div>
               )}

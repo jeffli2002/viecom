@@ -41,7 +41,7 @@ export async function Footer() {
 
           {/* Tools */}
           <div>
-            <h4 className="font-bold text-slate-900 dark:text-white mb-6">{t('footerProduct')}</h4>
+            <h3 className="font-bold text-slate-900 dark:text-white mb-6">{t('footerProduct')}</h3>
             <ul className="space-y-4 text-sm text-slate-600 dark:text-slate-400">
               <li>
                 <Link href="/image-generation" className="hover:text-teal-500 transition-colors">
@@ -84,7 +84,7 @@ export async function Footer() {
 
           {/* Learn */}
           <div>
-            <h4 className="font-bold text-slate-900 dark:text-white mb-6">{t('footerLearn')}</h4>
+            <h3 className="font-bold text-slate-900 dark:text-white mb-6">{t('footerLearn')}</h3>
             <ul className="space-y-4 text-sm text-slate-600 dark:text-slate-400">
               <li>
                 <Link href="/docs" className="hover:text-teal-500 transition-colors">
@@ -119,7 +119,7 @@ export async function Footer() {
 
           {/* Solutions */}
           <div>
-            <h4 className="font-bold text-slate-900 dark:text-white mb-6">{t('solutions')}</h4>
+            <h3 className="font-bold text-slate-900 dark:text-white mb-6">{t('solutions')}</h3>
             <ul className="space-y-4 text-sm text-slate-600 dark:text-slate-400">
               <li>
                 <Link href="/solutions/amazon" className="hover:text-teal-500 transition-colors">
@@ -141,7 +141,7 @@ export async function Footer() {
 
           {/* Company */}
           <div>
-            <h4 className="font-bold text-slate-900 dark:text-white mb-6">{t('footerCompany')}</h4>
+            <h3 className="font-bold text-slate-900 dark:text-white mb-6">{t('footerCompany')}</h3>
             <ul className="space-y-4 text-sm text-slate-600 dark:text-slate-400">
               <li>
                 <Link href="/about" className="hover:text-teal-500 transition-colors">
@@ -173,11 +173,11 @@ export async function Footer() {
         </div>
 
         <div className="pt-8 border-t border-slate-200 dark:border-white/5 space-y-4">
-          <div className="flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-slate-500 dark:text-slate-500">
+          <div className="flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-slate-600 dark:text-slate-400">
             <p>© {new Date().getFullYear()} Viecom. All rights reserved.</p>
           </div>
           <div className="pt-4 border-t border-slate-200 dark:border-white/5">
-            <p className="text-xs text-slate-400 dark:text-slate-500 leading-relaxed">
+            <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
               {t('independenceDisclaimer')}
             </p>
           </div>
