@@ -8,6 +8,20 @@
       "when": 1765934690996,
       "tag": "0010_generation_lock",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1766152600000,
+      "tag": "0011_affiliate_system",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1766154200000,
+      "tag": "0012_affiliate_settlement_and_payout",
+      "breakpoints": true
     }
   ]
 }

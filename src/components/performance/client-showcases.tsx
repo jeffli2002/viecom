@@ -20,4 +20,3 @@ export function ClientVideoGenerationShowcase() {
 export function ClientShowcaseGallery() {
   return <ShowcaseGallery />;
 }
-

@@ -73,7 +73,7 @@ const appendOAuthCallbackParam = (url?: string, provider = 'google') => {
     return target;
   }
 
-  const [pathWithQuery, hash] = target.split('#', 2);
+  const [pathWithQuery = target, hash] = target.split('#', 2);
   const separator = pathWithQuery.includes('?') ? '&' : '?';
   const updatedPath = `${pathWithQuery}${separator}authCallback=${provider}`;
   const withHash = hash ? `${updatedPath}#${hash}` : updatedPath;

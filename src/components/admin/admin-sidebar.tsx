@@ -6,6 +6,7 @@ import {
   Gift,
   LayoutDashboard,
   Settings,
+  Share2,
   Sparkles,
   Users,
   Zap,
@@ -32,6 +33,16 @@ const menuItems = [
   {
     name: 'Payments',
     href: '/admin/payments',
+    icon: DollarSign,
+  },
+  {
+    name: 'Affiliates',
+    href: '/admin/affiliates',
+    icon: Share2,
+  },
+  {
+    name: 'Affiliate Payouts',
+    href: '/admin/affiliate-payouts',
     icon: DollarSign,
   },
   {

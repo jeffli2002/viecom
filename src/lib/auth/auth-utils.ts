@@ -12,6 +12,15 @@ export interface Session {
   user?: SessionUser;
 }
 
+const safeGetSession = async (headers: Headers): Promise<Session | null> => {
+  try {
+    return await auth.api.getSession({ headers });
+  } catch (error) {
+    console.warn('[auth] Failed to fetch session, treating as unauthenticated:', error);
+    return null;
+  }
+};
+
 /**
  * Get session with support for DISABLE_AUTH bypass
  */
@@ -30,9 +39,7 @@ export async function getSessionWithAuthBypass(): Promise<Session | null> {
   const cookieHeader = headerList.get('cookie');
 
   if (cookieHeader) {
-    return await auth.api.getSession({
-      headers: headerList,
-    });
+    return await safeGetSession(headerList);
   }
 
   const cookieStore = await cookies();
@@ -41,14 +48,14 @@ export async function getSessionWithAuthBypass(): Promise<Session | null> {
     .map((cookie) => `${cookie.name}=${cookie.value}`)
     .join('; ');
 
-  const fallbackHeaders = new Headers();
-  if (serializedCookies) {
-    fallbackHeaders.set('cookie', serializedCookies);
+  if (!serializedCookies) {
+    return null;
   }
 
-  return await auth.api.getSession({
-    headers: fallbackHeaders,
-  });
+  const fallbackHeaders = new Headers();
+  fallbackHeaders.set('cookie', serializedCookies);
+
+  return await safeGetSession(fallbackHeaders);
 }
 
 /**
@@ -65,7 +72,5 @@ export async function getSessionFromRequest(requestHeaders: Headers): Promise<Se
     };
   }
 
-  return await auth.api.getSession({
-    headers: requestHeaders,
-  });
+  return await safeGetSession(requestHeaders);
 }

@@ -9,6 +9,7 @@ import { Progress } from '@/components/ui/progress';
 import { creditsConfig } from '@/config/credits.config';
 import { paymentConfig } from '@/config/payment.config';
 import { useSubscription } from '@/hooks/use-subscription';
+import { Link, useRouter } from '@/i18n/navigation';
 import { resolvePlanByIdentifier, resolvePlanByProductId } from '@/lib/creem/plan-utils';
 import { useAuthStore } from '@/store/auth-store';
 import { formatDistance } from 'date-fns';
@@ -26,7 +27,6 @@ import {
   TrendingUp,
   Video,
 } from 'lucide-react';
-import { Link, useRouter } from '@/i18n/navigation';
 import { useTranslations } from 'next-intl';
 import { Suspense, useCallback, useEffect, useMemo, useState } from 'react';
 
@@ -107,8 +107,12 @@ const formatDateDisplay = (value?: string | null) => {
 
 function DashboardPageContent() {
   const t = useTranslations('dashboard');
-  const { isAuthenticated, user, isInitialized: authInitialized, isLoading: authLoading } =
-    useAuthStore();
+  const {
+    isAuthenticated,
+    user,
+    isInitialized: authInitialized,
+    isLoading: authLoading,
+  } = useAuthStore();
   const router = useRouter();
   const [creditBalance, setCreditBalance] = useState<CreditBalance | null>(null);
   const [quotaUsage, setQuotaUsage] = useState<QuotaUsage | null>(null);

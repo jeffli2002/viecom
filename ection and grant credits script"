@@ -1,0 +1,55 @@
+warning: in the working copy of 'src/app/[locale]/batch-image-generation/page.tsx', LF will be replaced by CRLF the next time Git touches it
+[1mdiff --git a/src/app/[locale]/batch-image-generation/page.tsx b/src/app/[locale]/batch-image-generation/page.tsx[m
+[1mindex b60c0bc5..6e086aae 100644[m
+[1m--- a/src/app/[locale]/batch-image-generation/page.tsx[m
+[1m+++ b/src/app/[locale]/batch-image-generation/page.tsx[m
+[36m@@ -13,6 +13,49 @@[m [mexport default function BatchImageGenerationPage() {[m
+         <p className="text-body">{t('subtitleImage')}</p>[m
+       </div>[m
+       <BatchImageUpload />[m
+[32m+[m
+[32m+[m[32m      {/* FAQ Section */}[m
+[32m+[m[32m      <div className="max-w-3xl mx-auto mt-20 mb-12">[m
+[32m+[m[32m        <h2 className="h2-section text-center mb-12">{t('faq.title')}</h2>[m
+[32m+[m[32m        <div className="space-y-8">[m
+[32m+[m[32m          <div>[m
+[32m+[m[32m            <h3 className="text-xl font-semibold mb-3 text-slate-900 dark:text-white">[m
+[32m+[m[32m              {t('faq.q1.question')}[m
+[32m+[m[32m            </h3>[m
+[32m+[m[32m            <p className="text-slate-600 dark:text-slate-300">{t('faq.q1.answer')}</p>[m
+[32m+[m[32m          </div>[m
+[32m+[m[32m          <div>[m
+[32m+[m[32m            <h3 className="text-xl font-semibold mb-3 text-slate-900 dark:text-white">[m
+[32m+[m[32m              {t('faq.q2.question')}[m
+[32m+[m[32m            </h3>[m
+[32m+[m[32m            <p className="text-slate-600 dark:text-slate-300">{t('faq.q2.answer')}</p>[m
+[32m+[m[32m          </div>[m
+[32m+[m[32m          <div>[m
+[32m+[m[32m            <h3 className="text-xl font-semibold mb-3 text-slate-900 dark:text-white">[m
+[32m+[m[32m              {t('faq.q3.question')}[m
+[32m+[m[32m            </h3>[m
+[32m+[m[32m            <p className="text-slate-600 dark:text-slate-300">{t('faq.q3.answer')}</p>[m
+[32m+[m[32m          </div>[m
+[32m+[m[32m          <div>[m
+[32m+[m[32m            <h3 className="text-xl font-semibold mb-3 text-slate-900 dark:text-white">[m
+[32m+[m[32m              {t('faq.q4.question')}[m
+[32m+[m[32m            </h3>[m
+[32m+[m[32m            <p className="text-slate-600 dark:text-slate-300">{t('faq.q4.answer')}</p>[m
+[32m+[m[32m          </div>[m
+[32m+[m[32m          <div>[m
+[32m+[m[32m            <h3 className="text-xl font-semibold mb-3 text-slate-900 dark:text-white">[m
+[32m+[m[32m              {t('faq.q5.question')}[m
+[32m+[m[32m            </h3>[m
+[32m+[m[32m            <p className="text-slate-600 dark:text-slate-300">{t('faq.q5.answer')}</p>[m
+[32m+[m[32m          </div>[m
+[32m+[m[32m          <div>[m
+[32m+[m[32m            <h3 className="text-xl font-semibold mb-3 text-slate-900 dark:text-white">[m
+[32m+[m[32m              {t('faq.q6.question')}[m
+[32m+[m[32m            </h3>[m
+[32m+[m[32m            <p className="text-slate-600 dark:text-slate-300">{t('faq.q6.answer')}</p>[m
+[32m+[m[32m          </div>[m
+[32m+[m[32m        </div>[m
+[32m+[m[32m      </div>[m
+     </div>[m
+   );[m
+ }[m

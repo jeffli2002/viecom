@@ -43,6 +43,12 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Missing success/cancel URLs' }, { status: 400 });
     }
 
+    const affiliateCookie = request.cookies.get('aff_ref')?.value?.trim();
+    const affiliateCode =
+      affiliateCookie && /^[A-Za-z0-9_-]{4,32}$/.test(affiliateCookie)
+        ? affiliateCookie
+        : undefined;
+
     // If productKey is provided (credit pack purchase), skip subscription checks
     if (productKey) {
       console.log('[Create Checkout] Credit pack purchase with productKey:', productKey);
@@ -53,6 +59,7 @@ export async function POST(request: NextRequest) {
         productKey,
         successUrl,
         cancelUrl,
+        affiliateCode,
       });
 
       if (!checkout.success || !checkout.url) {
@@ -120,6 +127,7 @@ export async function POST(request: NextRequest) {
       successUrl,
       cancelUrl,
       currentPlan: currentPlanForCheckout,
+      affiliateCode,
     });
 
     if (!checkout.success || !checkout.url) {

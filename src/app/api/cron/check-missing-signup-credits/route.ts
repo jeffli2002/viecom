@@ -9,11 +9,11 @@ import { NextResponse } from 'next/server';
 /**
  * Background task to check and fix missing signup credits for new users
  * Should be called periodically (e.g., every hour) via cron job
- * 
+ *
  * This checks users registered in the last 24 hours who don't have:
  * 1. A credit account, OR
  * 2. A signup bonus transaction
- * 
+ *
  * And automatically grants them the signup bonus.
  */
 export async function POST(request: NextRequest) {
@@ -124,4 +124,3 @@ export async function POST(request: NextRequest) {
     );
   }
 }
-

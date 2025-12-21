@@ -1,7 +1,7 @@
 'use client';
 
-import dynamic from 'next/dynamic';
 import { Loader2 } from 'lucide-react';
+import dynamic from 'next/dynamic';
 
 const VideoGenerator = dynamic(
   () => import('@/components/video-generator').then((mod) => mod.default || mod),
@@ -18,4 +18,3 @@ const VideoGenerator = dynamic(
 export function ClientVideoGenerator() {
   return <VideoGenerator />;
 }
-

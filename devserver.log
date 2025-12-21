@@ -1,0 +1,1347 @@
+
+> ecommerce-ai-studio@0.1.0 dev /mnt/d/ai/viecom
+> next dev
+
+   ▲ Next.js 15.5.7
+   - Local:        http://localhost:3000
+   - Network:      http://10.255.255.254:3000
+   - Environments: .env.local
+   - Experiments (use with caution):
+     · serverActions
+
+ ✓ Starting...
+ ✓ Ready in 28.7s
+ ○ Compiling /middleware ...
+ ✓ Compiled /middleware in 637ms (212 modules)
+ ○ Compiling /[locale] ...
+ ✓ Compiled /[locale] in 8.3s (1958 modules)
+Image with src "https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?auto=format&fit=crop&q=80&w=1600" is using quality "70" which is not configured in images.qualities. This config will be required starting in Next.js 16.
+Read more: https://nextjs.org/docs/messages/next-image-unconfigured-qualities
+ GET /en 200 in 24577ms
+ GET /en 200 in 741ms
+ GET /en 200 in 736ms
+ GET /en 200 in 829ms
+ GET /en 200 in 754ms
+ GET /en 200 in 2803ms
+[2m2025-12-20T04:21:56.976Z[0m [31mERROR[0m [1m[Better Auth]:[0m INTERNAL_SERVER_ERROR Error [NeonDbError]: Error connecting to database: TypeError: fetch failed
+    at async getSessionWithAuthBypass (src/lib/auth/auth-utils.ts:33:12)
+    at async Hero (src/components/blocks/hero.tsx:45:19)
+  31 |
+  32 |   if (cookieHeader) {
+> 33 |     return await auth.api.getSession({
+     |            ^
+  34 |       headers: headerList,
+  35 |     });
+  36 |   } {
+  severity: undefined,
+  code: undefined,
+  detail: undefined,
+  hint: undefined,
+  position: undefined,
+  internalPosition: undefined,
+  internalQuery: undefined,
+  where: undefined,
+  schema: undefined,
+  table: undefined,
+  column: undefined,
+  dataType: undefined,
+  constraint: undefined,
+  file: undefined,
+  line: undefined,
+  routine: undefined,
+  sourceError: TypeError: fetch failed
+      at async getSessionWithAuthBypass (src/lib/auth/auth-utils.ts:33:12)
+      at async Hero (src/components/blocks/hero.tsx:45:19)
+    31 |
+    32 |   if (cookieHeader) {
+  > 33 |     return await auth.api.getSession({
+       |            ^
+    34 |       headers: headerList,
+    35 |     });
+    36 |   } {
+    [cause]: [AggregateError: ] { code: 'ETIMEDOUT' }
+  }
+}
+ ⨯ [Error [APIError]: Failed to get session] {
+  status: 'INTERNAL_SERVER_ERROR',
+  body: [Object],
+  headers: {},
+  statusCode: 500,
+  digest: '3914836991'
+}
+[2m2025-12-20T04:22:13.345Z[0m [31mERROR[0m [1m[Better Auth]:[0m INTERNAL_SERVER_ERROR Error [NeonDbError]: Error connecting to database: TypeError: fetch failed
+    at async getSessionWithAuthBypass (src/lib/auth/auth-utils.ts:33:12)
+    at async Hero (src/components/blocks/hero.tsx:45:19)
+  31 |
+  32 |   if (cookieHeader) {
+> 33 |     return await auth.api.getSession({
+     |            ^
+  34 |       headers: headerList,
+  35 |     });
+  36 |   } {
+  severity: undefined,
+  code: undefined,
+  detail: undefined,
+  hint: undefined,
+  position: undefined,
+  internalPosition: undefined,
+  internalQuery: undefined,
+  where: undefined,
+  schema: undefined,
+  table: undefined,
+  column: undefined,
+  dataType: undefined,
+  constraint: undefined,
+  file: undefined,
+  line: undefined,
+  routine: undefined,
+  sourceError: TypeError: fetch failed
+      at async getSessionWithAuthBypass (src/lib/auth/auth-utils.ts:33:12)
+      at async Hero (src/components/blocks/hero.tsx:45:19)
+    31 |
+    32 |   if (cookieHeader) {
+  > 33 |     return await auth.api.getSession({
+       |            ^
+    34 |       headers: headerList,
+    35 |     });
+    36 |   } {
+    [cause]: [AggregateError: ] { code: 'ETIMEDOUT' }
+  }
+}
+ ⨯ [Error [APIError]: Failed to get session] {
+  status: 'INTERNAL_SERVER_ERROR',
+  body: [Object],
+  headers: {},
+  statusCode: 500,
+  digest: '3914836991'
+}
+ GET /en 500 in 2409ms
+[2m2025-12-20T04:22:22.223Z[0m [31mERROR[0m [1m[Better Auth]:[0m INTERNAL_SERVER_ERROR Error [NeonDbError]: Error connecting to database: TypeError: fetch failed
+    at async getSessionWithAuthBypass (src/lib/auth/auth-utils.ts:33:12)
+    at async Hero (src/components/blocks/hero.tsx:45:19)
+  31 |
+  32 |   if (cookieHeader) {
+> 33 |     return await auth.api.getSession({
+     |            ^
+  34 |       headers: headerList,
+  35 |     });
+  36 |   } {
+  severity: undefined,
+  code: undefined,
+  detail: undefined,
+  hint: undefined,
+  position: undefined,
+  internalPosition: undefined,
+  internalQuery: undefined,
+  where: undefined,
+  schema: undefined,
+  table: undefined,
+  column: undefined,
+  dataType: undefined,
+  constraint: undefined,
+  file: undefined,
+  line: undefined,
+  routine: undefined,
+  sourceError: TypeError: fetch failed
+      at async getSessionWithAuthBypass (src/lib/auth/auth-utils.ts:33:12)
+      at async Hero (src/components/blocks/hero.tsx:45:19)
+    31 |
+    32 |   if (cookieHeader) {
+  > 33 |     return await auth.api.getSession({
+       |            ^
+    34 |       headers: headerList,
+    35 |     });
+    36 |   } {
+    [cause]: [AggregateError: ] { code: 'ETIMEDOUT' }
+  }
+}
+ ⨯ [Error [APIError]: Failed to get session] {
+  status: 'INTERNAL_SERVER_ERROR',
+  body: [Object],
+  headers: {},
+  statusCode: 500,
+  digest: '3914836991'
+}
+ GET /en 500 in 2358ms
+ ○ Compiling /api/auth/get-session ...
+ ✓ Compiled /api/auth/get-session in 2.8s (1978 modules)
+[2m2025-12-20T04:22:29.858Z[0m [31mERROR[0m [1m[Better Auth]:[0m INTERNAL_SERVER_ERROR Error [NeonDbError]: Error connecting to database: TypeError: fetch failed
+    at async GET (src/app/api/auth/get-session/route.ts:9:21)
+   7 | export async function GET(request: Request) {
+   8 |   try {
+>  9 |     const session = await auth.api.getSession({
+     |                     ^
+  10 |       headers: request.headers,
+  11 |     });
+  12 | {
+  severity: undefined,
+  code: undefined,
+  detail: undefined,
+  hint: undefined,
+  position: undefined,
+  internalPosition: undefined,
+  internalQuery: undefined,
+  where: undefined,
+  schema: undefined,
+  table: undefined,
+  column: undefined,
+  dataType: undefined,
+  constraint: undefined,
+  file: undefined,
+  line: undefined,
+  routine: undefined,
+  sourceError: TypeError: fetch failed
+      at async GET (src/app/api/auth/get-session/route.ts:9:21)
+     7 | export async function GET(request: Request) {
+     8 |   try {
+  >  9 |     const session = await auth.api.getSession({
+       |                     ^
+    10 |       headers: request.headers,
+    11 |     });
+    12 | {
+    [cause]: [AggregateError: ] { code: 'ETIMEDOUT' }
+  }
+}
+[get-session] failed to load session [Error [APIError]: Failed to get session] {
+  status: 'INTERNAL_SERVER_ERROR',
+  body: [Object],
+  headers: {},
+  statusCode: 500
+}
+ GET /api/auth/get-session 200 in 6432ms
+[2m2025-12-20T04:22:32.024Z[0m [31mERROR[0m [1m[Better Auth]:[0m INTERNAL_SERVER_ERROR Error [NeonDbError]: Error connecting to database: TypeError: fetch failed
+    at async GET (src/app/api/auth/get-session/route.ts:9:21)
+   7 | export async function GET(request: Request) {
+   8 |   try {
+>  9 |     const session = await auth.api.getSession({
+     |                     ^
+  10 |       headers: request.headers,
+  11 |     });
+  12 | {
+  severity: undefined,
+  code: undefined,
+  detail: undefined,
+  hint: undefined,
+  position: undefined,
+  internalPosition: undefined,
+  internalQuery: undefined,
+  where: undefined,
+  schema: undefined,
+  table: undefined,
+  column: undefined,
+  dataType: undefined,
+  constraint: undefined,
+  file: undefined,
+  line: undefined,
+  routine: undefined,
+  sourceError: TypeError: fetch failed
+      at async GET (src/app/api/auth/get-session/route.ts:9:21)
+     7 | export async function GET(request: Request) {
+     8 |   try {
+  >  9 |     const session = await auth.api.getSession({
+       |                     ^
+    10 |       headers: request.headers,
+    11 |     });
+    12 | {
+    [cause]: [AggregateError: ] { code: 'ETIMEDOUT' }
+  }
+}
+[get-session] failed to load session [Error [APIError]: Failed to get session] {
+  status: 'INTERNAL_SERVER_ERROR',
+  body: [Object],
+  headers: {},
+  statusCode: 500
+}
+ GET /api/auth/get-session 200 in 2093ms
+[2m2025-12-20T04:47:21.900Z[0m [31mERROR[0m [1m[Better Auth]:[0m INTERNAL_SERVER_ERROR Error [NeonDbError]: Error connecting to database: TypeError: fetch failed
+    at async getSessionWithAuthBypass (src/lib/auth/auth-utils.ts:33:12)
+    at async Hero (src/components/blocks/hero.tsx:45:19)
+  31 |
+  32 |   if (cookieHeader) {
+> 33 |     return await auth.api.getSession({
+     |            ^
+  34 |       headers: headerList,
+  35 |     });
+  36 |   } {
+  severity: undefined,
+  code: undefined,
+  detail: undefined,
+  hint: undefined,
+  position: undefined,
+  internalPosition: undefined,
+  internalQuery: undefined,
+  where: undefined,
+  schema: undefined,
+  table: undefined,
+  column: undefined,
+  dataType: undefined,
+  constraint: undefined,
+  file: undefined,
+  line: undefined,
+  routine: undefined,
+  sourceError: TypeError: fetch failed
+      at async getSessionWithAuthBypass (src/lib/auth/auth-utils.ts:33:12)
+      at async Hero (src/components/blocks/hero.tsx:45:19)
+    31 |
+    32 |   if (cookieHeader) {
+  > 33 |     return await auth.api.getSession({
+       |            ^
+    34 |       headers: headerList,
+    35 |     });
+    36 |   } {
+    [cause]: [AggregateError: ] { code: 'ETIMEDOUT' }
+  }
+}
+ ⨯ [Error [APIError]: Failed to get session] {
+  status: 'INTERNAL_SERVER_ERROR',
+  body: [Object],
+  headers: {},
+  statusCode: 500,
+  digest: '3914836991'
+}
+ GET /en 500 in 4863ms
+[2m2025-12-20T04:47:25.848Z[0m [31mERROR[0m [1m[Better Auth]:[0m INTERNAL_SERVER_ERROR Error [NeonDbError]: Error connecting to database: TypeError: fetch failed
+    at async GET (src/app/api/auth/get-session/route.ts:9:21)
+   7 | export async function GET(request: Request) {
+   8 |   try {
+>  9 |     const session = await auth.api.getSession({
+     |                     ^
+  10 |       headers: request.headers,
+  11 |     });
+  12 | {
+  severity: undefined,
+  code: undefined,
+  detail: undefined,
+  hint: undefined,
+  position: undefined,
+  internalPosition: undefined,
+  internalQuery: undefined,
+  where: undefined,
+  schema: undefined,
+  table: undefined,
+  column: undefined,
+  dataType: undefined,
+  constraint: undefined,
+  file: undefined,
+  line: undefined,
+  routine: undefined,
+  sourceError: TypeError: fetch failed
+      at async GET (src/app/api/auth/get-session/route.ts:9:21)
+     7 | export async function GET(request: Request) {
+     8 |   try {
+  >  9 |     const session = await auth.api.getSession({
+       |                     ^
+    10 |       headers: request.headers,
+    11 |     });
+    12 | {
+    [cause]: [AggregateError: ] { code: 'ETIMEDOUT' }
+  }
+}
+[get-session] failed to load session [Error [APIError]: Failed to get session] {
+  status: 'INTERNAL_SERVER_ERROR',
+  body: [Object],
+  headers: {},
+  statusCode: 500
+}
+ GET /api/auth/get-session 200 in 2927ms
+[2m2025-12-20T04:47:26.342Z[0m [31mERROR[0m [1m[Better Auth]:[0m INTERNAL_SERVER_ERROR Error [NeonDbError]: Error connecting to database: TypeError: fetch failed
+    at async getSessionWithAuthBypass (src/lib/auth/auth-utils.ts:33:12)
+    at async Hero (src/components/blocks/hero.tsx:45:19)
+  31 |
+  32 |   if (cookieHeader) {
+> 33 |     return await auth.api.getSession({
+     |            ^
+  34 |       headers: headerList,
+  35 |     });
+  36 |   } {
+  severity: undefined,
+  code: undefined,
+  detail: undefined,
+  hint: undefined,
+  position: undefined,
+  internalPosition: undefined,
+  internalQuery: undefined,
+  where: undefined,
+  schema: undefined,
+  table: undefined,
+  column: undefined,
+  dataType: undefined,
+  constraint: undefined,
+  file: undefined,
+  line: undefined,
+  routine: undefined,
+  sourceError: TypeError: fetch failed
+      at async getSessionWithAuthBypass (src/lib/auth/auth-utils.ts:33:12)
+      at async Hero (src/components/blocks/hero.tsx:45:19)
+    31 |
+    32 |   if (cookieHeader) {
+  > 33 |     return await auth.api.getSession({
+       |            ^
+    34 |       headers: headerList,
+    35 |     });
+    36 |   } {
+    [cause]: [AggregateError: ] { code: 'ETIMEDOUT' }
+  }
+}
+ ⨯ [Error [APIError]: Failed to get session] {
+  status: 'INTERNAL_SERVER_ERROR',
+  body: [Object],
+  headers: {},
+  statusCode: 500,
+  digest: '3914836991'
+}
+ GET /favicon.ico 404 in 2950ms
+[2m2025-12-20T04:47:28.064Z[0m [31mERROR[0m [1m[Better Auth]:[0m INTERNAL_SERVER_ERROR Error [NeonDbError]: Error connecting to database: TypeError: fetch failed
+    at async GET (src/app/api/auth/get-session/route.ts:9:21)
+   7 | export async function GET(request: Request) {
+   8 |   try {
+>  9 |     const session = await auth.api.getSession({
+     |                     ^
+  10 |       headers: request.headers,
+  11 |     });
+  12 | {
+  severity: undefined,
+  code: undefined,
+  detail: undefined,
+  hint: undefined,
+  position: undefined,
+  internalPosition: undefined,
+  internalQuery: undefined,
+  where: undefined,
+  schema: undefined,
+  table: undefined,
+  column: undefined,
+  dataType: undefined,
+  constraint: undefined,
+  file: undefined,
+  line: undefined,
+  routine: undefined,
+  sourceError: TypeError: fetch failed
+      at async GET (src/app/api/auth/get-session/route.ts:9:21)
+     7 | export async function GET(request: Request) {
+     8 |   try {
+  >  9 |     const session = await auth.api.getSession({
+       |                     ^
+    10 |       headers: request.headers,
+    11 |     });
+    12 | {
+    [cause]: [AggregateError: ] { code: 'ETIMEDOUT' }
+  }
+}
+[get-session] failed to load session [Error [APIError]: Failed to get session] {
+  status: 'INTERNAL_SERVER_ERROR',
+  body: [Object],
+  headers: {},
+  statusCode: 500
+}
+ GET /api/auth/get-session 200 in 2185ms
+[2m2025-12-20T04:49:16.967Z[0m [31mERROR[0m [1m[Better Auth]:[0m INTERNAL_SERVER_ERROR Error [NeonDbError]: Error connecting to database: TypeError: fetch failed
+    at async getSessionWithAuthBypass (src/lib/auth/auth-utils.ts:33:12)
+    at async Hero (src/components/blocks/hero.tsx:45:19)
+  31 |
+  32 |   if (cookieHeader) {
+> 33 |     return await auth.api.getSession({
+     |            ^
+  34 |       headers: headerList,
+  35 |     });
+  36 |   } {
+  severity: undefined,
+  code: undefined,
+  detail: undefined,
+  hint: undefined,
+  position: undefined,
+  internalPosition: undefined,
+  internalQuery: undefined,
+  where: undefined,
+  schema: undefined,
+  table: undefined,
+  column: undefined,
+  dataType: undefined,
+  constraint: undefined,
+  file: undefined,
+  line: undefined,
+  routine: undefined,
+  sourceError: TypeError: fetch failed
+      at async getSessionWithAuthBypass (src/lib/auth/auth-utils.ts:33:12)
+      at async Hero (src/components/blocks/hero.tsx:45:19)
+    31 |
+    32 |   if (cookieHeader) {
+  > 33 |     return await auth.api.getSession({
+       |            ^
+    34 |       headers: headerList,
+    35 |     });
+    36 |   } {
+    [cause]: [AggregateError: ] { code: 'ETIMEDOUT' }
+  }
+}
+ ⨯ [Error [APIError]: Failed to get session] {
+  status: 'INTERNAL_SERVER_ERROR',
+  body: [Object],
+  headers: {},
+  statusCode: 500,
+  digest: '3914836991'
+}
+ GET /en 500 in 2271ms
+[2m2025-12-20T04:49:19.745Z[0m [31mERROR[0m [1m[Better Auth]:[0m INTERNAL_SERVER_ERROR Error [NeonDbError]: Error connecting to database: TypeError: fetch failed
+    at async GET (src/app/api/auth/get-session/route.ts:9:21)
+   7 | export async function GET(request: Request) {
+   8 |   try {
+>  9 |     const session = await auth.api.getSession({
+     |                     ^
+  10 |       headers: request.headers,
+  11 |     });
+  12 | {
+  severity: undefined,
+  code: undefined,
+  detail: undefined,
+  hint: undefined,
+  position: undefined,
+  internalPosition: undefined,
+  internalQuery: undefined,
+  where: undefined,
+  schema: undefined,
+  table: undefined,
+  column: undefined,
+  dataType: undefined,
+  constraint: undefined,
+  file: undefined,
+  line: undefined,
+  routine: undefined,
+  sourceError: TypeError: fetch failed
+      at async GET (src/app/api/auth/get-session/route.ts:9:21)
+     7 | export async function GET(request: Request) {
+     8 |   try {
+  >  9 |     const session = await auth.api.getSession({
+       |                     ^
+    10 |       headers: request.headers,
+    11 |     });
+    12 | {
+    [cause]: [AggregateError: ] { code: 'ETIMEDOUT' }
+  }
+}
+[get-session] failed to load session [Error [APIError]: Failed to get session] {
+  status: 'INTERNAL_SERVER_ERROR',
+  body: [Object],
+  headers: {},
+  statusCode: 500
+}
+ GET /api/auth/get-session 200 in 2152ms
+[2m2025-12-20T04:49:22.711Z[0m [31mERROR[0m [1m[Better Auth]:[0m INTERNAL_SERVER_ERROR Error [NeonDbError]: Error connecting to database: TypeError: fetch failed
+    at async GET (src/app/api/auth/get-session/route.ts:9:21)
+   7 | export async function GET(request: Request) {
+   8 |   try {
+>  9 |     const session = await auth.api.getSession({
+     |                     ^
+  10 |       headers: request.headers,
+  11 |     });
+  12 | {
+  severity: undefined,
+  code: undefined,
+  detail: undefined,
+  hint: undefined,
+  position: undefined,
+  internalPosition: undefined,
+  internalQuery: undefined,
+  where: undefined,
+  schema: undefined,
+  table: undefined,
+  column: undefined,
+  dataType: undefined,
+  constraint: undefined,
+  file: undefined,
+  line: undefined,
+  routine: undefined,
+  sourceError: TypeError: fetch failed
+      at async GET (src/app/api/auth/get-session/route.ts:9:21)
+     7 | export async function GET(request: Request) {
+     8 |   try {
+  >  9 |     const session = await auth.api.getSession({
+       |                     ^
+    10 |       headers: request.headers,
+    11 |     });
+    12 | {
+    [cause]: [AggregateError: ] { code: 'ETIMEDOUT' }
+  }
+}
+[get-session] failed to load session [Error [APIError]: Failed to get session] {
+  status: 'INTERNAL_SERVER_ERROR',
+  body: [Object],
+  headers: {},
+  statusCode: 500
+}
+ GET /api/auth/get-session 200 in 2939ms
+[2m2025-12-20T04:49:24.120Z[0m [31mERROR[0m [1m[Better Auth]:[0m INTERNAL_SERVER_ERROR Error [NeonDbError]: Error connecting to database: TypeError: fetch failed
+    at async getSessionWithAuthBypass (src/lib/auth/auth-utils.ts:33:12)
+    at async Hero (src/components/blocks/hero.tsx:45:19)
+  31 |
+  32 |   if (cookieHeader) {
+> 33 |     return await auth.api.getSession({
+     |            ^
+  34 |       headers: headerList,
+  35 |     });
+  36 |   } {
+  severity: undefined,
+  code: undefined,
+  detail: undefined,
+  hint: undefined,
+  position: undefined,
+  internalPosition: undefined,
+  internalQuery: undefined,
+  where: undefined,
+  schema: undefined,
+  table: undefined,
+  column: undefined,
+  dataType: undefined,
+  constraint: undefined,
+  file: undefined,
+  line: undefined,
+  routine: undefined,
+  sourceError: TypeError: fetch failed
+      at async getSessionWithAuthBypass (src/lib/auth/auth-utils.ts:33:12)
+      at async Hero (src/components/blocks/hero.tsx:45:19)
+    31 |
+    32 |   if (cookieHeader) {
+  > 33 |     return await auth.api.getSession({
+       |            ^
+    34 |       headers: headerList,
+    35 |     });
+    36 |   } {
+    [cause]: [AggregateError: ] { code: 'ETIMEDOUT' }
+  }
+}
+ ⨯ [Error [APIError]: Failed to get session] {
+  status: 'INTERNAL_SERVER_ERROR',
+  body: [Object],
+  headers: {},
+  statusCode: 500,
+  digest: '3914836991'
+}
+ GET /en 500 in 2996ms
+[2m2025-12-20T04:49:26.895Z[0m [31mERROR[0m [1m[Better Auth]:[0m INTERNAL_SERVER_ERROR Error [NeonDbError]: Error connecting to database: TypeError: fetch failed
+    at async GET (src/app/api/auth/get-session/route.ts:9:21)
+   7 | export async function GET(request: Request) {
+   8 |   try {
+>  9 |     const session = await auth.api.getSession({
+     |                     ^
+  10 |       headers: request.headers,
+  11 |     });
+  12 | {
+  severity: undefined,
+  code: undefined,
+  detail: undefined,
+  hint: undefined,
+  position: undefined,
+  internalPosition: undefined,
+  internalQuery: undefined,
+  where: undefined,
+  schema: undefined,
+  table: undefined,
+  column: undefined,
+  dataType: undefined,
+  constraint: undefined,
+  file: undefined,
+  line: undefined,
+  routine: undefined,
+  sourceError: TypeError: fetch failed
+      at async GET (src/app/api/auth/get-session/route.ts:9:21)
+     7 | export async function GET(request: Request) {
+     8 |   try {
+  >  9 |     const session = await auth.api.getSession({
+       |                     ^
+    10 |       headers: request.headers,
+    11 |     });
+    12 | {
+    [cause]: [AggregateError: ] { code: 'ETIMEDOUT' }
+  }
+}
+[get-session] failed to load session [Error [APIError]: Failed to get session] {
+  status: 'INTERNAL_SERVER_ERROR',
+  body: [Object],
+  headers: {},
+  statusCode: 500
+}
+ GET /api/auth/get-session 200 in 2328ms
+[2m2025-12-20T04:49:27.297Z[0m [31mERROR[0m [1m[Better Auth]:[0m INTERNAL_SERVER_ERROR Error [NeonDbError]: Error connecting to database: TypeError: fetch failed
+    at async getSessionWithAuthBypass (src/lib/auth/auth-utils.ts:33:12)
+    at async Hero (src/components/blocks/hero.tsx:45:19)
+  31 |
+  32 |   if (cookieHeader) {
+> 33 |     return await auth.api.getSession({
+     |            ^
+  34 |       headers: headerList,
+  35 |     });
+  36 |   } {
+  severity: undefined,
+  code: undefined,
+  detail: undefined,
+  hint: undefined,
+  position: undefined,
+  internalPosition: undefined,
+  internalQuery: undefined,
+  where: undefined,
+  schema: undefined,
+  table: undefined,
+  column: undefined,
+  dataType: undefined,
+  constraint: undefined,
+  file: undefined,
+  line: undefined,
+  routine: undefined,
+  sourceError: TypeError: fetch failed
+      at async getSessionWithAuthBypass (src/lib/auth/auth-utils.ts:33:12)
+      at async Hero (src/components/blocks/hero.tsx:45:19)
+    31 |
+    32 |   if (cookieHeader) {
+  > 33 |     return await auth.api.getSession({
+       |            ^
+    34 |       headers: headerList,
+    35 |     });
+    36 |   } {
+    [cause]: [AggregateError: ] { code: 'ETIMEDOUT' }
+  }
+}
+ ⨯ [Error [APIError]: Failed to get session] {
+  status: 'INTERNAL_SERVER_ERROR',
+  body: [Object],
+  headers: {},
+  statusCode: 500,
+  digest: '3914836991'
+}
+ GET /favicon.ico 404 in 2531ms
+[2m2025-12-20T04:49:29.025Z[0m [31mERROR[0m [1m[Better Auth]:[0m INTERNAL_SERVER_ERROR Error [NeonDbError]: Error connecting to database: TypeError: fetch failed
+    at async GET (src/app/api/auth/get-session/route.ts:9:21)
+   7 | export async function GET(request: Request) {
+   8 |   try {
+>  9 |     const session = await auth.api.getSession({
+     |                     ^
+  10 |       headers: request.headers,
+  11 |     });
+  12 | {
+  severity: undefined,
+  code: undefined,
+  detail: undefined,
+  hint: undefined,
+  position: undefined,
+  internalPosition: undefined,
+  internalQuery: undefined,
+  where: undefined,
+  schema: undefined,
+  table: undefined,
+  column: undefined,
+  dataType: undefined,
+  constraint: undefined,
+  file: undefined,
+  line: undefined,
+  routine: undefined,
+  sourceError: TypeError: fetch failed
+      at async GET (src/app/api/auth/get-session/route.ts:9:21)
+     7 | export async function GET(request: Request) {
+     8 |   try {
+  >  9 |     const session = await auth.api.getSession({
+       |                     ^
+    10 |       headers: request.headers,
+    11 |     });
+    12 | {
+    [cause]: [AggregateError: ] { code: 'ETIMEDOUT' }
+  }
+}
+[get-session] failed to load session [Error [APIError]: Failed to get session] {
+  status: 'INTERNAL_SERVER_ERROR',
+  body: [Object],
+  headers: {},
+  statusCode: 500
+}
+ GET /api/auth/get-session 200 in 2121ms
+[2m2025-12-20T04:49:40.032Z[0m [31mERROR[0m [1m[Better Auth]:[0m INTERNAL_SERVER_ERROR Error [NeonDbError]: Error connecting to database: TypeError: fetch failed
+    at async getSessionWithAuthBypass (src/lib/auth/auth-utils.ts:33:12)
+    at async Hero (src/components/blocks/hero.tsx:45:19)
+  31 |
+  32 |   if (cookieHeader) {
+> 33 |     return await auth.api.getSession({
+     |            ^
+  34 |       headers: headerList,
+  35 |     });
+  36 |   } {
+  severity: undefined,
+  code: undefined,
+  detail: undefined,
+  hint: undefined,
+  position: undefined,
+  internalPosition: undefined,
+  internalQuery: undefined,
+  where: undefined,
+  schema: undefined,
+  table: undefined,
+  column: undefined,
+  dataType: undefined,
+  constraint: undefined,
+  file: undefined,
+  line: undefined,
+  routine: undefined,
+  sourceError: TypeError: fetch failed
+      at async getSessionWithAuthBypass (src/lib/auth/auth-utils.ts:33:12)
+      at async Hero (src/components/blocks/hero.tsx:45:19)
+    31 |
+    32 |   if (cookieHeader) {
+  > 33 |     return await auth.api.getSession({
+       |            ^
+    34 |       headers: headerList,
+    35 |     });
+    36 |   } {
+    [cause]: [AggregateError: ] { code: 'ETIMEDOUT' }
+  }
+}
+ ⨯ [Error [APIError]: Failed to get session] {
+  status: 'INTERNAL_SERVER_ERROR',
+  body: [Object],
+  headers: {},
+  statusCode: 500,
+  digest: '3914836991'
+}
+ GET /en 500 in 2211ms
+[2m2025-12-20T04:49:42.861Z[0m [31mERROR[0m [1m[Better Auth]:[0m INTERNAL_SERVER_ERROR Error [NeonDbError]: Error connecting to database: TypeError: fetch failed
+    at async GET (src/app/api/auth/get-session/route.ts:9:21)
+   7 | export async function GET(request: Request) {
+   8 |   try {
+>  9 |     const session = await auth.api.getSession({
+     |                     ^
+  10 |       headers: request.headers,
+  11 |     });
+  12 | {
+  severity: undefined,
+  code: undefined,
+  detail: undefined,
+  hint: undefined,
+  position: undefined,
+  internalPosition: undefined,
+  internalQuery: undefined,
+  where: undefined,
+  schema: undefined,
+  table: undefined,
+  column: undefined,
+  dataType: undefined,
+  constraint: undefined,
+  file: undefined,
+  line: undefined,
+  routine: undefined,
+  sourceError: TypeError: fetch failed
+      at async GET (src/app/api/auth/get-session/route.ts:9:21)
+     7 | export async function GET(request: Request) {
+     8 |   try {
+  >  9 |     const session = await auth.api.getSession({
+       |                     ^
+    10 |       headers: request.headers,
+    11 |     });
+    12 | {
+    [cause]: [AggregateError: ] { code: 'ETIMEDOUT' }
+  }
+}
+[get-session] failed to load session [Error [APIError]: Failed to get session] {
+  status: 'INTERNAL_SERVER_ERROR',
+  body: [Object],
+  headers: {},
+  statusCode: 500
+}
+ GET /api/auth/get-session 200 in 2418ms
+[2m2025-12-20T04:49:43.295Z[0m [31mERROR[0m [1m[Better Auth]:[0m INTERNAL_SERVER_ERROR Error [NeonDbError]: Error connecting to database: TypeError: fetch failed
+    at async getSessionWithAuthBypass (src/lib/auth/auth-utils.ts:33:12)
+    at async Hero (src/components/blocks/hero.tsx:45:19)
+  31 |
+  32 |   if (cookieHeader) {
+> 33 |     return await auth.api.getSession({
+     |            ^
+  34 |       headers: headerList,
+  35 |     });
+  36 |   } {
+  severity: undefined,
+  code: undefined,
+  detail: undefined,
+  hint: undefined,
+  position: undefined,
+  internalPosition: undefined,
+  internalQuery: undefined,
+  where: undefined,
+  schema: undefined,
+  table: undefined,
+  column: undefined,
+  dataType: undefined,
+  constraint: undefined,
+  file: undefined,
+  line: undefined,
+  routine: undefined,
+  sourceError: TypeError: fetch failed
+      at async getSessionWithAuthBypass (src/lib/auth/auth-utils.ts:33:12)
+      at async Hero (src/components/blocks/hero.tsx:45:19)
+    31 |
+    32 |   if (cookieHeader) {
+  > 33 |     return await auth.api.getSession({
+       |            ^
+    34 |       headers: headerList,
+    35 |     });
+    36 |   } {
+    [cause]: [AggregateError: ] { code: 'ETIMEDOUT' }
+  }
+}
+ ⨯ [Error [APIError]: Failed to get session] {
+  status: 'INTERNAL_SERVER_ERROR',
+  body: [Object],
+  headers: {},
+  statusCode: 500,
+  digest: '3914836991'
+}
+ GET /favicon.ico 404 in 2606ms
+[2m2025-12-20T04:49:45.025Z[0m [31mERROR[0m [1m[Better Auth]:[0m INTERNAL_SERVER_ERROR Error [NeonDbError]: Error connecting to database: TypeError: fetch failed
+    at async GET (src/app/api/auth/get-session/route.ts:9:21)
+   7 | export async function GET(request: Request) {
+   8 |   try {
+>  9 |     const session = await auth.api.getSession({
+     |                     ^
+  10 |       headers: request.headers,
+  11 |     });
+  12 | {
+  severity: undefined,
+  code: undefined,
+  detail: undefined,
+  hint: undefined,
+  position: undefined,
+  internalPosition: undefined,
+  internalQuery: undefined,
+  where: undefined,
+  schema: undefined,
+  table: undefined,
+  column: undefined,
+  dataType: undefined,
+  constraint: undefined,
+  file: undefined,
+  line: undefined,
+  routine: undefined,
+  sourceError: TypeError: fetch failed
+      at async GET (src/app/api/auth/get-session/route.ts:9:21)
+     7 | export async function GET(request: Request) {
+     8 |   try {
+  >  9 |     const session = await auth.api.getSession({
+       |                     ^
+    10 |       headers: request.headers,
+    11 |     });
+    12 | {
+    [cause]: [AggregateError: ] { code: 'ETIMEDOUT' }
+  }
+}
+[get-session] failed to load session [Error [APIError]: Failed to get session] {
+  status: 'INTERNAL_SERVER_ERROR',
+  body: [Object],
+  headers: {},
+  statusCode: 500
+}
+ GET /api/auth/get-session 200 in 2136ms
+[2m2025-12-20T04:49:46.987Z[0m [31mERROR[0m [1m[Better Auth]:[0m INTERNAL_SERVER_ERROR Error [NeonDbError]: Error connecting to database: TypeError: fetch failed
+    at async getSessionWithAuthBypass (src/lib/auth/auth-utils.ts:33:12)
+    at async Hero (src/components/blocks/hero.tsx:45:19)
+  31 |
+  32 |   if (cookieHeader) {
+> 33 |     return await auth.api.getSession({
+     |            ^
+  34 |       headers: headerList,
+  35 |     });
+  36 |   } {
+  severity: undefined,
+  code: undefined,
+  detail: undefined,
+  hint: undefined,
+  position: undefined,
+  internalPosition: undefined,
+  internalQuery: undefined,
+  where: undefined,
+  schema: undefined,
+  table: undefined,
+  column: undefined,
+  dataType: undefined,
+  constraint: undefined,
+  file: undefined,
+  line: undefined,
+  routine: undefined,
+  sourceError: TypeError: fetch failed
+      at async getSessionWithAuthBypass (src/lib/auth/auth-utils.ts:33:12)
+      at async Hero (src/components/blocks/hero.tsx:45:19)
+    31 |
+    32 |   if (cookieHeader) {
+  > 33 |     return await auth.api.getSession({
+       |            ^
+    34 |       headers: headerList,
+    35 |     });
+    36 |   } {
+    [cause]: [AggregateError: ] { code: 'ETIMEDOUT' }
+  }
+}
+ ⨯ [Error [APIError]: Failed to get session] {
+  status: 'INTERNAL_SERVER_ERROR',
+  body: [Object],
+  headers: {},
+  statusCode: 500,
+  digest: '3914836991'
+}
+ GET /en 500 in 5427ms
+[2m2025-12-20T04:49:49.754Z[0m [31mERROR[0m [1m[Better Auth]:[0m INTERNAL_SERVER_ERROR Error [NeonDbError]: Error connecting to database: TypeError: fetch failed
+    at async GET (src/app/api/auth/get-session/route.ts:9:21)
+   7 | export async function GET(request: Request) {
+   8 |   try {
+>  9 |     const session = await auth.api.getSession({
+     |                     ^
+  10 |       headers: request.headers,
+  11 |     });
+  12 | {
+  severity: undefined,
+  code: undefined,
+  detail: undefined,
+  hint: undefined,
+  position: undefined,
+  internalPosition: undefined,
+  internalQuery: undefined,
+  where: undefined,
+  schema: undefined,
+  table: undefined,
+  column: undefined,
+  dataType: undefined,
+  constraint: undefined,
+  file: undefined,
+  line: undefined,
+  routine: undefined,
+  sourceError: TypeError: fetch failed
+      at async GET (src/app/api/auth/get-session/route.ts:9:21)
+     7 | export async function GET(request: Request) {
+     8 |   try {
+  >  9 |     const session = await auth.api.getSession({
+       |                     ^
+    10 |       headers: request.headers,
+    11 |     });
+    12 | {
+    [cause]: [AggregateError: ] { code: 'ETIMEDOUT' }
+  }
+}
+[get-session] failed to load session [Error [APIError]: Failed to get session] {
+  status: 'INTERNAL_SERVER_ERROR',
+  body: [Object],
+  headers: {},
+  statusCode: 500
+}
+ GET /api/auth/get-session 200 in 2391ms
+[2m2025-12-20T04:49:51.984Z[0m [31mERROR[0m [1m[Better Auth]:[0m INTERNAL_SERVER_ERROR Error [NeonDbError]: Error connecting to database: TypeError: fetch failed
+    at async GET (src/app/api/auth/get-session/route.ts:9:21)
+   7 | export async function GET(request: Request) {
+   8 |   try {
+>  9 |     const session = await auth.api.getSession({
+     |                     ^
+  10 |       headers: request.headers,
+  11 |     });
+  12 | {
+  severity: undefined,
+  code: undefined,
+  detail: undefined,
+  hint: undefined,
+  position: undefined,
+  internalPosition: undefined,
+  internalQuery: undefined,
+  where: undefined,
+  schema: undefined,
+  table: undefined,
+  column: undefined,
+  dataType: undefined,
+  constraint: undefined,
+  file: undefined,
+  line: undefined,
+  routine: undefined,
+  sourceError: TypeError: fetch failed
+      at async GET (src/app/api/auth/get-session/route.ts:9:21)
+     7 | export async function GET(request: Request) {
+     8 |   try {
+  >  9 |     const session = await auth.api.getSession({
+       |                     ^
+    10 |       headers: request.headers,
+    11 |     });
+    12 | {
+    [cause]: [AggregateError: ] { code: 'ETIMEDOUT' }
+  }
+}
+[get-session] failed to load session [Error [APIError]: Failed to get session] {
+  status: 'INTERNAL_SERVER_ERROR',
+  body: [Object],
+  headers: {},
+  statusCode: 500
+}
+ GET /api/auth/get-session 200 in 2203ms
+[2m2025-12-20T04:49:52.702Z[0m [31mERROR[0m [1m[Better Auth]:[0m INTERNAL_SERVER_ERROR Error [NeonDbError]: Error connecting to database: TypeError: fetch failed
+    at async getSessionWithAuthBypass (src/lib/auth/auth-utils.ts:33:12)
+    at async Hero (src/components/blocks/hero.tsx:45:19)
+  31 |
+  32 |   if (cookieHeader) {
+> 33 |     return await auth.api.getSession({
+     |            ^
+  34 |       headers: headerList,
+  35 |     });
+  36 |   } {
+  severity: undefined,
+  code: undefined,
+  detail: undefined,
+  hint: undefined,
+  position: undefined,
+  internalPosition: undefined,
+  internalQuery: undefined,
+  where: undefined,
+  schema: undefined,
+  table: undefined,
+  column: undefined,
+  dataType: undefined,
+  constraint: undefined,
+  file: undefined,
+  line: undefined,
+  routine: undefined,
+  sourceError: TypeError: fetch failed
+      at async getSessionWithAuthBypass (src/lib/auth/auth-utils.ts:33:12)
+      at async Hero (src/components/blocks/hero.tsx:45:19)
+    31 |
+    32 |   if (cookieHeader) {
+  > 33 |     return await auth.api.getSession({
+       |            ^
+    34 |       headers: headerList,
+    35 |     });
+    36 |   } {
+    [cause]: [AggregateError: ] { code: 'ETIMEDOUT' }
+  }
+}
+ ⨯ [Error [APIError]: Failed to get session] {
+  status: 'INTERNAL_SERVER_ERROR',
+  body: [Object],
+  headers: {},
+  statusCode: 500,
+  digest: '3914836991'
+}
+ GET /favicon.ico 404 in 5070ms
+ GET /en 200 in 1448ms
+[2m2025-12-20T04:51:56.828Z[0m [31mERROR[0m [1m[Better Auth]:[0m INTERNAL_SERVER_ERROR Error [NeonDbError]: Error connecting to database: TypeError: fetch failed
+    at async getSessionWithAuthBypass (src/lib/auth/auth-utils.ts:33:12)
+    at async Hero (src/components/blocks/hero.tsx:45:19)
+  31 |
+  32 |   if (cookieHeader) {
+> 33 |     return await auth.api.getSession({
+     |            ^
+  34 |       headers: headerList,
+  35 |     });
+  36 |   } {
+  severity: undefined,
+  code: undefined,
+  detail: undefined,
+  hint: undefined,
+  position: undefined,
+  internalPosition: undefined,
+  internalQuery: undefined,
+  where: undefined,
+  schema: undefined,
+  table: undefined,
+  column: undefined,
+  dataType: undefined,
+  constraint: undefined,
+  file: undefined,
+  line: undefined,
+  routine: undefined,
+  sourceError: TypeError: fetch failed
+      at async getSessionWithAuthBypass (src/lib/auth/auth-utils.ts:33:12)
+      at async Hero (src/components/blocks/hero.tsx:45:19)
+    31 |
+    32 |   if (cookieHeader) {
+  > 33 |     return await auth.api.getSession({
+       |            ^
+    34 |       headers: headerList,
+    35 |     });
+    36 |   } {
+    [cause]: [AggregateError: ] { code: 'ETIMEDOUT' }
+  }
+}
+ ⨯ [Error [APIError]: Failed to get session] {
+  status: 'INTERNAL_SERVER_ERROR',
+  body: [Object],
+  headers: {},
+  statusCode: 500,
+  digest: '3914836991'
+}
+[2m2025-12-20T04:51:58.418Z[0m [31mERROR[0m [1m[Better Auth]:[0m INTERNAL_SERVER_ERROR Error [NeonDbError]: Error connecting to database: TypeError: fetch failed
+    at async getSessionWithAuthBypass (src/lib/auth/auth-utils.ts:33:12)
+    at async Hero (src/components/blocks/hero.tsx:45:19)
+  31 |
+  32 |   if (cookieHeader) {
+> 33 |     return await auth.api.getSession({
+     |            ^
+  34 |       headers: headerList,
+  35 |     });
+  36 |   } {
+  severity: undefined,
+  code: undefined,
+  detail: undefined,
+  hint: undefined,
+  position: undefined,
+  internalPosition: undefined,
+  internalQuery: undefined,
+  where: undefined,
+  schema: undefined,
+  table: undefined,
+  column: undefined,
+  dataType: undefined,
+  constraint: undefined,
+  file: undefined,
+  line: undefined,
+  routine: undefined,
+  sourceError: TypeError: fetch failed
+      at async getSessionWithAuthBypass (src/lib/auth/auth-utils.ts:33:12)
+      at async Hero (src/components/blocks/hero.tsx:45:19)
+    31 |
+    32 |   if (cookieHeader) {
+  > 33 |     return await auth.api.getSession({
+       |            ^
+    34 |       headers: headerList,
+    35 |     });
+    36 |   } {
+    [cause]: [AggregateError: ] { code: 'ETIMEDOUT' }
+  }
+}
+ ⨯ [Error [APIError]: Failed to get session] {
+  status: 'INTERNAL_SERVER_ERROR',
+  body: [Object],
+  headers: {},
+  statusCode: 500,
+  digest: '3914836991'
+}
+ GET /en 500 in 2358ms
+[2m2025-12-20T04:52:01.842Z[0m [31mERROR[0m [1m[Better Auth]:[0m INTERNAL_SERVER_ERROR Error [NeonDbError]: Error connecting to database: TypeError: fetch failed
+    at async GET (src/app/api/auth/get-session/route.ts:9:21)
+   7 | export async function GET(request: Request) {
+   8 |   try {
+>  9 |     const session = await auth.api.getSession({
+     |                     ^
+  10 |       headers: request.headers,
+  11 |     });
+  12 | {
+  severity: undefined,
+  code: undefined,
+  detail: undefined,
+  hint: undefined,
+  position: undefined,
+  internalPosition: undefined,
+  internalQuery: undefined,
+  where: undefined,
+  schema: undefined,
+  table: undefined,
+  column: undefined,
+  dataType: undefined,
+  constraint: undefined,
+  file: undefined,
+  line: undefined,
+  routine: undefined,
+  sourceError: TypeError: fetch failed
+      at async GET (src/app/api/auth/get-session/route.ts:9:21)
+     7 | export async function GET(request: Request) {
+     8 |   try {
+  >  9 |     const session = await auth.api.getSession({
+       |                     ^
+    10 |       headers: request.headers,
+    11 |     });
+    12 | {
+    [cause]: [AggregateError: ] { code: 'ETIMEDOUT' }
+  }
+}
+[get-session] failed to load session [Error [APIError]: Failed to get session] {
+  status: 'INTERNAL_SERVER_ERROR',
+  body: [Object],
+  headers: {},
+  statusCode: 500
+}
+ GET /api/auth/get-session 200 in 2377ms
+[2m2025-12-20T04:52:02.280Z[0m [31mERROR[0m [1m[Better Auth]:[0m INTERNAL_SERVER_ERROR Error [NeonDbError]: Error connecting to database: TypeError: fetch failed
+    at async getSessionWithAuthBypass (src/lib/auth/auth-utils.ts:33:12)
+    at async Hero (src/components/blocks/hero.tsx:45:19)
+  31 |
+  32 |   if (cookieHeader) {
+> 33 |     return await auth.api.getSession({
+     |            ^
+  34 |       headers: headerList,
+  35 |     });
+  36 |   } {
+  severity: undefined,
+  code: undefined,
+  detail: undefined,
+  hint: undefined,
+  position: undefined,
+  internalPosition: undefined,
+  internalQuery: undefined,
+  where: undefined,
+  schema: undefined,
+  table: undefined,
+  column: undefined,
+  dataType: undefined,
+  constraint: undefined,
+  file: undefined,
+  line: undefined,
+  routine: undefined,
+  sourceError: TypeError: fetch failed
+      at async getSessionWithAuthBypass (src/lib/auth/auth-utils.ts:33:12)
+      at async Hero (src/components/blocks/hero.tsx:45:19)
+    31 |
+    32 |   if (cookieHeader) {
+  > 33 |     return await auth.api.getSession({
+       |            ^
+    34 |       headers: headerList,
+    35 |     });
+    36 |   } {
+    [cause]: [AggregateError: ] { code: 'ETIMEDOUT' }
+  }
+}
+ ⨯ [Error [APIError]: Failed to get session] {
+  status: 'INTERNAL_SERVER_ERROR',
+  body: [Object],
+  headers: {},
+  statusCode: 500,
+  digest: '3914836991'
+}
+ GET /favicon.ico 404 in 2593ms
+[2m2025-12-20T04:52:04.127Z[0m [31mERROR[0m [1m[Better Auth]:[0m INTERNAL_SERVER_ERROR Error [NeonDbError]: Error connecting to database: TypeError: fetch failed
+    at async GET (src/app/api/auth/get-session/route.ts:9:21)
+   7 | export async function GET(request: Request) {
+   8 |   try {
+>  9 |     const session = await auth.api.getSession({
+     |                     ^
+  10 |       headers: request.headers,
+  11 |     });
+  12 | {
+  severity: undefined,
+  code: undefined,
+  detail: undefined,
+  hint: undefined,
+  position: undefined,
+  internalPosition: undefined,
+  internalQuery: undefined,
+  where: undefined,
+  schema: undefined,
+  table: undefined,
+  column: undefined,
+  dataType: undefined,
+  constraint: undefined,
+  file: undefined,
+  line: undefined,
+  routine: undefined,
+  sourceError: TypeError: fetch failed
+      at async GET (src/app/api/auth/get-session/route.ts:9:21)
+     7 | export async function GET(request: Request) {
+     8 |   try {
+  >  9 |     const session = await auth.api.getSession({
+       |                     ^
+    10 |       headers: request.headers,
+    11 |     });
+    12 | {
+    [cause]: [AggregateError: ] { code: 'ETIMEDOUT' }
+  }
+}
+[get-session] failed to load session [Error [APIError]: Failed to get session] {
+  status: 'INTERNAL_SERVER_ERROR',
+  body: [Object],
+  headers: {},
+  statusCode: 500
+}
+ GET /api/auth/get-session 200 in 2236ms

@@ -577,6 +577,8 @@
     "filterType": "タイプでフィルター",
     "all": "すべて",
     "download": "ダウンロード",
+    "delete": "Delete",
+    "confirmDelete": "Delete this asset? This cannot be undone.",
     "noAssets": "アセットがありません",
     "noAssetsDesc": "最初のコンテンツを生成してみましょう",
     "noAssetsSearch": "一致するアセットが見つかりませんでした",

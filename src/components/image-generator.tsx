@@ -1790,11 +1790,7 @@ export default function ImageGenerator() {
           </div>
         )}
         {isPublishModalOpen && (
-          <div
-            role="dialog"
-            aria-modal="true"
-            className="fixed inset-0 z-50 grid place-items-center bg-black/60 p-4"
-          >
+          <dialog open className="fixed inset-0 z-50 grid place-items-center bg-black/60 p-4">
             <div className="max-w-md rounded-2xl bg-white p-6 shadow-xl space-y-4 text-slate-700">
               <div className="flex items-start gap-3">
                 <div className="rounded-full bg-teal-100 p-2 text-teal-600">
@@ -1824,7 +1820,7 @@ export default function ImageGenerator() {
                 </Button>
               </div>
             </div>
-          </div>
+          </dialog>
         )}
       </div>
     </div>

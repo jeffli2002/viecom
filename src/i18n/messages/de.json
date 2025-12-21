@@ -577,6 +577,8 @@
     "filterType": "Typ filtern",
     "all": "Alle",
     "download": "Herunterladen",
+    "delete": "Delete",
+    "confirmDelete": "Delete this asset? This cannot be undone.",
     "noAssets": "Keine Assets",
     "noAssetsDesc": "Beginnen Sie mit der Generierung Ihres ersten Inhalts",
     "noAssetsSearch": "Keine passenden Assets gefunden",

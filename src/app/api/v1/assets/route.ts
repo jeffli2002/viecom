@@ -1,7 +1,8 @@
 import { auth } from '@/lib/auth/auth';
+import { r2StorageService } from '@/lib/storage/r2';
 import { db } from '@/server/db';
 import { generatedAsset } from '@/server/db/schema';
-import { desc, eq } from 'drizzle-orm';
+import { and, desc, eq } from 'drizzle-orm';
 import { type NextRequest, NextResponse } from 'next/server';
 
 export const dynamic = 'force-dynamic';
@@ -59,6 +60,56 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(
       {
         error: error instanceof Error ? error.message : 'Failed to get assets',
+      },
+      { status: 500 }
+    );
+  }
+}
+
+export async function DELETE(request: NextRequest) {
+  try {
+    const session = await auth.api.getSession({
+      headers: request.headers,
+    });
+
+    if (!session?.user?.id) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const { searchParams } = new URL(request.url);
+    const assetId = searchParams.get('id');
+
+    if (!assetId) {
+      return NextResponse.json({ error: 'Missing asset id' }, { status: 400 });
+    }
+
+    const [asset] = await db
+      .select({
+        id: generatedAsset.id,
+        r2Key: generatedAsset.r2Key,
+      })
+      .from(generatedAsset)
+      .where(and(eq(generatedAsset.id, assetId), eq(generatedAsset.userId, session.user.id)))
+      .limit(1);
+
+    if (!asset) {
+      return NextResponse.json({ error: 'Asset not found' }, { status: 404 });
+    }
+
+    if (asset.r2Key) {
+      await r2StorageService.deleteFile(asset.r2Key);
+    }
+
+    await db
+      .delete(generatedAsset)
+      .where(and(eq(generatedAsset.id, assetId), eq(generatedAsset.userId, session.user.id)));
+
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    console.error('Delete asset error:', error);
+    return NextResponse.json(
+      {
+        error: error instanceof Error ? error.message : 'Failed to delete asset',
       },
       { status: 500 }
     );

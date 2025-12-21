@@ -3,7 +3,7 @@ import { creemService } from '@/lib/creem/creem-service';
 import { resolvePlanByIdentifier } from '@/lib/creem/plan-utils';
 import { isCreemConfigured } from '@/payment/creem/client';
 import { paymentRepository } from '@/server/db/repositories/payment-repository';
-import { headers } from 'next/headers';
+import { cookies, headers } from 'next/headers';
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 
@@ -71,6 +71,13 @@ export async function POST(request: Request) {
     if (!planId) {
       return NextResponse.json({ error: 'Invalid plan selection' }, { status: 400 });
     }
+
+    const cookieStore = await cookies();
+    const affiliateCookie = cookieStore.get('aff_ref')?.value?.trim();
+    const affiliateCode =
+      affiliateCookie && /^[A-Za-z0-9_-]{4,32}$/.test(affiliateCookie)
+        ? affiliateCookie
+        : undefined;
 
     const billingInterval: 'month' | 'year' = interval || 'month';
     const successRedirect = successUrl || DEFAULT_SUCCESS_URL;
@@ -151,6 +158,7 @@ export async function POST(request: Request) {
       successUrl: successRedirect,
       cancelUrl: cancelRedirect,
       currentPlan: currentPlanForMetadata,
+      affiliateCode,
     });
 
     if (!checkoutResult.success || !checkoutResult.url) {

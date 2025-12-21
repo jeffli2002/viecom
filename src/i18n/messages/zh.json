@@ -577,6 +577,8 @@
     "filterType": "筛选类型",
     "all": "全部",
     "download": "下载",
+    "delete": "Delete",
+    "confirmDelete": "Delete this asset? This cannot be undone.",
     "noAssets": "暂无资产",
     "noAssetsDesc": "开始生成你的第一个内容吧",
     "noAssetsSearch": "没有找到匹配的资产",

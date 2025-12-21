@@ -1,6 +1,7 @@
 import {
   boolean,
   decimal,
+  index,
   integer,
   jsonb,
   pgTable,
@@ -71,6 +72,183 @@ export const verification = pgTable('verification', {
   updatedAt: timestamp('updated_at').$defaultFn(() => new Date()),
 });
 
+// Affiliate (Distribution) system
+export const affiliateProgram = pgTable('affiliate_program', {
+  id: text('id').primaryKey(), // use a singleton row, e.g. "default"
+  enabled: boolean('enabled').notNull().default(true),
+  attributionWindowDays: integer('attribution_window_days').notNull().default(30),
+  settlementDelayDays: integer('settlement_delay_days').notNull().default(7),
+  negativeBalanceLimitCents: integer('negative_balance_limit_cents').notNull().default(10000),
+  defaultCommissionBps: integer('default_commission_bps').notNull().default(1000), // 10.00%
+  createdAt: timestamp('created_at')
+    .$defaultFn(() => new Date())
+    .notNull(),
+  updatedAt: timestamp('updated_at')
+    .$defaultFn(() => new Date())
+    .notNull(),
+});
+
+export const affiliate = pgTable(
+  'affiliate',
+  {
+    id: text('id').primaryKey(),
+    userId: text('user_id')
+      .notNull()
+      .unique()
+      .references(() => user.id, { onDelete: 'cascade' }),
+    code: text('code').notNull(),
+    status: text('status', { enum: ['pending', 'active', 'suspended', 'banned'] })
+      .notNull()
+      .default('active'),
+    // Reserved for 2nd-level / team structure (not used in v1)
+    parentAffiliateId: text('parent_affiliate_id'),
+    createdAt: timestamp('created_at')
+      .$defaultFn(() => new Date())
+      .notNull(),
+    updatedAt: timestamp('updated_at')
+      .$defaultFn(() => new Date())
+      .notNull(),
+  },
+  (table) => ({
+    codeUnique: uniqueIndex('affiliate_code_unique').on(table.code),
+  })
+);
+
+export const affiliateApplication = pgTable('affiliate_application', {
+  id: text('id').primaryKey(),
+  userId: text('user_id')
+    .notNull()
+    .unique()
+    .references(() => user.id, { onDelete: 'cascade' }),
+  name: text('name').notNull(),
+  email: text('email').notNull(),
+  companyName: text('company_name'),
+  companyDescription: text('company_description'),
+  channels: jsonb('channels').$type<string[]>().notNull().default([]),
+  address: text('address'),
+  city: text('city'),
+  country: text('country'),
+  zipCode: text('zip_code'),
+  region: text('region'),
+  payoutMethod: text('payout_method'),
+  payoutAccount: text('payout_account'),
+  status: text('status').notNull().default('submitted'),
+  createdAt: timestamp('created_at')
+    .$defaultFn(() => new Date())
+    .notNull(),
+  updatedAt: timestamp('updated_at')
+    .$defaultFn(() => new Date())
+    .notNull(),
+});
+
+export const affiliateClick = pgTable(
+  'affiliate_click',
+  {
+    id: text('id').primaryKey(),
+    affiliateId: text('affiliate_id')
+      .notNull()
+      .references(() => affiliate.id, { onDelete: 'cascade' }),
+    affiliateCode: text('affiliate_code').notNull(),
+    userId: text('user_id').references(() => user.id, { onDelete: 'set null' }),
+    path: text('path'),
+    referrer: text('referrer'),
+    ipHash: text('ip_hash'),
+    userAgentHash: text('user_agent_hash'),
+    createdAt: timestamp('created_at')
+      .$defaultFn(() => new Date())
+      .notNull(),
+  },
+  (table) => ({
+    affiliateIdIdx: index('affiliate_click_affiliate_id_idx').on(table.affiliateId),
+  })
+);
+
+export const affiliateCommission = pgTable(
+  'affiliate_commission',
+  {
+    id: text('id').primaryKey(),
+    affiliateId: text('affiliate_id')
+      .notNull()
+      .references(() => affiliate.id, { onDelete: 'cascade' }),
+    buyerUserId: text('buyer_user_id').references(() => user.id, { onDelete: 'set null' }),
+    sourceType: text('source_type', {
+      enum: ['credit_pack_purchase', 'subscription_initial', 'subscription_renewal'],
+    }).notNull(),
+    sourceId: text('source_id'), // e.g. orderId / checkoutId / subscriptionId
+    provider: text('provider', { enum: ['stripe', 'creem'] }).notNull(),
+    providerEventId: text('provider_event_id').notNull(),
+    currency: text('currency').notNull().default('USD'),
+    baseAmountCents: integer('base_amount_cents').notNull(),
+    commissionBps: integer('commission_bps').notNull(),
+    commissionAmountCents: integer('commission_amount_cents').notNull(),
+    status: text('status', { enum: ['pending', 'available', 'paid', 'void'] })
+      .notNull()
+      .default('available'),
+    availableAt: timestamp('available_at')
+      .$defaultFn(() => new Date())
+      .notNull(),
+    createdAt: timestamp('created_at')
+      .$defaultFn(() => new Date())
+      .notNull(),
+  },
+  (table) => ({
+    providerEventUnique: uniqueIndex('affiliate_commission_provider_event_unique').on(
+      table.provider,
+      table.providerEventId
+    ),
+    affiliateIdIdx: index('affiliate_commission_affiliate_id_idx').on(table.affiliateId),
+  })
+);
+
+export const affiliateWalletLedger = pgTable(
+  'affiliate_wallet_ledger',
+  {
+    id: text('id').primaryKey(),
+    affiliateId: text('affiliate_id')
+      .notNull()
+      .references(() => affiliate.id, { onDelete: 'cascade' }),
+    type: text('type', { enum: ['commission', 'payout', 'adjustment', 'reversal'] }).notNull(),
+    amountCents: integer('amount_cents').notNull(), // signed integer
+    currency: text('currency').notNull().default('USD'),
+    referenceType: text('reference_type').notNull(),
+    referenceId: text('reference_id').notNull(),
+    metadata: jsonb('metadata').$type<Record<string, unknown> | null>(),
+    createdAt: timestamp('created_at')
+      .$defaultFn(() => new Date())
+      .notNull(),
+  },
+  (table) => ({
+    referenceUnique: uniqueIndex('affiliate_wallet_reference_unique').on(
+      table.affiliateId,
+      table.referenceType,
+      table.referenceId
+    ),
+    affiliateIdIdx: index('affiliate_wallet_affiliate_id_idx').on(table.affiliateId),
+  })
+);
+
+export const affiliatePayout = pgTable('affiliate_payout', {
+  id: text('id').primaryKey(),
+  affiliateId: text('affiliate_id')
+    .notNull()
+    .references(() => affiliate.id, { onDelete: 'cascade' }),
+  amountCents: integer('amount_cents').notNull(),
+  currency: text('currency').notNull().default('USD'),
+  status: text('status', { enum: ['requested', 'approved', 'paid', 'rejected', 'failed'] })
+    .notNull()
+    .default('requested'),
+  evidenceUrl: text('evidence_url'),
+  externalReference: text('external_reference'),
+  paidAt: timestamp('paid_at'),
+  metadata: jsonb('metadata').$type<Record<string, unknown> | null>(),
+  createdAt: timestamp('created_at')
+    .$defaultFn(() => new Date())
+    .notNull(),
+  updatedAt: timestamp('updated_at')
+    .$defaultFn(() => new Date())
+    .notNull(),
+});
+
 // Credit system
 export const userCredits = pgTable('user_credits', {
   id: text('id').primaryKey(),
@@ -137,6 +315,8 @@ export const creditPackPurchase = pgTable('credit_pack_purchase', {
   userId: text('user_id')
     .notNull()
     .references(() => user.id, { onDelete: 'cascade' }),
+  affiliateId: text('affiliate_id').references(() => affiliate.id, { onDelete: 'set null' }),
+  affiliateCode: text('affiliate_code'),
   creditPackId: text('credit_pack_id').notNull(),
   credits: integer('credits').notNull(),
   amountCents: integer('amount_cents').notNull(),
@@ -183,6 +363,8 @@ export const payment = pgTable('payment', {
   scheduledPeriodStart: timestamp('scheduled_period_start'),
   scheduledPeriodEnd: timestamp('scheduled_period_end'),
   scheduledAt: timestamp('scheduled_at'),
+  affiliateId: text('affiliate_id').references(() => affiliate.id, { onDelete: 'set null' }),
+  affiliateCode: text('affiliate_code'),
   createdAt: timestamp('created_at')
     .$defaultFn(() => new Date())
     .notNull(),

@@ -40,4 +40,3 @@ export function Deferred({ children, timeoutMs = 1200 }: DeferredProps) {
   if (!ready) return null;
   return <>{children}</>;
 }
-

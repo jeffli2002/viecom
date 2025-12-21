@@ -55,6 +55,7 @@ export interface CreateCheckoutSessionParams {
   successUrl: string;
   cancelUrl: string;
   currentPlan?: 'free' | 'pro' | 'proplus';
+  affiliateCode?: string;
 }
 
 const getErrorMessage = (error: unknown) => {
@@ -110,6 +111,7 @@ class CreemPaymentService {
     successUrl,
     cancelUrl: _cancelUrl,
     currentPlan = 'free',
+    affiliateCode,
   }: CreateCheckoutSessionParams) {
     try {
       const CREEM_API_KEY = getCreemApiKey();
@@ -144,6 +146,7 @@ class CreemPaymentService {
           planId: planId,
           currentPlan: currentPlan,
           interval: interval,
+          ...(affiliateCode ? { affiliateCode } : {}),
         },
         customer: {
           email: userEmail,
@@ -216,12 +219,14 @@ class CreemPaymentService {
     productKey,
     successUrl,
     cancelUrl: _cancelUrl,
+    affiliateCode,
   }: {
     userId: string;
     userEmail: string;
     productKey: string;
     successUrl: string;
     cancelUrl: string;
+    affiliateCode?: string;
   }) {
     try {
       const CREEM_API_KEY = getCreemApiKey();
@@ -245,6 +250,7 @@ class CreemPaymentService {
           userId: userId,
           userEmail: userEmail,
           type: 'credit_pack',
+          ...(affiliateCode ? { affiliateCode } : {}),
         },
         customer: {
           email: userEmail,
@@ -903,6 +909,7 @@ class CreemPaymentService {
         return this.handleSubscriptionDeleted(eventData as CreemSubscriptionPayload);
 
       case 'subscription.paid':
+      case 'payment.succeeded':
         return this.handlePaymentSuccess(eventData as CreemSubscriptionPayload);
 
       case 'subscription.expired':
@@ -948,6 +955,7 @@ class CreemPaymentService {
 
     const customerId = typeof customer === 'string' ? customer : customer?.id;
     const userId = metadata?.userId || customer?.external_id;
+    const affiliateCode = metadata?.affiliateCode as string | undefined;
 
     if (!id || !customerId) {
       return { success: true };
@@ -976,6 +984,7 @@ class CreemPaymentService {
       userId: userId,
       status: status,
       planId: planId,
+      affiliateCode,
       trialPeriodDays: trial_period_days,
       trialStart: trial_start_date ? new Date(trial_start_date) : undefined,
       trialEnd: trial_end_date ? new Date(trial_end_date) : undefined,
@@ -1011,6 +1020,7 @@ class CreemPaymentService {
       (metadata as { userId?: string } | undefined)?.userId ||
       customerObj?.external_id ||
       (checkout as { userId?: string }).userId;
+    const affiliateCode = (metadata as { affiliateCode?: string } | undefined)?.affiliateCode;
 
     // Check if this is a one-time credit pack purchase
     const metadataType = (metadata as { type?: string } | undefined)?.type;
@@ -1091,6 +1101,7 @@ class CreemPaymentService {
         currency: orderCurrency,
         checkoutId: (checkout as { id?: string }).id as string | undefined,
         orderId: (order as { id?: string } | undefined)?.id as string | undefined,
+        affiliateCode: affiliateCode as string | undefined,
       };
     }
 
@@ -1138,6 +1149,7 @@ class CreemPaymentService {
       billingInterval: billingInterval as string | undefined,
       interval: normalizedInterval as string | undefined,
       status: status as string | undefined,
+      affiliateCode: affiliateCode as string | undefined,
     };
   }
 
@@ -1191,16 +1203,49 @@ class CreemPaymentService {
   }
 
   private async handlePaymentSuccess(subscription: CreemSubscriptionPayload) {
-    const { customer, id, metadata } = subscription;
+    const { customer, id, metadata, order, amount, currency } = subscription;
 
     const customerId = typeof customer === 'string' ? customer : customer?.id;
     const userId = metadata?.userId;
+    const affiliateCode = metadata?.affiliateCode as string | undefined;
+
+    const orderObj = typeof order === 'object' ? (order as Record<string, unknown>) : undefined;
+    const orderId =
+      (orderObj?.id as string | undefined) ||
+      (orderObj?.order_id as string | undefined) ||
+      (subscription as { orderId?: string } | undefined)?.orderId;
+
+    const amountRaw =
+      typeof amount === 'number'
+        ? amount
+        : typeof orderObj?.amount_paid === 'number'
+          ? (orderObj.amount_paid as number)
+          : typeof orderObj?.amount === 'number'
+            ? (orderObj.amount as number)
+            : undefined;
+
+    const amountCents =
+      typeof amountRaw === 'number' && Number.isFinite(amountRaw)
+        ? amountRaw > 100
+          ? Math.round(amountRaw)
+          : Math.round(amountRaw * 100)
+        : undefined;
+
+    const currencyRaw =
+      (typeof currency === 'string' ? currency : undefined) ||
+      (typeof orderObj?.currency === 'string' ? (orderObj.currency as string) : undefined) ||
+      undefined;
 
     return {
       type: 'payment_success',
       customerId: customerId,
       subscriptionId: id,
       userId: userId,
+      affiliateCode,
+      orderId,
+      amount: amountRaw,
+      amountCents,
+      currency: currencyRaw,
     };
   }
 
@@ -1224,6 +1269,7 @@ class CreemPaymentService {
     const customerId = typeof customer === 'string' ? customer : customer?.id;
     const userId = metadata?.userId;
     const planId = metadata?.planId || this.getPlanFromProduct(product?.id);
+    const affiliateCode = metadata?.affiliateCode as string | undefined;
 
     return {
       type: 'subscription_trial_will_end',
@@ -1231,6 +1277,7 @@ class CreemPaymentService {
       userId: userId,
       planId: planId,
       trialEndDate: trial_end_date ? new Date(trial_end_date) : undefined,
+      affiliateCode,
     };
   }
 
@@ -1240,6 +1287,7 @@ class CreemPaymentService {
     const customerId = typeof customer === 'string' ? customer : customer?.id;
     const userId = metadata?.userId;
     const planId = metadata?.planId || this.getPlanFromProduct(product?.id);
+    const affiliateCode = metadata?.affiliateCode as string | undefined;
 
     return {
       type: 'subscription_trial_ended',
@@ -1247,6 +1295,7 @@ class CreemPaymentService {
       userId: userId,
       subscriptionId: id,
       planId: planId,
+      affiliateCode,
     };
   }
 

@@ -113,6 +113,8 @@ export interface PaymentRecord {
   cancelAtPeriodEnd?: boolean;
   trialStart?: Date;
   trialEnd?: Date;
+  affiliateId?: string;
+  affiliateCode?: string;
   // Scheduled upgrade fields (方案2: 单条记录+字段)
   scheduledPlanId?: string;
   scheduledInterval?: PaymentInterval;

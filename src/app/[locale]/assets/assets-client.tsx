@@ -12,7 +12,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { useAuthStore } from '@/store/auth-store';
-import { Download, Image as ImageIcon, Loader2, Search, Video } from 'lucide-react';
+import { Download, Image as ImageIcon, Loader2, Search, Video, X } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -38,6 +38,7 @@ function AssetsPageContent() {
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [filterType, setFilterType] = useState<'all' | 'image' | 'video'>('all');
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   useEffect(() => {
     if (!authLoading && !isAuthenticated) {
@@ -140,6 +141,35 @@ function AssetsPageContent() {
     }
   };
 
+  const handleDelete = async (asset: Asset) => {
+    if (deletingId) {
+      return;
+    }
+
+    const confirmed = window.confirm(t('confirmDelete'));
+    if (!confirmed) {
+      return;
+    }
+
+    try {
+      setDeletingId(asset.id);
+      const response = await fetch(`/api/v1/assets?id=${encodeURIComponent(asset.id)}`, {
+        method: 'DELETE',
+        credentials: 'include',
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to delete asset: ${response.status}`);
+      }
+
+      setAssets((current) => current.filter((item) => item.id !== asset.id));
+    } catch (error) {
+      console.error('Delete failed:', error);
+    } finally {
+      setDeletingId(null);
+    }
+  };
+
   if (authLoading || isLoading) {
     return (
       <div className="container mx-auto py-8">
@@ -228,7 +258,7 @@ function AssetsPageContent() {
                     preload="metadata"
                   />
                 )}
-                <div className="absolute top-2 right-2">
+                <div className="absolute top-2 left-2">
                   <Badge variant={asset.type === 'image' ? 'default' : 'secondary'}>
                     {asset.type === 'image' ? (
                       <ImageIcon className="mr-1 h-3 w-3" />
@@ -238,6 +268,20 @@ function AssetsPageContent() {
                     {asset.type === 'image' ? 'Image' : 'Video'}
                   </Badge>
                 </div>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="absolute right-2 top-2 h-8 w-8 rounded-full bg-background/80 text-foreground shadow-sm hover:bg-destructive hover:text-destructive-foreground"
+                  onClick={() => handleDelete(asset)}
+                  disabled={deletingId === asset.id}
+                  aria-label={t('delete')}
+                >
+                  {deletingId === asset.id ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <X className="h-4 w-4" />
+                  )}
+                </Button>
               </div>
               <div className="p-4">
                 <p className="mb-3 line-clamp-2 text-sm text-muted-foreground">{asset.prompt}</p>

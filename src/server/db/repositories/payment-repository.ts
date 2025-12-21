@@ -20,6 +20,8 @@ export interface CreatePaymentData {
   cancelAtPeriodEnd?: boolean;
   trialStart?: Date;
   trialEnd?: Date;
+  affiliateId?: string | null;
+  affiliateCode?: string | null;
 }
 
 export interface UpdatePaymentData {
@@ -33,6 +35,8 @@ export interface UpdatePaymentData {
   trialStart?: Date;
   trialEnd?: Date;
   interval?: PaymentInterval | null;
+  affiliateId?: string | null;
+  affiliateCode?: string | null;
   // Scheduled upgrade fields (方案2: 单条记录+字段)
   scheduledPlanId?: string | null;
   scheduledInterval?: PaymentInterval | null;
@@ -84,6 +88,8 @@ export class PaymentRepository {
         cancelAtPeriodEnd: data.cancelAtPeriodEnd || null,
         trialStart: data.trialStart || null,
         trialEnd: data.trialEnd || null,
+        affiliateId: data.affiliateId || null,
+        affiliateCode: data.affiliateCode || null,
       })
       .returning();
 
@@ -116,6 +122,8 @@ export class PaymentRepository {
         cancelAtPeriodEnd: payment.cancelAtPeriodEnd,
         trialStart: payment.trialStart,
         trialEnd: payment.trialEnd,
+        affiliateId: payment.affiliateId,
+        affiliateCode: payment.affiliateCode,
         createdAt: payment.createdAt,
         updatedAt: payment.updatedAt,
         // Scheduled fields
@@ -154,6 +162,8 @@ export class PaymentRepository {
         cancelAtPeriodEnd: payment.cancelAtPeriodEnd,
         trialStart: payment.trialStart,
         trialEnd: payment.trialEnd,
+        affiliateId: payment.affiliateId,
+        affiliateCode: payment.affiliateCode,
         createdAt: payment.createdAt,
         updatedAt: payment.updatedAt,
         // Scheduled fields
@@ -205,6 +215,8 @@ export class PaymentRepository {
         cancelAtPeriodEnd: payment.cancelAtPeriodEnd,
         trialStart: payment.trialStart,
         trialEnd: payment.trialEnd,
+        affiliateId: payment.affiliateId,
+        affiliateCode: payment.affiliateCode,
         createdAt: payment.createdAt,
         updatedAt: payment.updatedAt,
         // Scheduled fields
@@ -245,6 +257,8 @@ export class PaymentRepository {
         cancelAtPeriodEnd: payment.cancelAtPeriodEnd,
         trialStart: payment.trialStart,
         trialEnd: payment.trialEnd,
+        affiliateId: payment.affiliateId,
+        affiliateCode: payment.affiliateCode,
         createdAt: payment.createdAt,
         updatedAt: payment.updatedAt,
         // Scheduled fields
@@ -289,6 +303,8 @@ export class PaymentRepository {
     if (data.trialStart !== undefined) updateData.trialStart = data.trialStart;
     if (data.trialEnd !== undefined) updateData.trialEnd = data.trialEnd;
     if (data.interval !== undefined) updateData.interval = data.interval;
+    if (data.affiliateId !== undefined) updateData.affiliateId = data.affiliateId;
+    if (data.affiliateCode !== undefined) updateData.affiliateCode = data.affiliateCode;
     // Scheduled upgrade fields (方案2: 单条记录+字段)
     if (data.scheduledPlanId !== undefined) updateData.scheduledPlanId = data.scheduledPlanId;
     if (data.scheduledInterval !== undefined) updateData.scheduledInterval = data.scheduledInterval;
@@ -665,6 +681,8 @@ export class PaymentRepository {
       cancelAtPeriodEnd: record.cancelAtPeriodEnd || undefined,
       trialStart: record.trialStart || undefined,
       trialEnd: record.trialEnd || undefined,
+      affiliateId: record.affiliateId || undefined,
+      affiliateCode: record.affiliateCode || undefined,
       // Scheduled upgrade fields (方案2: 单条记录+字段)
       scheduledPlanId: record.scheduledPlanId || undefined,
       scheduledInterval: (record.scheduledInterval as PaymentInterval) || undefined,

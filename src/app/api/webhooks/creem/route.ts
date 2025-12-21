@@ -2,6 +2,8 @@
 import { randomUUID } from 'node:crypto';
 import { paymentConfig } from '@/config/payment.config';
 import { env } from '@/env';
+import { recordAffiliateCommission } from '@/lib/affiliate/affiliate-commission';
+import { getAffiliateProgramConfig } from '@/lib/affiliate/affiliate-program';
 import { creemService } from '@/lib/creem/creem-service';
 import { enforceSingleCreemSubscription } from '@/lib/creem/enforce-single-subscription';
 import {
@@ -23,8 +25,16 @@ import {
 import { getUserInfo } from '@/lib/email/user-helper';
 import { awardReferralForPaidUser } from '@/lib/rewards/referral-reward';
 import { db } from '@/server/db';
+import { affiliateRepository } from '@/server/db/repositories/affiliate-repository';
 import { paymentRepository } from '@/server/db/repositories/payment-repository';
-import { creditPackPurchase, creditTransactions, userCredits } from '@/server/db/schema';
+import {
+  affiliate,
+  affiliateCommission,
+  affiliateWalletLedger,
+  creditPackPurchase,
+  creditTransactions,
+  userCredits,
+} from '@/server/db/schema';
 import { and, desc, eq, or, sql } from 'drizzle-orm';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
@@ -102,6 +112,7 @@ interface CreemWebhookData {
   checkoutId?: string;
   orderId?: string;
   amount?: number;
+  amountCents?: number;
   reason?: string;
   priceId?: string;
   creditsGranted?: number;
@@ -110,6 +121,7 @@ interface CreemWebhookData {
   productName?: string;
   productId?: string;
   currency?: string;
+  affiliateCode?: string;
   [key: string]: unknown;
 }
 
@@ -329,6 +341,23 @@ export async function handleCreditPackPurchase(data: CreemWebhookData) {
     }
     const referenceId = `creem_credit_pack_${stableId}`;
 
+    const affiliateCookieCode = data.affiliateCode?.toString().trim() || null;
+    const affiliateCode =
+      affiliateCookieCode && /^[A-Za-z0-9_-]{4,32}$/.test(affiliateCookieCode)
+        ? affiliateCookieCode
+        : null;
+
+    let affiliateId: string | null = null;
+    let affiliateCodeNormalized: string | null = null;
+
+    if (affiliateCode) {
+      const affiliateRow = await affiliateRepository.findActiveByCode(affiliateCode);
+      if (affiliateRow) {
+        affiliateId = affiliateRow.id;
+        affiliateCodeNormalized = affiliateRow.code;
+      }
+    }
+
     // Check for existing transaction to prevent duplicates
     // Check by referenceId first (most reliable)
     const [existingByReference] = await db
@@ -429,6 +458,8 @@ export async function handleCreditPackPurchase(data: CreemWebhookData) {
       await db.insert(creditPackPurchase).values({
         id: randomUUID(),
         userId,
+        affiliateId,
+        affiliateCode: affiliateCodeNormalized,
         creditPackId: creditPack?.id || productId || 'unknown',
         credits,
         amountCents: Math.round((normalizedAmount || 0) * 100),
@@ -495,6 +526,19 @@ export async function handleCreditPackPurchase(data: CreemWebhookData) {
       },
     });
 
+    if (affiliateCodeNormalized && data.eventId) {
+      await recordAffiliateCommission({
+        affiliateCode: affiliateCodeNormalized,
+        buyerUserId: userId,
+        provider: 'creem',
+        providerEventId: data.eventId,
+        sourceType: 'credit_pack_purchase',
+        sourceId: orderId || checkoutId || null,
+        baseAmountCents: Math.round((normalizedAmount || 0) * 100),
+        currency: (currency || 'USD').toUpperCase(),
+      });
+    }
+
     // Send credit pack purchase email
     try {
       const userInfo = await getUserInfo(userId);
@@ -552,6 +596,7 @@ async function handleCheckoutComplete(data: CreemWebhookData) {
     billingInterval,
     interval,
     status: incomingStatus,
+    affiliateCode: incomingAffiliateCode,
   } = data;
 
   console.log('[Creem Webhook] handleCheckoutComplete called with:', {
@@ -575,6 +620,15 @@ async function handleCheckoutComplete(data: CreemWebhookData) {
   }
 
   try {
+    const affiliateCandidate = incomingAffiliateCode?.toString().trim() || null;
+    const affiliateCode =
+      affiliateCandidate && /^[A-Za-z0-9_-]{4,32}$/.test(affiliateCandidate)
+        ? affiliateCandidate
+        : null;
+    const affiliateRow = affiliateCode
+      ? await affiliateRepository.findActiveByCode(affiliateCode)
+      : null;
+
     // Enforce single active subscription rule BEFORE processing
     const activeCount = await paymentRepository.getActiveSubscriptionCount(userId);
     if (activeCount > 1) {
@@ -607,6 +661,8 @@ async function handleCheckoutComplete(data: CreemWebhookData) {
           interval: resolvedInterval,
           trialEnd: trialEnd ? new Date(trialEnd) : undefined,
           cancelAtPeriodEnd: false,
+          affiliateId: affiliateRow?.id,
+          affiliateCode: affiliateRow?.code,
         });
         await enforceSingleCreemSubscription(userId, subscriptionId);
 
@@ -767,6 +823,7 @@ async function handleSubscriptionCreated(data: CreemWebhookData) {
     trialStart,
     trialEnd,
     interval,
+    affiliateCode: incomingAffiliateCode,
   } = data;
 
   if (!subscriptionId || !customerId) {
@@ -775,6 +832,15 @@ async function handleSubscriptionCreated(data: CreemWebhookData) {
   }
 
   try {
+    const affiliateCandidate = incomingAffiliateCode?.toString().trim() || null;
+    const affiliateCode =
+      affiliateCandidate && /^[A-Za-z0-9_-]{4,32}$/.test(affiliateCandidate)
+        ? affiliateCandidate
+        : null;
+    const affiliateRow = affiliateCode
+      ? await affiliateRepository.findActiveByCode(affiliateCode)
+      : null;
+
     // Enforce single active subscription rule BEFORE processing
     const ownerUserId = userId || customerId;
     const activeCount = await paymentRepository.getActiveSubscriptionCount(ownerUserId);
@@ -806,6 +872,8 @@ async function handleSubscriptionCreated(data: CreemWebhookData) {
         trialStart: trialStart ? new Date(trialStart) : undefined,
         trialEnd: trialEnd ? new Date(trialEnd) : undefined,
         cancelAtPeriodEnd: false,
+        affiliateId: affiliateRow?.id,
+        affiliateCode: affiliateRow?.code,
       });
       await enforceSingleCreemSubscription(ownerUserId, subscriptionId);
 
@@ -1437,7 +1505,14 @@ async function handleSubscriptionDeleted(data: CreemWebhookData) {
 }
 
 async function handlePaymentSuccess(data: CreemWebhookData) {
-  const { customerId, subscriptionId, userId: _userId } = data;
+  const {
+    customerId,
+    subscriptionId,
+    userId: _userId,
+    affiliateCode,
+    amountCents,
+    currency,
+  } = data;
 
   if (!customerId) {
     return;
@@ -1462,6 +1537,51 @@ async function handlePaymentSuccess(data: CreemWebhookData) {
           isYearly ? 'year' : 'month',
           true
         );
+      }
+
+      const providerEventId = data.eventId;
+      const baseAmount =
+        typeof amountCents === 'number'
+          ? amountCents
+          : typeof data.amount === 'number' && Number.isFinite(data.amount)
+            ? data.amount > 100
+              ? Math.round(data.amount)
+              : Math.round(data.amount * 100)
+            : null;
+      const commissionCurrency = (currency || paymentConfig.currency || 'USD').toUpperCase();
+
+      const affiliateCandidate =
+        affiliateCode?.toString().trim() || paymentRecord.affiliateCode?.toString().trim() || null;
+
+      if (providerEventId && baseAmount && baseAmount > 0 && subscriptionId && affiliateCandidate) {
+        const affiliateCodeNormalized = /^[A-Za-z0-9_-]{4,32}$/.test(affiliateCandidate)
+          ? affiliateCandidate
+          : null;
+
+        if (affiliateCodeNormalized) {
+          const [existingInitial] = await db
+            .select({ id: affiliateCommission.id })
+            .from(affiliateCommission)
+            .where(
+              and(
+                eq(affiliateCommission.provider, 'creem'),
+                eq(affiliateCommission.sourceType, 'subscription_initial'),
+                eq(affiliateCommission.sourceId, subscriptionId)
+              )
+            )
+            .limit(1);
+
+          await recordAffiliateCommission({
+            affiliateCode: affiliateCodeNormalized,
+            buyerUserId: paymentRecord.userId,
+            provider: 'creem',
+            providerEventId,
+            sourceType: existingInitial ? 'subscription_renewal' : 'subscription_initial',
+            sourceId: subscriptionId,
+            baseAmountCents: baseAmount,
+            currency: commissionCurrency,
+          });
+        }
       }
 
       await paymentRepository.createEvent({
@@ -1552,12 +1672,17 @@ async function handleSubscriptionPaused(data: CreemWebhookData) {
 }
 
 async function handleRefundCreated(data: CreemWebhookData) {
-  const { customerId: _customerId, subscriptionId, checkoutId, amount } = data;
+  const { customerId: _customerId, subscriptionId, checkoutId, amount, eventId } = data;
 
   try {
     console.log(
       `[Creem Webhook] Refund created for ${subscriptionId || checkoutId}, amount: ${amount}`
     );
+
+    const targetId = subscriptionId || checkoutId;
+    if (!targetId) {
+      return;
+    }
 
     if (subscriptionId) {
       const paymentRecord = await paymentRepository.findBySubscriptionId(subscriptionId);
@@ -1570,6 +1695,96 @@ async function handleRefundCreated(data: CreemWebhookData) {
 
         // TODO: Revoke credits if refund within X days
         console.log(`[Creem Webhook] Subscription ${subscriptionId} canceled due to refund`);
+      }
+    }
+
+    const refundBaseAmountCents =
+      typeof amount === 'number' && Number.isFinite(amount)
+        ? amount > 100
+          ? Math.round(amount)
+          : Math.round(amount * 100)
+        : null;
+
+    const commissions = await db
+      .select({
+        id: affiliateCommission.id,
+        affiliateId: affiliateCommission.affiliateId,
+        status: affiliateCommission.status,
+        currency: affiliateCommission.currency,
+        commissionAmountCents: affiliateCommission.commissionAmountCents,
+        commissionBps: affiliateCommission.commissionBps,
+      })
+      .from(affiliateCommission)
+      .where(
+        and(
+          eq(affiliateCommission.provider, 'creem'),
+          eq(affiliateCommission.sourceId, targetId),
+          sql`${affiliateCommission.status} != 'void'`
+        )
+      )
+      .limit(20);
+
+    if (commissions.length === 0) {
+      return;
+    }
+
+    const program = await getAffiliateProgramConfig();
+    const negativeLimitCents = program.negativeBalanceLimitCents;
+
+    for (const commission of commissions) {
+      if (commission.status === 'pending') {
+        await db
+          .update(affiliateCommission)
+          .set({ status: 'void' })
+          .where(eq(affiliateCommission.id, commission.id));
+        continue;
+      }
+
+      const desiredReversalCents =
+        refundBaseAmountCents === null
+          ? commission.commissionAmountCents
+          : Math.round((refundBaseAmountCents * commission.commissionBps) / 10_000);
+      const reversalCents = Math.min(desiredReversalCents, commission.commissionAmountCents);
+
+      const reversalReference = `${eventId || `refund_${targetId}`}:${commission.id}`;
+
+      await db
+        .insert(affiliateWalletLedger)
+        .values({
+          id: randomUUID(),
+          affiliateId: commission.affiliateId,
+          type: 'reversal',
+          amountCents: -Math.abs(reversalCents),
+          currency: commission.currency,
+          referenceType: 'refund',
+          referenceId: reversalReference,
+          metadata: {
+            targetId,
+            provider: 'creem',
+            refundBaseAmountCents,
+            reversalCents,
+          },
+          createdAt: new Date(),
+        })
+        .onConflictDoNothing();
+
+      await db
+        .update(affiliateCommission)
+        .set({ status: 'void' })
+        .where(eq(affiliateCommission.id, commission.id));
+
+      const [balanceRow] = await db
+        .select({
+          balance: sql<number>`coalesce(sum(${affiliateWalletLedger.amountCents}), 0)::int`,
+        })
+        .from(affiliateWalletLedger)
+        .where(eq(affiliateWalletLedger.affiliateId, commission.affiliateId));
+
+      if ((balanceRow?.balance ?? 0) <= -negativeLimitCents) {
+        await db
+          .update(affiliate)
+          .set({ status: 'suspended', updatedAt: new Date() })
+          .where(eq(affiliate.id, commission.affiliateId));
       }
     }
   } catch (error) {
