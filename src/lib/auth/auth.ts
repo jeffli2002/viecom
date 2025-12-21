@@ -1,6 +1,7 @@
 import { paymentConfig } from '@/config/payment.config';
 import { env } from '@/env';
 import { creditService } from '@/lib/credits';
+import { sendWelcomeEmail } from '@/lib/email';
 import { db } from '@/server/db';
 import { creditTransactions } from '@/server/db/schema';
 import { betterAuth } from 'better-auth';
@@ -91,6 +92,13 @@ export const auth = betterAuth({
             });
 
             console.log(`[auth] Granted signup credits to ${newUser.email}`);
+
+            try {
+              await sendWelcomeEmail(newUser.email, newUser.name || 'User');
+              console.log(`[auth] Welcome email sent to ${newUser.email}`);
+            } catch (emailError) {
+              console.error(`[auth] Failed to send welcome email to ${newUser.email}:`, emailError);
+            }
           } catch (error) {
             console.error(
               `[auth] Failed to grant signup credits for ${newUser?.email ?? 'unknown user'}:`,
