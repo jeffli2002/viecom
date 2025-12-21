@@ -2,7 +2,6 @@
 
 import { SHOWCASE_CATEGORIES } from '@/config/showcase.config';
 import { Upload, X } from 'lucide-react';
-import Image from 'next/image';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { toast } from 'sonner';
 
@@ -202,20 +201,34 @@ export default function AdminPublishPage() {
             category: 'other',
             notes: '',
           };
+          const previewUrl = submission.previewUrl ?? submission.assetUrl;
+          const isVideo = Boolean(
+            previewUrl?.match(/\.mp4$|\.webm$|\.mov$/i) ||
+              submission.assetUrl.match(/\.mp4$|\.webm$|\.mov$/i)
+          );
           return (
             <div
               key={submission.id}
-              className="grid gap-6 rounded-2xl border border-slate-200 bg-white p-6 lg:grid-cols-[220px,1fr]"
+              className="grid gap-6 rounded-2xl border border-slate-200 bg-white p-6 sm:grid-cols-[180px,1fr]"
             >
               <div className="flex flex-col gap-3">
-                <div className="overflow-hidden rounded-xl border border-slate-100 bg-slate-50">
-                  <Image
-                    src={submission.previewUrl ?? submission.assetUrl}
-                    alt={submission.title ?? 'Submission asset'}
-                    width={320}
-                    height={400}
-                    className="h-full w-full object-cover"
-                  />
+                <div className="h-44 overflow-hidden rounded-xl border border-slate-100 bg-slate-50">
+                  {isVideo ? (
+                    <video
+                      src={previewUrl}
+                      className="h-full w-full object-cover"
+                      muted
+                      playsInline
+                      loop
+                      autoPlay
+                    />
+                  ) : (
+                    <img
+                      src={previewUrl}
+                      alt={submission.title ?? 'Submission asset'}
+                      className="h-full w-full object-cover"
+                    />
+                  )}
                 </div>
                 <a
                   href={submission.assetUrl}
