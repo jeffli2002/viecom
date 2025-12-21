@@ -1,6 +1,7 @@
 export { sendEmail } from './email-service';
 export {
   getWelcomeEmailTemplate,
+  getEmailVerificationTemplate,
   getSubscriptionCreatedEmailTemplate,
   getSubscriptionUpgradedEmailTemplate,
   getSubscriptionDowngradedEmailTemplate,
@@ -19,6 +20,24 @@ export async function sendWelcomeEmail(userEmail: string, userName: string) {
     to: userEmail,
     subject: 'Welcome to Viecom! 🎉',
     html: getWelcomeEmailTemplate(userName, userEmail),
+  });
+}
+
+/**
+ * Send email verification email
+ */
+export async function sendEmailVerificationEmail(
+  userEmail: string,
+  userName: string,
+  verificationUrl: string
+) {
+  const { sendEmail } = await import('./email-service');
+  const { getEmailVerificationTemplate } = await import('./templates');
+
+  return sendEmail({
+    to: userEmail,
+    subject: 'Confirm your email address',
+    html: getEmailVerificationTemplate(userName, verificationUrl),
   });
 }
 

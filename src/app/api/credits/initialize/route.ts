@@ -18,6 +18,7 @@ export async function POST(request: NextRequest) {
     }
 
     const { userId } = await request.json();
+    const isEmailVerified = session.user.emailVerified === true;
 
     // Verify that the user can only initialize their own credits
     if (userId !== session.user.id) {
@@ -76,7 +77,11 @@ export async function POST(request: NextRequest) {
       const freePlan = paymentConfig.plans.find((p) => p.id === 'free');
       const signupCredits = freePlan?.credits?.onSignup;
 
-      if (signupCredits && signupCredits > 0) {
+      if (!isEmailVerified) {
+        console.log(
+          `⚠️ Email not verified for ${session.user.email}, skipping signup bonus for now`
+        );
+      } else if (signupCredits && signupCredits > 0) {
         await creditService.earnCredits({
           userId,
           amount: signupCredits,
@@ -89,8 +94,12 @@ export async function POST(request: NextRequest) {
 
         // Send welcome email
         try {
-          await sendWelcomeEmail(session.user.email, session.user.name || 'User');
-          console.log(`✅ Welcome email sent to ${session.user.email}`);
+          const sent = await sendWelcomeEmail(session.user.email, session.user.name || 'User');
+          if (sent) {
+            console.log(`✅ Welcome email sent to ${session.user.email}`);
+          } else {
+            console.warn(`⚠️ Welcome email skipped for ${session.user.email}`);
+          }
         } catch (emailError) {
           console.error('Failed to send welcome email:', emailError);
           // Don't throw - email failure shouldn't block the response

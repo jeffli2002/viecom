@@ -107,6 +107,35 @@ export function getWelcomeEmailTemplate(userName: string, _userEmail: string): s
 }
 
 /**
+ * Email verification template for new user signup
+ */
+export function getEmailVerificationTemplate(userName: string, verificationUrl: string): string {
+  const content = `
+    <h2 style="color: #111827; margin: 0 0 20px 0; font-size: 24px;">Confirm your email address</h2>
+    
+    <p style="margin: 0 0 20px 0; color: #374151;">
+      Hi ${userName || 'there'},
+    </p>
+    
+    <p style="margin: 0 0 20px 0; color: #374151;">
+      Please confirm your email address to activate your ${APP_NAME} account and receive your signup bonus.
+    </p>
+    
+    <div style="margin: 30px 0; text-align: center;">
+      <a href="${verificationUrl}" style="display: inline-block; padding: 12px 24px; background-color: #14b8a6; color: #ffffff; text-decoration: none; border-radius: 6px; font-weight: 600;">
+        Confirm Email
+      </a>
+    </div>
+    
+    <p style="margin: 20px 0 0 0; color: #6b7280; font-size: 14px;">
+      If you did not create an account, you can safely ignore this email.
+    </p>
+  `;
+
+  return baseTemplate(content);
+}
+
+/**
  * Subscription created email template
  */
 export function getSubscriptionCreatedEmailTemplate(

@@ -1,10 +1,10 @@
 import { paymentConfig } from '@/config/payment.config';
 import { env } from '@/env';
 import { creditService } from '@/lib/credits';
-import { sendWelcomeEmail } from '@/lib/email';
+import { sendEmailVerificationEmail, sendWelcomeEmail } from '@/lib/email';
 import { db } from '@/server/db';
 import { creditTransactions } from '@/server/db/schema';
-import { betterAuth } from 'better-auth';
+import { betterAuth, createEmailVerificationToken } from 'better-auth';
 import { drizzleAdapter } from 'better-auth/adapters/drizzle';
 import { admin, apiKey } from 'better-auth/plugins';
 import { eq } from 'drizzle-orm';
@@ -50,6 +50,71 @@ const createTrustedOrigins = (): string[] => {
   return Array.from(origins);
 };
 
+const EMAIL_VERIFICATION_EXPIRES_IN = 60 * 60 * 24;
+
+const buildVerificationUrl = async (email: string): Promise<string> => {
+  const appUrl = env.NEXT_PUBLIC_APP_URL;
+  const callbackUrl = `${appUrl}/login`;
+  const token = await createEmailVerificationToken(
+    env.BETTER_AUTH_SECRET,
+    email,
+    undefined,
+    EMAIL_VERIFICATION_EXPIRES_IN
+  );
+
+  return `${appUrl}/api/auth/verify-email?token=${encodeURIComponent(
+    token
+  )}&callbackURL=${encodeURIComponent(callbackUrl)}`;
+};
+
+const grantSignupCreditsAndWelcomeEmail = async (user: {
+  id: string;
+  email: string;
+  name?: string | null;
+}) => {
+  const freePlan = paymentConfig.plans.find((plan) => plan.id === 'free');
+  const signupCredits = freePlan?.credits?.onSignup ?? 0;
+
+  if (!signupCredits || signupCredits <= 0) {
+    return;
+  }
+
+  const signupReferenceId = `signup_${user.id}`;
+
+  const [existingSignupTx] = await db
+    .select({ id: creditTransactions.id })
+    .from(creditTransactions)
+    .where(eq(creditTransactions.referenceId, signupReferenceId))
+    .limit(1);
+
+  if (existingSignupTx) {
+    return;
+  }
+
+  await creditService.getOrCreateCreditAccount(user.id);
+
+  await creditService.earnCredits({
+    userId: user.id,
+    amount: signupCredits,
+    source: 'bonus',
+    description: 'Welcome bonus - thank you for signing up!',
+    referenceId: signupReferenceId,
+  });
+
+  console.log(`[auth] Granted signup credits to ${user.email}`);
+
+  try {
+    const sent = await sendWelcomeEmail(user.email, user.name || 'User');
+    if (sent) {
+      console.log(`[auth] Welcome email sent to ${user.email}`);
+    } else {
+      console.warn(`[auth] Welcome email skipped for ${user.email}`);
+    }
+  } catch (emailError) {
+    console.error(`[auth] Failed to send welcome email to ${user.email}:`, emailError);
+  }
+};
+
 export const auth = betterAuth({
   database: drizzleAdapter(db, {
     provider: 'pg',
@@ -62,51 +127,62 @@ export const auth = betterAuth({
       create: {
         after: async (newUser) => {
           try {
-            const freePlan = paymentConfig.plans.find((plan) => plan.id === 'free');
-            const signupCredits = freePlan?.credits?.onSignup ?? 0;
-
-            if (!signupCredits || signupCredits <= 0) {
+            if (newUser.emailVerified) {
+              await grantSignupCreditsAndWelcomeEmail(newUser);
               return;
             }
 
-            const signupReferenceId = `signup_${newUser.id}`;
+            const verificationUrl = await buildVerificationUrl(newUser.email);
+            const sent = await sendEmailVerificationEmail(
+              newUser.email,
+              newUser.name || 'User',
+              verificationUrl
+            );
 
-            const [existingSignupTx] = await db
-              .select({ id: creditTransactions.id })
-              .from(creditTransactions)
-              .where(eq(creditTransactions.referenceId, signupReferenceId))
-              .limit(1);
-
-            if (existingSignupTx) {
-              return;
-            }
-
-            await creditService.getOrCreateCreditAccount(newUser.id);
-
-            await creditService.earnCredits({
-              userId: newUser.id,
-              amount: signupCredits,
-              source: 'bonus',
-              description: 'Welcome bonus - thank you for signing up!',
-              referenceId: signupReferenceId,
-            });
-
-            console.log(`[auth] Granted signup credits to ${newUser.email}`);
-
-            try {
-              await sendWelcomeEmail(newUser.email, newUser.name || 'User');
-              console.log(`[auth] Welcome email sent to ${newUser.email}`);
-            } catch (emailError) {
-              console.error(`[auth] Failed to send welcome email to ${newUser.email}:`, emailError);
+            if (sent) {
+              console.log(`[auth] Verification email sent to ${newUser.email}`);
+            } else {
+              console.warn(`[auth] Verification email skipped for ${newUser.email}`);
             }
           } catch (error) {
             console.error(
-              `[auth] Failed to grant signup credits for ${newUser?.email ?? 'unknown user'}:`,
+              `[auth] Failed to process signup flow for ${newUser?.email ?? 'unknown user'}:`,
               error
             );
           }
         },
       },
+    },
+  },
+  emailVerification: {
+    expiresIn: EMAIL_VERIFICATION_EXPIRES_IN,
+    sendVerificationEmail: async ({ user, token }) => {
+      const appUrl = env.NEXT_PUBLIC_APP_URL;
+      const callbackUrl = `${appUrl}/login`;
+      const verificationUrl = `${appUrl}/api/auth/verify-email?token=${encodeURIComponent(
+        token
+      )}&callbackURL=${encodeURIComponent(callbackUrl)}`;
+      const sent = await sendEmailVerificationEmail(
+        user.email,
+        user.name || 'User',
+        verificationUrl
+      );
+
+      if (sent) {
+        console.log(`[auth] Verification email sent to ${user.email}`);
+      } else {
+        console.warn(`[auth] Verification email skipped for ${user.email}`);
+      }
+    },
+    afterEmailVerification: async (verifiedUser) => {
+      try {
+        await grantSignupCreditsAndWelcomeEmail(verifiedUser);
+      } catch (error) {
+        console.error(
+          `[auth] Failed to process signup credits after verification for ${verifiedUser?.email ?? 'unknown user'}:`,
+          error
+        );
+      }
     },
   },
   emailAndPassword: {
