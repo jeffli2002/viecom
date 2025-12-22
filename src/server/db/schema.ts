@@ -1,4 +1,5 @@
 import {
+  bigint,
   boolean,
   decimal,
   index,
@@ -70,6 +71,12 @@ export const verification = pgTable('verification', {
   expiresAt: timestamp('expires_at').notNull(),
   createdAt: timestamp('created_at').$defaultFn(() => new Date()),
   updatedAt: timestamp('updated_at').$defaultFn(() => new Date()),
+});
+
+export const rateLimit = pgTable('rateLimit', {
+  key: text('key').primaryKey(),
+  count: integer('count').notNull(),
+  lastRequest: bigint('last_request', { mode: 'number' }).notNull(),
 });
 
 // Affiliate (Distribution) system

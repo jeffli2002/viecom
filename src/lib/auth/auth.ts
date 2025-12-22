@@ -237,6 +237,21 @@ export const auth = betterAuth({
   },
   advanced: {
     useSecureCookies: env.NODE_ENV === 'production',
+    ipAddress: {
+      ipAddressHeaders: ['x-forwarded-for', 'x-vercel-forwarded-for', 'x-real-ip'],
+    },
+  },
+  rateLimit: {
+    enabled: true,
+    storage: 'database',
+    window: 60 * 60,
+    max: 100,
+    customRules: {
+      '/sign-up/email': {
+        window: 60 * 60,
+        max: 3,
+      },
+    },
   },
   plugins: [admin(), apiKey()],
 });
