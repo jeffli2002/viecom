@@ -12,6 +12,8 @@ type ExtendedUser = User & {
 
 const ACCOUNT_DISABLED_ERROR =
   'Your account has been disabled. Please contact support if you believe this is a mistake.';
+const EMAIL_NOT_VERIFIED_ERROR =
+  'Email not verified. Please check your inbox and confirm your email before signing in.';
 
 const isUserBanned = (user: ExtendedUser | null | undefined): boolean => Boolean(user?.banned);
 
@@ -131,7 +133,8 @@ interface AuthState {
   signUp: (
     email: string,
     password: string,
-    name?: string
+    name?: string,
+    callbackURL?: string
   ) => Promise<{ success: boolean; error?: string }>;
   signOut: () => Promise<void>;
 
@@ -250,6 +253,19 @@ export const useAuthStore = create<AuthState>()(
                   };
                 }
 
+                if (!user.emailVerified) {
+                  try {
+                    await authClient.signOut();
+                  } catch (signOutError) {
+                    console.warn('[Auth] Failed to sign out unverified user:', signOutError);
+                  }
+                  set({ isLoading: false, error: EMAIL_NOT_VERIFIED_ERROR });
+                  return {
+                    success: false,
+                    error: EMAIL_NOT_VERIFIED_ERROR,
+                  };
+                }
+
                 set({
                   user,
                   isAuthenticated: true,
@@ -279,7 +295,7 @@ export const useAuthStore = create<AuthState>()(
               };
             }
           },
-          signUp: async (email, password, name) => {
+          signUp: async (email, password, name, callbackURL) => {
             set({ isLoading: true, error: null });
 
             try {
@@ -287,10 +303,11 @@ export const useAuthStore = create<AuthState>()(
                 email: email,
                 password,
                 name: name || '',
+                ...(callbackURL ? { callbackURL } : {}),
               });
 
-              if (result.data) {
-                const user = result.data.user;
+              if (result.data?.user) {
+                const user = result.data.user as ExtendedUser;
 
                 // Check if user exists and has an id
                 if (!user || !user.id) {
@@ -299,6 +316,16 @@ export const useAuthStore = create<AuthState>()(
                     success: false,
                     error: 'Invalid user data',
                   };
+                }
+
+                if (!user.emailVerified) {
+                  set({
+                    user,
+                    isAuthenticated: false,
+                    isLoading: false,
+                    lastUpdated: Date.now(),
+                  });
+                  return { success: true };
                 }
 
                 set({
@@ -317,6 +344,10 @@ export const useAuthStore = create<AuthState>()(
                   set({ isLoading: false });
                 }
 
+                return { success: true };
+              }
+              if (!result.error) {
+                set({ isLoading: false });
                 return { success: true };
               }
               set({ isLoading: false });

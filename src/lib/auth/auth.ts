@@ -128,6 +128,7 @@ export const auth = betterAuth({
   emailVerification: {
     expiresIn: EMAIL_VERIFICATION_EXPIRES_IN,
     sendOnSignUp: true,
+    sendOnSignIn: true,
     sendVerificationEmail: async ({ user, url }) => {
       const sent = await sendEmailVerificationEmail(user.email, user.name || 'User', url);
 
@@ -150,6 +151,7 @@ export const auth = betterAuth({
   },
   emailAndPassword: {
     enabled: true,
+    requireEmailVerification: true,
     async sendResetPassword({ user, url }) {
       try {
         if (env.RESEND_API_KEY && env.RESEND_FROM_EMAIL) {

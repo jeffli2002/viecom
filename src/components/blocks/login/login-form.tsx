@@ -4,9 +4,11 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { routing } from '@/i18n/routing';
 import { cn, isMobile, isWebView } from '@/lib/utils';
 import type { LoginFormProps } from '@/types/login';
 import { AlertCircle } from 'lucide-react';
+import { useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
 export function LoginForm({
@@ -22,11 +24,67 @@ export function LoginForm({
 }: LoginFormProps & React.ComponentProps<'div'>) {
   const [isInWebView, setIsInWebView] = useState(false);
   const [showWebViewWarning, setShowWebViewWarning] = useState(false);
+  const [showVerificationBanner, setShowVerificationBanner] = useState(false);
+  const [verificationEmail, setVerificationEmail] = useState('');
+  const [resendStatus, setResendStatus] = useState<string | null>(null);
+  const [isResending, setIsResending] = useState(false);
+  const searchParams = useSearchParams();
+
+  const isEmailNotVerified =
+    error?.toLowerCase().includes('email not verified') ||
+    error?.toLowerCase().includes('email_not_verified');
 
   useEffect(() => {
     const inWebView = isWebView() && isMobile();
     setIsInWebView(inWebView);
   }, []);
+
+  useEffect(() => {
+    const verifyParam = searchParams.get('verification');
+    try {
+      const stored = window.localStorage.getItem('viecom:verification-email');
+      if (!stored && !verifyParam) return;
+      const parsed = stored ? JSON.parse(stored) : null;
+      if (parsed?.email) {
+        setVerificationEmail(parsed.email);
+      }
+      setShowVerificationBanner(true);
+    } catch (_storageError) {
+      if (verifyParam) {
+        setShowVerificationBanner(true);
+      }
+    }
+  }, [searchParams]);
+
+  const handleResendVerification = async () => {
+    const targetEmail = formData.email || verificationEmail;
+    if (!targetEmail) {
+      setResendStatus('Please enter your email address to resend the confirmation.');
+      return;
+    }
+    setIsResending(true);
+    setResendStatus(null);
+    try {
+      const [_, maybeLocale] = window.location.pathname.split('/');
+      const locale = routing.locales.includes(maybeLocale) ? maybeLocale : routing.defaultLocale;
+      const callbackURL = new URL(`/${locale}/email-verified`, window.location.origin).toString();
+      const response = await fetch('/api/auth/send-verification-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: targetEmail, callbackURL }),
+        credentials: 'include',
+      });
+      if (!response.ok) {
+        const detail = await response.text();
+        throw new Error(detail || 'Failed to resend verification email');
+      }
+      setResendStatus('Verification email sent. Please check your inbox.');
+    } catch (err) {
+      setResendStatus(err instanceof Error ? err.message : 'Failed to resend verification email');
+    } finally {
+      setIsResending(false);
+    }
+  };
 
   const handleSocialLogin = (provider: 'google') => {
     if (isInWebView) {
@@ -55,6 +113,15 @@ export function LoginForm({
         <CardContent>
           <form onSubmit={onEmailLogin} data-testid="login-form">
             <div className="grid gap-6">
+              {showVerificationBanner && (
+                <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-amber-800 text-sm">
+                  <p className="font-semibold">Check your email to continue</p>
+                  <p className="mt-1">
+                    We sent a confirmation link to {verificationEmail || 'your inbox'}. Confirm
+                    your email to finish setting up your account.
+                  </p>
+                </div>
+              )}
               {/* Error message display */}
               {error && (
                 <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-red-600 text-sm">
@@ -66,6 +133,23 @@ export function LoginForm({
                   >
                     Close
                   </button>
+                </div>
+              )}
+              {isEmailNotVerified && (
+                <div className="rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-slate-700 text-sm">
+                  <p className="font-semibold">Need a new confirmation email?</p>
+                  <p className="mt-1">We can resend the verification link to your email.</p>
+                  <div className="mt-3 flex flex-wrap items-center gap-3">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={handleResendVerification}
+                      disabled={isResending}
+                    >
+                      {isResending ? 'Sending...' : 'Resend confirmation email'}
+                    </Button>
+                    {resendStatus && <span className="text-slate-600">{resendStatus}</span>}
+                  </div>
                 </div>
               )}
 
