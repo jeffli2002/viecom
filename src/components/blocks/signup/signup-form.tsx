@@ -4,6 +4,14 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { useToastMessages } from '@/hooks/use-toast-messages';
 import { useRouter } from '@/i18n/navigation';
 import { routing } from '@/i18n/routing';
@@ -43,6 +51,8 @@ export function SignupForm({ className, ...props }: React.ComponentProps<'div'>)
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [showVerificationNotice, setShowVerificationNotice] = useState(false);
+  const [signupEmail, setSignupEmail] = useState('');
 
   const locale = router.locale ?? routing.defaultLocale;
 
@@ -52,11 +62,11 @@ export function SignupForm({ className, ...props }: React.ComponentProps<'div'>)
   }, [locale, searchParams]);
 
   useEffect(() => {
-    if (isAuthenticated) {
+    if (isAuthenticated && !showVerificationNotice) {
       const { relative } = getRedirectTarget();
       router.replace(relative);
     }
-  }, [isAuthenticated, router, getRedirectTarget]);
+  }, [isAuthenticated, showVerificationNotice, router, getRedirectTarget]);
 
   const handleSocialLogin = async (_provider: 'google') => {
     try {
@@ -83,13 +93,12 @@ export function SignupForm({ className, ...props }: React.ComponentProps<'div'>)
     const result = await emailSignup(email, password, name);
     if (result.success) {
       // Clear form data
+      setSignupEmail(email);
       setName('');
       setEmail('');
       setPassword('');
       setConfirmPassword('');
-      // Redirect immediately after successful signup
-      const { relative } = getRedirectTarget();
-      router.replace(relative);
+      setShowVerificationNotice(true);
     } else {
       if (result.error) {
         setError(result.error);
@@ -99,6 +108,23 @@ export function SignupForm({ className, ...props }: React.ComponentProps<'div'>)
 
   return (
     <div className={cn('flex flex-col gap-6', className)} {...props}>
+      <AlertDialog open={showVerificationNotice} onOpenChange={setShowVerificationNotice}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Confirm your email</AlertDialogTitle>
+            <AlertDialogDescription>
+              We sent a confirmation email to {signupEmail || 'your inbox'}. Please check your email
+              and click the confirmation link to activate your account and receive your signup
+              credits.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <div className="flex justify-end">
+            <AlertDialogAction onClick={() => router.replace('/login')}>
+              Go to login
+            </AlertDialogAction>
+          </div>
+        </AlertDialogContent>
+      </AlertDialog>
       <Card>
         <CardHeader className="text-center">
           <CardTitle className="text-xl">Create Account</CardTitle>

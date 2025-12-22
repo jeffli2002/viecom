@@ -4,7 +4,7 @@ import { creditService } from '@/lib/credits';
 import { sendEmailVerificationEmail, sendWelcomeEmail } from '@/lib/email';
 import { db } from '@/server/db';
 import { creditTransactions } from '@/server/db/schema';
-import { betterAuth, createEmailVerificationToken } from 'better-auth';
+import { betterAuth } from 'better-auth';
 import { drizzleAdapter } from 'better-auth/adapters/drizzle';
 import { admin, apiKey } from 'better-auth/plugins';
 import { eq } from 'drizzle-orm';
@@ -51,21 +51,6 @@ const createTrustedOrigins = (): string[] => {
 };
 
 const EMAIL_VERIFICATION_EXPIRES_IN = 60 * 60 * 24;
-
-const buildVerificationUrl = async (email: string): Promise<string> => {
-  const appUrl = env.NEXT_PUBLIC_APP_URL;
-  const callbackUrl = `${appUrl}/login`;
-  const token = await createEmailVerificationToken(
-    env.BETTER_AUTH_SECRET,
-    email,
-    undefined,
-    EMAIL_VERIFICATION_EXPIRES_IN
-  );
-
-  return `${appUrl}/api/auth/verify-email?token=${encodeURIComponent(
-    token
-  )}&callbackURL=${encodeURIComponent(callbackUrl)}`;
-};
 
 const grantSignupCreditsAndWelcomeEmail = async (user: {
   id: string;
@@ -129,20 +114,6 @@ export const auth = betterAuth({
           try {
             if (newUser.emailVerified) {
               await grantSignupCreditsAndWelcomeEmail(newUser);
-              return;
-            }
-
-            const verificationUrl = await buildVerificationUrl(newUser.email);
-            const sent = await sendEmailVerificationEmail(
-              newUser.email,
-              newUser.name || 'User',
-              verificationUrl
-            );
-
-            if (sent) {
-              console.log(`[auth] Verification email sent to ${newUser.email}`);
-            } else {
-              console.warn(`[auth] Verification email skipped for ${newUser.email}`);
             }
           } catch (error) {
             console.error(
@@ -156,17 +127,9 @@ export const auth = betterAuth({
   },
   emailVerification: {
     expiresIn: EMAIL_VERIFICATION_EXPIRES_IN,
-    sendVerificationEmail: async ({ user, token }) => {
-      const appUrl = env.NEXT_PUBLIC_APP_URL;
-      const callbackUrl = `${appUrl}/login`;
-      const verificationUrl = `${appUrl}/api/auth/verify-email?token=${encodeURIComponent(
-        token
-      )}&callbackURL=${encodeURIComponent(callbackUrl)}`;
-      const sent = await sendEmailVerificationEmail(
-        user.email,
-        user.name || 'User',
-        verificationUrl
-      );
+    sendOnSignUp: true,
+    sendVerificationEmail: async ({ user, url }) => {
+      const sent = await sendEmailVerificationEmail(user.email, user.name || 'User', url);
 
       if (sent) {
         console.log(`[auth] Verification email sent to ${user.email}`);
