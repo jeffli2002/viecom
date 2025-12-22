@@ -341,13 +341,21 @@ function DashboardPageContent() {
               </Badge>
             </div>
             <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-              <Button variant="ghost" className="w-full" asChild>
+              <Button variant="ghost" className="w-full whitespace-normal text-center" asChild>
                 <Link href="/settings/billing">{t('manageSubscription')}</Link>
               </Button>
-              <Button variant="outline" className="w-full" asChild>
+              <Button
+                variant="default"
+                className="w-full bg-teal-500 text-white hover:bg-teal-600"
+                asChild
+              >
                 <Link href="/pricing">{t('upgradeNow', { defaultValue: 'Upgrade Plan' })}</Link>
               </Button>
-              <Button variant="secondary" className="w-full sm:col-span-2" asChild>
+              <Button
+                variant="default"
+                className="w-full bg-teal-200 text-teal-900 hover:bg-teal-300 sm:col-span-2"
+                asChild
+              >
                 <Link href="/pricing#credit-packs">
                   {t('buyCredits', { defaultValue: 'Buy Credits' })}
                 </Link>

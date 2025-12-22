@@ -15,7 +15,7 @@ function BillingContent() {
       popular: plan.popular,
       creditsPerInterval: {
         month: plan.credits.monthly ?? 0,
-        year: (plan.credits.monthly ?? 0) * 12,
+        year: plan.credits.yearly ?? (plan.credits.monthly ?? 0) * 12,
       },
     }));
 

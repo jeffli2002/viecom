@@ -5,7 +5,6 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { Switch } from '@/components/ui/switch';
 import { useCreemPayment } from '@/hooks/use-creem-payment';
 import { useAuthStore } from '@/store/auth-store';
 import { Calendar, Check, CreditCard, Loader2, RefreshCcw, TrendingUp } from 'lucide-react';
@@ -64,6 +63,13 @@ const statusLabels: Record<string, string> = {
 const intervalLabels: Record<'month' | 'year', string> = {
   month: 'Monthly',
   year: 'Yearly',
+};
+
+const calculateSavings = (monthlyPrice: number, yearlyPrice: number) => {
+  const annualMonthly = monthlyPrice * 12;
+  const savings = annualMonthly - yearlyPrice;
+  const percentage = annualMonthly > 0 ? Math.round((savings / annualMonthly) * 100) : 0;
+  return { amount: savings, percentage };
 };
 
 const formatDate = (value?: string | null) => {
@@ -843,22 +849,52 @@ const BillingClient = ({ plans }: BillingClientProps) => {
               you can finish the current cycle before moving.
             </CardDescription>
           </div>
-          <div className="flex items-center gap-3 rounded-full border px-4 py-2">
-            <span className="text-sm text-slate-600 dark:text-slate-400">Monthly</span>
-            <Switch
-              checked={interval === 'year'}
-              onCheckedChange={(checked: boolean) => setInterval(checked ? 'year' : 'month')}
-            />
-            <span className="text-sm text-slate-600 dark:text-slate-400">Yearly</span>
+          <div className="inline-flex items-center gap-3 rounded-full bg-slate-100 p-1 dark:bg-slate-800">
+            <Button
+              variant="ghost"
+              size="sm"
+              className={`rounded-full px-6 ${
+                interval === 'month'
+                  ? 'bg-white text-teal-600 shadow-sm hover:bg-white hover:text-teal-600 dark:bg-slate-900'
+                  : 'text-slate-600 hover:bg-transparent hover:text-slate-900 dark:text-slate-400 dark:hover:text-white'
+              }`}
+              onClick={() => setInterval('month')}
+            >
+              Monthly
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              className={`rounded-full px-6 ${
+                interval === 'year'
+                  ? 'bg-white text-teal-600 shadow-sm hover:bg-white hover:text-teal-600 dark:bg-slate-900'
+                  : 'text-slate-600 hover:bg-transparent hover:text-slate-900 dark:text-slate-400 dark:hover:text-white'
+              }`}
+              onClick={() => setInterval('year')}
+            >
+              Yearly
+              {plans.some((plan) => plan.yearlyPrice) && (
+                <Badge className="ml-2 bg-teal-500 text-white">Save</Badge>
+              )}
+            </Button>
           </div>
         </CardHeader>
         <CardContent>
           <div className="grid gap-6 md:grid-cols-2">
             {plans.map((plan) => {
               const isCurrent = isCurrentPlan(plan.id);
-              const displayPrice = interval === 'year' ? plan.yearlyPrice : plan.price;
+              const yearlyPrice = plan.yearlyPrice ?? plan.price * 12;
+              const displayPrice = interval === 'year' ? yearlyPrice : plan.price;
               const priceLabel =
                 displayPrice && displayPrice > 0 ? `$${displayPrice.toFixed(2)}` : 'Contact us';
+              const monthlyEquivalent =
+                interval === 'year' && yearlyPrice > 0 ? (yearlyPrice / 12).toFixed(2) : null;
+              const savings =
+                interval === 'year' && yearlyPrice > 0
+                  ? calculateSavings(plan.price, yearlyPrice)
+                  : null;
+              const creditsPerInterval =
+                interval === 'year' ? plan.creditsPerInterval.year : plan.creditsPerInterval.month;
 
               return (
                 <div
@@ -882,12 +918,33 @@ const BillingClient = ({ plans }: BillingClientProps) => {
                   </div>
 
                   <div className="mt-4 flex items-baseline gap-2">
-                    <span className="text-4xl font-bold text-slate-900 dark:text-white">
-                      {priceLabel}
-                    </span>
-                    {displayPrice && displayPrice > 0 && (
-                      <span className="text-sm text-slate-500 dark:text-slate-400">
-                        /{interval === 'year' ? 'year' : 'month'}
+                    {displayPrice && displayPrice > 0 ? (
+                      <div className="flex flex-col">
+                        <div className="flex items-baseline gap-2">
+                          <span className="text-4xl font-bold text-slate-900 dark:text-white">
+                            ${monthlyEquivalent || plan.price.toFixed(2)}
+                          </span>
+                          {interval === 'year' && (
+                            <span className="text-lg text-slate-400 line-through">
+                              ${plan.price.toFixed(2)}
+                            </span>
+                          )}
+                        </div>
+                        <span className="text-sm text-slate-500 dark:text-slate-400">
+                          /month
+                        </span>
+                        {interval === 'year' && (
+                          <div className="mt-1 flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400">
+                            <span>${priceLabel.replace('$', '')}/year</span>
+                            {savings && savings.amount > 0 && (
+                              <Badge className="bg-teal-500 text-white">Save {savings.percentage}%</Badge>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    ) : (
+                      <span className="text-4xl font-bold text-slate-900 dark:text-white">
+                        {priceLabel}
                       </span>
                     )}
                   </div>
@@ -895,20 +952,35 @@ const BillingClient = ({ plans }: BillingClientProps) => {
                   <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">
                     {interval === 'year' ? 'Billed annually' : 'Billed monthly'}
                   </p>
+                  <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+                    Includes {creditsPerInterval.toLocaleString()} credits/
+                    {interval === 'year' ? 'year' : 'month'}
+                  </p>
 
                   <Separator className="my-4" />
 
                   <ul className="space-y-2">
-                    {plan.features.slice(0, 5).map((feature) => (
-                      <li key={`${plan.id}-${feature}`} className="flex items-center gap-2 text-sm">
-                        <Check className="h-4 w-4 text-green-600" />
-                        <span>{feature}</span>
-                      </li>
-                    ))}
+                    {plan.features.slice(0, 5).map((feature, index) => {
+                      let displayFeature = feature;
+                      if (index === 0 && feature.toLowerCase().includes('credits')) {
+                        displayFeature = `${creditsPerInterval.toLocaleString()} credits/${
+                          interval === 'year' ? 'year' : 'month'
+                        }`;
+                      }
+                      return (
+                        <li
+                          key={`${plan.id}-${feature}`}
+                          className="flex items-center gap-2 text-sm"
+                        >
+                          <Check className="h-4 w-4 text-green-600" />
+                          <span>{displayFeature}</span>
+                        </li>
+                      );
+                    })}
                   </ul>
 
                   <Button
-                    className="mt-6 w-full"
+                    className="mt-6 w-full bg-teal-500 text-white hover:bg-teal-600"
                     onClick={() => handleUpgrade(plan.id)}
                     disabled={isCurrent || actionLoading}
                   >
