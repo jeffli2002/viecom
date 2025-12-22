@@ -3,11 +3,12 @@ import { env } from '@/env';
 import { creditService } from '@/lib/credits';
 import { sendEmailVerificationEmail, sendWelcomeEmail } from '@/lib/email';
 import { db } from '@/server/db';
-import { creditTransactions } from '@/server/db/schema';
+import { creditTransactions, verification } from '@/server/db/schema';
 import { betterAuth } from 'better-auth';
 import { drizzleAdapter } from 'better-auth/adapters/drizzle';
 import { admin, apiKey } from 'better-auth/plugins';
-import { eq } from 'drizzle-orm';
+import { randomUUID } from 'crypto';
+import { desc, eq } from 'drizzle-orm';
 
 const createTrustedOrigins = (): string[] => {
   const origins = new Set<string>();
@@ -51,6 +52,7 @@ const createTrustedOrigins = (): string[] => {
 };
 
 const EMAIL_VERIFICATION_EXPIRES_IN = 60 * 60 * 24;
+const EMAIL_VERIFICATION_COOLDOWN_MS = 2 * 60 * 1000;
 
 const grantSignupCreditsAndWelcomeEmail = async (user: {
   id: string;
@@ -130,10 +132,38 @@ export const auth = betterAuth({
     sendOnSignUp: true,
     sendOnSignIn: true,
     sendVerificationEmail: async ({ user, url }) => {
+      const identifier = `email-verification:${user.email.toLowerCase()}`;
+      const [recentEntry] = await db
+        .select({ createdAt: verification.createdAt })
+        .from(verification)
+        .where(eq(verification.identifier, identifier))
+        .orderBy(desc(verification.createdAt))
+        .limit(1);
+
+      if (recentEntry) {
+        const elapsedMs = Date.now() - new Date(recentEntry.createdAt).getTime();
+        if (elapsedMs < EMAIL_VERIFICATION_COOLDOWN_MS) {
+          console.warn(`[auth] Verification email throttled for ${user.email}`);
+          return;
+        }
+      }
+
       const sent = await sendEmailVerificationEmail(user.email, user.name || 'User', url);
 
       if (sent) {
         console.log(`[auth] Verification email sent to ${user.email}`);
+        try {
+          await db.insert(verification).values({
+            id: randomUUID(),
+            identifier,
+            value: 'email-verification',
+            expiresAt: new Date(Date.now() + EMAIL_VERIFICATION_COOLDOWN_MS),
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          });
+        } catch (insertError) {
+          console.warn('[auth] Failed to store verification throttle record:', insertError);
+        }
       } else {
         console.warn(`[auth] Verification email skipped for ${user.email}`);
       }
