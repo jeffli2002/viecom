@@ -1,11 +1,27 @@
 import { auth } from '@/lib/auth/auth';
+import { reportServerError } from '@/lib/monitoring/error-reporting';
 import { toNextJsHandler } from 'better-auth/next-js';
 import { type NextRequest, NextResponse } from 'next/server';
 
 const handler = toNextJsHandler(auth);
 
-export const POST = handler.POST;
-export const GET = handler.GET;
+export async function POST(request: NextRequest) {
+  try {
+    return await handler.POST(request);
+  } catch (error) {
+    await reportServerError(error, { route: '/api/auth/[...all]', method: 'POST' });
+    throw error;
+  }
+}
+
+export async function GET(request: NextRequest) {
+  try {
+    return await handler.GET(request);
+  } catch (error) {
+    await reportServerError(error, { route: '/api/auth/[...all]', method: 'GET' });
+    throw error;
+  }
+}
 
 // Handle OPTIONS preflight requests for CORS
 export async function OPTIONS(request: NextRequest) {
