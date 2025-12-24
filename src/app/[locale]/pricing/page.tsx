@@ -6,6 +6,7 @@ import { getPricingFAQSchema } from '@/lib/utils/faq-generator';
 import { calculateGenerationCapacity, formatCapacityRange } from '@/lib/utils/pricing-calculator';
 import { Sparkles } from 'lucide-react';
 import type { Metadata } from 'next';
+import Image from 'next/image';
 import { getTranslations } from 'next-intl/server';
 
 export async function generateMetadata({
@@ -66,7 +67,9 @@ export default async function PricingPage() {
       id: plan.id,
       name: plan.name,
       price: plan.price,
+      originalPrice: plan.originalPrice,
       yearlyPrice: plan.yearlyPrice,
+      originalYearlyPrice: plan.originalYearlyPrice,
       monthlyCredits,
       yearlyCredits,
       description: plan.description,
@@ -84,60 +87,74 @@ export default async function PricingPage() {
   const faqSchema = getPricingFAQSchema();
 
   return (
-    <div className="container-base py-24">
-      <script
-        type="application/ld+json"
-        suppressHydrationWarning
-        // biome-ignore lint/security/noDangerouslySetInnerHtml: JSON-LD schema is safe
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
-      />
-      <div className="mb-12 text-center">
-        <h1 className="h2-section mb-4">{t('title')}</h1>
-        <p className="text-body text-lg mb-6">{t('subtitle')}</p>
-        <div className="inline-flex items-center gap-2 bg-teal-50 dark:bg-teal-900/20 px-4 py-2 rounded-full border border-teal-200 dark:border-teal-800">
-          <Sparkles className="h-4 w-4 text-teal-500" />
-          <span className="text-sm font-medium text-slate-900 dark:text-white">
-            {t('rewardsBadge')}
-          </span>
+    <div>
+      <div className="relative w-screen left-1/2 right-1/2 -mx-[50vw] overflow-hidden">
+        <div className="relative aspect-[16/5] w-full">
+          <Image
+            src="/xmashero.png"
+            alt="Christmas pricing hero"
+            fill
+            sizes="100vw"
+            className="object-cover"
+            priority
+          />
         </div>
       </div>
+      <div className="container-base py-24">
+        <script
+          type="application/ld+json"
+          suppressHydrationWarning
+          // biome-ignore lint/security/noDangerouslySetInnerHtml: JSON-LD schema is safe
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
+        />
+        <div className="mb-12 text-center">
+          <h1 className="h2-section mb-4">{t('title')}</h1>
+          <p className="text-body text-lg mb-6">{t('subtitle')}</p>
+          <div className="inline-flex items-center gap-2 bg-teal-50 dark:bg-teal-900/20 px-4 py-2 rounded-full border border-teal-200 dark:border-teal-800">
+            <Sparkles className="h-4 w-4 text-teal-500" />
+            <span className="text-sm font-medium text-slate-900 dark:text-white">
+              {t('rewardsBadge')}
+            </span>
+          </div>
+        </div>
 
-      <PricingPlans plans={plans} creditPacks={paymentConfig.creditPacks} />
+        <PricingPlans plans={plans} creditPacks={paymentConfig.creditPacks} />
 
-      <div className="mt-16 max-w-3xl mx-auto">
-        <h2 className="text-2xl font-bold text-center mb-8 text-slate-900 dark:text-white">
-          {t('faqTitle')}
-        </h2>
-        <div className="space-y-6">
-          <div>
-            <h3 className="text-lg font-semibold mb-2 text-slate-900 dark:text-white">
-              {t('faqQ1')}
-            </h3>
-            <p className="text-body">{t('faqA1')}</p>
-          </div>
-          <div>
-            <h3 className="text-lg font-semibold mb-2 text-slate-900 dark:text-white">
-              {t('faqQ2')}
-            </h3>
-            <p className="text-body">{t('faqA2', faqParams)}</p>
-          </div>
-          <div>
-            <h3 className="text-lg font-semibold mb-2 text-slate-900 dark:text-white">
-              {t('faqQ3')}
-            </h3>
-            <p className="text-body">{t('faqA3')}</p>
-          </div>
-          <div>
-            <h3 className="text-lg font-semibold mb-2 text-slate-900 dark:text-white">
-              {t('faqQ4')}
-            </h3>
-            <p className="text-body">{t('faqA4')}</p>
-          </div>
-          <div>
-            <h3 className="text-lg font-semibold mb-2 text-slate-900 dark:text-white">
-              {t('faqQ5')}
-            </h3>
-            <p className="text-body">{t('faqA5')}</p>
+        <div className="mt-16 max-w-3xl mx-auto">
+          <h2 className="text-2xl font-bold text-center mb-8 text-slate-900 dark:text-white">
+            {t('faqTitle')}
+          </h2>
+          <div className="space-y-6">
+            <div>
+              <h3 className="text-lg font-semibold mb-2 text-slate-900 dark:text-white">
+                {t('faqQ1')}
+              </h3>
+              <p className="text-body">{t('faqA1')}</p>
+            </div>
+            <div>
+              <h3 className="text-lg font-semibold mb-2 text-slate-900 dark:text-white">
+                {t('faqQ2')}
+              </h3>
+              <p className="text-body">{t('faqA2', faqParams)}</p>
+            </div>
+            <div>
+              <h3 className="text-lg font-semibold mb-2 text-slate-900 dark:text-white">
+                {t('faqQ3')}
+              </h3>
+              <p className="text-body">{t('faqA3')}</p>
+            </div>
+            <div>
+              <h3 className="text-lg font-semibold mb-2 text-slate-900 dark:text-white">
+                {t('faqQ4')}
+              </h3>
+              <p className="text-body">{t('faqA4')}</p>
+            </div>
+            <div>
+              <h3 className="text-lg font-semibold mb-2 text-slate-900 dark:text-white">
+                {t('faqQ5')}
+              </h3>
+              <p className="text-body">{t('faqA5')}</p>
+            </div>
           </div>
         </div>
       </div>

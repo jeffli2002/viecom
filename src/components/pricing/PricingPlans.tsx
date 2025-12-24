@@ -15,7 +15,9 @@ interface PricingPlan {
   id: string;
   name: string;
   price: number;
+  originalPrice?: number;
   yearlyPrice?: number;
+  originalYearlyPrice?: number;
   monthlyCredits: number;
   yearlyCredits?: number;
   description: string;
@@ -63,6 +65,11 @@ export function PricingPlans({ plans, creditPacks }: PricingPlansProps) {
 
   return (
     <>
+      <div className="flex justify-center mb-6">
+        <Badge className="bg-red-50 text-red-700 border border-red-200 dark:bg-red-950/40 dark:text-red-200 dark:border-red-900/50 px-4 py-1 text-sm font-semibold">
+          Christmas Sale Week, up to 30% off
+        </Badge>
+      </div>
       <div className="flex justify-center mb-12">
         <div className="inline-flex items-center gap-3 bg-slate-100 dark:bg-slate-800 rounded-full p-1">
           <Button
@@ -88,11 +95,6 @@ export function PricingPlans({ plans, creditPacks }: PricingPlansProps) {
             onClick={() => setBillingInterval('year')}
           >
             {t('yearly')}
-            {resolvedPlans.some((p) => p.yearlyPrice) && (
-              <Badge className="ml-2 bg-teal-500 text-white border-0 text-xs px-2">
-                {t('savePercentage')}
-              </Badge>
-            )}
           </Button>
         </div>
       </div>
@@ -107,6 +109,7 @@ export function PricingPlans({ plans, creditPacks }: PricingPlansProps) {
 
           const displayPrice =
             billingInterval === 'year' && plan.yearlyPrice ? plan.yearlyPrice : plan.price;
+          const originalMonthlyPrice = plan.originalPrice ?? plan.price;
           const displayCredits =
             billingInterval === 'year' && plan.yearlyCredits
               ? plan.yearlyCredits
@@ -140,6 +143,18 @@ export function PricingPlans({ plans, creditPacks }: PricingPlansProps) {
 
               <CardHeader className="text-center pb-6">
                 <CardTitle className="text-2xl mb-2">{plan.name}</CardTitle>
+                {(plan.id === 'pro' || plan.id === 'proplus') && (
+                  <div className="flex justify-center mb-2">
+                    <div className="flex items-center gap-2">
+                      <Badge className="bg-red-50 text-red-700 border border-red-200 dark:bg-red-950/40 dark:text-red-200 dark:border-red-900/50 px-3 py-0.5 text-xs font-semibold">
+                        Christmas Sale Week
+                      </Badge>
+                      <Badge className="bg-emerald-50 text-emerald-700 border border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-200 dark:border-emerald-900/50 px-2.5 py-0.5 text-xs font-semibold">
+                        30% Off
+                      </Badge>
+                    </div>
+                  </div>
+                )}
                 <div className="mb-2 flex items-center justify-center gap-3">
                   {displayPrice === 0 ? (
                     <span className="text-4xl font-bold text-slate-900 dark:text-white">$0</span>
@@ -153,9 +168,12 @@ export function PricingPlans({ plans, creditPacks }: PricingPlansProps) {
                               ? (displayPrice / 12).toFixed(2)
                               : displayPrice}
                           </span>
-                          {billingInterval === 'year' && (
+                          {(billingInterval === 'year' ||
+                            (billingInterval === 'month' &&
+                              plan.originalPrice &&
+                              plan.originalPrice > plan.price)) && (
                             <span className="text-xl text-slate-400 dark:text-slate-500 line-through">
-                              ${plan.price}
+                              ${originalMonthlyPrice}
                             </span>
                           )}
                         </div>
@@ -168,9 +186,6 @@ export function PricingPlans({ plans, creditPacks }: PricingPlansProps) {
                               ${displayPrice}
                               {t('perYear')}
                             </p>
-                            <Badge className="mt-2 bg-teal-500 text-white border-0 text-xs px-2">
-                              {t('save', { percentage: savings?.percentage || 0 })}
-                            </Badge>
                           </>
                         )}
                       </div>

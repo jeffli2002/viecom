@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 240" role="img" aria-label="Christmas tree">
+  <polygon points="100,10 18,190 182,190" fill="#159a47"/>
+  <rect x="85" y="190" width="30" height="36" rx="4" fill="#8b5a2b"/>
+  <circle cx="80" cy="120" r="6" fill="#ffd166"/>
+  <circle cx="120" cy="120" r="6" fill="#ffd166"/>
+  <circle cx="95" cy="150" r="6" fill="#ff6b6b"/>
+  <circle cx="105" cy="150" r="6" fill="#4dabf7"/>
+  <polygon points="100,0 93,16 110,16 96,26 102,42 100,32 90,42 96,26 82,16 99,16" fill="#f4d35e"/>
+</svg>

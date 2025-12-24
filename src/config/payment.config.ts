@@ -60,7 +60,9 @@ export interface Plan {
   name: string;
   description: string;
   price: number;
+  originalPrice?: number;
   yearlyPrice?: number;
+  originalYearlyPrice?: number;
   interval: 'month' | 'year' | null;
   stripePriceIds?: {
     monthly?: string;
@@ -151,8 +153,9 @@ export const paymentConfig: PaymentConfig = {
       id: 'pro',
       name: 'Pro',
       description: 'Great for individual creators',
-      price: 19.9,
-      yearlyPrice: 191.04,
+      price: 13.93,
+      originalPrice: 19.9,
+      yearlyPrice: 167.16,
       interval: 'month',
       stripePriceIds: {
         monthly: process.env.NEXT_PUBLIC_STRIPE_PRICE_PRO_MONTHLY || 'price_pro_monthly',
@@ -193,8 +196,9 @@ export const paymentConfig: PaymentConfig = {
       id: 'proplus',
       name: 'Pro+',
       description: 'For professional creators and businesses',
-      price: 34.9,
-      yearlyPrice: 335.04,
+      price: 24.43,
+      originalPrice: 34.9,
+      yearlyPrice: 293.16,
       interval: 'month',
       stripePriceIds: {
         monthly: process.env.NEXT_PUBLIC_STRIPE_PRICE_PROPLUS_MONTHLY || 'price_proplus_monthly',
@@ -307,6 +311,5 @@ export const paymentConfig: PaymentConfig = {
     webhooks: true,
   },
 };
-
 
 
