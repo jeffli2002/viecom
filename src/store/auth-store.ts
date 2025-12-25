@@ -12,8 +12,6 @@ type ExtendedUser = User & {
 
 const ACCOUNT_DISABLED_ERROR =
   'Your account has been disabled. Please contact support if you believe this is a mistake.';
-const EMAIL_NOT_VERIFIED_ERROR =
-  'Email not verified. Please check your inbox and confirm your email before signing in.';
 
 const isUserBanned = (user: ExtendedUser | null | undefined): boolean => Boolean(user?.banned);
 
@@ -253,19 +251,6 @@ export const useAuthStore = create<AuthState>()(
                   };
                 }
 
-                if (!user.emailVerified) {
-                  try {
-                    await authClient.signOut();
-                  } catch (signOutError) {
-                    console.warn('[Auth] Failed to sign out unverified user:', signOutError);
-                  }
-                  set({ isLoading: false, error: EMAIL_NOT_VERIFIED_ERROR });
-                  return {
-                    success: false,
-                    error: EMAIL_NOT_VERIFIED_ERROR,
-                  };
-                }
-
                 set({
                   user,
                   isAuthenticated: true,
@@ -316,16 +301,6 @@ export const useAuthStore = create<AuthState>()(
                     success: false,
                     error: 'Invalid user data',
                   };
-                }
-
-                if (!user.emailVerified) {
-                  set({
-                    user,
-                    isAuthenticated: false,
-                    isLoading: false,
-                    lastUpdated: Date.now(),
-                  });
-                  return { success: true };
                 }
 
                 set({
