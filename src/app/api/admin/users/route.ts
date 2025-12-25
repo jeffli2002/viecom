@@ -1,7 +1,7 @@
 import { requireAdmin } from '@/lib/admin/auth';
 import { db } from '@/server/db';
-import { subscription, user, userCredits } from '@/server/db/schema';
-import { desc, eq, gte, like, sql } from 'drizzle-orm';
+import { creditPackPurchase, subscription, user, userCredits } from '@/server/db/schema';
+import { and, desc, eq, like, sql } from 'drizzle-orm';
 import { NextResponse } from 'next/server';
 
 export async function GET(request: Request) {
@@ -12,6 +12,8 @@ export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);
     const search = searchParams.get('search') || '';
     const range = searchParams.get('range') || 'all';
+    const verified = searchParams.get('verified') || 'all';
+    const paid = searchParams.get('paid') || 'all';
     const limit = Number.parseInt(searchParams.get('limit') || '100');
     const offset = Number.parseInt(searchParams.get('offset') || '0');
 
@@ -26,6 +28,27 @@ export async function GET(request: Request) {
       startDate.setDate(startDate.getDate() - daysAgo);
     }
 
+    const paidSubscription = sql`exists (select 1 from ${subscription} paid_sub where paid_sub.user_id = ${user.id} and paid_sub.plan_type <> 'free')`;
+    const paidCreditPack = sql`exists (select 1 from ${creditPackPurchase} paid_pack where paid_pack.user_id = ${user.id})`;
+    const filters = [];
+
+    if (startDate) {
+      filters.push(sql`${user.createdAt} >= ${startDate}`);
+    }
+    if (search) {
+      filters.push(like(user.email, `%${search}%`));
+    }
+    if (verified === 'yes') {
+      filters.push(eq(user.emailVerified, true));
+    } else if (verified === 'no') {
+      filters.push(eq(user.emailVerified, false));
+    }
+    if (paid === 'yes') {
+      filters.push(sql`(${paidSubscription} OR ${paidCreditPack})`);
+    } else if (paid === 'no') {
+      filters.push(sql`NOT (${paidSubscription} OR ${paidCreditPack})`);
+    }
+
     // Build query
     let query = db
       .select({
@@ -33,6 +56,7 @@ export async function GET(request: Request) {
         email: user.email,
         name: user.name,
         createdAt: user.createdAt,
+        emailVerified: user.emailVerified,
         banned: user.banned,
         banReason: user.banReason,
         plan: subscription.planType,
@@ -48,15 +72,8 @@ export async function GET(request: Request) {
       .limit(limit)
       .offset(offset);
 
-    // Add date range filter
-    if (startDate) {
-      query = query.where(
-        search
-          ? sql`${user.email} LIKE ${`%${search}%`} AND ${user.createdAt} >= ${startDate}`
-          : sql`${user.createdAt} >= ${startDate}`
-      );
-    } else if (search) {
-      query = query.where(like(user.email, `%${search}%`));
+    if (filters.length > 0) {
+      query = query.where(and(...filters));
     }
 
     const usersList = await query;
@@ -64,14 +81,8 @@ export async function GET(request: Request) {
     // Get total count
     let totalCountQuery = db.select({ count: sql<number>`count(*)` }).from(user);
 
-    if (startDate && search) {
-      totalCountQuery = totalCountQuery.where(
-        sql`${user.email} LIKE ${`%${search}%`} AND ${user.createdAt} >= ${startDate}`
-      );
-    } else if (startDate) {
-      totalCountQuery = totalCountQuery.where(sql`${user.createdAt} >= ${startDate}`);
-    } else if (search) {
-      totalCountQuery = totalCountQuery.where(like(user.email, `%${search}%`));
+    if (filters.length > 0) {
+      totalCountQuery = totalCountQuery.where(and(...filters));
     }
 
     const totalCount = await totalCountQuery;

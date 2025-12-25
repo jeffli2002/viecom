@@ -19,6 +19,7 @@ interface User {
   email: string;
   name: string | null;
   createdAt: Date;
+  emailVerified: boolean;
   banned: boolean | null;
   banReason: string | null;
   plan: string | null;
@@ -32,6 +33,8 @@ export default function AdminUsersPage() {
   const [users, setUsers] = useState<User[]>([]);
   const [search, setSearch] = useState('');
   const [range, setRange] = useState('all');
+  const [verifiedFilter, setVerifiedFilter] = useState('all');
+  const [paidFilter, setPaidFilter] = useState('all');
   const [isLoading, setIsLoading] = useState(true);
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
@@ -44,7 +47,7 @@ export default function AdminUsersPage() {
       const timestamp = new Date().getTime();
       const offset = (page - 1) * pageSize;
       const response = await fetch(
-        `/api/admin/users?search=${search}&range=${range}&limit=${pageSize}&offset=${offset}&_t=${timestamp}`,
+        `/api/admin/users?search=${search}&range=${range}&verified=${verifiedFilter}&paid=${paidFilter}&limit=${pageSize}&offset=${offset}&_t=${timestamp}`,
         {
           cache: 'no-store',
         }
@@ -61,7 +64,7 @@ export default function AdminUsersPage() {
     } finally {
       setIsLoading(false);
     }
-  }, [range, search, page, pageSize]);
+  }, [range, search, page, pageSize, verifiedFilter, paidFilter]);
 
   useEffect(() => {
     void fetchUsers();
@@ -127,6 +130,38 @@ export default function AdminUsersPage() {
               <SelectItem value="all">All Time</SelectItem>
             </SelectContent>
           </Select>
+          <Select
+            value={paidFilter}
+            onValueChange={(value) => {
+              setPaidFilter(value);
+              setPage(1);
+            }}
+          >
+            <SelectTrigger className="w-[160px]">
+              <SelectValue placeholder="Paid users" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Users</SelectItem>
+              <SelectItem value="yes">Paid Users</SelectItem>
+              <SelectItem value="no">Unpaid Users</SelectItem>
+            </SelectContent>
+          </Select>
+          <Select
+            value={verifiedFilter}
+            onValueChange={(value) => {
+              setVerifiedFilter(value);
+              setPage(1);
+            }}
+          >
+            <SelectTrigger className="w-[160px]">
+              <SelectValue placeholder="Verified" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Users</SelectItem>
+              <SelectItem value="yes">Verified</SelectItem>
+              <SelectItem value="no">Unverified</SelectItem>
+            </SelectContent>
+          </Select>
           <Select value={pageSize.toString()} onValueChange={handlePageSizeChange}>
             <SelectTrigger className="w-[140px]">
               <SelectValue />
@@ -175,6 +210,7 @@ export default function AdminUsersPage() {
                     <th className="py-3 px-4">Email</th>
                     <th className="py-3 px-4">Name</th>
                     <th className="py-3 px-4">Registration Date</th>
+                    <th className="py-3 px-4">Verified</th>
                     <th className="py-3 px-4">Plan</th>
                     <th className="py-3 px-4">Status</th>
                     <th className="py-3 px-4">Available Credits</th>
@@ -189,6 +225,9 @@ export default function AdminUsersPage() {
                       <td className="py-3 px-4 text-sm">{user.name || '-'}</td>
                       <td className="py-3 px-4 text-sm">
                         {new Date(user.createdAt).toLocaleDateString()}
+                      </td>
+                      <td className="py-3 px-4 text-sm">
+                        {user.emailVerified ? 'Yes' : 'No'}
                       </td>
                       <td className="py-3 px-4">
                         <span
