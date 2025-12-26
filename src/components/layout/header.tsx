@@ -134,6 +134,12 @@ export function Header() {
           description: t('nanoBananaProDesc'),
           icon: Sparkles,
         },
+        {
+          title: t('enhancingProductPhotos'),
+          href: '/enhancing-product-photos',
+          description: t('enhancingProductPhotosDesc'),
+          icon: ImageIcon,
+        },
       ],
     },
     {

@@ -226,9 +226,7 @@ export default function AdminUsersPage() {
                       <td className="py-3 px-4 text-sm">
                         {new Date(user.createdAt).toLocaleDateString()}
                       </td>
-                      <td className="py-3 px-4 text-sm">
-                        {user.emailVerified ? 'Yes' : 'No'}
-                      </td>
+                      <td className="py-3 px-4 text-sm">{user.emailVerified ? 'Yes' : 'No'}</td>
                       <td className="py-3 px-4">
                         <span
                           className={`px-2 py-1 rounded text-xs font-medium ${

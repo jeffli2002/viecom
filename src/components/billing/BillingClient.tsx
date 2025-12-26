@@ -930,14 +930,14 @@ const BillingClient = ({ plans }: BillingClientProps) => {
                             </span>
                           )}
                         </div>
-                        <span className="text-sm text-slate-500 dark:text-slate-400">
-                          /month
-                        </span>
+                        <span className="text-sm text-slate-500 dark:text-slate-400">/month</span>
                         {interval === 'year' && (
                           <div className="mt-1 flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400">
                             <span>${priceLabel.replace('$', '')}/year</span>
                             {savings && savings.amount > 0 && (
-                              <Badge className="bg-teal-500 text-white">Save {savings.percentage}%</Badge>
+                              <Badge className="bg-teal-500 text-white">
+                                Save {savings.percentage}%
+                              </Badge>
                             )}
                           </div>
                         )}

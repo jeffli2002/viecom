@@ -56,12 +56,6 @@ export function PricingPlans({ plans, creditPacks }: PricingPlansProps) {
   const resolvedPlans = useMemo(() => plans, [plans]);
   const [billingInterval, setBillingInterval] = useState<'month' | 'year'>('year');
 
-  const calculateSavings = (monthlyPrice: number, yearlyPrice: number) => {
-    const annualMonthly = monthlyPrice * 12;
-    const savings = annualMonthly - yearlyPrice;
-    const percentage = Math.round((savings / annualMonthly) * 100);
-    return { amount: savings, percentage };
-  };
 
   return (
     <>
@@ -119,10 +113,6 @@ export function PricingPlans({ plans, creditPacks }: PricingPlansProps) {
               ? plan.yearlyCapacityInfo
               : plan.capacityInfo;
 
-          const savings =
-            billingInterval === 'year' && plan.yearlyPrice && plan.price > 0
-              ? calculateSavings(plan.price, plan.yearlyPrice)
-              : null;
 
           const buttonText = isCurrent && !loadingSubscription ? t('currentPlan') : plan.cta;
 
@@ -181,12 +171,10 @@ export function PricingPlans({ plans, creditPacks }: PricingPlansProps) {
                           {t('perMonth')}
                         </span>
                         {billingInterval === 'year' && (
-                          <>
-                            <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
-                              ${displayPrice}
-                              {t('perYear')}
-                            </p>
-                          </>
+                          <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
+                            ${displayPrice}
+                            {t('perYear')}
+                          </p>
                         )}
                       </div>
                     </>

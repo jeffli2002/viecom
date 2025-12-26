@@ -1,3 +1,4 @@
+import { randomUUID } from 'node:crypto';
 import { paymentConfig } from '@/config/payment.config';
 import { env } from '@/env';
 import { creditService } from '@/lib/credits';
@@ -7,7 +8,6 @@ import { creditTransactions, verification } from '@/server/db/schema';
 import { betterAuth } from 'better-auth';
 import { drizzleAdapter } from 'better-auth/adapters/drizzle';
 import { admin, apiKey } from 'better-auth/plugins';
-import { randomUUID } from 'crypto';
 import { desc, eq } from 'drizzle-orm';
 
 const createTrustedOrigins = (): string[] => {

@@ -16,7 +16,11 @@ export default function EmailVerifiedPage() {
             <CardDescription>Your email is confirmed. You can sign in now.</CardDescription>
           </CardHeader>
           <CardContent>
-            <Button type="button" className="w-full btn-primary" onClick={() => router.replace('/login')}>
+            <Button
+              type="button"
+              className="w-full btn-primary"
+              onClick={() => router.replace('/login')}
+            >
               Go to login
             </Button>
           </CardContent>

@@ -117,8 +117,8 @@ export function LoginForm({
                 <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-amber-800 text-sm">
                   <p className="font-semibold">Check your email to continue</p>
                   <p className="mt-1">
-                    We sent a confirmation link to {verificationEmail || 'your inbox'}. Confirm
-                    your email to finish setting up your account.
+                    We sent a confirmation link to {verificationEmail || 'your inbox'}. Confirm your
+                    email to finish setting up your account.
                   </p>
                 </div>
               )}

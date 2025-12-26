@@ -23,18 +23,12 @@ export async function GET() {
     }
 
     if (missing.length > 0) {
-      return NextResponse.json(
-        { ok: false, missing },
-        { status: 500 }
-      );
+      return NextResponse.json({ ok: false, missing }, { status: 500 });
     }
 
     return NextResponse.json({ ok: true });
   } catch (error) {
     await reportServerError(error, { route: '/api/health/auth', method: 'GET' });
-    return NextResponse.json(
-      { ok: false, error: 'auth health check failed' },
-      { status: 500 }
-    );
+    return NextResponse.json({ ok: false, error: 'auth health check failed' }, { status: 500 });
   }
 }

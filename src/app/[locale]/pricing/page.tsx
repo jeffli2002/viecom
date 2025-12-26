@@ -6,8 +6,8 @@ import { getPricingFAQSchema } from '@/lib/utils/faq-generator';
 import { calculateGenerationCapacity, formatCapacityRange } from '@/lib/utils/pricing-calculator';
 import { Sparkles } from 'lucide-react';
 import type { Metadata } from 'next';
-import Image from 'next/image';
 import { getTranslations } from 'next-intl/server';
+import Image from 'next/image';
 
 export async function generateMetadata({
   params,

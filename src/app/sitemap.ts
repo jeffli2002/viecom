@@ -25,6 +25,7 @@ const PUBLIC_PATHS: Array<{
   { path: '/ai-video-generator-free', priority: 0.9, changeFrequency: 'weekly' },
   { path: '/video-enhancer-ai', priority: 0.8, changeFrequency: 'weekly' },
   { path: '/models/nano-banana', priority: 0.9, changeFrequency: 'weekly' },
+  { path: '/enhancing-product-photos', priority: 0.8, changeFrequency: 'monthly' },
 
   // Solution Pages (Platform-specific optimization)
   { path: '/solutions/amazon', priority: 0.9, changeFrequency: 'weekly' },
