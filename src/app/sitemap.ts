@@ -1,4 +1,4 @@
-import { locales, routing } from '@/i18n/routing';
+import { routing } from '@/i18n/routing';
 import { getMetadataBase } from '@/lib/seo/metadata';
 import type { MetadataRoute } from 'next';
 
@@ -54,27 +54,14 @@ const PUBLIC_PATHS: Array<{
   { path: '/dashboard', priority: 0.6, changeFrequency: 'daily' },
 ];
 
-const defaultLocale = routing.defaultLocale;
 const lastModified = new Date();
 
 /**
- * Build path with default locale prefix only.
- *
- * IMPORTANT: To avoid duplicate content issues in sitemap.xml, we only include
- * the default locale (English) URLs. Other language versions are still accessible
- * and will be discovered through:
- * 1. Internal links on the site
- * 2. Hreflang tags in page metadata (if implemented)
- * 3. User navigation
- *
- * This follows SEO best practices for multi-language sites:
- * - Include only canonical/default language URLs in sitemap
- * - Use hreflang tags in HTML to indicate alternate language versions
- * - Avoid duplicate content penalties
+ * Build path with a locale prefix.
  */
-function buildDefaultLocalePath(path: string): string {
+function buildLocalePath(locale: string, path: string): string {
   const normalizedPath = path === '/' ? '' : path;
-  const prefix = `/${defaultLocale}`;
+  const prefix = `/${locale}`;
   return normalizedPath ? `${prefix}${normalizedPath}` : prefix;
 }
 
@@ -82,13 +69,15 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const base = getMetadataBase();
   const baseUrl = base.toString().replace(/\/$/, '');
 
-  return PUBLIC_PATHS.map(({ path, priority, changeFrequency }) => {
-    const fullPath = buildDefaultLocalePath(path);
-    return {
-      url: `${baseUrl}${fullPath}`,
-      lastModified,
-      changeFrequency,
-      priority,
-    };
+  return PUBLIC_PATHS.flatMap(({ path, priority, changeFrequency }) => {
+    return routing.locales.map((locale) => {
+      const fullPath = buildLocalePath(locale, path);
+      return {
+        url: `${baseUrl}${fullPath}`,
+        lastModified,
+        changeFrequency,
+        priority,
+      };
+    });
   });
 }
