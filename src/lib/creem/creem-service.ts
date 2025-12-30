@@ -421,6 +421,14 @@ class CreemPaymentService {
         });
 
         if (!response.ok) {
+          // Gracefully handle 404 as an expected "not found" case without throwing/logging
+          if (response.status === 404) {
+            return {
+              success: false as const,
+              notFound: true as const,
+              error: 'Subscription not found',
+            };
+          }
           const errorData = await response.json().catch(() => ({ message: 'Unknown error' }));
           throw new Error(errorData.message || `HTTP ${response.status}`);
         }
@@ -433,7 +441,15 @@ class CreemPaymentService {
       }
     } catch (error: unknown) {
       const message = getErrorMessage(error);
-      console.error('Creem get subscription error:', error);
+      // Downgrade noise for expected not-found cases
+      const isNotFound =
+        typeof message === 'string' && /404|not\s*found/i.test(message || '');
+      const logPayload = { subscriptionId, message };
+      if (isNotFound) {
+        console.warn('[Creem] Subscription not found (getSubscription):', logPayload);
+      } else {
+        console.error('Creem get subscription error:', logPayload);
+      }
       return {
         success: false,
         error: message || 'Failed to get subscription',
