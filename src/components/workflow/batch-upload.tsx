@@ -27,7 +27,11 @@ export function BatchUpload() {
       a.download = `batch-generation-template.${format === 'excel' ? 'xlsx' : 'csv'}`;
       document.body.appendChild(a);
       a.click();
-      document.body.removeChild(a);
+      if (a.remove) {
+        a.remove();
+      } else if (a.parentNode) {
+        a.parentNode.removeChild(a);
+      }
       window.URL.revokeObjectURL(url);
     } catch (error) {
       console.error('Download template error:', error);

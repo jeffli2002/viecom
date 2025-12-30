@@ -1007,7 +1007,12 @@ export default function ImageGenerator() {
       a.download = `generated-image-${Date.now()}.png`;
       document.body.appendChild(a);
       a.click();
-      document.body.removeChild(a);
+      // Use safe removal to avoid DOMExceptions if node already detached
+      if (a.remove) {
+        a.remove();
+      } else if (a.parentNode) {
+        a.parentNode.removeChild(a);
+      }
       window.URL.revokeObjectURL(url);
     } catch (error) {
       console.error('Download failed:', error);

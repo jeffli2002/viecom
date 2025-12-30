@@ -686,7 +686,11 @@ export default function VideoGenerator() {
       a.download = `generated-video-${Date.now()}.mp4`;
       document.body.appendChild(a);
       a.click();
-      document.body.removeChild(a);
+      if (a.remove) {
+        a.remove();
+      } else if (a.parentNode) {
+        a.parentNode.removeChild(a);
+      }
       window.URL.revokeObjectURL(url);
     } catch (error) {
       console.error('Download failed:', error);

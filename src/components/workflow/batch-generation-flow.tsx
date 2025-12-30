@@ -921,7 +921,11 @@ export function BatchGenerationFlow({ generationType }: BatchGenerationFlowProps
       a.download = `batch-${generationType}-generation-template.${format === 'excel' ? 'xlsx' : 'csv'}`;
       document.body.appendChild(a);
       a.click();
-      document.body.removeChild(a);
+      if (a.remove) {
+        a.remove();
+      } else if (a.parentNode) {
+        a.parentNode.removeChild(a);
+      }
       window.URL.revokeObjectURL(url);
     } catch (error) {
       console.error('Download template error:', error);
@@ -983,7 +987,11 @@ export function BatchGenerationFlow({ generationType }: BatchGenerationFlowProps
     a.download = `batch-results-${Date.now()}.xlsx`;
     document.body.appendChild(a);
     a.click();
-    document.body.removeChild(a);
+    if (a.remove) {
+      a.remove();
+    } else if (a.parentNode) {
+      a.parentNode.removeChild(a);
+    }
     window.URL.revokeObjectURL(url);
   };
 
@@ -1980,7 +1988,11 @@ export function BatchGenerationFlow({ generationType }: BatchGenerationFlowProps
                                     a.download = `${row.productName || `generated-${row.rowIndex}`}-${Date.now()}.${generationType === 'image' ? 'jpg' : 'mp4'}`;
                                     document.body.appendChild(a);
                                     a.click();
-                                    document.body.removeChild(a);
+                                    if (a.remove) {
+                                      a.remove();
+                                    } else if (a.parentNode) {
+                                      a.parentNode.removeChild(a);
+                                    }
                                   }}
                                   className="bg-white dark:bg-slate-900/90 hover:bg-white dark:bg-slate-900"
                                 >

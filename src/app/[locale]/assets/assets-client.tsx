@@ -123,7 +123,11 @@ function AssetsPageContent() {
       anchor.download = `${asset.type}-${asset.id}-${Date.now()}.${extension}`;
       document.body.appendChild(anchor);
       anchor.click();
-      document.body.removeChild(anchor);
+      if (anchor.remove) {
+        anchor.remove();
+      } else if (anchor.parentNode) {
+        anchor.parentNode.removeChild(anchor);
+      }
       window.URL.revokeObjectURL(url);
     } catch (error) {
       console.error('Download failed:', error);
@@ -137,7 +141,11 @@ function AssetsPageContent() {
       anchor.download = `${asset.type}-${asset.id}.${asset.type === 'image' ? 'png' : 'mp4'}`;
       document.body.appendChild(anchor);
       anchor.click();
-      document.body.removeChild(anchor);
+      if (anchor.remove) {
+        anchor.remove();
+      } else if (anchor.parentNode) {
+        anchor.parentNode.removeChild(anchor);
+      }
     }
   };
 

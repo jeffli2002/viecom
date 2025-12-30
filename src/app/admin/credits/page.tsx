@@ -258,5 +258,9 @@ function downloadCSV(filename: string, data: Array<Record<string, unknown>>) {
   link.setAttribute('download', filename);
   document.body.appendChild(link);
   link.click();
-  document.body.removeChild(link);
+  if (link.remove) {
+    link.remove();
+  } else if (link.parentNode) {
+    link.parentNode.removeChild(link);
+  }
 }

@@ -96,9 +96,13 @@ export default function AdminUsersPage() {
     const link = document.createElement('a');
     link.href = url;
     link.setAttribute('download', filename);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+  document.body.appendChild(link);
+  link.click();
+  if (link.remove) {
+    link.remove();
+  } else if (link.parentNode) {
+    link.parentNode.removeChild(link);
+  }
   };
 
   return (
