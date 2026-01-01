@@ -10,8 +10,11 @@ import {
   useRefreshSession,
 } from "@/store/auth-store";
 import { CheckCircle2 } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { Suspense, useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
+
+// Ensure this route is rendered dynamically to avoid prerendering issues
+export const dynamic = "force-dynamic";
 
 export default function EmailVerifiedPage() {
   const router = useRouter();
@@ -53,27 +56,39 @@ export default function EmailVerifiedPage() {
   }, [isInitialized, isAuthenticated, router, target, redirecting]);
 
   return (
-    <div className="container-base py-24">
-      <div className="mx-auto max-w-xl text-center">
-        <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-emerald-100 text-emerald-600">
-          <CheckCircle2 className="h-7 w-7" />
+    <Suspense
+      fallback={
+        <div className="container-base py-24">
+          <div className="mx-auto max-w-xl text-center">
+            <h1 className="h2-section mb-2">Email verified</h1>
+            <p className="text-body">Finalizing sign-in...</p>
+          </div>
         </div>
-        <h1 className="h2-section mb-2">Email verified</h1>
-        <p className="text-body mb-6">
-          Your email has been confirmed. We’re signing you in automatically.
-        </p>
-        <div className="flex items-center justify-center gap-3">
-          <Button
-            onClick={() => router.replace(target.relative === "/" ? "/dashboard" : target.relative)}
-          >
-            Continue
-          </Button>
-          <a href="/login" className="text-sm text-muted-foreground underline">
-            Go to login
-          </a>
+      }
+    >
+      <div className="container-base py-24">
+        <div className="mx-auto max-w-xl text-center">
+          <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-emerald-100 text-emerald-600">
+            <CheckCircle2 className="h-7 w-7" />
+          </div>
+          <h1 className="h2-section mb-2">Email verified</h1>
+          <p className="text-body mb-6">
+            Your email has been confirmed. We’re signing you in automatically.
+          </p>
+          <div className="flex items-center justify-center gap-3">
+            <Button
+              onClick={() =>
+                router.replace(target.relative === "/" ? "/dashboard" : target.relative)
+              }
+            >
+              Continue
+            </Button>
+            <a href="/login" className="text-sm text-muted-foreground underline">
+              Go to login
+            </a>
+          </div>
         </div>
       </div>
-    </div>
+    </Suspense>
   );
 }
-
