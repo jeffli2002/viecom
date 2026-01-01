@@ -61,10 +61,6 @@ export function SignupForm({ className, ...props }: React.ComponentProps<'div'>)
 
   const locale = router.locale ?? routing.defaultLocale;
   const verificationCallbackPath = `/${locale}/email-verified`;
-  const verificationCallbackUrl =
-    typeof window !== 'undefined'
-      ? new URL(verificationCallbackPath, window.location.origin).toString()
-      : verificationCallbackPath;
 
   const getRedirectTarget = useCallback(() => {
     const callbackUrl = searchParams.get('callbackUrl');
@@ -100,6 +96,16 @@ export function SignupForm({ className, ...props }: React.ComponentProps<'div'>)
       return;
     }
 
+    // Preserve intended post-verification destination
+    const { localized } = getRedirectTarget();
+    const verificationCallbackUrl =
+      typeof window !== 'undefined'
+        ? new URL(
+            `${verificationCallbackPath}?callbackUrl=${encodeURIComponent(localized)}`,
+            window.location.origin
+          ).toString()
+        : `${verificationCallbackPath}?callbackUrl=${encodeURIComponent(localized)}`;
+
     const result = await emailSignup(email, password, name, verificationCallbackUrl);
     if (result.success) {
       // Clear form data
@@ -133,12 +139,21 @@ export function SignupForm({ className, ...props }: React.ComponentProps<'div'>)
     setResendStatus(null);
 
     try {
+      const { localized } = getRedirectTarget();
+      const callbackURL =
+        typeof window !== 'undefined'
+          ? new URL(
+              `${verificationCallbackPath}?callbackUrl=${encodeURIComponent(localized)}`,
+              window.location.origin
+            ).toString()
+          : `${verificationCallbackPath}?callbackUrl=${encodeURIComponent(localized)}`;
+
       const response = await fetch('/api/auth/send-verification-email', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           email: signupEmail,
-          callbackURL: verificationCallbackUrl,
+          callbackURL,
         }),
         credentials: 'include',
       });
@@ -166,12 +181,21 @@ export function SignupForm({ className, ...props }: React.ComponentProps<'div'>)
     setChangeEmailStatus(null);
 
     try {
+      const { localized } = getRedirectTarget();
+      const callbackURL =
+        typeof window !== 'undefined'
+          ? new URL(
+              `${verificationCallbackPath}?callbackUrl=${encodeURIComponent(localized)}`,
+              window.location.origin
+            ).toString()
+          : `${verificationCallbackPath}?callbackUrl=${encodeURIComponent(localized)}`;
+
       const response = await fetch('/api/auth/change-email', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           newEmail,
-          callbackURL: verificationCallbackUrl,
+          callbackURL,
         }),
         credentials: 'include',
       });

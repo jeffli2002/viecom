@@ -67,7 +67,11 @@ export function LoginForm({
     try {
       const [_, maybeLocale] = window.location.pathname.split('/');
       const locale = routing.locales.includes(maybeLocale) ? maybeLocale : routing.defaultLocale;
-      const callbackURL = new URL(`/${locale}/email-verified`, window.location.origin).toString();
+      // Preserve intended post-verification destination
+      const rawTarget = searchParams.get('callbackUrl');
+      const target = rawTarget && rawTarget.trim().length > 0 ? rawTarget : '/';
+      const base = `/${locale}/email-verified?callbackUrl=${encodeURIComponent(target)}`;
+      const callbackURL = new URL(base, window.location.origin).toString();
       const response = await fetch('/api/auth/send-verification-email', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
