@@ -7,7 +7,6 @@ import { calculateGenerationCapacity, formatCapacityRange } from '@/lib/utils/pr
 import { Sparkles } from 'lucide-react';
 import type { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';
-import Image from 'next/image';
 
 export async function generateMetadata({
   params,
@@ -88,18 +87,6 @@ export default async function PricingPage() {
 
   return (
     <div>
-      <div className="relative w-screen left-1/2 right-1/2 -mx-[50vw] overflow-hidden">
-        <div className="relative aspect-[16/5] w-full">
-          <Image
-            src="/xmashero.png"
-            alt="Christmas pricing hero"
-            fill
-            sizes="100vw"
-            className="object-cover"
-            priority
-          />
-        </div>
-      </div>
       <div className="container-base py-24">
         <script
           type="application/ld+json"
