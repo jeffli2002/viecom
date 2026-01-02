@@ -26,12 +26,8 @@ const createTrustedOrigins = (): string[] => {
       hostname.endsWith('.local') ||
       hostname.endsWith('.localhost');
 
-    // Trust Vercel preview deployments
-    const isVercelPreview = hostname.endsWith('.vercel.app');
-
-    if (!isLocalhost && !isVercelPreview) {
+    if (!isLocalhost) {
       const portSuffix = baseUrl.port ? `:${baseUrl.port}` : '';
-
       if (hostname.startsWith('www.')) {
         const rootHost = hostname.replace(/^www\./, '');
         origins.add(`${baseUrl.protocol}//${rootHost}${portSuffix}`);
@@ -39,13 +35,26 @@ const createTrustedOrigins = (): string[] => {
         origins.add(`${baseUrl.protocol}//www.${hostname}${portSuffix}`);
       }
     }
-
-    // For Vercel previews, explicitly trust the exact URL
-    if (isVercelPreview) {
-      origins.add(baseOrigin);
-    }
   } catch (error) {
     console.warn('[auth] Invalid NEXT_PUBLIC_APP_URL, cannot derive trusted origins:', error);
+  }
+
+  // Also trust the current Vercel deployment URL when present (previews and production)
+  // Vercel provides VERCEL_URL without protocol
+  const vercelUrl = process.env.VERCEL_URL || process.env.NEXT_PUBLIC_VERCEL_URL;
+  if (vercelUrl) {
+    try {
+      const vercelOrigin = `https://${vercelUrl}`;
+      origins.add(vercelOrigin);
+      const vercelHost = new URL(vercelOrigin).hostname.toLowerCase();
+      if (vercelHost.startsWith('www.')) {
+        origins.add(`https://${vercelHost.replace(/^www\./, '')}`);
+      } else {
+        origins.add(`https://www.${vercelHost}`);
+      }
+    } catch (e) {
+      console.warn('[auth] Invalid VERCEL_URL, skipping trusted origin add:', vercelUrl);
+    }
   }
 
   return Array.from(origins);

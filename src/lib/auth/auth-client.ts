@@ -7,13 +7,14 @@ import { createAuthClient } from 'better-auth/react';
 // In development, falls back to env variable
 const getBaseURL = () => {
   try {
-    // Always prefer NEXT_PUBLIC_APP_URL to keep host consistent (prevents www/apex cookie jitter)
     const fromEnv = env.NEXT_PUBLIC_APP_URL;
     if (fromEnv) return fromEnv;
   } catch {}
   if (typeof window !== 'undefined') {
     return window.location.origin;
   }
+  const vercelUrl = process.env.VERCEL_URL || process.env.NEXT_PUBLIC_VERCEL_URL;
+  if (vercelUrl) return `https://${vercelUrl}`;
   return 'http://localhost:3000';
 };
 
