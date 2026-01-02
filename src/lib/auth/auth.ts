@@ -141,19 +141,34 @@ export const auth = betterAuth({
     sendOnSignUp: true,
     sendOnSignIn: true,
     sendVerificationEmail: async ({ user, url }) => {
-      // Normalize verification URL host to match the callbackURL host if present.
-      // This ensures the session cookie is set for the same host the user returns to (www vs apex).
+      // Normalize both the verification endpoint URL and the callbackURL to the canonical host.
+      // This avoids apex/www mismatches that prevent the session cookie from being readable.
       let normalizedUrl = url;
       try {
+        const canonicalHost = (() => {
+          try {
+            if (env.NEXT_PUBLIC_APP_URL) return new URL(env.NEXT_PUBLIC_APP_URL).host;
+          } catch {}
+          return 'www.viecom.pro';
+        })();
+
         const u = new URL(url);
-        const cb = u.searchParams.get('callbackURL');
-        if (cb) {
-          const c = new URL(cb);
-          if (u.host !== c.host) {
-            u.host = c.host;
-            u.protocol = c.protocol;
-            normalizedUrl = u.toString();
+        const cbRaw = u.searchParams.get('callbackURL');
+        if (cbRaw) {
+          const c = new URL(cbRaw, `${u.protocol}//${u.host}`);
+          // Force callbackURL to canonical host
+          if (c.host !== canonicalHost) {
+            c.host = canonicalHost;
+            c.protocol = 'https:';
           }
+          // Update the callbackURL param
+          u.searchParams.set('callbackURL', c.toString());
+          // Ensure the verification endpoint also hits the canonical host
+          if (u.host !== canonicalHost) {
+            u.host = canonicalHost;
+            u.protocol = 'https:';
+          }
+          normalizedUrl = u.toString();
         } else if (env.NEXT_PUBLIC_APP_URL) {
           const app = new URL(env.NEXT_PUBLIC_APP_URL);
           if (u.host !== app.host) {
