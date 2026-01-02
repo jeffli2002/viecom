@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import '@/styles/globals.css';
 import { GoogleAnalytics } from '@/components/analytics/google-analytics';
+import { AuthProvider } from '@/components/auth/auth-provider';
 import { DEFAULT_SEO_KEYWORDS, getMetadataBase } from '@/lib/seo/metadata';
 
 export const metadata: Metadata = {
@@ -24,6 +25,7 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body>
         <GoogleAnalytics />
+        <AuthProvider />
         {children}
       </body>
     </html>

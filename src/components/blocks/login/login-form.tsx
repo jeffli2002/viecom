@@ -74,7 +74,7 @@ export function LoginForm({
       const rawTarget = searchParams.get('callbackUrl');
       const target = rawTarget && rawTarget.trim().length > 0 ? rawTarget : '/';
       // After verification, return to signup so we can refresh session and redirect to the intended page
-      const base = `/${locale}/signup?verification=1&callbackUrl=${encodeURIComponent(target)}`;
+      const base = `/${locale}/email-verified?callbackUrl=${encodeURIComponent(target)}`;
       const callbackURL = new URL(base, window.location.origin).toString();
       const response = await fetch('/api/auth/send-verification-email', {
         method: 'POST',
