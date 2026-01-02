@@ -63,7 +63,7 @@ export function SignupForm({ className, ...props }: React.ComponentProps<'div'>)
   const locale = router.locale ?? routing.defaultLocale;
   // After email verification, return to signup page where we refresh session
   // and immediately redirect to the intended destination.
-  const verificationCallbackPath = `/${locale}/email-verified`;
+  const verificationCallbackPath = `/${locale}/signup`;
 
   const getRedirectTarget = useCallback(() => {
     const callbackUrl = searchParams.get('callbackUrl');
@@ -122,10 +122,10 @@ export function SignupForm({ className, ...props }: React.ComponentProps<'div'>)
     const verificationCallbackUrl =
       typeof window !== 'undefined'
         ? new URL(
-            `${verificationCallbackPath}?callbackUrl=${encodeURIComponent(localized)}`,
+            `${verificationCallbackPath}?verification=1&callbackUrl=${encodeURIComponent(localized)}`,
             window.location.origin
           ).toString()
-        : `${verificationCallbackPath}?callbackUrl=${encodeURIComponent(localized)}`;
+        : `${verificationCallbackPath}?verification=1&callbackUrl=${encodeURIComponent(localized)}`;
 
     const result = await emailSignup(email, password, name, verificationCallbackUrl);
     if (result.success) {
@@ -164,10 +164,10 @@ export function SignupForm({ className, ...props }: React.ComponentProps<'div'>)
       const callbackURL =
         typeof window !== 'undefined'
           ? new URL(
-              `${verificationCallbackPath}?callbackUrl=${encodeURIComponent(localized)}`,
+              `${verificationCallbackPath}?verification=1&callbackUrl=${encodeURIComponent(localized)}`,
               window.location.origin
             ).toString()
-          : `${verificationCallbackPath}?callbackUrl=${encodeURIComponent(localized)}`;
+          : `${verificationCallbackPath}?verification=1&callbackUrl=${encodeURIComponent(localized)}`;
 
       const response = await fetch('/api/auth/send-verification-email', {
         method: 'POST',
@@ -206,10 +206,10 @@ export function SignupForm({ className, ...props }: React.ComponentProps<'div'>)
       const callbackURL =
         typeof window !== 'undefined'
           ? new URL(
-              `${verificationCallbackPath}?callbackUrl=${encodeURIComponent(localized)}`,
+              `${verificationCallbackPath}?verification=1&callbackUrl=${encodeURIComponent(localized)}`,
               window.location.origin
             ).toString()
-          : `${verificationCallbackPath}?callbackUrl=${encodeURIComponent(localized)}`;
+          : `${verificationCallbackPath}?verification=1&callbackUrl=${encodeURIComponent(localized)}`;
 
       const response = await fetch('/api/auth/change-email', {
         method: 'POST',
