@@ -24,33 +24,65 @@ function AuthProviderContent() {
     const cbParam = searchParams.get('callbackUrl');
 
     if (code || state || authCallback) {
-      const timer = setTimeout(async () => {
-        await refreshSession();
+      let cancelled = false;
+      const run = async () => {
+        const locale = (router as any)?.locale ?? routing.defaultLocale;
+        const target = resolveRedirectTarget(locale, cbParam || '/image-generation');
 
-        // If verification or OAuth callback completes, redirect to the intended target
-        if (authCallback) {
-          const { isAuthenticated } = useAuthStore.getState();
-          const locale = (router as any)?.locale ?? routing.defaultLocale;
-          // default to image-generation if no target provided
-          const target = resolveRedirectTarget(locale, cbParam || '/image-generation');
-          if (isAuthenticated) {
-            router.replace(target.relative);
-            return;
+        // Try up to 3 times to allow cookies to propagate on prod
+        for (let attempt = 1; attempt <= 3 && !cancelled; attempt++) {
+          try {
+            await refreshSession();
+
+            if (authCallback) {
+              const { isAuthenticated } = useAuthStore.getState();
+              if (isAuthenticated) {
+                router.replace(target.relative);
+                return;
+              }
+
+              // Also try direct REST session as a fallback
+              try {
+                const resp = await fetch('/api/auth/get-session', {
+                  credentials: 'include',
+                  cache: 'no-store',
+                });
+                if (resp.ok) {
+                  const data = await resp.json();
+                  const sessionUser = (data?.session?.user ?? data?.user ?? null) as any;
+                  if (sessionUser?.id && sessionUser?.emailVerified) {
+                    const s = useAuthStore.getState();
+                    s.setUser(sessionUser);
+                    useAuthStore.setState({ isAuthenticated: true, lastUpdated: Date.now() });
+                    router.replace(target.relative);
+                    return;
+                  }
+                }
+              } catch {
+                // ignore and retry
+              }
+            }
+          } catch {
+            // ignore and retry
           }
+          // wait before next attempt
+          await new Promise((r) => setTimeout(r, 1200));
         }
 
         // Clean URL params if staying on the same page
-        if (window.history.replaceState) {
+        if (!cancelled && window.history.replaceState) {
           const url = new URL(window.location.href);
           url.searchParams.delete('code');
           url.searchParams.delete('state');
           url.searchParams.delete('authCallback');
-          // Keep callbackUrl in case the page uses it later
           window.history.replaceState({}, '', url.toString());
         }
-      }, 800);
+      };
 
-      return () => clearTimeout(timer);
+      run();
+      return () => {
+        cancelled = true;
+      };
     }
   }, [searchParams, refreshSession, router]);
 
