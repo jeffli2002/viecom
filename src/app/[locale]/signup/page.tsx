@@ -2,7 +2,8 @@
 
 import { SignupForm } from '@/components/blocks/signup/signup-form';
 import { useRouter } from '@/i18n/navigation';
-import { useAuthInitialized, useIsAuthenticated, useRefreshSession } from '@/store/auth-store';
+import { useAuthInitialized, useInitialize, useIsAuthenticated, useRefreshSession } from '@/store/auth-store';
+import { useAuthStore } from '@/store/auth-store';
 import { Loader2 } from 'lucide-react';
 import { Suspense, useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
@@ -13,6 +14,7 @@ function SignupPageContent() {
   const isAuthenticated = useIsAuthenticated();
   const isInitialized = useAuthInitialized();
   const refreshSession = useRefreshSession();
+  const initialize = useInitialize();
   const [processingVerification, setProcessingVerification] = useState(false);
 
   // If returning from email verification, refresh the session then redirect to image generation
@@ -31,8 +33,34 @@ function SignupPageContent() {
       try {
         setProcessingVerification(true);
         // Give Better Auth a brief moment to set cookies, then refresh
-        await new Promise((r) => setTimeout(r, 400));
+        await new Promise((r) => setTimeout(r, 700));
+
+        // First, try direct session fetch to catch updated auth quickly
+        try {
+          const sessionResponse = await fetch('/api/auth/get-session', {
+            credentials: 'include',
+            cache: 'no-store',
+          });
+          if (sessionResponse.ok) {
+            const data = await sessionResponse.json();
+            const sessionUser = (data?.session?.user ?? data?.user ?? null) as any;
+            if (sessionUser?.id && sessionUser?.emailVerified) {
+              const s = useAuthStore.getState();
+              s.setUser(sessionUser);
+              useAuthStore.setState({ isAuthenticated: true, lastUpdated: Date.now() });
+              // small delay then redirect
+              await new Promise((r) => setTimeout(r, 250));
+              router.replace('/image-generation');
+              return;
+            }
+          }
+        } catch (_e) {
+          // ignore and fall back to refresh
+        }
+
+        // Fallback: refresh session and force initialize to sync store flags
         await refreshSession();
+        await initialize(true);
       } finally {
         if (!cancelled) setProcessingVerification(false);
       }

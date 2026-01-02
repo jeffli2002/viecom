@@ -82,13 +82,16 @@ export function SignupForm({ className, ...props }: React.ComponentProps<'div'>)
   };
 
   useEffect(() => {
-    // If we're on signup due to verification callback, do not redirect here.
-    const comingFromVerification =
-      typeof window !== 'undefined' && new URL(window.location.href).searchParams.get('verification');
+    // If we're on signup due to verification callback, avoid racing with the page's own redirect.
+    const params = typeof window !== 'undefined' ? new URL(window.location.href).searchParams : null;
+    const comingFromVerification = params?.get('verification');
 
-    if (isAuthenticated && !showVerificationNotice && !comingFromVerification) {
-      const { relative } = getRedirectTarget();
-      router.replace(relative);
+    if (isAuthenticated && !showVerificationNotice) {
+      if (!comingFromVerification) {
+        const { relative } = getRedirectTarget();
+        router.replace(relative);
+      }
+      // If coming from verification, let the page-level effect handle redirect to /image-generation
     }
   }, [isAuthenticated, showVerificationNotice, router, getRedirectTarget]);
 
