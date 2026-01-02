@@ -73,8 +73,8 @@ export function LoginForm({
       // Preserve intended post-verification destination
       const rawTarget = searchParams.get('callbackUrl');
       const target = rawTarget && rawTarget.trim().length > 0 ? rawTarget : '/';
-      // After verification, return to signup so we can refresh session and redirect to the intended page
-      const base = `/${locale}/email-verified?callbackUrl=${encodeURIComponent(target)}`;
+      // After verification, return to signup (AIedu pattern) so AuthProvider refreshes session and redirects
+      const base = `/${locale}/signup?authCallback=verified&callbackUrl=${encodeURIComponent(target)}`;
       const callbackURL = new URL(base, window.location.origin).toString();
       const response = await fetch('/api/auth/send-verification-email', {
         method: 'POST',
