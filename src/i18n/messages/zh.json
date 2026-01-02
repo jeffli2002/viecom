@@ -20,6 +20,48 @@
     "selectAll": "全选",
     "deselectAll": "取消全选"
   },
+  "auth": {
+    "orContinueWith": "或继续使用",
+    "orUseEmail": "或使用邮箱",
+    "forgotPassword": "忘记密码？",
+    "name": "姓名",
+    "namePlaceholder": "您的姓名",
+    "email": "邮箱",
+    "emailPlaceholder": "name@example.com",
+    "password": "密码",
+    "confirmPassword": "确认密码",
+    "passwordAtLeast": "至少 {count} 个字符",
+    "passwordHint": "至少 {count} 个字符。",
+    "verification": {
+      "title": "请查收邮箱",
+      "description": "我们已向 {email} 发送了确认链接，请点击完成账户设置。",
+      "yourEmail": "您的邮箱",
+      "yourInbox": "您的邮箱",
+      "resend": "重新发送确认邮件",
+      "resendIn": "{seconds} 秒后可重发",
+      "sending": "发送中...",
+      "needNew": "需要新的确认邮件？",
+      "resendHelp": "我们可以重新发送确认链接到您的邮箱。",
+      "changeEmail": "更换邮箱",
+      "newEmail": "新邮箱",
+      "updateEmail": "更新邮箱"
+    },
+    "signup": {
+      "title": "创建账户",
+      "subtitle": "使用您的信息注册",
+      "withGoogle": "使用 Google 注册",
+      "signingUp": "注册中...",
+      "submit": "注册",
+      "haveAccount": "已有账户？",
+      "linkText": "注册"
+    },
+    "signin": {
+      "signingIn": "登录中...",
+      "submit": "登录",
+      "noAccount": "还没有账户？",
+      "linkText": "登录"
+    }
+  },
   "nav": {
     "home": "首页",
     "generationTools": "工具",

@@ -8,6 +8,7 @@ import { routing } from '@/i18n/routing';
 import { cn, isMobile, isWebView } from '@/lib/utils';
 import type { LoginFormProps } from '@/types/login';
 import { AlertCircle } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
@@ -22,6 +23,8 @@ export function LoginForm({
   onClearError,
   ...props
 }: LoginFormProps & React.ComponentProps<'div'>) {
+  const tCommon = useTranslations('common');
+  const tAuth = useTranslations('auth');
   const [isInWebView, setIsInWebView] = useState(false);
   const [showWebViewWarning, setShowWebViewWarning] = useState(false);
   const [showVerificationBanner, setShowVerificationBanner] = useState(false);
@@ -70,7 +73,8 @@ export function LoginForm({
       // Preserve intended post-verification destination
       const rawTarget = searchParams.get('callbackUrl');
       const target = rawTarget && rawTarget.trim().length > 0 ? rawTarget : '/';
-      const base = `/${locale}/email-verified?callbackUrl=${encodeURIComponent(target)}`;
+      // After verification, return to signup so we can refresh session and redirect to the intended page
+      const base = `/${locale}/signup?verification=1&callbackUrl=${encodeURIComponent(target)}`;
       const callbackURL = new URL(base, window.location.origin).toString();
       const response = await fetch('/api/auth/send-verification-email', {
         method: 'POST',
@@ -119,10 +123,9 @@ export function LoginForm({
             <div className="grid gap-6">
               {showVerificationBanner && (
                 <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-amber-800 text-sm">
-                  <p className="font-semibold">Check your email to continue</p>
+                  <p className="font-semibold">{tAuth('verification.bannerTitle')}</p>
                   <p className="mt-1">
-                    We sent a confirmation link to {verificationEmail || 'your inbox'}. Confirm your
-                    email to finish setting up your account.
+                    {tAuth('verification.bannerBody', { email: verificationEmail || tAuth('verification.yourInbox') })}
                   </p>
                 </div>
               )}
@@ -135,14 +138,14 @@ export function LoginForm({
                     onClick={onClearError}
                     className="ml-2 underline hover:no-underline"
                   >
-                    Close
+                    {tCommon('close')}
                   </button>
                 </div>
               )}
               {isEmailNotVerified && (
                 <div className="rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-slate-700 text-sm">
-                  <p className="font-semibold">Need a new confirmation email?</p>
-                  <p className="mt-1">We can resend the verification link to your email.</p>
+                  <p className="font-semibold">{tAuth('verification.needNew')}</p>
+                  <p className="mt-1">{tAuth('verification.resendHelp')}</p>
                   <div className="mt-3 flex flex-wrap items-center gap-3">
                     <Button
                       type="button"
@@ -150,7 +153,7 @@ export function LoginForm({
                       onClick={handleResendVerification}
                       disabled={isResending}
                     >
-                      {isResending ? 'Sending...' : 'Resend confirmation email'}
+                      {isResending ? tAuth('verification.sending') : tAuth('verification.resend')}
                     </Button>
                     {resendStatus && <span className="text-slate-600">{resendStatus}</span>}
                   </div>
@@ -229,7 +232,7 @@ export function LoginForm({
                   <div className="w-full border-t border-gray-200" />
                 </div>
                 <div className="relative flex justify-center text-sm">
-                  <span className="bg-white px-4 text-gray-500 font-medium">Or use email</span>
+                  <span className="bg-white px-4 text-gray-500 font-medium">{tAuth('orUseEmail')}</span>
                 </div>
               </div>
 
@@ -252,11 +255,8 @@ export function LoginForm({
                 <div className="grid gap-3">
                   <div className="flex items-center">
                     <Label htmlFor="password">Password</Label>
-                    <a
-                      href="/reset-password"
-                      className="ml-auto text-sm underline-offset-4 hover:underline"
-                    >
-                      Forgot password?
+                    <a href="/reset-password" className="ml-auto text-sm underline-offset-4 hover:underline">
+                      {tAuth('forgotPassword')}
                     </a>
                   </div>
                   <Input
@@ -276,14 +276,14 @@ export function LoginForm({
                   disabled={isLoading || !formData.email || !formData.password}
                   data-testid="login-button"
                 >
-                  {isLoading ? 'Signing in...' : 'Sign In'}
+                  {isLoading ? tAuth('signin.signingIn') : tAuth('signin.submit')}
                 </Button>
               </div>
 
               <div className="text-center text-sm">
-                Don't have an account?{' '}
+                {tAuth('signin.noAccount')}{' '}
                 <a href="/signup" className="underline underline-offset-4">
-                  Sign up
+                  {tAuth('signup.linkText')}
                 </a>
               </div>
             </div>

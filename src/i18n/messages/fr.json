@@ -20,6 +20,48 @@
     "selectAll": "Tout sélectionner",
     "deselectAll": "Tout désélectionner"
   },
+  "auth": {
+    "orContinueWith": "Ou continuer avec",
+    "orUseEmail": "Ou utiliser l'email",
+    "forgotPassword": "Mot de passe oublié ?",
+    "name": "Nom",
+    "namePlaceholder": "Votre nom",
+    "email": "Email",
+    "emailPlaceholder": "name@example.com",
+    "password": "Mot de passe",
+    "confirmPassword": "Confirmer le mot de passe",
+    "passwordAtLeast": "Au moins {count} caractères",
+    "passwordHint": "Doit contenir au moins {count} caractères.",
+    "verification": {
+      "title": "Vérifiez votre boîte mail",
+      "description": "Cliquez sur le lien envoyé à {email} pour terminer la configuration de votre compte.",
+      "yourEmail": "votre email",
+      "yourInbox": "votre boîte de réception",
+      "resend": "Renvoyer l'email de confirmation",
+      "resendIn": "Renvoyer dans {seconds}s",
+      "sending": "Envoi...",
+      "needNew": "Besoin d'un nouvel email de confirmation ?",
+      "resendHelp": "Nous pouvons renvoyer le lien de vérification à votre email.",
+      "changeEmail": "Changer d'email",
+      "newEmail": "Nouvel email",
+      "updateEmail": "Mettre à jour l'email"
+    },
+    "signup": {
+      "title": "Créer un compte",
+      "subtitle": "Inscrivez-vous avec votre compte",
+      "withGoogle": "S'inscrire avec Google",
+      "signingUp": "Inscription...",
+      "submit": "S'inscrire",
+      "haveAccount": "Vous avez déjà un compte ?",
+      "linkText": "S'inscrire"
+    },
+    "signin": {
+      "signingIn": "Connexion...",
+      "submit": "Se connecter",
+      "noAccount": "Vous n'avez pas de compte ?",
+      "linkText": "Se connecter"
+    }
+  },
   "nav": {
     "home": "Accueil",
     "generationTools": "Outils",

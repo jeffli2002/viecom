@@ -20,6 +20,48 @@
     "selectAll": "Alles auswählen",
     "deselectAll": "Auswahl aufheben"
   },
+  "auth": {
+    "orContinueWith": "Oder fortfahren mit",
+    "orUseEmail": "Oder E-Mail verwenden",
+    "forgotPassword": "Passwort vergessen?",
+    "name": "Name",
+    "namePlaceholder": "Ihr Name",
+    "email": "E-Mail",
+    "emailPlaceholder": "name@example.com",
+    "password": "Passwort",
+    "confirmPassword": "Passwort bestätigen",
+    "passwordAtLeast": "Mindestens {count} Zeichen",
+    "passwordHint": "Mindestens {count} Zeichen.",
+    "verification": {
+      "title": "Posteingang prüfen",
+      "description": "Klicken Sie auf den Link, den wir an {email} gesendet haben, um die Einrichtung Ihres Kontos abzuschließen.",
+      "yourEmail": "Ihre E-Mail",
+      "yourInbox": "Ihr Posteingang",
+      "resend": "Bestätigungs-E-Mail erneut senden",
+      "resendIn": "Erneut senden in {seconds}s",
+      "sending": "Senden...",
+      "needNew": "Neue Bestätigungs-E-Mail benötigt?",
+      "resendHelp": "Wir können den Bestätigungslink an Ihre E-Mail erneut senden.",
+      "changeEmail": "E-Mail ändern",
+      "newEmail": "Neue E-Mail",
+      "updateEmail": "E-Mail aktualisieren"
+    },
+    "signup": {
+      "title": "Konto erstellen",
+      "subtitle": "Registrieren Sie sich mit Ihrem Konto",
+      "withGoogle": "Mit Google registrieren",
+      "signingUp": "Registrierung...",
+      "submit": "Registrieren",
+      "haveAccount": "Sie haben bereits ein Konto?",
+      "linkText": "Registrieren"
+    },
+    "signin": {
+      "signingIn": "Anmelden...",
+      "submit": "Anmelden",
+      "noAccount": "Noch kein Konto?",
+      "linkText": "Anmelden"
+    }
+  },
   "nav": {
     "home": "Startseite",
     "generationTools": "Tools",

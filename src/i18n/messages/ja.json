@@ -20,6 +20,48 @@
     "selectAll": "すべて選択",
     "deselectAll": "すべて解除"
   },
+  "auth": {
+    "orContinueWith": "または次で続行",
+    "orUseEmail": "またはメールを使用",
+    "forgotPassword": "パスワードをお忘れですか？",
+    "name": "名前",
+    "namePlaceholder": "お名前",
+    "email": "メール",
+    "emailPlaceholder": "name@example.com",
+    "password": "パスワード",
+    "confirmPassword": "パスワード確認",
+    "passwordAtLeast": "最低 {count} 文字",
+    "passwordHint": "最低 {count} 文字が必要です。",
+    "verification": {
+      "title": "メールを確認してください",
+      "description": "{email} に送信したリンクをクリックして、アカウント設定を完了してください。",
+      "yourEmail": "あなたのメール",
+      "yourInbox": "受信箱",
+      "resend": "確認メールを再送",
+      "resendIn": "{seconds}秒後に再送",
+      "sending": "送信中...",
+      "needNew": "確認メールが必要ですか？",
+      "resendHelp": "確認リンクをメールに再送できます。",
+      "changeEmail": "メールを変更",
+      "newEmail": "新しいメール",
+      "updateEmail": "メールを更新"
+    },
+    "signup": {
+      "title": "アカウント作成",
+      "subtitle": "アカウントで登録",
+      "withGoogle": "Googleで登録",
+      "signingUp": "登録中...",
+      "submit": "登録",
+      "haveAccount": "すでにアカウントをお持ちですか？",
+      "linkText": "登録"
+    },
+    "signin": {
+      "signingIn": "サインイン中...",
+      "submit": "サインイン",
+      "noAccount": "アカウントをお持ちではありませんか？",
+      "linkText": "サインイン"
+    }
+  },
   "nav": {
     "home": "ホーム",
     "generationTools": "ツール",

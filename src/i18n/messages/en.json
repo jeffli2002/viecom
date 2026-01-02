@@ -20,6 +20,48 @@
     "selectAll": "Select All",
     "deselectAll": "Deselect All"
   },
+  "auth": {
+    "orContinueWith": "Or continue with",
+    "orUseEmail": "Or use email",
+    "forgotPassword": "Forgot password?",
+    "name": "Name",
+    "namePlaceholder": "Your name",
+    "email": "Email",
+    "emailPlaceholder": "name@example.com",
+    "password": "Password",
+    "confirmPassword": "Confirm Password",
+    "passwordAtLeast": "At least {count} characters",
+    "passwordHint": "Must be at least {count} characters.",
+    "verification": {
+      "title": "Check your inbox",
+      "description": "Click the link we sent to {email} to finish setting up your account.",
+      "yourEmail": "your email",
+      "yourInbox": "your inbox",
+      "resend": "Resend confirmation email",
+      "resendIn": "Resend in {seconds}s",
+      "sending": "Sending...",
+      "needNew": "Need a new confirmation email?",
+      "resendHelp": "We can resend the verification link to your email.",
+      "changeEmail": "Change email",
+      "newEmail": "New email",
+      "updateEmail": "Update email"
+    },
+    "signup": {
+      "title": "Create Account",
+      "subtitle": "Sign up with your account",
+      "withGoogle": "Sign up with Google",
+      "signingUp": "Signing up...",
+      "submit": "Sign Up",
+      "haveAccount": "Already have an account?",
+      "linkText": "Sign up"
+    },
+    "signin": {
+      "signingIn": "Signing in...",
+      "submit": "Sign In",
+      "noAccount": "Don't have an account?",
+      "linkText": "Sign in"
+    }
+  },
   "nav": {
     "home": "Home",
     "generationTools": "Tools",

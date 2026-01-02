@@ -20,6 +20,48 @@
     "selectAll": "Seleccionar todo",
     "deselectAll": "Deseleccionar todo"
   },
+  "auth": {
+    "orContinueWith": "O continuar con",
+    "orUseEmail": "O usar email",
+    "forgotPassword": "¿Olvidaste tu contraseña?",
+    "name": "Nombre",
+    "namePlaceholder": "Tu nombre",
+    "email": "Correo",
+    "emailPlaceholder": "name@example.com",
+    "password": "Contraseña",
+    "confirmPassword": "Confirmar contraseña",
+    "passwordAtLeast": "Al menos {count} caracteres",
+    "passwordHint": "Debe tener al menos {count} caracteres.",
+    "verification": {
+      "title": "Revisa tu bandeja de entrada",
+      "description": "Haz clic en el enlace que enviamos a {email} para completar la configuración de tu cuenta.",
+      "yourEmail": "tu correo",
+      "yourInbox": "tu bandeja",
+      "resend": "Reenviar correo de confirmación",
+      "resendIn": "Reenviar en {seconds}s",
+      "sending": "Enviando...",
+      "needNew": "¿Necesitas un nuevo correo de confirmación?",
+      "resendHelp": "Podemos reenviar el enlace de verificación a tu correo.",
+      "changeEmail": "Cambiar correo",
+      "newEmail": "Nuevo correo",
+      "updateEmail": "Actualizar correo"
+    },
+    "signup": {
+      "title": "Crear cuenta",
+      "subtitle": "Regístrate con tu cuenta",
+      "withGoogle": "Registrarse con Google",
+      "signingUp": "Registrando...",
+      "submit": "Registrarse",
+      "haveAccount": "¿Ya tienes una cuenta?",
+      "linkText": "Registrarse"
+    },
+    "signin": {
+      "signingIn": "Iniciando sesión...",
+      "submit": "Iniciar sesión",
+      "noAccount": "¿No tienes una cuenta?",
+      "linkText": "Iniciar sesión"
+    }
+  },
   "nav": {
     "home": "Inicio",
     "generationTools": "Herramientas",
