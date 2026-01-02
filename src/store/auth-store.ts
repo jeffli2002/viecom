@@ -243,8 +243,13 @@ export const useAuthStore = create<AuthState>()(
                   };
                 }
 
-                // Block sign-in if email is not verified
+                // Block sign-in if email is not verified (and clear any partial session)
                 if (!user.emailVerified) {
+                  try {
+                    await authClient.signOut();
+                  } catch (_e) {
+                    // ignore
+                  }
                   set({ isLoading: false, error: 'Email not verified. Please check your inbox.' });
                   return { success: false, error: 'email_not_verified' };
                 }
@@ -309,8 +314,8 @@ export const useAuthStore = create<AuthState>()(
                   };
                 }
 
-                // Do not authenticate immediately; wait for email verification
-                set({ isLoading: false });
+                // Store user but do not authenticate until email verification is completed
+                set({ user, isAuthenticated: false, isLoading: false, lastUpdated: Date.now() });
                 return { success: true };
               }
               if (!result.error) {
