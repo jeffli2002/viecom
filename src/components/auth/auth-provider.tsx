@@ -69,12 +69,27 @@ function AuthProviderContent() {
           await new Promise((r) => setTimeout(r, 1200));
         }
 
-        // Clean URL params if staying on the same page
+        // If not redirected yet and authCallback is present, try one last time to refresh
+        if (authCallback) {
+          try {
+            await refreshSession();
+            const { isAuthenticated } = useAuthStore.getState();
+            if (isAuthenticated) {
+              const locale = (router as any)?.locale ?? routing.defaultLocale;
+              const target = resolveRedirectTarget(locale, cbParam || '/image-generation');
+              router.replace(target.relative);
+              return;
+            }
+          } catch {}
+        }
+
+        // Clean URL params if staying on the same page (ensure a clean signup URL)
         if (!cancelled && window.history.replaceState) {
           const url = new URL(window.location.href);
           url.searchParams.delete('code');
           url.searchParams.delete('state');
           url.searchParams.delete('authCallback');
+          // keep callbackUrl if present; some flows may use it later
           window.history.replaceState({}, '', url.toString());
         }
       };

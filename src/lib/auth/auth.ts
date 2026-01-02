@@ -141,15 +141,26 @@ export const auth = betterAuth({
     sendOnSignUp: true,
     sendOnSignIn: true,
     sendVerificationEmail: async ({ user, url }) => {
-      // Normalize verification URL host to match NEXT_PUBLIC_APP_URL (prevents apex/www cookie mismatches)
+      // Normalize verification URL host to match the callbackURL host if present.
+      // This ensures the session cookie is set for the same host the user returns to (www vs apex).
       let normalizedUrl = url;
       try {
-        const app = new URL(env.NEXT_PUBLIC_APP_URL);
         const u = new URL(url);
-        if (u.host !== app.host) {
-          u.host = app.host;
-          u.protocol = app.protocol;
-          normalizedUrl = u.toString();
+        const cb = u.searchParams.get('callbackURL');
+        if (cb) {
+          const c = new URL(cb);
+          if (u.host !== c.host) {
+            u.host = c.host;
+            u.protocol = c.protocol;
+            normalizedUrl = u.toString();
+          }
+        } else if (env.NEXT_PUBLIC_APP_URL) {
+          const app = new URL(env.NEXT_PUBLIC_APP_URL);
+          if (u.host !== app.host) {
+            u.host = app.host;
+            u.protocol = app.protocol;
+            normalizedUrl = u.toString();
+          }
         }
       } catch {
         // leave original url if parsing fails
