@@ -61,10 +61,26 @@
       "linkText": "Registrarse"
     },
     "signin": {
+      "title": "Bienvenido de nuevo",
+      "subtitle": "Inicia sesión con tu cuenta",
+      "withGoogle": "Iniciar sesión con Google",
       "signingIn": "Iniciando sesión...",
       "submit": "Iniciar sesión",
       "noAccount": "¿No tienes una cuenta?",
-      "linkText": "Iniciar sesión"
+      "linkText": "Iniciar sesión",
+      "passwordsDoNotMatch": "Las contraseñas no coinciden",
+      "verificationEmailSent": "Correo de verificación enviado. Por favor revisa tu bandeja de entrada.",
+      "emailUpdated": "Correo actualizado. Por favor revisa tu bandeja de entrada para confirmar.",
+      "enterValidEmail": "Por favor ingresa una dirección de correo válida.",
+      "enterEmailToResend": "Por favor ingresa tu dirección de correo para reenviar la confirmación.",
+      "unableToSignInBrowser": "No se puede iniciar sesión desde este navegador",
+      "googleSignInNotSupported": "El inicio de sesión con Google no es compatible con navegadores integrados. Por favor:",
+      "openInBrowserOption": "Usa la opción \"Abrir en navegador\" del menú de tu aplicación",
+      "signInWithEmailBelow": "O inicia sesión con correo y contraseña a continuación",
+      "copyUrlToOpen": "Copiar URL para abrir en navegador",
+      "urlCopied": "¡URL copiada! Ábrela en Safari (iOS) o Chrome (Android)",
+      "failedToResendVerificationEmail": "Error al reenviar el correo de verificación",
+      "failedToChangeEmail": "Error al cambiar el correo"
     }
   },
   "nav": {

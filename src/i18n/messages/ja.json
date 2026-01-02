@@ -61,10 +61,26 @@
       "linkText": "登録"
     },
     "signin": {
+      "title": "おかえりなさい",
+      "subtitle": "アカウントでサインイン",
+      "withGoogle": "Googleでサインイン",
       "signingIn": "サインイン中...",
       "submit": "サインイン",
       "noAccount": "アカウントをお持ちではありませんか？",
-      "linkText": "サインイン"
+      "linkText": "サインイン",
+      "passwordsDoNotMatch": "パスワードが一致しません",
+      "verificationEmailSent": "確認メールを送信しました。受信箱を確認してください。",
+      "emailUpdated": "メールを更新しました。確認のため受信箱を確認してください。",
+      "enterValidEmail": "有効なメールアドレスを入力してください。",
+      "enterEmailToResend": "確認メールを再送するには、メールアドレスを入力してください。",
+      "unableToSignInBrowser": "このブラウザからサインインできません",
+      "googleSignInNotSupported": "Googleサインインは埋め込みブラウザではサポートされていません。次のいずれかを行ってください：",
+      "openInBrowserOption": "アプリのメニューから「ブラウザで開く」オプションを使用する",
+      "signInWithEmailBelow": "または下のメールとパスワードでサインインする",
+      "copyUrlToOpen": "URLをコピーしてブラウザで開く",
+      "urlCopied": "URLをコピーしました！Safari（iOS）またはChrome（Android）で開いてください",
+      "failedToResendVerificationEmail": "確認メールの再送に失敗しました",
+      "failedToChangeEmail": "メールの変更に失敗しました"
     }
   },
   "nav": {

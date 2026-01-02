@@ -62,7 +62,7 @@ export function LoginForm({
   const handleResendVerification = async () => {
     const targetEmail = formData.email || verificationEmail;
     if (!targetEmail) {
-      setResendStatus('Please enter your email address to resend the confirmation.');
+      setResendStatus(tAuth('signin.enterEmailToResend'));
       return;
     }
     setIsResending(true);
@@ -84,11 +84,11 @@ export function LoginForm({
       });
       if (!response.ok) {
         const detail = await response.text();
-        throw new Error(detail || 'Failed to resend verification email');
+        throw new Error(detail || tAuth('signin.failedToResendVerificationEmail'));
       }
-      setResendStatus('Verification email sent. Please check your inbox.');
+      setResendStatus(tAuth('signin.verificationEmailSent'));
     } catch (err) {
-      setResendStatus(err instanceof Error ? err.message : 'Failed to resend verification email');
+      setResendStatus(err instanceof Error ? err.message : tAuth('signin.failedToResendVerificationEmail'));
     } finally {
       setIsResending(false);
     }
@@ -115,8 +115,8 @@ export function LoginForm({
     <div className={cn('flex flex-col gap-6', className)} {...props}>
       <Card>
         <CardHeader className="text-center">
-          <CardTitle className="text-xl">Welcome Back</CardTitle>
-          <CardDescription>Sign in with your account</CardDescription>
+          <CardTitle className="text-xl">{tAuth('signin.title')}</CardTitle>
+          <CardDescription>{tAuth('signin.subtitle')}</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={onEmailLogin} data-testid="login-form">
@@ -165,13 +165,13 @@ export function LoginForm({
                 <div className="flex items-start gap-2 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-amber-800 text-sm">
                   <AlertCircle className="mt-0.5 h-5 w-5 flex-shrink-0" />
                   <div className="flex-1">
-                    <p className="font-semibold">Unable to sign in from this browser</p>
+                    <p className="font-semibold">{tAuth('signin.unableToSignInBrowser')}</p>
                     <p className="mt-1">
-                      Google sign-in is not supported in embedded browsers. Please:
+                      {tAuth('signin.googleSignInNotSupported')}
                     </p>
                     <ul className="mt-1 list-inside list-disc space-y-1">
-                      <li>Use the "Open in Browser" option from your app's menu</li>
-                      <li>Or sign in with email and password below</li>
+                      <li>{tAuth('signin.openInBrowserOption')}</li>
+                      <li>{tAuth('signin.signInWithEmailBelow')}</li>
                     </ul>
                     <Button
                       type="button"
@@ -180,10 +180,10 @@ export function LoginForm({
                       className="mt-2 bg-white"
                       onClick={() => {
                         navigator.clipboard.writeText(window.location.href);
-                        alert('URL copied! Open it in Safari (iOS) or Chrome (Android)');
+                        alert(tAuth('signin.urlCopied'));
                       }}
                     >
-                      Copy URL to Open in Browser
+                      {tAuth('signin.copyUrlToOpen')}
                     </Button>
                   </div>
                 </div>
@@ -223,7 +223,7 @@ export function LoginForm({
                       d="M43.611,20.083H42V20H24v8h11.303c-0.792,2.237-2.231,4.166-4.087,5.571c0.001-0.001,0.002-0.001,0.003-0.002l6.19,5.238C36.971,39.205,44,34,44,24C44,22.659,43.862,21.35,43.611,20.083z"
                     />
                   </svg>
-                  {isLoading ? 'Signing in...' : 'Sign in with Google'}
+                  {isLoading ? tAuth('signin.signingIn') : tAuth('signin.withGoogle')}
                 </Button>
               </div>
 
@@ -239,11 +239,11 @@ export function LoginForm({
               {/* Email password login */}
               <div className="grid gap-6">
                 <div className="grid gap-3">
-                  <Label htmlFor="email">Email</Label>
+                  <Label htmlFor="email">{tAuth('email')}</Label>
                   <Input
                     id="email"
                     type="email"
-                    placeholder="name@example.com"
+                    placeholder={tAuth('emailPlaceholder')}
                     value={formData.email}
                     onChange={handleEmailChange}
                     required
@@ -254,7 +254,7 @@ export function LoginForm({
                 </div>
                 <div className="grid gap-3">
                   <div className="flex items-center">
-                    <Label htmlFor="password">Password</Label>
+                    <Label htmlFor="password">{tAuth('password')}</Label>
                     <a href="/reset-password" className="ml-auto text-sm underline-offset-4 hover:underline">
                       {tAuth('forgotPassword')}
                     </a>

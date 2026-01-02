@@ -45,12 +45,13 @@ function SignupPageContent() {
             const data = await sessionResponse.json();
             const sessionUser = (data?.session?.user ?? data?.user ?? null) as any;
             if (sessionUser?.id && sessionUser?.emailVerified) {
-              const s = useAuthStore.getState();
-              s.setUser(sessionUser);
-              useAuthStore.setState({ isAuthenticated: true, lastUpdated: Date.now() });
+              // Use setUser which already handles isAuthenticated and lastUpdated
+              useAuthStore.getState().setUser(sessionUser);
               // small delay then redirect
               await new Promise((r) => setTimeout(r, 250));
-              router.replace('/image-generation');
+              if (!cancelled) {
+                router.replace('/image-generation');
+              }
               return;
             }
           }
@@ -59,8 +60,12 @@ function SignupPageContent() {
         }
 
         // Fallback: refresh session and force initialize to sync store flags
-        await refreshSession();
-        await initialize(true);
+        if (!cancelled) {
+          await refreshSession();
+          await initialize(true);
+        }
+      } catch (error) {
+        console.error('[Signup] Error processing verification:', error);
       } finally {
         if (!cancelled) setProcessingVerification(false);
       }
@@ -69,7 +74,7 @@ function SignupPageContent() {
     return () => {
       cancelled = true;
     };
-  }, [searchParams, refreshSession]);
+  }, [searchParams, refreshSession, initialize, router]);
 
   // Once authenticated (after verification), redirect to image generation immediately
   useEffect(() => {

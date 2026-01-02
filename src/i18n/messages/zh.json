@@ -61,10 +61,26 @@
       "linkText": "注册"
     },
     "signin": {
+      "title": "欢迎回来",
+      "subtitle": "使用您的账户登录",
+      "withGoogle": "使用 Google 登录",
       "signingIn": "登录中...",
       "submit": "登录",
       "noAccount": "还没有账户？",
-      "linkText": "登录"
+      "linkText": "登录",
+      "passwordsDoNotMatch": "密码不匹配",
+      "verificationEmailSent": "验证邮件已发送。请检查您的收件箱。",
+      "emailUpdated": "邮箱已更新。请检查您的收件箱以确认。",
+      "enterValidEmail": "请输入有效的邮箱地址。",
+      "enterEmailToResend": "请输入您的邮箱地址以重新发送确认邮件。",
+      "unableToSignInBrowser": "无法从此浏览器登录",
+      "googleSignInNotSupported": "Google 登录不支持嵌入式浏览器。请：",
+      "openInBrowserOption": "使用应用菜单中的\"在浏览器中打开\"选项",
+      "signInWithEmailBelow": "或使用下方的邮箱和密码登录",
+      "copyUrlToOpen": "复制 URL 在浏览器中打开",
+      "urlCopied": "URL 已复制！请在 Safari（iOS）或 Chrome（Android）中打开",
+      "failedToResendVerificationEmail": "重新发送验证邮件失败",
+      "failedToChangeEmail": "更改邮箱失败"
     }
   },
   "nav": {

@@ -61,10 +61,26 @@
       "linkText": "Registrieren"
     },
     "signin": {
+      "title": "Willkommen zurück",
+      "subtitle": "Melden Sie sich mit Ihrem Konto an",
+      "withGoogle": "Mit Google anmelden",
       "signingIn": "Anmelden...",
       "submit": "Anmelden",
       "noAccount": "Noch kein Konto?",
-      "linkText": "Anmelden"
+      "linkText": "Anmelden",
+      "passwordsDoNotMatch": "Passwörter stimmen nicht überein",
+      "verificationEmailSent": "Bestätigungs-E-Mail gesendet. Bitte überprüfen Sie Ihren Posteingang.",
+      "emailUpdated": "E-Mail aktualisiert. Bitte überprüfen Sie Ihren Posteingang zur Bestätigung.",
+      "enterValidEmail": "Bitte geben Sie eine gültige E-Mail-Adresse ein.",
+      "enterEmailToResend": "Bitte geben Sie Ihre E-Mail-Adresse ein, um die Bestätigung erneut zu senden.",
+      "unableToSignInBrowser": "Anmeldung von diesem Browser nicht möglich",
+      "googleSignInNotSupported": "Google-Anmeldung wird in eingebetteten Browsern nicht unterstützt. Bitte:",
+      "openInBrowserOption": "Verwenden Sie die Option \"Im Browser öffnen\" aus dem Menü Ihrer App",
+      "signInWithEmailBelow": "Oder melden Sie sich unten mit E-Mail und Passwort an",
+      "copyUrlToOpen": "URL kopieren, um im Browser zu öffnen",
+      "urlCopied": "URL kopiert! Öffnen Sie sie in Safari (iOS) oder Chrome (Android)",
+      "failedToResendVerificationEmail": "Fehler beim erneuten Senden der Bestätigungs-E-Mail",
+      "failedToChangeEmail": "Fehler beim Ändern der E-Mail"
     }
   },
   "nav": {

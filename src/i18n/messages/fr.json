@@ -61,10 +61,26 @@
       "linkText": "S'inscrire"
     },
     "signin": {
+      "title": "Bon retour",
+      "subtitle": "Connectez-vous avec votre compte",
+      "withGoogle": "Se connecter avec Google",
       "signingIn": "Connexion...",
       "submit": "Se connecter",
       "noAccount": "Vous n'avez pas de compte ?",
-      "linkText": "Se connecter"
+      "linkText": "Se connecter",
+      "passwordsDoNotMatch": "Les mots de passe ne correspondent pas",
+      "verificationEmailSent": "Email de vérification envoyé. Veuillez vérifier votre boîte de réception.",
+      "emailUpdated": "Email mis à jour. Veuillez vérifier votre boîte de réception pour confirmer.",
+      "enterValidEmail": "Veuillez entrer une adresse email valide.",
+      "enterEmailToResend": "Veuillez entrer votre adresse email pour renvoyer la confirmation.",
+      "unableToSignInBrowser": "Impossible de se connecter depuis ce navigateur",
+      "googleSignInNotSupported": "La connexion Google n'est pas prise en charge dans les navigateurs intégrés. Veuillez :",
+      "openInBrowserOption": "Utiliser l'option \"Ouvrir dans le navigateur\" du menu de votre application",
+      "signInWithEmailBelow": "Ou connectez-vous avec l'email et le mot de passe ci-dessous",
+      "copyUrlToOpen": "Copier l'URL pour ouvrir dans le navigateur",
+      "urlCopied": "URL copiée ! Ouvrez-la dans Safari (iOS) ou Chrome (Android)",
+      "failedToResendVerificationEmail": "Échec de l'envoi de l'email de vérification",
+      "failedToChangeEmail": "Échec du changement d'email"
     }
   },
   "nav": {

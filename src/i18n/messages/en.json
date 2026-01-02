@@ -61,10 +61,26 @@
       "linkText": "Sign up"
     },
     "signin": {
+      "title": "Welcome Back",
+      "subtitle": "Sign in with your account",
+      "withGoogle": "Sign in with Google",
       "signingIn": "Signing in...",
       "submit": "Sign In",
       "noAccount": "Don't have an account?",
-      "linkText": "Sign in"
+      "linkText": "Sign in",
+      "passwordsDoNotMatch": "Passwords do not match",
+      "verificationEmailSent": "Verification email sent. Please check your inbox.",
+      "emailUpdated": "Email updated. Please check your inbox for confirmation.",
+      "enterValidEmail": "Please enter a valid email address.",
+      "enterEmailToResend": "Please enter your email address to resend the confirmation.",
+      "unableToSignInBrowser": "Unable to sign in from this browser",
+      "googleSignInNotSupported": "Google sign-in is not supported in embedded browsers. Please:",
+      "openInBrowserOption": "Use the \"Open in Browser\" option from your app's menu",
+      "signInWithEmailBelow": "Or sign in with email and password below",
+      "copyUrlToOpen": "Copy URL to Open in Browser",
+      "urlCopied": "URL copied! Open it in Safari (iOS) or Chrome (Android)",
+      "failedToResendVerificationEmail": "Failed to resend verification email",
+      "failedToChangeEmail": "Failed to change email"
     }
   },
   "nav": {

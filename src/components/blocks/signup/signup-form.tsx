@@ -113,7 +113,7 @@ export function SignupForm({ className, ...props }: React.ComponentProps<'div'>)
 
     // Validate password match
     if (password !== confirmPassword) {
-      setError('Passwords do not match');
+      setError(tAuth('signin.passwordsDoNotMatch'));
       return;
     }
 
@@ -181,21 +181,21 @@ export function SignupForm({ className, ...props }: React.ComponentProps<'div'>)
 
       if (!response.ok) {
         const detail = await response.text();
-        throw new Error(detail || 'Failed to resend verification email');
+        throw new Error(detail || tAuth('signin.failedToResendVerificationEmail'));
       }
 
-      setResendStatus('Verification email sent. Please check your inbox.');
+      setResendStatus(tAuth('signin.verificationEmailSent'));
       setResendCooldown(30);
     } catch (error) {
       setResendStatus(
-        error instanceof Error ? error.message : 'Failed to resend verification email'
+        error instanceof Error ? error.message : tAuth('signin.failedToResendVerificationEmail')
       );
     }
   };
 
   const handleChangeEmail = async () => {
     if (!newEmail) {
-      setChangeEmailStatus('Please enter a valid email address.');
+      setChangeEmailStatus(tAuth('signin.enterValidEmail'));
       return;
     }
 
@@ -223,16 +223,16 @@ export function SignupForm({ className, ...props }: React.ComponentProps<'div'>)
 
       if (!response.ok) {
         const detail = await response.text();
-        throw new Error(detail || 'Failed to change email');
+        throw new Error(detail || tAuth('signin.failedToChangeEmail'));
       }
 
       setSignupEmail(newEmail);
       setShowChangeEmail(false);
       setNewEmail('');
-      setChangeEmailStatus('Email updated. Please check your inbox for confirmation.');
+      setChangeEmailStatus(tAuth('signin.emailUpdated'));
       setResendCooldown(30);
     } catch (error) {
-      setChangeEmailStatus(error instanceof Error ? error.message : 'Failed to change email');
+      setChangeEmailStatus(error instanceof Error ? error.message : tAuth('signin.failedToChangeEmail'));
     }
   };
 
