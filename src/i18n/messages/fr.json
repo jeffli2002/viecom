@@ -44,7 +44,10 @@
       "resendHelp": "Nous pouvons renvoyer le lien de vérification à votre email.",
       "changeEmail": "Changer d'email",
       "newEmail": "Nouvel email",
-      "updateEmail": "Mettre à jour l'email"
+      "updateEmail": "Mettre à jour l'email",
+      "openGmail": "Ouvrir Gmail",
+      "openOutlook": "Ouvrir Outlook",
+      "openQQMail": "Ouvrir QQ Mail"
     },
     "signup": {
       "title": "Créer un compte",

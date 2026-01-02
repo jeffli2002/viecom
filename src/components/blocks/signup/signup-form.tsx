@@ -70,6 +70,17 @@ export function SignupForm({ className, ...props }: React.ComponentProps<'div'>)
     return resolveRedirectTarget(locale, callbackUrl);
   }, [locale, searchParams]);
 
+  // Quick open common email providers (parity with AIedu)
+  const handleOpenGmail = () => {
+    if (typeof window !== 'undefined') window.open('https://mail.google.com', '_blank');
+  };
+  const handleOpenOutlook = () => {
+    if (typeof window !== 'undefined') window.open('https://outlook.live.com', '_blank');
+  };
+  const handleOpenQQMail = () => {
+    if (typeof window !== 'undefined') window.open('https://mail.qq.com', '_blank');
+  };
+
   useEffect(() => {
     // If we're on signup due to verification callback, do not redirect here.
     const comingFromVerification =
@@ -272,9 +283,36 @@ export function SignupForm({ className, ...props }: React.ComponentProps<'div'>)
               {resendStatus}
             </div>
           )}
+          {/* Email client quick actions */}
+          <div className="flex flex-col gap-3 mb-4">
+            <Button
+              type="button"
+              variant="outline"
+              className="w-full h-11 border-gray-300 bg-white text-gray-900"
+              onClick={handleOpenGmail}
+            >
+              {tAuth('verification.openGmail')}
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              className="w-full h-11 border-gray-300 bg-white text-gray-900"
+              onClick={handleOpenOutlook}
+            >
+              {tAuth('verification.openOutlook')}
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              className="w-full h-11 border-gray-300 bg-white text-gray-900"
+              onClick={handleOpenQQMail}
+            >
+              {tAuth('verification.openQQMail')}
+            </Button>
+          </div>
           {showChangeEmail && (
             <div className="mt-4 grid gap-3">
-              <Label htmlFor="new-email">{tAuth('verification.newEmail')}</Label>
+              <Label htmlFor="new-email" className="text-xs font-medium text-gray-700 uppercase tracking-wide">{tAuth('verification.newEmail')}</Label>
               <Input
                 id="new-email"
                 type="email"
@@ -390,9 +428,9 @@ export function SignupForm({ className, ...props }: React.ComponentProps<'div'>)
                 </div>
 
                 {/* Email password registration */}
-                <div className="grid gap-6">
-                  <div className="grid gap-3">
-                    <Label htmlFor="name">{tAuth('name')}</Label>
+                <div className="grid gap-5">
+                  <div className="grid gap-2">
+                    <Label htmlFor="name" className="text-xs font-medium text-gray-700 uppercase tracking-wide">{tAuth('name')}</Label>
                     <Input
                       id="name"
                       type="text"
@@ -406,8 +444,8 @@ export function SignupForm({ className, ...props }: React.ComponentProps<'div'>)
                       className="h-11 bg-gray-50 border-gray-300"
                     />
                   </div>
-                  <div className="grid gap-3">
-                    <Label htmlFor="email">{tAuth('email')}</Label>
+                  <div className="grid gap-2">
+                    <Label htmlFor="email" className="text-xs font-medium text-gray-700 uppercase tracking-wide">{tAuth('email')}</Label>
                     <Input
                       id="email"
                       type="email"
@@ -421,8 +459,8 @@ export function SignupForm({ className, ...props }: React.ComponentProps<'div'>)
                       className="h-11 bg-gray-50 border-gray-300"
                     />
                   </div>
-                  <div className="grid gap-3">
-                    <Label htmlFor="password">{tAuth('password')}</Label>
+                  <div className="grid gap-2">
+                    <Label htmlFor="password" className="text-xs font-medium text-gray-700 uppercase tracking-wide">{tAuth('password')}</Label>
                     <Input
                       id="password"
                       type="password"
@@ -440,8 +478,8 @@ export function SignupForm({ className, ...props }: React.ComponentProps<'div'>)
                       {tAuth('passwordHint', { count: MIN_PASSWORD_LENGTH })}
                     </p>
                   </div>
-                  <div className="grid gap-3">
-                    <Label htmlFor="confirmPassword">{tAuth('confirmPassword')}</Label>
+                  <div className="grid gap-2">
+                    <Label htmlFor="confirmPassword" className="text-xs font-medium text-gray-700 uppercase tracking-wide">{tAuth('confirmPassword')}</Label>
                     <Input
                       id="confirmPassword"
                       type="password"
@@ -485,7 +523,7 @@ export function SignupForm({ className, ...props }: React.ComponentProps<'div'>)
 
                 <div className="text-center text-sm">
                   {tAuth('signup.haveAccount')}{' '}
-                  <a href="/login" className="underline underline-offset-4">
+                  <a href="/signin" className="underline underline-offset-4">
                     {tAuth('signin.linkText')}
                   </a>
                 </div>

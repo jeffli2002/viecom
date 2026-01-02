@@ -44,7 +44,10 @@
       "resendHelp": "Wir können den Bestätigungslink an Ihre E-Mail erneut senden.",
       "changeEmail": "E-Mail ändern",
       "newEmail": "Neue E-Mail",
-      "updateEmail": "E-Mail aktualisieren"
+      "updateEmail": "E-Mail aktualisieren",
+      "openGmail": "Gmail öffnen",
+      "openOutlook": "Outlook öffnen",
+      "openQQMail": "QQ Mail öffnen"
     },
     "signup": {
       "title": "Konto erstellen",

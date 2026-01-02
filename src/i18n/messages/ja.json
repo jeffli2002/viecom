@@ -44,7 +44,10 @@
       "resendHelp": "確認リンクをメールに再送できます。",
       "changeEmail": "メールを変更",
       "newEmail": "新しいメール",
-      "updateEmail": "メールを更新"
+      "updateEmail": "メールを更新",
+      "openGmail": "Gmail を開く",
+      "openOutlook": "Outlook を開く",
+      "openQQMail": "QQ メールを開く"
     },
     "signup": {
       "title": "アカウント作成",

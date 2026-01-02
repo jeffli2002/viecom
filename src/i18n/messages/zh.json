@@ -44,7 +44,10 @@
       "resendHelp": "我们可以重新发送确认链接到您的邮箱。",
       "changeEmail": "更换邮箱",
       "newEmail": "新邮箱",
-      "updateEmail": "更新邮箱"
+      "updateEmail": "更新邮箱",
+      "openGmail": "打开 Gmail",
+      "openOutlook": "打开 Outlook",
+      "openQQMail": "打开 QQ 邮箱"
     },
     "signup": {
       "title": "创建账户",
