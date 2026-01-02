@@ -34,8 +34,8 @@ export function LoginForm({
   const searchParams = useSearchParams();
 
   const isEmailNotVerified =
-    error?.toLowerCase().includes('email not verified') ||
-    error?.toLowerCase().includes('email_not_verified');
+    (error && error.toLowerCase().includes('email not verified')) ||
+    (error && error.toLowerCase().includes('email_not_verified'));
 
   useEffect(() => {
     const inWebView = isWebView() && isMobile();

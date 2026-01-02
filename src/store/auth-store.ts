@@ -243,6 +243,12 @@ export const useAuthStore = create<AuthState>()(
                   };
                 }
 
+                // Block sign-in if email is not verified
+                if (!user.emailVerified) {
+                  set({ isLoading: false, error: 'Email not verified. Please check your inbox.' });
+                  return { success: false, error: 'email_not_verified' };
+                }
+
                 if (isUserBanned(user)) {
                   await handleDisabledUser();
                   return {
@@ -303,22 +309,8 @@ export const useAuthStore = create<AuthState>()(
                   };
                 }
 
-                set({
-                  user,
-                  isAuthenticated: true,
-                  lastUpdated: Date.now(),
-                });
-
-                // Initialize user credits after successful registration and wait for completion
-                try {
-                  await initializeUserCredits(user.id, 3);
-                } catch (err) {
-                  console.error('Failed to initialize credits during signup:', err);
-                  // Allow signup to succeed even if credit initialization fails
-                } finally {
-                  set({ isLoading: false });
-                }
-
+                // Do not authenticate immediately; wait for email verification
+                set({ isLoading: false });
                 return { success: true };
               }
               if (!result.error) {
