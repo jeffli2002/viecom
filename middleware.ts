@@ -14,16 +14,33 @@ export default async function middleware(request: NextRequest) {
     console.log('[Middleware] Processing:', pathname);
   }
 
-  // Redirect non-www to www (canonical domain)
-  // Only apply in production to avoid breaking localhost
-  if (
-    process.env.NODE_ENV === 'production' &&
-    hostname === 'viecom.pro' &&
-    !hostname.startsWith('www.')
-  ) {
+  // Canonical host redirect (enforce single host)
+  // - Uses NEXT_PUBLIC_APP_URL when available; falls back to www.viecom.pro
+  // - Skips localhost and vercel preview deployments
+  const canonicalHost = (() => {
+    try {
+      const envUrl = process.env.NEXT_PUBLIC_APP_URL;
+      if (envUrl) return new URL(envUrl).host;
+    } catch (_) {}
+    return 'www.viecom.pro';
+  })();
+
+  const isLocalOrPreview =
+    hostname === 'localhost' ||
+    hostname.startsWith('localhost:') ||
+    hostname === '127.0.0.1' ||
+    hostname.endsWith('.vercel.app');
+
+  if (!isLocalOrPreview && hostname !== canonicalHost) {
     const url = request.nextUrl.clone();
-    url.hostname = 'www.viecom.pro';
-    return NextResponse.redirect(url, 301);
+    url.hostname = canonicalHost;
+    url.protocol = 'https';
+    return NextResponse.redirect(url, 308);
+  }
+
+  // Never apply i18n logic to API routes (but host canonicalization above still ran)
+  if (pathname.startsWith('/api/')) {
+    return NextResponse.next();
   }
 
   // Handle admin routes (no i18n needed)
@@ -92,9 +109,9 @@ export const config = {
   // - favicon.ico (favicon file)
   // - files with extensions (e.g. .png, .jpg, etc.)
   matcher: [
-    // Match all pathnames except for
-    // - … if they start with `/api`, `/_next` or `/_vercel`
-    // - … the ones containing a dot (e.g. `favicon.ico`)
-    '/((?!api|_next|_vercel|.*\\..*).*)',
+    // Ensure auth callbacks also use canonical host
+    '/api/auth/:path*',
+    // Match all other paths except internals/static
+    '/((?!_next|_vercel|.*\\..*).*)',
   ],
 };
