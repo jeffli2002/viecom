@@ -21,7 +21,7 @@ function SigninPageContent() {
     if (code || state) {
       const timer = setTimeout(() => {
         refreshSession();
-      }, 1000);
+      }, 800);
       return () => clearTimeout(timer);
     }
   }, [searchParams, refreshSession]);
