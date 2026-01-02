@@ -37,6 +37,8 @@
       "description": "Cliquez sur le lien envoyé à {email} pour terminer la configuration de votre compte.",
       "yourEmail": "votre email",
       "yourInbox": "votre boîte de réception",
+      "bannerTitle": "Vérifiez votre email pour continuer",
+      "bannerBody": "Nous avons envoyé un lien de confirmation à {email}. Confirmez votre email pour terminer l'inscription.",
       "resend": "Renvoyer l'email de confirmation",
       "resendIn": "Renvoyer dans {seconds}s",
       "sending": "Envoi...",

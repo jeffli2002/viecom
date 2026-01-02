@@ -37,6 +37,8 @@
       "description": "我们已向 {email} 发送了确认链接，请点击完成账户设置。",
       "yourEmail": "您的邮箱",
       "yourInbox": "您的邮箱",
+      "bannerTitle": "请查收邮件以继续",
+      "bannerBody": "我们已向 {email} 发送确认链接，请完成邮箱验证以继续注册。",
       "resend": "重新发送确认邮件",
       "resendIn": "{seconds} 秒后可重发",
       "sending": "发送中...",

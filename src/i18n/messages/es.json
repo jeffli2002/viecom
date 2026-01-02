@@ -37,6 +37,8 @@
       "description": "Haz clic en el enlace que enviamos a {email} para completar la configuración de tu cuenta.",
       "yourEmail": "tu correo",
       "yourInbox": "tu bandeja",
+      "bannerTitle": "Revisa tu correo para continuar",
+      "bannerBody": "Hemos enviado un enlace de confirmación a {email}. Confirma tu correo para completar el registro.",
       "resend": "Reenviar correo de confirmación",
       "resendIn": "Reenviar en {seconds}s",
       "sending": "Enviando...",

@@ -37,6 +37,8 @@
       "description": "Click the link we sent to {email} to finish setting up your account.",
       "yourEmail": "your email",
       "yourInbox": "your inbox",
+      "bannerTitle": "Check your email to continue",
+      "bannerBody": "We sent a confirmation link to {email}. Confirm your email to finish setting up your account.",
       "resend": "Resend confirmation email",
       "resendIn": "Resend in {seconds}s",
       "sending": "Sending...",

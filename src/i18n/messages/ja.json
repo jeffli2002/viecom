@@ -37,6 +37,8 @@
       "description": "{email} に送信したリンクをクリックして、アカウント設定を完了してください。",
       "yourEmail": "あなたのメール",
       "yourInbox": "受信箱",
+      "bannerTitle": "続行するにはメールを確認してください",
+      "bannerBody": "{email} に確認リンクを送信しました。メールを確認して登録を完了してください。",
       "resend": "確認メールを再送",
       "resendIn": "{seconds}秒後に再送",
       "sending": "送信中...",

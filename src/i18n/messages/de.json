@@ -37,6 +37,8 @@
       "description": "Klicken Sie auf den Link, den wir an {email} gesendet haben, um die Einrichtung Ihres Kontos abzuschließen.",
       "yourEmail": "Ihre E-Mail",
       "yourInbox": "Ihr Posteingang",
+      "bannerTitle": "Überprüfen Sie Ihre E-Mail, um fortzufahren",
+      "bannerBody": "Wir haben einen Bestätigungslink an {email} gesendet. Bitte bestätigen Sie Ihre E-Mail, um die Registrierung abzuschließen.",
       "resend": "Bestätigungs-E-Mail erneut senden",
       "resendIn": "Erneut senden in {seconds}s",
       "sending": "Senden...",
