@@ -140,6 +140,9 @@ export const auth = betterAuth({
     expiresIn: EMAIL_VERIFICATION_EXPIRES_IN,
     sendOnSignUp: true,
     sendOnSignIn: true,
+    // Create a session automatically once the user verifies their email.
+    // This mirrors AIedu behavior: land on signup with a valid session, then redirect.
+    autoSignInAfterVerification: true,
     sendVerificationEmail: async ({ user, url }) => {
       // Normalize both the verification endpoint URL and the callbackURL to the canonical host.
       // This avoids apex/www mismatches that prevent the session cookie from being readable.
