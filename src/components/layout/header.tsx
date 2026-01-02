@@ -48,12 +48,16 @@ const LanguageSwitcher = dynamic(() => import('@/components/widget/language-swit
 export function Header() {
   const t = useTranslations('nav');
   const [pathname, setPathname] = useState<string | null>(null);
+  const [isClient, setIsClient] = useState(false);
+  // usePathname must be called unconditionally (React hooks rule)
+  // But next-intl hooks are safe in client components, so this should be fine
   const pathnameHook = usePathname();
   const { user, isAuthenticated, signOut } = useAuthStore();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [darkMode, setDarkMode] = useState(false);
 
   useEffect(() => {
+    setIsClient(true);
     if (pathnameHook) {
       setPathname(pathnameHook);
     }
