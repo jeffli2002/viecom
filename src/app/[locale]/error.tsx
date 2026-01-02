@@ -1,7 +1,6 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
-import { useRouter } from '@/i18n/navigation';
 import { useEffect } from 'react';
 
 // biome-ignore lint/suspicious/noShadowRestrictedNames: Next.js requires this component name
@@ -12,16 +11,10 @@ export default function Error({
   error: Error & { digest?: string };
   reset: () => void;
 }) {
-  const router = useRouter();
-
   useEffect(() => {
     // Log the error to an error reporting service
     console.error('Locale layout error:', error);
   }, [error]);
-
-  const handleGoHome = () => {
-    router.push('/');
-  };
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center p-4">
@@ -36,9 +29,9 @@ export default function Error({
           <Button onClick={reset} variant="default">
             Try again
           </Button>
-          <Button onClick={handleGoHome} variant="outline">
+          <a href="/" className="inline-flex items-center rounded-md border px-4 py-2 text-sm hover:bg-slate-50 dark:hover:bg-slate-900">
             Go home
-          </Button>
+          </a>
         </div>
       </div>
     </div>
