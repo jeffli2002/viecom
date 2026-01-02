@@ -19,7 +19,6 @@ import {
   NavigationMenuList,
   NavigationMenuTrigger,
 } from '@/components/ui/navigation-menu';
-import { LanguageSwitcher } from '@/components/widget/language-switcher';
 import { Link, usePathname } from '@/i18n/navigation';
 import { routing } from '@/i18n/routing';
 import { useAuthStore } from '@/store/auth-store';
@@ -38,14 +37,27 @@ import {
   X,
 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
+import dynamic from 'next/dynamic';
 import { useEffect, useState } from 'react';
+
+const LanguageSwitcher = dynamic(() => import('@/components/widget/language-switcher').then(mod => ({ default: mod.LanguageSwitcher })), {
+  ssr: false,
+  loading: () => <div className="w-32 h-9" />,
+});
 
 export function Header() {
   const t = useTranslations('nav');
-  const pathname = usePathname();
+  const [pathname, setPathname] = useState<string | null>(null);
+  const pathnameHook = usePathname();
   const { user, isAuthenticated, signOut } = useAuthStore();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [darkMode, setDarkMode] = useState(false);
+
+  useEffect(() => {
+    if (pathnameHook) {
+      setPathname(pathnameHook);
+    }
+  }, [pathnameHook]);
 
   useEffect(() => {
     const isDark = document.documentElement.classList.contains('dark');
