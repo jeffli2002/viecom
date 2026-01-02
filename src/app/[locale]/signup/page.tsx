@@ -1,7 +1,6 @@
 'use client';
 
 import { SignupForm } from '@/components/blocks/signup/signup-form';
-import { useRouter } from '@/i18n/navigation';
 import { useAuthInitialized, useInitialize, useIsAuthenticated, useRefreshSession } from '@/store/auth-store';
 import { useAuthStore } from '@/store/auth-store';
 import { Loader2 } from 'lucide-react';
@@ -9,7 +8,6 @@ import { Suspense, useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 
 function SignupPageContent() {
-  const router = useRouter();
   const searchParams = useSearchParams();
   const isAuthenticated = useIsAuthenticated();
   const isInitialized = useAuthInitialized();
@@ -49,8 +47,12 @@ function SignupPageContent() {
               useAuthStore.getState().setUser(sessionUser);
               // small delay then redirect
               await new Promise((r) => setTimeout(r, 250));
-              if (!cancelled) {
-                router.replace('/image-generation');
+              if (!cancelled && typeof window !== 'undefined') {
+                // Get locale from current path or use default
+                const parts = window.location.pathname.split('/').filter(Boolean);
+                const currentLocale = parts[0] || 'en';
+                const target = `/${currentLocale}/image-generation`;
+                window.location.replace(target);
               }
               return;
             }
@@ -74,7 +76,7 @@ function SignupPageContent() {
     return () => {
       cancelled = true;
     };
-  }, [searchParams, refreshSession, initialize, router]);
+  }, [searchParams, refreshSession, initialize]);
 
   // Once authenticated (after verification), redirect to image generation immediately
   useEffect(() => {
@@ -84,10 +86,14 @@ function SignupPageContent() {
       Boolean(searchParams.get('code')) ||
       Boolean(searchParams.get('token'));
 
-    if (isVerification && isInitialized && isAuthenticated) {
-      router.replace('/image-generation');
+    if (isVerification && isInitialized && isAuthenticated && typeof window !== 'undefined') {
+      // Get locale from current path or use default
+      const parts = window.location.pathname.split('/').filter(Boolean);
+      const currentLocale = parts[0] || 'en';
+      const target = `/${currentLocale}/image-generation`;
+      window.location.replace(target);
     }
-  }, [isAuthenticated, isInitialized, router, searchParams]);
+  }, [isAuthenticated, isInitialized, searchParams]);
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-6 bg-gray-50 p-6 md:p-10">
