@@ -6,12 +6,15 @@ import { createAuthClient } from 'better-auth/react';
 // In production, this will match the current origin
 // In development, falls back to env variable
 const getBaseURL = () => {
+  try {
+    // Always prefer NEXT_PUBLIC_APP_URL to keep host consistent (prevents www/apex cookie jitter)
+    const fromEnv = env.NEXT_PUBLIC_APP_URL;
+    if (fromEnv) return fromEnv;
+  } catch {}
   if (typeof window !== 'undefined') {
-    // Client-side: use current origin to avoid CORS issues with subdomains
     return window.location.origin;
   }
-  // Server-side: use environment variable
-  return env.NEXT_PUBLIC_APP_URL;
+  return 'http://localhost:3000';
 };
 
 export const authClient = createAuthClient({

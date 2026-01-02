@@ -69,21 +69,25 @@ const initializeUserCredits = async (userId: string, retries = 3): Promise<void>
 const appendOAuthCallbackParam = (url?: string, provider = 'google') => {
   const target = url && url.trim().length > 0 ? url : '/';
 
-  if (target.includes('authCallback=')) {
-    return target;
-  }
+  // Normalize to a relative path to avoid cross-host mismatches
+  const normalizeToRelative = (input: string) => {
+    try {
+      if (input.startsWith('http://') || input.startsWith('https://')) {
+        const u = new URL(input);
+        return `${u.pathname}${u.search}${u.hash}` || '/';
+      }
+    } catch {}
+    if (!input || input === '') return '/';
+    return input.startsWith('/') ? input : `/${input}`;
+  };
 
-  const [pathWithQuery = target, hash] = target.split('#', 2);
+  const base = normalizeToRelative(target);
+  if (base.includes('authCallback=')) return base;
+
+  const [pathWithQuery = base, hash] = base.split('#', 2);
   const separator = pathWithQuery.includes('?') ? '&' : '?';
   const updatedPath = `${pathWithQuery}${separator}authCallback=${provider}`;
   const withHash = hash ? `${updatedPath}#${hash}` : updatedPath;
-
-  // Better Auth expects absolute callback URLs in some deployments
-  if (typeof window !== 'undefined' && !withHash.startsWith('http')) {
-    const absolute = new URL(withHash, window.location.origin);
-    return absolute.toString();
-  }
-
   return withHash;
 };
 

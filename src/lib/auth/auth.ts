@@ -132,6 +132,19 @@ export const auth = betterAuth({
     sendOnSignUp: true,
     sendOnSignIn: true,
     sendVerificationEmail: async ({ user, url }) => {
+      // Normalize verification URL host to match NEXT_PUBLIC_APP_URL (prevents apex/www cookie mismatches)
+      let normalizedUrl = url;
+      try {
+        const app = new URL(env.NEXT_PUBLIC_APP_URL);
+        const u = new URL(url);
+        if (u.host !== app.host) {
+          u.host = app.host;
+          u.protocol = app.protocol;
+          normalizedUrl = u.toString();
+        }
+      } catch {
+        // leave original url if parsing fails
+      }
       const identifier = `email-verification:${user.email.toLowerCase()}`;
       const [recentEntry] = await db
         .select({ createdAt: verification.createdAt })
@@ -148,7 +161,7 @@ export const auth = betterAuth({
         }
       }
 
-      const sent = await sendEmailVerificationEmail(user.email, user.name || 'User', url);
+      const sent = await sendEmailVerificationEmail(user.email, user.name || 'User', normalizedUrl);
 
       if (sent) {
         console.log(`[auth] Verification email sent to ${user.email}`);
