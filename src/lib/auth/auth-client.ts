@@ -6,13 +6,13 @@ import { createAuthClient } from 'better-auth/react';
 // In production, this will match the current origin
 // In development, falls back to env variable
 const getBaseURL = () => {
-  try {
-    const fromEnv = env.NEXT_PUBLIC_APP_URL;
-    if (fromEnv) return fromEnv;
-  } catch {}
   if (typeof window !== 'undefined') {
+    // Client-side: use current origin to avoid CORS issues with subdomains
     return window.location.origin;
   }
+  // Server-side fallback to env or vercel URL
+  const fromEnv = env.NEXT_PUBLIC_APP_URL;
+  if (fromEnv) return fromEnv;
   const vercelUrl = process.env.VERCEL_URL || process.env.NEXT_PUBLIC_VERCEL_URL;
   if (vercelUrl) return `https://${vercelUrl}`;
   return 'http://localhost:3000';
