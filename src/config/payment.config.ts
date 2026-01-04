@@ -153,9 +153,8 @@ export const paymentConfig: PaymentConfig = {
       id: 'pro',
       name: 'Pro',
       description: 'Great for individual creators',
-      price: 13.93,
-      originalPrice: 19.9,
-      yearlyPrice: 167.16,
+      price: 19.9,
+      yearlyPrice: 191.04,
       interval: 'month',
       stripePriceIds: {
         monthly: process.env.NEXT_PUBLIC_STRIPE_PRICE_PRO_MONTHLY || 'price_pro_monthly',
@@ -196,9 +195,8 @@ export const paymentConfig: PaymentConfig = {
       id: 'proplus',
       name: 'Pro+',
       description: 'For professional creators and businesses',
-      price: 24.43,
-      originalPrice: 34.9,
-      yearlyPrice: 293.16,
+      price: 34.9,
+      yearlyPrice: 335.04,
       interval: 'month',
       stripePriceIds: {
         monthly: process.env.NEXT_PUBLIC_STRIPE_PRICE_PROPLUS_MONTHLY || 'price_proplus_monthly',

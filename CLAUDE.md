@@ -47,6 +47,15 @@ pnpm test:coverage          # Tests with coverage report
 pnpm test:e2e               # Playwright E2E tests
 pnpm test:e2e:ui            # E2E with Playwright UI
 pnpm test:all               # Run all tests
+pnpm test -- path/to/file   # Run single test file
+```
+
+### Diagnostics & Analysis
+```bash
+pnpm smoke:auth             # Auth smoke test (runs after deploy)
+pnpm test:generation        # Test AI generation APIs
+pnpm diagnose:creem         # Debug Creem 403 errors
+pnpm analyze                # Bundle size analysis
 ```
 
 ### Admin
@@ -80,6 +89,18 @@ const credits = 5;
 
 **Apply this rule to ALL pages, components, and API routes** that mention pricing, credits, or features. See `.cursorrules` for comprehensive examples.
 
+### Verification Commands
+
+Run these to find hardcoded values before committing:
+```bash
+# Find hardcoded credit amounts
+grep -r "30 credits\|500 credits\|900 credits" src/app src/components
+grep -r "5 credits\|15 credits\|20 credits" src/app src/components
+
+# Find hardcoded prices
+grep -r "\$14.9\|\$24.9" src/app src/components
+```
+
 ## Routing & Internationalization
 
 **CRITICAL RULES** - Follow these to avoid site-wide 404 errors:
@@ -108,7 +129,7 @@ const credits = 5;
 
 ```typescript
 export const routing = defineRouting({
-  locales: ['en', 'zh'],
+  locales: ['en', 'zh', 'es', 'fr', 'de', 'ja'],
   defaultLocale: 'en',
   localePrefix: 'always', // NEVER change this to 'as-needed'
   localeDetection: true,
@@ -350,8 +371,9 @@ Run tests with proper environment setup. See `tests/README.md`.
 ## Internationalization
 
 - **next-intl**: Locale management
-- **Supported**: English (en), Chinese (zh)
+- **Supported**: English (en), Chinese (zh), Spanish (es), French (fr), German (de), Japanese (ja)
 - **Messages**: `src/i18n/messages/`
+- **Routing**: `src/i18n/routing.ts`
 - **Middleware**: Auto-detects locale and redirects
 
 ## Security Notes

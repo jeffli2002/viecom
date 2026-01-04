@@ -76,7 +76,7 @@ export default function UpgradePrompt({
   const targetPlan: 'pro' | 'proplus' = userPlanId === 'pro' ? 'proplus' : 'pro';
   const targetPlanConfig = paymentConfig.plans.find((p) => p.id === targetPlan);
   const targetPlanName = targetPlanConfig?.name || (targetPlan === 'proplus' ? 'Pro+' : 'Pro');
-  const targetPlanPrice = targetPlanConfig?.price || 14.9;
+  const targetPlanPrice = targetPlanConfig?.price || 19.9;
   const targetPlanCredits = targetPlanConfig?.credits.monthly || 500;
 
   const handleUpgradeClick = async () => {
