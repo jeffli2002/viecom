@@ -51,7 +51,6 @@ export function SignupForm({ className, ...props }: React.ComponentProps<'div'>)
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
   const [showVerificationNotice, setShowVerificationNotice] = useState(false);
   const [signupEmail, setSignupEmail] = useState('');
   const [resendStatus, setResendStatus] = useState<string | null>(null);
@@ -436,7 +435,7 @@ export function SignupForm({ className, ...props }: React.ComponentProps<'div'>)
       </AlertDialog>
       {!showVerificationNotice && (
         <Card className="border-0 shadow-none bg-transparent w-full">
-          <CardHeader className="text-center pb-5 px-0">
+          <CardHeader className="text-center pb-5 px-4">
             <CardTitle className="text-4xl font-bold mb-3 text-gray-900">
               {tAuth('signup.title')}
             </CardTitle>
@@ -444,7 +443,7 @@ export function SignupForm({ className, ...props }: React.ComponentProps<'div'>)
               {tAuth('signup.subtitle')}
             </CardDescription>
             {/* Terms and Privacy Notice */}
-            <p className="text-[10px] text-gray-500 leading-relaxed px-2 mb-2">
+            <p className="text-[10px] text-gray-500 leading-relaxed mb-2">
               {tAuth.rich('signup.termsNotice', {
                 terms: (chunks) => (
                   <a
@@ -469,7 +468,7 @@ export function SignupForm({ className, ...props }: React.ComponentProps<'div'>)
               })}
             </p>
           </CardHeader>
-          <CardContent className="px-0">
+          <CardContent className="px-4">
             <form onSubmit={handleEmailSignup} data-testid="signup-form" autoComplete="off">
               <div className="grid gap-4">
                 {/* Error message display */}
@@ -608,36 +607,11 @@ export function SignupForm({ className, ...props }: React.ComponentProps<'div'>)
                       className="h-14 bg-white border-gray-300 text-base"
                     />
                   </div>
-                  <div className="grid gap-2">
-                    <Label
-                      htmlFor="confirmPassword"
-                      className="text-[10px] font-medium text-gray-600 uppercase tracking-wide"
-                    >
-                      {tAuth('confirmPassword')}
-                    </Label>
-                    <Input
-                      id="confirmPassword"
-                      type="password"
-                      value={confirmPassword}
-                      onChange={(e) => setConfirmPassword(e.target.value)}
-                      required
-                      disabled={isLoading}
-                      minLength={MIN_PASSWORD_LENGTH}
-                      placeholder={tAuth('passwordAtLeast', { count: MIN_PASSWORD_LENGTH })}
-                      autoComplete="new-password"
-                      data-testid="confirm-password-input"
-                      className="h-14 bg-white border-gray-300 text-base"
-                    />
-                  </div>
                   <Button
                     type="submit"
                     className={cn(
                       'w-full h-14 font-bold text-lg',
-                      password.length >= MIN_PASSWORD_LENGTH &&
-                        password === confirmPassword &&
-                        email &&
-                        name &&
-                        !isLoading
+                      password.length >= MIN_PASSWORD_LENGTH && email && name && !isLoading
                         ? 'btn-primary'
                         : 'bg-gray-300 text-gray-500 cursor-not-allowed hover:bg-gray-300 dark:bg-gray-600 dark:text-gray-400'
                     )}
@@ -646,9 +620,7 @@ export function SignupForm({ className, ...props }: React.ComponentProps<'div'>)
                       !email ||
                       !name ||
                       !password ||
-                      !confirmPassword ||
-                      password.length < MIN_PASSWORD_LENGTH ||
-                      password !== confirmPassword
+                      password.length < MIN_PASSWORD_LENGTH
                     }
                     data-testid="signup-button"
                   >
