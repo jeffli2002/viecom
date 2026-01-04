@@ -2,7 +2,7 @@ import { randomUUID } from 'node:crypto';
 import { db } from '@/server/db';
 import { creditTransactions, userCredits } from '@/server/db/schema';
 import { DatabaseError } from '@/server/db/types';
-import { and, desc, eq } from 'drizzle-orm';
+import { and, desc, eq, notInArray } from 'drizzle-orm';
 
 // Credit transaction types
 export type CreditTransactionType =
@@ -307,7 +307,12 @@ export class CreditService {
       const transactions = await db
         .select()
         .from(creditTransactions)
-        .where(eq(creditTransactions.userId, userId))
+        .where(
+          and(
+            eq(creditTransactions.userId, userId),
+            notInArray(creditTransactions.type, ['freeze', 'unfreeze'])
+          )
+        )
         .orderBy(desc(creditTransactions.createdAt))
         .limit(limit)
         .offset(offset);
