@@ -1,5 +1,6 @@
 'use client';
 
+import { Hero } from '@/components/blocks/hero';
 import { SignupForm } from '@/components/blocks/signup/signup-form';
 import {
   useAuthInitialized,
@@ -101,9 +102,20 @@ function SignupPageContent() {
   }, [isAuthenticated, isInitialized, searchParams]);
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-gray-100 p-6 md:p-10 w-full">
-      <div className="w-full max-w-md">
-        <SignupForm />
+    <div className="relative min-h-screen w-full overflow-hidden">
+      {/* Homepage background - Hero section */}
+      <div className="absolute inset-0 z-0">
+        <Hero />
+      </div>
+
+      {/* Dark overlay */}
+      <div className="absolute inset-0 z-10 bg-black/50 backdrop-blur-sm" />
+
+      {/* Signup form modal */}
+      <div className="relative z-20 flex min-h-screen flex-col items-center justify-center p-6 md:p-10 w-full">
+        <div className="w-full max-w-md">
+          <SignupForm />
+        </div>
       </div>
     </div>
   );
@@ -113,10 +125,14 @@ export default function SignupPage() {
   return (
     <Suspense
       fallback={
-        <div className="flex min-h-screen flex-col items-center justify-center gap-6 bg-gray-100 p-6 md:p-10 w-full">
-          <div className="flex w-full max-w-md flex-col items-center">
-            <Loader2 className="h-8 w-8 animate-spin text-primary" />
-            <p className="text-muted-foreground text-sm">Loading...</p>
+        <div className="relative min-h-screen w-full overflow-hidden">
+          <div className="absolute inset-0 z-0 bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900" />
+          <div className="absolute inset-0 z-10 bg-black/50 backdrop-blur-sm" />
+          <div className="relative z-20 flex min-h-screen flex-col items-center justify-center gap-6 p-6 md:p-10 w-full">
+            <div className="flex w-full max-w-md flex-col items-center">
+              <Loader2 className="h-8 w-8 animate-spin text-white" />
+              <p className="text-white/70 text-sm">Loading...</p>
+            </div>
           </div>
         </div>
       }
