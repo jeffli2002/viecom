@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { useRouter } from '@/i18n/navigation';
 import { routing } from '@/i18n/routing';
 import { cn, isMobile, isWebView } from '@/lib/utils';
 import type { LoginFormProps } from '@/types/login';
@@ -23,6 +24,7 @@ export function LoginForm({
   onClearError,
   ...props
 }: LoginFormProps & React.ComponentProps<'div'>) {
+  const router = useRouter();
   const tCommon = useTranslations('common');
   const tAuth = useTranslations('auth');
   const [isInWebView, setIsInWebView] = useState(false);
@@ -34,8 +36,8 @@ export function LoginForm({
   const searchParams = useSearchParams();
 
   const isEmailNotVerified =
-    (error && error.toLowerCase().includes('email not verified')) ||
-    (error && error.toLowerCase().includes('email_not_verified'));
+    error?.toLowerCase().includes('email not verified') ||
+    error?.toLowerCase().includes('email_not_verified');
 
   useEffect(() => {
     const inWebView = isWebView() && isMobile();
@@ -88,7 +90,9 @@ export function LoginForm({
       }
       setResendStatus(tAuth('signin.verificationEmailSent'));
     } catch (err) {
-      setResendStatus(err instanceof Error ? err.message : tAuth('signin.failedToResendVerificationEmail'));
+      setResendStatus(
+        err instanceof Error ? err.message : tAuth('signin.failedToResendVerificationEmail')
+      );
     } finally {
       setIsResending(false);
     }
@@ -111,21 +115,77 @@ export function LoginForm({
     setFormData({ ...formData, password: e.target.value });
   };
 
+  const locale = router.locale ?? routing.defaultLocale;
+
   return (
     <div className={cn('flex flex-col gap-6', className)} {...props}>
-      <Card>
-        <CardHeader className="text-center">
-          <CardTitle className="text-xl">{tAuth('signin.title')}</CardTitle>
-          <CardDescription>{tAuth('signin.subtitle')}</CardDescription>
+      <Card className="relative border border-gray-200 shadow-lg bg-white w-full max-w-md mx-auto rounded-2xl">
+        {/* Close button */}
+        <button
+          type="button"
+          onClick={() => router.back()}
+          className="absolute top-4 right-4 p-1 text-gray-400 hover:text-gray-600 transition-colors"
+          aria-label={tCommon('close')}
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden="true"
+          >
+            <line x1="18" y1="6" x2="6" y2="18" />
+            <line x1="6" y1="6" x2="18" y2="18" />
+          </svg>
+        </button>
+        <CardHeader className="text-center pb-4 px-8 pt-8">
+          <CardTitle className="text-3xl font-bold mb-2 text-gray-900">
+            {tAuth('signin.title')}
+          </CardTitle>
+          <CardDescription className="text-xs text-gray-500 mb-2">
+            {tAuth('signin.subtitle')}
+          </CardDescription>
+          {/* Terms and Privacy Notice */}
+          <p className="text-[10px] text-gray-400 leading-relaxed">
+            {tAuth.rich('signup.termsNotice', {
+              terms: (chunks) => (
+                <a
+                  href={`/${locale}/terms`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-blue-500 hover:underline"
+                >
+                  {chunks}
+                </a>
+              ),
+              privacy: (chunks) => (
+                <a
+                  href={`/${locale}/privacy`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-blue-500 hover:underline"
+                >
+                  {chunks}
+                </a>
+              ),
+            })}
+          </p>
         </CardHeader>
-        <CardContent>
+        <CardContent className="px-8 pb-8">
           <form onSubmit={onEmailLogin} data-testid="login-form">
             <div className="grid gap-6">
               {showVerificationBanner && (
                 <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-amber-800 text-sm">
                   <p className="font-semibold">{tAuth('verification.bannerTitle')}</p>
                   <p className="mt-1">
-                    {tAuth('verification.bannerBody', { email: verificationEmail || tAuth('verification.yourInbox') })}
+                    {tAuth('verification.bannerBody', {
+                      email: verificationEmail || tAuth('verification.yourInbox'),
+                    })}
                   </p>
                 </div>
               )}
@@ -166,9 +226,7 @@ export function LoginForm({
                   <AlertCircle className="mt-0.5 h-5 w-5 flex-shrink-0" />
                   <div className="flex-1">
                     <p className="font-semibold">{tAuth('signin.unableToSignInBrowser')}</p>
-                    <p className="mt-1">
-                      {tAuth('signin.googleSignInNotSupported')}
-                    </p>
+                    <p className="mt-1">{tAuth('signin.googleSignInNotSupported')}</p>
                     <ul className="mt-1 list-inside list-disc space-y-1">
                       <li>{tAuth('signin.openInBrowserOption')}</li>
                       <li>{tAuth('signin.signInWithEmailBelow')}</li>
@@ -194,7 +252,7 @@ export function LoginForm({
                 <Button
                   type="button"
                   variant="outline"
-                  className="w-full transition-colors hover:bg-gray-50 dark:hover:bg-gray-900"
+                  className="w-full h-14 border-gray-300 bg-white text-gray-900 hover:bg-gray-50 transition-colors shadow-sm text-base font-medium"
                   onClick={() => handleSocialLogin('google')}
                   disabled={isLoading}
                   data-testid="google-login-button"
@@ -202,44 +260,46 @@ export function LoginForm({
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     viewBox="0 0 48 48"
-                    className="mr-2 h-5 w-5"
+                    className="mr-3 h-6 w-6"
                     role="img"
                     aria-label="Google"
                   >
                     <path
-                      fill="#FFC107"
-                      d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12c0-6.627,5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24c0,11.045,8.955,20,20,20c11.045,0,20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"
+                      fill="#4285F4"
+                      d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"
                     />
                     <path
-                      fill="#FF3D00"
-                      d="M6.306,14.691l6.571,4.819C14.655,15.108,18.961,12,24,12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C16.318,4,9.656,8.337,6.306,14.691z"
+                      fill="#34A853"
+                      d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"
                     />
                     <path
-                      fill="#4CAF50"
-                      d="M24,44c5.166,0,9.86-1.977,13.409-5.192l-6.19-5.238C29.211,35.091,26.715,36,24,36c-5.202,0-9.619-3.317-11.283-7.946l-6.522,5.025C9.505,39.556,16.227,44,24,44z"
+                      fill="#FBBC05"
+                      d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"
                     />
                     <path
-                      fill="#1976D2"
-                      d="M43.611,20.083H42V20H24v8h11.303c-0.792,2.237-2.231,4.166-4.087,5.571c0.001-0.001,0.002-0.001,0.003-0.002l6.19,5.238C36.971,39.205,44,34,44,24C44,22.659,43.862,21.35,43.611,20.083z"
+                      fill="#EA4335"
+                      d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"
                     />
                   </svg>
-                  {isLoading ? tAuth('signin.signingIn') : tAuth('signin.withGoogle')}
+                  {isLoading ? tAuth('signin.signingIn') : tAuth('signup.continueWithGoogle')}
                 </Button>
               </div>
 
-              <div className="relative py-6">
-                <div className="absolute inset-0 flex items-center">
-                  <div className="w-full border-t border-gray-200" />
-                </div>
-                <div className="relative flex justify-center text-sm">
-                  <span className="bg-white px-4 text-gray-500 font-medium">{tAuth('orUseEmail')}</span>
-                </div>
+              <div className="relative flex items-center">
+                <div className="flex-1 border-t border-gray-300" />
+                <span className="px-4 text-xs text-gray-400 bg-white">or</span>
+                <div className="flex-1 border-t border-gray-300" />
               </div>
 
               {/* Email password login */}
-              <div className="grid gap-6">
-                <div className="grid gap-3">
-                  <Label htmlFor="email">{tAuth('email')}</Label>
+              <div className="grid gap-5">
+                <div className="grid gap-2">
+                  <Label
+                    htmlFor="email"
+                    className="text-[10px] font-medium text-gray-600 uppercase tracking-wide"
+                  >
+                    {tAuth('email')}
+                  </Label>
                   <Input
                     id="email"
                     type="email"
@@ -250,12 +310,21 @@ export function LoginForm({
                     disabled={isLoading}
                     autoComplete="email"
                     data-testid="email-input"
+                    className="h-14 bg-white border-gray-300 text-base"
                   />
                 </div>
-                <div className="grid gap-3">
+                <div className="grid gap-2">
                   <div className="flex items-center">
-                    <Label htmlFor="password">{tAuth('password')}</Label>
-                    <a href="/reset-password" className="ml-auto text-sm underline-offset-4 hover:underline">
+                    <Label
+                      htmlFor="password"
+                      className="text-[10px] font-medium text-gray-600 uppercase tracking-wide"
+                    >
+                      {tAuth('password')}
+                    </Label>
+                    <a
+                      href={`/${locale}/reset-password`}
+                      className="ml-auto text-xs text-blue-500 hover:underline"
+                    >
                       {tAuth('forgotPassword')}
                     </a>
                   </div>
@@ -268,11 +337,12 @@ export function LoginForm({
                     disabled={isLoading}
                     autoComplete="current-password"
                     data-testid="password-input"
+                    className="h-14 bg-white border-gray-300 text-base"
                   />
                 </div>
                 <Button
                   type="submit"
-                  className="w-full btn-primary"
+                  className="w-full h-14 font-bold text-lg btn-primary"
                   disabled={isLoading || !formData.email || !formData.password}
                   data-testid="login-button"
                 >
@@ -282,7 +352,7 @@ export function LoginForm({
 
               <div className="text-center text-sm">
                 {tAuth('signin.noAccount')}{' '}
-                <a href="/signup" className="underline underline-offset-4">
+                <a href={`/${locale}/signup`} className="underline underline-offset-4">
                   {tAuth('signup.linkText')}
                 </a>
               </div>

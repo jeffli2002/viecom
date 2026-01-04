@@ -454,19 +454,11 @@ export const useAuthStore = create<AuthState>()(
             const previousUser = get().user;
 
             // Check if auth is disabled via environment variable
+            // When auth is disabled, treat as unauthenticated (no mock user)
             if (process.env.NEXT_PUBLIC_DISABLE_AUTH === 'true') {
-              const mockUser: User = {
-                id: 'dev-user',
-                email: 'dev@example.com',
-                name: 'Dev User',
-                emailVerified: true,
-                image: null,
-                createdAt: new Date(),
-                updatedAt: new Date(),
-              };
               set({
-                user: mockUser,
-                isAuthenticated: true,
+                user: null,
+                isAuthenticated: false,
                 isLoading: false,
                 isInitialized: true,
                 lastUpdated: Date.now(),

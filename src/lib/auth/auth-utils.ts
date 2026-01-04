@@ -25,14 +25,9 @@ const safeGetSession = async (headers: Headers): Promise<Session | null> => {
  * Get session with support for DISABLE_AUTH bypass
  */
 export async function getSessionWithAuthBypass(): Promise<Session | null> {
+  // When auth is disabled, return null (no mock user)
   if (env.DISABLE_AUTH === 'true') {
-    return {
-      user: {
-        id: 'dev-user',
-        email: 'dev@example.com',
-        name: 'Dev User',
-      },
-    };
+    return null;
   }
 
   const headerList = await headers();
@@ -62,14 +57,9 @@ export async function getSessionWithAuthBypass(): Promise<Session | null> {
  * Get session from NextRequest headers (for API routes)
  */
 export async function getSessionFromRequest(requestHeaders: Headers): Promise<Session | null> {
+  // When auth is disabled, return null (no mock user)
   if (env.DISABLE_AUTH === 'true') {
-    return {
-      user: {
-        id: 'dev-user',
-        email: 'dev@example.com',
-        name: 'Dev User',
-      },
-    };
+    return null;
   }
 
   return await safeGetSession(requestHeaders);

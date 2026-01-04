@@ -126,12 +126,6 @@ export function SignupForm({ className, ...props }: React.ComponentProps<'div'>)
     e.preventDefault();
     clearError();
 
-    // Validate password match
-    if (password !== confirmPassword) {
-      setError(tAuth('signin.passwordsDoNotMatch'));
-      return;
-    }
-
     // Preserve intended post-verification destination
     const { localized } = getRedirectTarget();
     const verificationCallbackUrl =
@@ -153,7 +147,6 @@ export function SignupForm({ className, ...props }: React.ComponentProps<'div'>)
       setName('');
       setEmail('');
       setPassword('');
-      setConfirmPassword('');
       try {
         window.localStorage.setItem(
           'viecom:verification-email',
@@ -654,7 +647,7 @@ export function SignupForm({ className, ...props }: React.ComponentProps<'div'>)
                 <div className="text-center text-xs text-gray-500">
                   {tAuth('signup.haveAccount')}{' '}
                   <a
-                    href={`/${locale}/signin`}
+                    href={`/${locale}/login`}
                     className="text-blue-600 hover:underline font-medium"
                   >
                     {tAuth('signin.linkText')}

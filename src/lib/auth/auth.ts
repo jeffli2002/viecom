@@ -191,7 +191,7 @@ export const auth = betterAuth({
         .orderBy(desc(verification.createdAt))
         .limit(1);
 
-      if (recentEntry) {
+      if (recentEntry?.createdAt) {
         const elapsedMs = Date.now() - new Date(recentEntry.createdAt).getTime();
         if (elapsedMs < EMAIL_VERIFICATION_COOLDOWN_MS) {
           console.warn(`[auth] Verification email throttled for ${user.email}`);

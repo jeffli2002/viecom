@@ -1,65 +1,33 @@
-'use client';
+import { BatchGenerationFeature } from '@/components/blocks/batch-generation-feature';
+import { BrandAnalysis } from '@/components/blocks/brand-analysis';
+import { FAQ } from '@/components/blocks/faq';
+import { Hero } from '@/components/blocks/hero';
+import { LoginOverlay, LoginOverlayLoading } from '@/components/blocks/login/login-overlay';
+import { ShowcaseGallery } from '@/components/blocks/showcase-gallery';
+import { TransformationShowcase } from '@/components/blocks/transformation-showcase';
+import { VideoGenerationShowcase } from '@/components/blocks/video-generation-showcase';
+import { Suspense } from 'react';
 
-import { LoginForm } from '@/components/blocks/login/login-form';
-import { useLogin } from '@/hooks/use-login';
-import { useAuthStore } from '@/store/auth-store';
-import { Loader2 } from 'lucide-react';
-import { useTranslations } from 'next-intl';
-import { useSearchParams } from 'next/navigation';
-import { Suspense, useEffect } from 'react';
-
-function LoginPageContent() {
-  const loginData = useLogin();
-  const refreshSession = useAuthStore((state) => state.refreshSession);
-  const searchParams = useSearchParams();
-  const tCommon = useTranslations('common');
-
-  // Check if we're returning from OAuth callback and refresh session
-  useEffect(() => {
-    const code = searchParams.get('code');
-    const state = searchParams.get('state');
-
-    if (code || state) {
-      // OAuth callback detected, refresh session after a short delay
-      const timer = setTimeout(() => {
-        refreshSession();
-      }, 1000);
-
-      return () => clearTimeout(timer);
-    }
-  }, [searchParams, refreshSession]);
-
+export default function LoginPage() {
   return (
-    <div className="flex min-h-svh flex-col items-center justify-center gap-6 bg-muted p-6 md:p-10">
-      <div className="flex w-full max-w-sm flex-col gap-6">
-        <LoginForm
-          formData={loginData.formData}
-          setFormData={loginData.setFormData}
-          isLoading={loginData.isLoading}
-          error={loginData.error}
-          onEmailLogin={loginData.handleEmailLogin}
-          onSocialLogin={loginData.handleSocialLogin}
-          onClearError={loginData.handleClearError}
-        />
+    <div className="relative min-h-screen bg-white overflow-hidden">
+      {/* Real homepage content as background */}
+      <div className="pointer-events-none">
+        <Hero />
+        <BrandAnalysis />
+        <TransformationShowcase />
+        <BatchGenerationFeature />
+        <VideoGenerationShowcase />
+        <ShowcaseGallery />
+        <FAQ />
       </div>
+
+      {/* Login overlay */}
+      <Suspense fallback={<LoginOverlayLoading />}>
+        <LoginOverlay />
+      </Suspense>
     </div>
   );
 }
 
-export default function LoginPage() {
-  const t = useTranslations('common');
-  return (
-    <Suspense
-      fallback={
-        <div className="flex min-h-svh flex-col items-center justify-center gap-6 bg-muted p-6 md:p-10">
-          <div className="flex w-full max-w-sm flex-col items-center gap-6">
-            <Loader2 className="h-8 w-8 animate-spin text-primary" />
-            <p className="text-muted-foreground text-sm">{t('loading')}</p>
-          </div>
-        </div>
-      }
-    >
-      <LoginPageContent />
-    </Suspense>
-  );
-}
+export const dynamic = 'force-dynamic';
