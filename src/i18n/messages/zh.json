@@ -55,10 +55,15 @@
       "title": "创建账户",
       "subtitle": "使用您的信息注册",
       "withGoogle": "使用 Google 注册",
+      "continueWithGoogle": "使用 Google 继续",
       "signingUp": "注册中...",
       "submit": "注册",
+      "createAccount": "创建账户",
       "haveAccount": "已有账户？",
-      "linkText": "注册"
+      "linkText": "注册",
+      "termsNotice": "继续即表示您同意 <terms>使用条款</terms> 和 <privacy>隐私政策</privacy>。",
+      "terms": "服务条款",
+      "privacy": "隐私政策"
     },
     "signin": {
       "title": "欢迎回来",

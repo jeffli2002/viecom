@@ -55,10 +55,15 @@
       "title": "Créer un compte",
       "subtitle": "Inscrivez-vous avec votre compte",
       "withGoogle": "S'inscrire avec Google",
+      "continueWithGoogle": "Continuer avec Google",
       "signingUp": "Inscription...",
       "submit": "S'inscrire",
+      "createAccount": "Créer un compte",
       "haveAccount": "Vous avez déjà un compte ?",
-      "linkText": "S'inscrire"
+      "linkText": "S'inscrire",
+      "termsNotice": "En continuant, vous acceptez les <terms>Conditions d'utilisation</terms> et la <privacy>Politique de confidentialité</privacy>.",
+      "terms": "Conditions d'utilisation",
+      "privacy": "Politique de confidentialité"
     },
     "signin": {
       "title": "Bon retour",

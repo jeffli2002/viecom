@@ -55,10 +55,15 @@
       "title": "Create Account",
       "subtitle": "Sign up with your account",
       "withGoogle": "Sign up with Google",
+      "continueWithGoogle": "Continue with Google",
       "signingUp": "Signing up...",
       "submit": "Sign Up",
+      "createAccount": "Create account",
       "haveAccount": "Already have an account?",
-      "linkText": "Sign up"
+      "linkText": "Sign up",
+      "termsNotice": "By continuing you agree to the <terms>Terms of Use</terms> and <privacy>Privacy Policy</privacy>.",
+      "terms": "Terms of Service",
+      "privacy": "Privacy Policy"
     },
     "signin": {
       "title": "Welcome Back",

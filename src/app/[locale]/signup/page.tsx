@@ -1,11 +1,16 @@
 'use client';
 
 import { SignupForm } from '@/components/blocks/signup/signup-form';
-import { useAuthInitialized, useInitialize, useIsAuthenticated, useRefreshSession } from '@/store/auth-store';
+import {
+  useAuthInitialized,
+  useInitialize,
+  useIsAuthenticated,
+  useRefreshSession,
+} from '@/store/auth-store';
 import { useAuthStore } from '@/store/auth-store';
 import { Loader2 } from 'lucide-react';
-import { Suspense, useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
+import { Suspense, useEffect, useState } from 'react';
 
 function SignupPageContent() {
   const searchParams = useSearchParams();
@@ -96,8 +101,8 @@ function SignupPageContent() {
   }, [isAuthenticated, isInitialized, searchParams]);
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center gap-6 bg-gray-50 p-6 md:p-10">
-      <div className="flex w-full max-w-lg flex-col items-center gap-6">
+    <div className="flex min-h-screen flex-col items-center justify-center bg-gray-100 p-6 md:p-10 w-full">
+      <div className="w-full max-w-md">
         <SignupForm />
       </div>
     </div>
@@ -108,8 +113,8 @@ export default function SignupPage() {
   return (
     <Suspense
       fallback={
-        <div className="flex min-h-screen flex-col items-center justify-center gap-6 bg-gray-50 p-6 md:p-10">
-          <div className="flex w-full max-w-lg flex-col items-center gap-6">
+        <div className="flex min-h-screen flex-col items-center justify-center gap-6 bg-gray-100 p-6 md:p-10 w-full">
+          <div className="flex w-full max-w-md flex-col items-center">
             <Loader2 className="h-8 w-8 animate-spin text-primary" />
             <p className="text-muted-foreground text-sm">Loading...</p>
           </div>

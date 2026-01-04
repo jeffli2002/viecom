@@ -434,23 +434,46 @@ export function SignupForm({ className, ...props }: React.ComponentProps<'div'>)
         </AlertDialogContent>
       </AlertDialog>
       {!showVerificationNotice && (
-        <Card className="border-0 shadow-none bg-transparent w-full">
-          <CardHeader className="text-center pb-5 px-4">
-            <CardTitle className="text-4xl font-bold mb-3 text-gray-900">
+        <Card className="relative border border-gray-200 shadow-lg bg-white w-full max-w-md mx-auto rounded-2xl">
+          {/* Close button */}
+          <button
+            type="button"
+            onClick={() => router.back()}
+            className="absolute top-4 right-4 p-1 text-gray-400 hover:text-gray-600 transition-colors"
+            aria-label={tCommon('close')}
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+            >
+              <line x1="18" y1="6" x2="6" y2="18" />
+              <line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
+          </button>
+          <CardHeader className="text-center pb-4 px-8 pt-8">
+            <CardTitle className="text-3xl font-bold mb-2 text-gray-900">
               {tAuth('signup.title')}
             </CardTitle>
-            <CardDescription className="text-xs text-gray-500 mb-3">
+            <CardDescription className="text-xs text-gray-500 mb-2">
               {tAuth('signup.subtitle')}
             </CardDescription>
             {/* Terms and Privacy Notice */}
-            <p className="text-[10px] text-gray-500 leading-relaxed mb-2">
+            <p className="text-[10px] text-gray-400 leading-relaxed">
               {tAuth.rich('signup.termsNotice', {
                 terms: (chunks) => (
                   <a
                     href={`/${locale}/terms`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-blue-600 hover:underline"
+                    className="text-blue-500 hover:underline"
                   >
                     {chunks}
                   </a>
@@ -460,7 +483,7 @@ export function SignupForm({ className, ...props }: React.ComponentProps<'div'>)
                     href={`/${locale}/privacy`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-blue-600 hover:underline"
+                    className="text-blue-500 hover:underline"
                   >
                     {chunks}
                   </a>
@@ -468,7 +491,7 @@ export function SignupForm({ className, ...props }: React.ComponentProps<'div'>)
               })}
             </p>
           </CardHeader>
-          <CardContent className="px-4">
+          <CardContent className="px-8 pb-8">
             <form onSubmit={handleEmailSignup} data-testid="signup-form" autoComplete="off">
               <div className="grid gap-4">
                 {/* Error message display */}

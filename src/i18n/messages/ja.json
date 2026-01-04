@@ -55,10 +55,15 @@
       "title": "アカウント作成",
       "subtitle": "アカウントで登録",
       "withGoogle": "Googleで登録",
+      "continueWithGoogle": "Googleで続行",
       "signingUp": "登録中...",
       "submit": "登録",
+      "createAccount": "アカウントを作成",
       "haveAccount": "すでにアカウントをお持ちですか？",
-      "linkText": "登録"
+      "linkText": "登録",
+      "termsNotice": "続行することで、<terms>利用規約</terms>および<privacy>プライバシーポリシー</privacy>に同意したことになります。",
+      "terms": "利用規約",
+      "privacy": "プライバシーポリシー"
     },
     "signin": {
       "title": "おかえりなさい",

@@ -55,10 +55,15 @@
       "title": "Konto erstellen",
       "subtitle": "Registrieren Sie sich mit Ihrem Konto",
       "withGoogle": "Mit Google registrieren",
+      "continueWithGoogle": "Mit Google fortfahren",
       "signingUp": "Registrierung...",
       "submit": "Registrieren",
+      "createAccount": "Konto erstellen",
       "haveAccount": "Sie haben bereits ein Konto?",
-      "linkText": "Registrieren"
+      "linkText": "Registrieren",
+      "termsNotice": "Mit der Fortsetzung stimmen Sie den <terms>Nutzungsbedingungen</terms> und der <privacy>Datenschutzrichtlinie</privacy> zu.",
+      "terms": "Nutzungsbedingungen",
+      "privacy": "Datenschutzrichtlinie"
     },
     "signin": {
       "title": "Willkommen zurück",
