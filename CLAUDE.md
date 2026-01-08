@@ -384,6 +384,10 @@ Run tests with proper environment setup. See `tests/README.md`.
 - Admin routes protected by role checks
 - Never expose API keys client-side
 
+## Lessons Learned
+
+- Creem webhook retries can be delayed and repeated; credit-pack grants must be idempotent before updating balances. Insert the `credit_transactions` row with conflict protection (prefer `checkoutId` for the reference) and only then mutate `user_credits`.
+
 ## Common Tasks
 
 ### Add New Subscription Plan

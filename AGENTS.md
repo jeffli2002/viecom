@@ -21,3 +21,6 @@ The distributed snapshot lacks Git history, so default to Conventional Commits (
 
 ## Security & Configuration Tips
 Never commit secrets; instead, copy `env.example` to `.env.local` and scope API keys per environment. R2, Creem, and DeepSeek credentials should be least-privilege and rotated regularly. When touching webhook or auth code, verify that routes under `src/app/api` still enforce auth guards and input validation via Zod.
+
+## Lessons Learned
+- Creem webhook retries can arrive hours/days later; credit-pack grants must be idempotent before mutating balances. Use a stable reference (prefer `checkoutId`) and insert the credit transaction with conflict protection first, then update `user_credits`.
