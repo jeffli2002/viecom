@@ -35,6 +35,7 @@ import type { SharePlatform, SharePlatformId } from '@/lib/share/share-platforms
 import { useAuthStore } from '@/store/auth-store';
 import {
   AlertCircle,
+  Copy,
   Download,
   Eraser,
   Globe,
@@ -540,6 +541,24 @@ export default function VideoGenerator() {
     }
   };
 
+  const copyEnhancedPrompt = async () => {
+    if (!enhancedPrompt) {
+      return;
+    }
+    try {
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(enhancedPrompt);
+      } else {
+        window.prompt(t('copyPrompt'), enhancedPrompt);
+      }
+      toast.success(t('copyPromptSuccess'));
+    } catch (error) {
+      console.error('Clipboard copy failed:', error);
+      toast.error(t('copyPromptFailed'));
+      window.prompt(t('copyPrompt'), enhancedPrompt);
+    }
+  };
+
   const submitPublishEntry = async () => {
     if (!result?.videoUrl) {
       throw new Error('No video available to publish.');
@@ -796,21 +815,35 @@ export default function VideoGenerator() {
                               <Sparkles className="h-4 w-4" />
                               {t('enhancedPrompt')}
                             </h4>
-                            <Button
-                              onClick={() => setEnhancedPrompt('')}
-                              size="sm"
-                              variant="ghost"
-                              className="h-6 w-6 p-0 text-slate-600 dark:text-slate-400"
-                            >
-                              <X className="h-4 w-4" />
-                            </Button>
+                            <div className="flex items-center gap-1">
+                              <Button
+                                onClick={copyEnhancedPrompt}
+                                size="sm"
+                                variant="ghost"
+                                className="h-7 w-7 p-0 text-slate-600 dark:text-slate-400 hover:text-teal-600 dark:hover:text-teal-400 transition-colors"
+                                title={t('copyPrompt')}
+                                aria-label={t('copyPrompt')}
+                              >
+                                <Copy className="h-3.5 w-3.5" />
+                              </Button>
+                              <Button
+                                onClick={() => setEnhancedPrompt('')}
+                                size="sm"
+                                variant="ghost"
+                                className="h-7 w-7 p-0 text-slate-600 dark:text-slate-400 hover:text-red-600 dark:hover:text-red-400 transition-colors"
+                                title={t('clearPrompt')}
+                                aria-label={t('clearPrompt')}
+                              >
+                                <X className="h-3.5 w-3.5" />
+                              </Button>
+                            </div>
                           </div>
                           <Textarea
                             value={enhancedPrompt}
                             onChange={(e) =>
                               setEnhancedPrompt(e.target.value.slice(0, maxPromptLength))
                             }
-                            className="resize-none border border-teal-200 dark:border-teal-800 bg-white dark:bg-slate-900 text-sm"
+                            className="resize-none border border-teal-200 dark:border-teal-800 bg-white dark:bg-slate-900 text-sm select-text"
                             rows={5}
                           />
                           <p className="mt-1 text-right text-teal-500 text-xs">
@@ -933,21 +966,35 @@ export default function VideoGenerator() {
                               <Sparkles className="h-4 w-4" />
                               {t('enhancedPrompt')}
                             </h4>
-                            <Button
-                              onClick={() => setEnhancedPrompt('')}
-                              size="sm"
-                              variant="ghost"
-                              className="h-6 w-6 p-0 text-slate-600 dark:text-slate-400"
-                            >
-                              <X className="h-4 w-4" />
-                            </Button>
+                            <div className="flex items-center gap-1">
+                              <Button
+                                onClick={copyEnhancedPrompt}
+                                size="sm"
+                                variant="ghost"
+                                className="h-7 w-7 p-0 text-slate-600 dark:text-slate-400 hover:text-teal-600 dark:hover:text-teal-400 transition-colors"
+                                title={t('copyPrompt')}
+                                aria-label={t('copyPrompt')}
+                              >
+                                <Copy className="h-3.5 w-3.5" />
+                              </Button>
+                              <Button
+                                onClick={() => setEnhancedPrompt('')}
+                                size="sm"
+                                variant="ghost"
+                                className="h-7 w-7 p-0 text-slate-600 dark:text-slate-400 hover:text-red-600 dark:hover:text-red-400 transition-colors"
+                                title={t('clearPrompt')}
+                                aria-label={t('clearPrompt')}
+                              >
+                                <X className="h-3.5 w-3.5" />
+                              </Button>
+                            </div>
                           </div>
                           <Textarea
                             value={enhancedPrompt}
                             onChange={(e) =>
                               setEnhancedPrompt(e.target.value.slice(0, maxPromptLength))
                             }
-                            className="resize-none border border-teal-200 dark:border-teal-800 bg-white dark:bg-slate-900 text-sm"
+                            className="resize-none border border-teal-200 dark:border-teal-800 bg-white dark:bg-slate-900 text-sm select-text"
                             rows={5}
                           />
                           <p className="mt-1 text-right text-teal-500 text-xs">

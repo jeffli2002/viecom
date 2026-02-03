@@ -236,7 +236,12 @@ Optimize the video for the user's selected aspect ratio and style preference. Na
       }
 
       const data = await response.json();
-      const enhancedPrompt = extractContent(data.choices?.[0]?.message?.content) || sanitizedPrompt;
+      let enhancedPrompt = extractContent(data.choices?.[0]?.message?.content) || sanitizedPrompt;
+
+      // For video generation, prepend the professional role prefix
+      if (generationContext === 'video') {
+        enhancedPrompt = `You are professional E-commerce Video director\n\n${enhancedPrompt}`;
+      }
 
       return NextResponse.json({
         enhancedPrompt,
