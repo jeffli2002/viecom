@@ -18,8 +18,8 @@ interface BatchGenerateRequest {
     baseImageUrl?: string; // Can be HTTP/HTTPS URL or base64 image
     productSellingPoints?: string;
     // 新增视频参数
-    model?: 'sora-2' | 'sora-2-pro';
-    resolution?: '720p' | '1080p';
+    model?: 'seedance-2-fast';
+    resolution?: '480p' | '720p';
     duration?: 10 | 15;
   }>;
   generationType: 'image' | 'video';
@@ -27,8 +27,8 @@ interface BatchGenerateRequest {
   aspectRatio: string;
   style?: string;
   // 批量视频参数
-  defaultModel?: 'sora-2' | 'sora-2-pro';
-  defaultResolution?: '720p' | '1080p';
+  defaultModel?: 'seedance-2-fast';
+  defaultResolution?: '480p' | '720p';
   defaultDuration?: 10 | 15;
 }
 
@@ -53,14 +53,16 @@ async function generateAssetWithRetry(
   rowIndex: number
 ): Promise<{ success: boolean; assetId?: string; assetUrl?: string; error?: string }> {
   const { getKieApiService } = await import('@/lib/kie/kie-api');
+  const { getArkVideoApiService, getArkVideoUrl } = await import('@/lib/volcengine/ark-video-api');
   const { r2StorageService } = await import('@/lib/storage/r2');
   const { creditsConfig } = await import('@/config/credits.config');
   const { creditService } = await import('@/lib/credits/credit-service');
 
   type KieApiService = ReturnType<typeof getKieApiService>;
   const kieApiService: KieApiService = getKieApiService();
+  const arkVideoApiService = getArkVideoApiService();
   type ImageTaskResponse = Awaited<ReturnType<KieApiService['generateImage']>>;
-  type VideoTaskResponse = Awaited<ReturnType<KieApiService['generateVideo']>>;
+  type VideoTaskResponse = Awaited<ReturnType<typeof arkVideoApiService.createVideoTask>>;
 
   let lastError: Error | null = null;
 
@@ -85,9 +87,7 @@ async function generateAssetWithRetry(
           ? actualMode === 'i2i'
             ? 'google/nano-banana-edit'
             : 'google/nano-banana'
-          : actualMode === 'i2v'
-            ? 'sora-2-image-to-video'
-            : 'sora-2-text-to-video';
+          : 'seedance-2-fast';
 
       // Check credits before generation
       const creditAccount = await creditService.getCreditAccount(userId);
@@ -100,9 +100,7 @@ async function generateAssetWithRetry(
           ? creditsConfig.consumption.imageGeneration[
               model as keyof typeof creditsConfig.consumption.imageGeneration
             ] || 10
-          : creditsConfig.consumption.videoGeneration[
-              model as keyof typeof creditsConfig.consumption.videoGeneration
-            ] || 50;
+          : creditsConfig.consumption.videoGeneration['seedance-2-fast-720p-10s'];
 
       if (creditAccount.balance < creditCost) {
         throw new Error(
@@ -196,28 +194,31 @@ async function generateAssetWithRetry(
         assetUrl = r2Result.url;
       } else {
         // Video generation
-        const aspectRatioMap: Record<string, 'square' | 'portrait' | 'landscape'> = {
-          '1:1': 'square',
-          '9:16': 'portrait',
-          '16:9': 'landscape',
-          '4:3': 'landscape',
-          '3:4': 'portrait',
-        };
-        const kieAspectRatio = aspectRatioMap[params.aspectRatio || '16:9'] || 'landscape';
-
-        taskResponse = await kieApiService.generateVideo({
+        taskResponse = await arkVideoApiService.createVideoTask({
           prompt: params.enhancedPrompt,
-          imageUrls: params.baseImage ? [params.baseImage] : undefined,
-          aspectRatio: kieAspectRatio,
+          imageUrl: processedImageUrl,
+          ratio: params.aspectRatio || '16:9',
+          resolution: '720p',
+          duration: 10,
         });
 
-        // Poll for video result
-        const videoResult = await kieApiService.pollTaskStatus(taskResponse.data.taskId, 'video');
-        if (!videoResult.videoUrl) {
-          throw new Error('Video generation failed: No video URL in response');
+        let videoUrl: string | undefined;
+        for (let attempt = 0; attempt < 120; attempt++) {
+          await new Promise((resolve) => setTimeout(resolve, 5000));
+          const videoTask = await arkVideoApiService.getVideoTask(taskResponse.id);
+          if (videoTask.status === 'succeeded') {
+            videoUrl = getArkVideoUrl(videoTask);
+            break;
+          }
+          if (['failed', 'expired', 'canceled'].includes(videoTask.status)) {
+            throw new Error(
+              typeof videoTask.error === 'string' ? videoTask.error : 'Video generation failed'
+            );
+          }
         }
 
-        assetUrl = videoResult.videoUrl;
+        if (!videoUrl) throw new Error('Video generation timed out or returned no video URL');
+        assetUrl = videoUrl;
 
         // Download and upload to R2
         const videoResponse = await fetch(assetUrl);
@@ -373,8 +374,8 @@ async function processBatchVideoGeneration(
     mode: 't2i' | 'i2i' | 't2v' | 'i2v';
     aspectRatio: string;
     style?: string;
-    defaultModel?: 'sora-2' | 'sora-2-pro';
-    defaultResolution?: '720p' | '1080p';
+    defaultModel?: 'seedance-2-fast';
+    defaultResolution?: '480p' | '720p';
     defaultDuration?: 10 | 15;
   }
 ) {
@@ -403,7 +404,7 @@ async function processBatchVideoGeneration(
     // 转换任务格式
     const tasks = rows.map((row) => ({
       rowIndex: row.rowIndex,
-      model: row.model || options.defaultModel || 'sora-2',
+      model: row.model || options.defaultModel || 'seedance-2-fast',
       resolution: row.resolution || options.defaultResolution || '720p',
       duration: row.duration || options.defaultDuration || 15,
       prompt: row.prompt,
@@ -442,8 +443,8 @@ async function processBatchGeneration(
     mode: 't2i' | 'i2i' | 't2v' | 'i2v';
     aspectRatio: string;
     style?: string;
-    defaultModel?: 'sora-2' | 'sora-2-pro';
-    defaultResolution?: '720p' | '1080p';
+    defaultModel?: 'seedance-2-fast';
+    defaultResolution?: '480p' | '720p';
     defaultDuration?: 10 | 15;
   }
 ) {

@@ -15,72 +15,75 @@ export async function generateMetadata({
     en: {
       title: 'AI Video Generator | Text to Video & Image to Video Free',
       description:
-        'Create professional product videos with AI. Text-to-video and image-to-video modes. Sora 2 models, 720p/1080p quality. Free trial with 15 credits.',
+        'Create professional product videos with Seedance 2.0 Fast. Text-to-video and image-to-video in 480p or 720p.',
       keywords: [
         'ai video generator',
         'text to video',
         'image to video',
         'product video generator',
-        'sora 2',
-        'sora 2 pro',
+        'seedance 2.0 fast',
         'free ai video',
       ],
     },
     zh: {
       title: 'AI视频生成器 | 文字转视频和图片转视频免费',
       description:
-        '用AI创建专业产品视频。文字转视频和图片转视频模式。Sora 2模型，720p/1080p质量。30积分免费试用。',
+        '使用 Seedance 2.0 Fast 创建专业产品视频，支持文字转视频、图片转视频以及 480p/720p 输出。',
       keywords: [
         'AI视频生成器',
         '文字转视频',
         '图片转视频',
         '产品视频生成器',
-        'sora 2',
-        'sora 2 pro',
+        'seedance 2.0 fast',
         '免费AI视频',
       ],
     },
     es: {
       title: 'Generador de Video IA | Texto a Video e Imagen a Video Gratis',
       description:
-        'Crea videos de productos profesionales con IA. Modos texto a video e imagen a video. Modelos Sora 2, calidad 720p/1080p. Prueba gratuita con 30 créditos.',
+        'Crea videos profesionales con Seedance 2.0 Fast, de texto o imagen a video en 480p o 720p.',
       keywords: [
         'generador video ia',
         'texto a video',
         'imagen a video',
         'generador video producto',
-        'sora 2',
+        'seedance 2.0 fast',
       ],
     },
     fr: {
       title: 'Générateur de Vidéo IA | Texte en Vidéo et Image en Vidéo Gratuit',
       description:
-        "Créez des vidéos de produits professionnelles avec l'IA. Modes texte vers vidéo et image vers vidéo. Modèles Sora 2, qualité 720p/1080p. Essai gratuit avec 30 crédits.",
+        'Créez des vidéos professionnelles avec Seedance 2.0 Fast, en 480p ou 720p à partir de texte ou d’images.',
       keywords: [
         'générateur vidéo ia',
         'texte en vidéo',
         'image en vidéo',
         'générateur vidéo produit',
-        'sora 2',
+        'seedance 2.0 fast',
       ],
     },
     de: {
       title: 'KI-Videogenerator | Text zu Video & Bild zu Video Kostenlos',
       description:
-        'Erstellen Sie professionelle Produktvideos mit KI. Text-zu-Video- und Bild-zu-Video-Modi. Sora 2 Modelle, 720p/1080p Qualität. Kostenlose Testversion mit 15 Credits.',
+        'Erstellen Sie professionelle Videos mit Seedance 2.0 Fast aus Text oder Bildern in 480p oder 720p.',
       keywords: [
         'ki videogenerator',
         'text zu video',
         'bild zu video',
         'produktvideo generator',
-        'sora 2',
+        'seedance 2.0 fast',
       ],
     },
     ja: {
       title: 'AI動画生成器 | テキストから動画・画像から動画 無料',
-      description:
-        'AIでプロフェッショナルな商品動画を作成。テキストから動画、画像から動画モード。Sora 2モデル、720p/1080p品質。30クレジットの無料トライアル。',
-      keywords: ['ai動画生成器', 'テキストから動画', '画像から動画', '商品動画生成器', 'sora 2'],
+      description: 'Seedance 2.0 Fastでテキストや画像から480pまたは720pの商品動画を作成します。',
+      keywords: [
+        'ai動画生成器',
+        'テキストから動画',
+        '画像から動画',
+        '商品動画生成器',
+        'seedance 2.0 fast',
+      ],
     },
   };
 

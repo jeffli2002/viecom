@@ -8,9 +8,7 @@ export default function PrivacyPage() {
       <div className="space-y-6 text-gray-700 dark:text-slate-300">
         <Card>
           <CardContent className="pt-6 space-y-4">
-            <p className="text-sm text-gray-500 dark:text-slate-400">
-              Last updated: November 12, 2025
-            </p>
+            <p className="text-sm text-gray-500 dark:text-slate-400">Last updated: July 14, 2026</p>
 
             <p>
               At Viecom, we take your privacy seriously. This Privacy Policy explains how we
@@ -46,6 +44,8 @@ export default function PrivacyPage() {
               <li>Text prompts for image and video generation</li>
               <li>Uploaded images for image-to-image or image-to-video generation</li>
               <li>Generated images and videos</li>
+              <li>Video task IDs, selected resolution, duration, aspect ratio, and task status</li>
+              <li>Pseudonymous safety identifiers used for provider abuse prevention</li>
               <li>Brand analysis data from websites you analyze</li>
               <li>Usage statistics and generation history</li>
             </ul>
@@ -87,7 +87,7 @@ export default function PrivacyPage() {
               <li>Process your image and video generation requests</li>
               <li>Manage your account and subscription</li>
               <li>Send you service updates and important notifications</li>
-              <li>Improve our AI models and service quality</li>
+              <li>Improve our service workflows, reliability, and user experience</li>
               <li>Prevent fraud and ensure platform security</li>
               <li>Comply with legal obligations</li>
             </ul>
@@ -127,8 +127,11 @@ export default function PrivacyPage() {
             <p>We do not sell your personal information. We may share your data with:</p>
             <ul className="list-disc list-inside space-y-2 ml-4">
               <li>
-                <strong>AI Service Providers:</strong> We use DeepSeek APIs to process your
-                generation requests. Your prompts are sent to these services for processing.
+                <strong>AI Service Providers:</strong> We use Google Gemini for image workflows,
+                DeepSeek for prompt processing, and ByteDance Seedance 2.0 Fast through Volcengine
+                Ark for video generation. Relevant prompts, source images, generation settings, and
+                pseudonymous safety identifiers are sent to the applicable provider to process your
+                request.
               </li>
               <li>
                 <strong>Payment Processors:</strong> Creem handles payment processing and may access
@@ -233,9 +236,11 @@ export default function PrivacyPage() {
             </h2>
 
             <p>
-              Your information may be transferred to and processed in countries other than your
-              country of residence. These countries may have different data protection laws. By
-              using our service, you consent to such transfers.
+              Your information may be transferred to and processed in countries or regions other
+              than your country of residence, including where our hosting, storage, payment, and AI
+              service providers operate. These locations may have different data protection laws. We
+              use the information only as needed to provide the requested service and apply
+              contractual and technical safeguards where appropriate.
             </p>
           </CardContent>
         </Card>
@@ -287,9 +292,11 @@ export default function PrivacyPage() {
             </h2>
 
             <p>
-              Viecom uses third-party AI models (such as Google's Gemini, OpenAI's models, and other
-              AI service providers) to power our content generation services. These AI models are
-              provided by their respective owners and are subject to their own terms and conditions.
+              Viecom uses third-party AI services, including Google Gemini for image workflows,
+              DeepSeek for prompt processing, and ByteDance Seedance 2.0 Fast through Volcengine Ark
+              for video generation. These services are provided by their respective owners and are
+              subject to their own terms, privacy practices, moderation rules, and technical
+              limitations.
             </p>
 
             <p>

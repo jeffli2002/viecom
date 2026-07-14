@@ -55,7 +55,7 @@ export function createTestBatchJob(params: CreateJobParams): TestBatchJob {
       type: assetType,
       prompt: row.prompt || `Row ${index + 1}`,
       enhancedPrompt: row.prompt ? `${row.prompt} (test-mode)` : undefined,
-      model: row.model || (assetType === 'image' ? 'nano-banana' : 'sora-2'),
+      model: row.model || (assetType === 'image' ? 'nano-banana' : 'seedance-2-fast'),
       status: 'completed',
       rowIndex: index,
     };

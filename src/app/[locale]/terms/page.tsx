@@ -8,8 +8,8 @@ export default function TermsPage() {
   // Get configuration values
   const nanoBananaCost = creditsConfig.consumption.imageGeneration['nano-banana'];
   const nanoBananaProCost = creditsConfig.consumption.imageGeneration['nano-banana-pro'];
-  const videoCostMin = creditsConfig.consumption.videoGeneration['sora-2-720p-10s'];
-  const videoCostMax = creditsConfig.consumption.videoGeneration['sora-2-pro-1080p-15s'];
+  const videoCostMin = creditsConfig.consumption.videoGeneration['seedance-2-fast-480p-10s'];
+  const videoCostMax = creditsConfig.consumption.videoGeneration['seedance-2-fast-720p-15s'];
   const freePlan = paymentConfig.plans.find((p) => p.id === 'free');
   const freeSignupBonus = freePlan?.credits.onSignup || 15;
   return (
@@ -19,9 +19,7 @@ export default function TermsPage() {
       <div className="space-y-6 text-gray-700 dark:text-slate-300">
         <Card>
           <CardContent className="pt-6 space-y-4">
-            <p className="text-sm text-gray-500 dark:text-slate-400">
-              Last updated: November 12, 2025
-            </p>
+            <p className="text-sm text-gray-500 dark:text-slate-400">Last updated: July 14, 2026</p>
 
             <p>
               Welcome to Viecom. By accessing or using our AI-powered e-commerce content generation
@@ -55,12 +53,21 @@ export default function TermsPage() {
             </p>
             <ul className="list-disc list-inside space-y-2 ml-4">
               <li>Text-to-image and image-to-image generation</li>
-              <li>Text-to-video and image-to-video generation</li>
+              <li>
+                Seedance 2.0 Fast text-to-video and image-to-video generation through Volcengine Ark
+              </li>
               <li>Brand tone and style analysis</li>
               <li>Batch content generation</li>
               <li>Asset management and storage</li>
               <li>Direct publishing to e-commerce platforms (where available)</li>
             </ul>
+            <p>
+              Video generation is an asynchronous third-party service. Prompts and uploaded source
+              images are submitted to ByteDance Seedance 2.0 Fast through Volcengine Ark. Current
+              Viecom options include 10s or 15s videos, 480p or 720p output, supported aspect
+              ratios, and generated audio. Availability and output are subject to provider
+              moderation, capacity, and technical limits.
+            </p>
           </CardContent>
         </Card>
 
@@ -125,10 +132,15 @@ export default function TermsPage() {
                 {nanoBananaCost} credits, Nano Banana Pro {nanoBananaProCost} credits)
               </li>
               <li>
-                Video generation: {videoCostMin}-{videoCostMax} credits per video (depending on
-                model, resolution, and duration)
+                Seedance 2.0 Fast video generation: {videoCostMin}-{videoCostMax} credits per video,
+                depending on resolution and duration
               </li>
             </ul>
+            <p className="mt-2">
+              Video credits are reserved while a generation task is processing. Tasks that fail,
+              expire, or are cancelled before completion are normally released without a completed
+              generation charge. Successfully completed tasks consume the displayed credit amount.
+            </p>
             <p className="mt-2">
               Free plan users receive {freeSignupBonus} credits as a sign-up bonus. Credits are
               valid for the duration of your subscription period and do not roll over to the next
@@ -219,6 +231,7 @@ export default function TermsPage() {
               <li>Specific quality or results of generated content</li>
               <li>That generated content will meet your specific requirements</li>
               <li>That our services will always be available</li>
+              <li>That a third-party AI provider will accept or complete every request</li>
             </ul>
 
             <p className="mt-4">
@@ -361,9 +374,10 @@ export default function TermsPage() {
             </h2>
 
             <p>
-              Viecom uses third-party AI models (such as Google's Gemini, OpenAI's models, and other
-              AI service providers) to power our content generation services. These AI models are
-              provided by their respective owners and are subject to their own terms and conditions.
+              Viecom uses third-party AI services, including Google Gemini for image workflows,
+              DeepSeek for prompt processing, and ByteDance Seedance 2.0 Fast through Volcengine Ark
+              for video generation. These services are provided by their respective owners and are
+              subject to their terms, moderation rules, availability, and technical limitations.
             </p>
 
             <p>

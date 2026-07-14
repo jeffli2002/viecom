@@ -120,8 +120,9 @@ export default function ContactPage() {
               How quickly can I generate images and videos?
             </h3>
             <p className="text-gray-700 dark:text-slate-300 text-sm">
-              Images typically generate in 20-30 seconds. Videos take 2-5 minutes depending on
-              complexity and server load. Batch generations process multiple items in parallel.
+              Images typically generate in 20-30 seconds. Seedance 2.0 Fast videos usually complete
+              in a few minutes depending on duration, resolution, provider capacity, and server
+              load. Batch generations process multiple items in parallel.
             </p>
           </div>
 

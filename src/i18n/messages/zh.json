@@ -93,12 +93,12 @@
     "generationTools": "工具",
     "imageGeneration": "AI图片",
     "imageGenerationDesc": "文生图和图生图",
-    "videoGeneration": "AI视频",
-    "videoGenerationDesc": "文生视频和图生视频",
+    "videoGeneration": "Seedance AI 视频",
+    "videoGenerationDesc": "Seedance 2.0 Fast 文生视频与图生视频",
     "batchImageGeneration": "批量生图",
     "batchImageGenerationDesc": "批量生成图片",
-    "batchVideoGeneration": "批量生视频",
-    "batchVideoGenerationDesc": "批量生成视频",
+    "batchVideoGeneration": "批量 Seedance 视频",
+    "batchVideoGenerationDesc": "批量生成 480p 和 720p Seedance 视频",
     "batchGeneration": "批量生成",
     "assets": "资产库",
     "dashboard": "控制台",
@@ -119,35 +119,35 @@
     "footerPrivacy": "隐私政策",
     "footerTerms": "服务条款",
     "footerRefund": "退款政策",
-    "independenceDisclaimer": "独立性声明：Viecom 使用第三方 AI 模型（如 Google 的 Gemini、OpenAI 的模型及其他 AI 服务提供商）来驱动我们的内容生成服务。这些 AI 模型由其各自所有者提供，并受其自身条款和条件约束。Viecom 是一家独立服务提供商，我们的平台、功能和服务均为自有产品。我们与这些 AI 模型提供商无关联、未获其认可或赞助。",
+    "independenceDisclaimer": "独立性声明：Viecom 使用第三方 AI 服务，包括用于图像工作流的 Google Gemini、用于提示词处理的 DeepSeek，以及通过火山方舟提供视频生成的字节跳动 Seedance 2.0 Fast。各服务受其所有者条款约束。Viecom 为独立服务商，与上述提供商不存在隶属、认可或赞助关系。",
     "brandAnalysis": "品牌分析",
     "brandAnalysisDesc": "AI驱动的品牌调性和风格分析",
     "learn": "学习",
     "pricing": "定价",
     "settings": "设置",
-    "imageToVideoAI": "图片转视频 AI",
-    "imageToVideoAIDesc": "将产品照片转换为吸引人的视频",
-    "freeAIVideoGenerator": "免费 AI 视频生成器",
-    "freeAIVideoGeneratorDesc": "免费获得30积分，无需信用卡",
+    "imageToVideoAI": "Seedance 图片转视频",
+    "imageToVideoAIDesc": "使用 Seedance 创建 480p 或 720p 产品视频",
+    "freeAIVideoGenerator": "Seedance 视频生成指南",
+    "freeAIVideoGeneratorDesc": "了解 Seedance 设置、积分和免费奖励",
     "videoEnhancer": "视频增强器",
     "videoEnhancerDesc": "使用 AI 将视频提升至 4K 质量",
     "enhancingProductPhotos": "产品照片增强",
     "enhancingProductPhotosDesc": "通过专业的图像编辑服务提升您的电商成功",
     "footerLearn": "学习",
     "documentation": "文档",
-    "documentationDesc": "完整指南和教程",
+    "documentationDesc": "Seedance 视频设置、定价和工作流指南",
     "nanoBananaPro": "Nano Banana Pro",
     "nanoBananaProDesc": "产品摄影AI模型",
     "solutions": "解决方案",
     "amazonSolutions": "Amazon 解决方案",
-    "amazonSolutionsDesc": "符合Amazon要求的产品图像",
+    "amazonSolutionsDesc": "Amazon 合规图片与 Seedance 产品视频",
     "tiktokSolutions": "TikTok 解决方案",
-    "tiktokSolutionsDesc": "TikTok Shop视频生成",
+    "tiktokSolutionsDesc": "面向 TikTok Shop 的 9:16 Seedance 视频",
     "shopifySolutions": "Shopify 解决方案",
-    "shopifySolutionsDesc": "Shopify批量图像生成"
+    "shopifySolutionsDesc": "Shopify 批量图片与 Seedance 视频"
   },
   "hero": {
-    "badge": "全新：Nano Banana Pro 图片生成引擎",
+    "badge": "全新：Seedance 2.0 Fast 视频生成",
     "titleLine1": "现代电商的AI视觉引擎",
     "titleLine2": "",
     "titleHighlight": "AI视觉",
@@ -161,12 +161,12 @@
     "descriptionSub": "支持批量生图、生视频，让每个SKU都能拥有统一又高质的视觉呈现。",
     "ctaLogin": "登录",
     "noCreditCard": "无需信用卡",
-    "freeCredits": "40免费积分",
+    "freeCredits": "15 免费积分",
     "cancelAnytime": "随时取消",
     "featureImage": "图片生成",
     "featureImageDesc": "文生图和图生图，支持品牌调性分析",
     "featureVideo": "视频生成",
-    "featureVideoDesc": "文生视频和图生视频，多种视频风格",
+    "featureVideoDesc": "Seedance 2.0 Fast 文生视频和图生视频，支持 480p/720p",
     "featureBatch": "批量处理",
     "featureBatchDesc": "Excel/CSV批量上传，一键生成并发布到电商平台"
   },
@@ -439,14 +439,13 @@
     },
     "textDefaultPrompt": "专业的 product 视频，展示现代智能手机流畅旋转，突出其时尚设计和优质功能，影棚灯光，干净背景",
     "imageDefaultPrompt": "从这张产品图片创建动态视频，流畅过渡，专业呈现",
-    "modelSora2": "Sora 2 - {credits} 积分",
-    "modelSora2Pro": "Sora 2 Pro - {credits} 积分",
+    "modelSeedanceFast": "Seedance 2.0 Fast - {credits} 积分",
     "aspectRatioLandscape": "横屏 (16:9)",
     "aspectRatioPortrait": "竖屏 (9:16)",
     "duration10": "10 秒",
     "duration15": "15 秒",
-    "qualityStandard": "标准 (720P)",
-    "qualityHigh": "高清 (1080P)"
+    "qualityStandard": "标准 (480P)",
+    "qualityHigh": "高清 (720P)"
   },
   "batchGeneration": {
     "title": "批量生成",
@@ -736,15 +735,15 @@
     "subtitle": "关于 Viecom AI 您需要了解的一切",
     "q1": {
       "question": "积分系统如何运作？",
-      "answer": "积分用于AI生成。图片生成根据模型不同消耗5-30积分（例如：Nano Banana 5积分，Nano Banana Pro 30积分）。视频生成根据模型和分辨率消耗15-130积分。免费用户注册赠送30积分。Pro套餐包含500-900月度积分。您也可以购买积分包，最低9.90美元可得200积分。"
+      "answer": "积分用于 AI 生成。图片生成消耗 5-30 积分；Seedance 2.0 Fast 视频根据分辨率和时长消耗 50-150 积分。免费用户注册赠送 15 积分，Pro 套餐每月包含 500-900 积分。"
     },
     "q2": {
       "question": "免费套餐包含什么？",
-      "answer": "免费用户注册获得30积分，每日签到奖励（2积分/天），推荐奖励（10积分），社交分享奖励（2积分）。您可以使用这些积分生成图片和视频，支持批量生成（1并发）和7天资产展示。"
+      "answer": "免费用户注册获得15积分，每日签到奖励（2积分/天），推荐奖励（10积分），社交分享奖励（2积分）。您可以使用这些积分生成图片和视频，支持批量生成（1并发）和7天资产展示。"
     },
     "q3": {
       "question": "支持哪些视频模型和分辨率？",
-      "answer": "我们提供Sora 2（仅720p，15-20积分）和Sora 2 Pro（720p/1080p，45-130积分），支持10秒或15秒视频。Sora 2 Pro提供更高质量和更快的生成速度。所有套餐都可使用积分访问这两种模型。"
+      "answer": "Viecom 通过火山方舟使用字节跳动 Seedance 2.0 Fast，支持文生视频和图生视频。可选 10 秒或 15 秒；480p 消耗 50-75 积分，720p 消耗 100-150 积分，并启用生成音频。"
     },
     "q4": {
       "question": "生成的内容可以商用吗？",
@@ -752,7 +751,7 @@
     },
     "q5": {
       "question": "批量生成如何工作？",
-      "answer": "上传多张图片或提示词以批量生成内容。免费用户可处理1个并发任务，Pro用户获得3个并发任务，Pro+用户获得10个。我们的智能队列优先处理720p任务，为混合批次提供更快反馈。"
+      "answer": "上传多张图片或提示词即可批量生成。免费用户可处理1个并发任务，Pro用户3个，Pro+用户10个。智能队列优先处理时长较短和480p任务，以便更快返回结果。"
     },
     "q6": {
       "question": "什么是品牌分析，它有什么帮助？",
@@ -981,9 +980,9 @@
     "feature2Desc": "上传整个产品目录电子表格，让AI完成剩余工作。"
   },
   "videoGenerationShowcase": {
-    "title": "从静态到",
-    "titleHighlight": "电影级",
-    "description": "从单张产品图像生成高保真视频资产。通过简单的文本提示控制相机运动、光照和物理效果。",
+    "title": "产品图片变身",
+    "titleHighlight": "Seedance 视频",
+    "description": "使用产品图片或文字提示生成 10 秒或 15 秒 Seedance 2.0 Fast 视频，支持 480p/720p、横竖屏与生成音频。",
     "source": "来源",
     "ready": "就绪",
     "prompt": "提示词",
@@ -1002,14 +1001,14 @@
     "disableAutoLoop": "禁用自动循环",
     "enableAutoLoop": "启用自动循环",
     "autoLoop": "自动循环",
-    "stageInitializing": "正在初始化 Veo 连接...",
-    "stageAnalyzing": "正在分析提示词和几何结构...",
-    "stageGenerating": "正在生成关键帧...",
-    "stageInterpolating": "正在插值运动...",
-    "stageFinalizing": "正在完成 4K 输出...",
-    "engineInitialized": "Veo_Engine_v3.1 已初始化",
-    "geometryInference": "几何推理：正常",
-    "physicsSimulation": "物理模拟：激活中"
+    "stageInitializing": "正在提交 Seedance 2.0 Fast 任务...",
+    "stageAnalyzing": "正在分析提示词和源图片...",
+    "stageGenerating": "正在生成视频和音频...",
+    "stageInterpolating": "正在渲染运动与转场...",
+    "stageFinalizing": "正在完成 480p 或 720p 输出...",
+    "engineInitialized": "Seedance_2.0_Fast 任务已初始化",
+    "geometryInference": "源图片分析：正常",
+    "physicsSimulation": "音频生成：激活中"
   },
   "showcaseGallery": {
     "title": "社区",

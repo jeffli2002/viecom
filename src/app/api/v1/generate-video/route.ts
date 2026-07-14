@@ -1,4 +1,4 @@
-import { randomUUID } from 'node:crypto';
+import { createHash, randomUUID } from 'node:crypto';
 import { getVideoModelInfo } from '@/config/credits.config';
 import { env } from '@/env';
 import { auth } from '@/lib/auth/auth';
@@ -12,6 +12,7 @@ import { getKieApiService } from '@/lib/kie/kie-api';
 import { updateQuotaUsage } from '@/lib/quota/quota-service';
 import { checkAndAwardReferralReward } from '@/lib/rewards/referral-reward';
 import { r2StorageService } from '@/lib/storage/r2';
+import { getArkVideoApiService } from '@/lib/volcengine/ark-video-api';
 import { db } from '@/server/db';
 import { generatedAsset, user as userTable } from '@/server/db/schema';
 import { eq, sql } from 'drizzle-orm';
@@ -94,10 +95,10 @@ export async function POST(request: NextRequest) {
     const requestBody = await request.json();
     const {
       prompt: promptInput,
-      model = 'sora-2',
       mode,
       aspect_ratio = '16:9',
       duration = 10,
+      resolution: resolutionInput = '720p',
       quality = 'standard',
       style,
       image,
@@ -120,13 +121,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const normalizedModel: 'sora-2' | 'sora-2-pro' =
-      model === 'sora-2-pro' ? 'sora-2-pro' : 'sora-2';
+    const normalizedModel = 'seedance-2-fast' as const;
     const normalizedDuration: 10 | 15 = duration === 15 ? 15 : 10;
-    const normalizedQuality =
-      normalizedModel === 'sora-2-pro' ? (quality === 'high' ? 'high' : 'standard') : 'standard';
-    const resolution: '720p' | '1080p' =
-      normalizedModel === 'sora-2-pro' ? (normalizedQuality === 'high' ? '1080p' : '720p') : '720p';
+    const normalizedQuality = quality === 'high' ? 'high' : 'standard';
+    const resolution: '480p' | '720p' = resolutionInput === '480p' ? '480p' : '720p';
 
     const { modelKey, credits: creditCost } = getVideoModelInfo({
       model: normalizedModel,
@@ -266,7 +264,10 @@ export async function POST(request: NextRequest) {
     const dailyPeriod = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
     const monthlyPeriod = new Date().toISOString().substring(0, 7); // YYYY-MM
 
-    const kieApiService = getKieApiService();
+    // Keep the legacy KIE path only for isolated test-mode coverage. Production video traffic
+    // is submitted to Ark Seedance and completed asynchronously by the status endpoint.
+    const kieApiService = isTestMode ? getKieApiService() : null;
+    const arkVideoApiService = isTestMode ? null : getArkVideoApiService();
 
     let imageUrlForKie: string | undefined;
     let sourceImagePublicUrl: string | undefined;
@@ -366,16 +367,29 @@ export async function POST(request: NextRequest) {
 
     let taskId: string;
     try {
-      const generationResponse = await kieApiService.generateVideo({
-        prompt,
-        model: normalizedModel,
-        aspectRatio: mapAspectRatio(aspect_ratio),
-        quality: normalizedQuality,
-        duration: normalizedDuration,
-        imageUrls: imageUrlForKie ? [imageUrlForKie] : undefined,
-      });
-
-      taskId = generationResponse.data.taskId;
+      if (isTestMode) {
+        if (!kieApiService) throw new Error('KIE API service is not available in test mode');
+        const generationResponse = await kieApiService.generateVideo({
+          prompt,
+          model: 'sora-2',
+          aspectRatio: mapAspectRatio(aspect_ratio),
+          quality: normalizedQuality,
+          duration: normalizedDuration,
+          imageUrls: imageUrlForKie ? [imageUrlForKie] : undefined,
+        });
+        taskId = generationResponse.data.taskId;
+      } else {
+        if (!arkVideoApiService) throw new Error('Ark video API service is not available');
+        const generationResponse = await arkVideoApiService.createVideoTask({
+          prompt,
+          resolution,
+          ratio: aspect_ratio,
+          duration: normalizedDuration,
+          imageUrl: imageUrlForKie,
+          safetyIdentifier: createHash('sha256').update(userId).digest('hex').slice(0, 64),
+        });
+        taskId = generationResponse.id;
+      }
 
       console.log('[Video Generation] Task created successfully:', {
         taskId,
@@ -470,6 +484,7 @@ export async function POST(request: NextRequest) {
           },
           metadata: {
             taskId,
+            provider: 'ark',
             generationMode,
             startedAt: new Date().toISOString(),
             creditsFrozen: true,
@@ -492,9 +507,8 @@ export async function POST(request: NextRequest) {
           taskId,
           assetId,
           status: 'processing',
-          message:
-            'Video generation started. This may take 5-20 minutes depending on model and duration.',
-          estimatedTime: normalizedModel === 'sora-2-pro' ? '10-20 minutes' : '5-10 minutes',
+          message: 'Seedance video generation started. This usually takes a few minutes.',
+          estimatedTime: '3-10 minutes',
         });
       } catch (saveError) {
         console.error('[Video Generation] Failed to save task record:', saveError);
@@ -519,14 +533,7 @@ export async function POST(request: NextRequest) {
 
     // Test mode - continue with old synchronous flow for testing
     const pollingIntervalMs = 5000;
-    const maxAttempts =
-      normalizedModel === 'sora-2-pro'
-        ? normalizedDuration === 15
-          ? 240 // up to 20 minutes
-          : 210
-        : normalizedDuration === 15
-          ? 180
-          : 150;
+    const maxAttempts = normalizedDuration === 15 ? 180 : 150;
 
     let videoResult: { imageUrl?: string; videoUrl?: string; status: string };
     try {
@@ -536,6 +543,10 @@ export async function POST(request: NextRequest) {
         maxAttempts,
         pollingIntervalMs,
       });
+
+      if (!kieApiService) {
+        throw new Error('KIE API service is not available in test mode');
+      }
 
       videoResult = await kieApiService.pollTaskStatus(
         taskId,

@@ -99,6 +99,8 @@ interface BatchGenerationFlowProps {
   generationType: GenerationType;
 }
 
+const VIDEO_MODEL = 'seedance-2-fast' as const;
+
 export function BatchGenerationFlow({ generationType }: BatchGenerationFlowProps) {
   const t = useTranslations('batchGeneration');
   const [file, setFile] = useState<File | null>(null);
@@ -121,9 +123,8 @@ export function BatchGenerationFlow({ generationType }: BatchGenerationFlowProps
   // Image-specific settings
   const [outputFormat, setOutputFormat] = useState<'PNG' | 'JPEG'>('PNG');
   // Video-specific settings
-  const [videoModel, setVideoModel] = useState<'sora-2' | 'sora-2-pro'>('sora-2');
   const [videoDuration, setVideoDuration] = useState<10 | 15>(10);
-  const [videoQuality, setVideoQuality] = useState<'standard' | 'high'>('standard');
+  const [videoQuality, setVideoQuality] = useState<'standard' | 'high'>('high');
   const [pollingInterval, setPollingInterval] = useState<NodeJS.Timeout | null>(null);
   const [generationProgress, setGenerationProgress] = useState<{ current: number; total: number }>({
     current: 0,
@@ -183,14 +184,12 @@ export function BatchGenerationFlow({ generationType }: BatchGenerationFlowProps
   const planLimitBatchLabel = translate('planLimitBatchSize', 'Rows per batch');
   const planLimitConcurrencyLabel = translate('planLimitConcurrency', 'Concurrent outputs');
 
-  // Calculate dynamic video credit cost based on model, duration, and quality
-  const getVideoCreditCost = () => {
-    if (videoModel === 'sora-2') {
-      return creditsConfig.consumption.videoGeneration[`sora-2-720p-${videoDuration}s`];
-    }
-    const resolution = videoQuality === 'standard' ? '720p' : '1080p';
-    return creditsConfig.consumption.videoGeneration[`sora-2-pro-${resolution}-${videoDuration}s`];
-  };
+  // Seedance Fast: standard selects 480p and high selects 720p.
+  const videoResolution = videoQuality === 'standard' ? '480p' : '720p';
+  const videoCreditCost =
+    creditsConfig.consumption.videoGeneration[
+      `seedance-2-fast-${videoResolution}-${videoDuration}s`
+    ];
   const [brandInfo, setBrandInfo] = useState<{
     brandName?: string;
     selectedStyle?: string;
@@ -615,12 +614,11 @@ export function BatchGenerationFlow({ generationType }: BatchGenerationFlowProps
       return;
     }
 
-    // Calculate total credit cost
-    // Note: For batch generation, we use nano-banana for images and sora-2 for videos
+    // Calculate total credit cost using the selected Seedance resolution and duration.
     const creditCostPerItem =
       generationType === 'image'
         ? creditsConfig.consumption.imageGeneration['nano-banana'] || 5
-        : creditsConfig.consumption.videoGeneration['sora-2'] || 20;
+        : videoCreditCost;
 
     const totalCreditCost = selectedRows.length * creditCostPerItem;
 
@@ -685,9 +683,9 @@ export function BatchGenerationFlow({ generationType }: BatchGenerationFlowProps
           }),
           // Video-specific parameters
           ...(generationType === 'video' && {
-            model: videoModel, // 'sora-2' or 'sora-2-pro'
-            duration: videoDuration, // 10 or 15
-            quality: videoModel === 'sora-2-pro' ? videoQuality : 'standard', // 'standard' or 'high'
+            defaultModel: VIDEO_MODEL,
+            defaultResolution: videoQuality === 'standard' ? '480p' : '720p',
+            defaultDuration: videoDuration,
           }),
         }),
         credentials: 'include',
@@ -717,12 +715,11 @@ export function BatchGenerationFlow({ generationType }: BatchGenerationFlowProps
     const selectedRows = rows.filter((row) => row.isSelected);
     if (selectedRows.length === 0) return;
 
-    // Calculate credit cost per item
-    // Note: For batch generation, we use nano-banana for images and sora-2 for videos
+    // Calculate credit cost per item.
     const creditCostPerItem =
       generationType === 'image'
         ? creditsConfig.consumption.imageGeneration['nano-banana'] || 5
-        : creditsConfig.consumption.videoGeneration['sora-2'] || 20;
+        : videoCreditCost;
 
     // Calculate how many items can be generated with available credits
     const maxAffordableItems = Math.floor(userCredits / creditCostPerItem);
@@ -1267,36 +1264,16 @@ export function BatchGenerationFlow({ generationType }: BatchGenerationFlowProps
                       <div>
                         <Label className="text-sm font-medium mb-2 block">{t('model')}</Label>
                         <Select
-                          value={videoModel}
-                          onValueChange={(value) => {
-                            setVideoModel(value as 'sora-2' | 'sora-2-pro');
-                            if (value === 'sora-2') {
-                              setVideoQuality('standard');
-                            }
-                          }}
+                          value={VIDEO_MODEL}
+                          onValueChange={() => undefined}
                           disabled={isGenerating}
                         >
                           <SelectTrigger>
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="sora-2">
-                              Sora 2 -{' '}
-                              {videoModel === 'sora-2'
-                                ? getVideoCreditCost()
-                                : creditsConfig.consumption.videoGeneration[
-                                    `sora-2-720p-${videoDuration}s`
-                                  ]}{' '}
-                              credits
-                            </SelectItem>
-                            <SelectItem value="sora-2-pro">
-                              Sora 2 Pro -{' '}
-                              {videoModel === 'sora-2-pro'
-                                ? getVideoCreditCost()
-                                : creditsConfig.consumption.videoGeneration[
-                                    `sora-2-pro-${videoQuality === 'standard' ? '720p' : '1080p'}-${videoDuration}s`
-                                  ]}{' '}
-                              credits
+                            <SelectItem value="seedance-2-fast">
+                              Seedance 2.0 Fast - {videoCreditCost} credits
                             </SelectItem>
                           </SelectContent>
                         </Select>
@@ -1332,70 +1309,67 @@ export function BatchGenerationFlow({ generationType }: BatchGenerationFlowProps
                       </div>
                     </div>
 
-                    {/* Quality selector - only for Sora 2 Pro */}
-                    {videoModel === 'sora-2-pro' && (
-                      <div>
-                        <Label className="text-sm font-medium mb-2 block">{t('quality')}</Label>
-                        <div className="grid grid-cols-2 gap-3">
-                          <button
-                            type="button"
-                            onClick={() => setVideoQuality('standard')}
-                            disabled={isGenerating}
-                            className={`flex items-center justify-center rounded-lg border-2 py-2.5 px-4 text-sm font-medium transition-all ${
-                              videoQuality === 'standard'
-                                ? 'border-teal-500 bg-teal-50 dark:bg-teal-900/20 text-slate-700 dark:text-slate-300'
-                                : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 hover:border-teal-400 dark:border-teal-600'
-                            } disabled:opacity-50 disabled:cursor-not-allowed`}
-                          >
-                            <span>Standard (720P)</span>
-                            {videoQuality === 'standard' && (
-                              <svg
-                                className="ml-2 h-4 w-4"
-                                fill="currentColor"
-                                viewBox="0 0 20 20"
-                                role="img"
-                                aria-label={t('selected') || 'Selected'}
-                              >
-                                <title>{t('selected') || 'Selected'}</title>
-                                <path
-                                  fillRule="evenodd"
-                                  d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                                  clipRule="evenodd"
-                                />
-                              </svg>
-                            )}
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => setVideoQuality('high')}
-                            disabled={isGenerating}
-                            className={`flex items-center justify-center rounded-lg border-2 py-2.5 px-4 text-sm font-medium transition-all ${
-                              videoQuality === 'high'
-                                ? 'border-teal-500 bg-teal-50 dark:bg-teal-900/20 text-slate-700 dark:text-slate-300'
-                                : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 hover:border-teal-400 dark:border-teal-600'
-                            } disabled:opacity-50 disabled:cursor-not-allowed`}
-                          >
-                            <span>High (1080P)</span>
-                            {videoQuality === 'high' && (
-                              <svg
-                                className="ml-2 h-4 w-4"
-                                fill="currentColor"
-                                viewBox="0 0 20 20"
-                                role="img"
-                                aria-label={t('selected') || 'Selected'}
-                              >
-                                <title>{t('selected') || 'Selected'}</title>
-                                <path
-                                  fillRule="evenodd"
-                                  d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                                  clipRule="evenodd"
-                                />
-                              </svg>
-                            )}
-                          </button>
-                        </div>
+                    <div>
+                      <Label className="text-sm font-medium mb-2 block">{t('quality')}</Label>
+                      <div className="grid grid-cols-2 gap-3">
+                        <button
+                          type="button"
+                          onClick={() => setVideoQuality('standard')}
+                          disabled={isGenerating}
+                          className={`flex items-center justify-center rounded-lg border-2 py-2.5 px-4 text-sm font-medium transition-all ${
+                            videoQuality === 'standard'
+                              ? 'border-teal-500 bg-teal-50 dark:bg-teal-900/20 text-slate-700 dark:text-slate-300'
+                              : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 hover:border-teal-400 dark:border-teal-600'
+                          } disabled:opacity-50 disabled:cursor-not-allowed`}
+                        >
+                          <span>480P</span>
+                          {videoQuality === 'standard' && (
+                            <svg
+                              className="ml-2 h-4 w-4"
+                              fill="currentColor"
+                              viewBox="0 0 20 20"
+                              role="img"
+                              aria-label={t('selected') || 'Selected'}
+                            >
+                              <title>{t('selected') || 'Selected'}</title>
+                              <path
+                                fillRule="evenodd"
+                                d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                                clipRule="evenodd"
+                              />
+                            </svg>
+                          )}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setVideoQuality('high')}
+                          disabled={isGenerating}
+                          className={`flex items-center justify-center rounded-lg border-2 py-2.5 px-4 text-sm font-medium transition-all ${
+                            videoQuality === 'high'
+                              ? 'border-teal-500 bg-teal-50 dark:bg-teal-900/20 text-slate-700 dark:text-slate-300'
+                              : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 hover:border-teal-400 dark:border-teal-600'
+                          } disabled:opacity-50 disabled:cursor-not-allowed`}
+                        >
+                          <span>720P</span>
+                          {videoQuality === 'high' && (
+                            <svg
+                              className="ml-2 h-4 w-4"
+                              fill="currentColor"
+                              viewBox="0 0 20 20"
+                              role="img"
+                              aria-label={t('selected') || 'Selected'}
+                            >
+                              <title>{t('selected') || 'Selected'}</title>
+                              <path
+                                fillRule="evenodd"
+                                d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                                clipRule="evenodd"
+                              />
+                            </svg>
+                          )}
+                        </button>
                       </div>
-                    )}
+                    </div>
                   </>
                 )}
               </div>

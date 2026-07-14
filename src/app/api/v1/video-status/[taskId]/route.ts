@@ -1,6 +1,7 @@
 import { randomUUID } from 'node:crypto';
 import { auth } from '@/lib/auth/auth';
 import { releaseGenerationLock } from '@/lib/generation/generation-lock';
+import { getArkVideoApiService, getArkVideoUrl } from '@/lib/volcengine/ark-video-api';
 import { db } from '@/server/db';
 import { generatedAsset } from '@/server/db/schema';
 import { eq } from 'drizzle-orm';
@@ -13,6 +14,7 @@ type AssetMetadata = Record<string, unknown> & {
   taskId?: string;
   previewUrl?: string;
   generationLockId?: string;
+  provider?: 'ark' | 'kie';
 };
 
 const toMetadata = (value: unknown): AssetMetadata =>
@@ -109,31 +111,54 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       });
     }
 
-    // Status is "processing" - check KIE.ai
-    console.log('[Video Status] Checking KIE.ai status:', {
+    const provider = assetMetadata.provider === 'ark' ? 'ark' : 'kie';
+    console.log('[Video Status] Checking provider status:', {
       taskId,
       userId,
       assetId: asset.id,
+      provider,
     });
 
     try {
-      const { getKieApiService } = await import('@/lib/kie/kie-api');
-      const kieApiService = getKieApiService();
+      const providerStatus =
+        provider === 'ark'
+          ? await getArkVideoApiService().getVideoTask(taskId)
+          : await (async () => {
+              const { getKieApiService } = await import('@/lib/kie/kie-api');
+              return getKieApiService().getTaskStatus(taskId);
+            })();
+      const arkStatus = provider === 'ark' ? providerStatus : null;
+      const kieStatus = provider === 'kie' ? providerStatus : null;
+      const status = arkStatus?.status;
+      const isProcessing =
+        status === 'queued' ||
+        status === 'running' ||
+        kieStatus?.data?.status === 'processing' ||
+        kieStatus?.data?.state === 'processing';
+      const isFailed =
+        status === 'failed' ||
+        status === 'expired' ||
+        status === 'canceled' ||
+        kieStatus?.data?.status === 'failed' ||
+        kieStatus?.data?.state === 'fail';
+      const isCompleted =
+        status === 'succeeded' ||
+        kieStatus?.data?.status === 'completed' ||
+        kieStatus?.data?.state === 'success';
 
-      const kieStatus = await kieApiService.getTaskStatus(taskId);
-
-      // Still processing in KIE.ai
-      if (kieStatus.data?.status === 'processing' || kieStatus.data?.state === 'processing') {
+      if (isProcessing) {
         return NextResponse.json({
           status: 'processing',
           progress: 50, // Estimate
-          message: 'Generating video... This may take 5-20 minutes',
+          message: 'Generating video... This may take a few minutes',
         });
       }
 
-      // Failed in KIE.ai
-      if (kieStatus.data?.status === 'failed' || kieStatus.data?.state === 'fail') {
-        const errorMsg = kieStatus.data?.error || kieStatus.data?.failMsg || 'Generation failed';
+      if (isFailed) {
+        const errorMsg =
+          typeof arkStatus?.error === 'string'
+            ? arkStatus.error
+            : kieStatus?.data?.error || kieStatus?.data?.failMsg || 'Generation failed';
 
         // Update database
         const metadataWithoutLock = { ...assetMetadata, generationLockId: undefined };
@@ -147,7 +172,8 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
             metadata: {
               ...metadataWithoutLock,
               failedAt: new Date().toISOString(),
-              kieError: errorMsg,
+              provider,
+              providerError: errorMsg,
             },
           })
           .where(eq(generatedAsset.id, asset.id));
@@ -176,21 +202,22 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
         });
       }
 
-      // Completed in KIE.ai - process the video!
-      if (kieStatus.data?.status === 'completed' || kieStatus.data?.state === 'success') {
-        console.log('[Video Status] Video ready in KIE.ai, processing...:', {
+      if (isCompleted) {
+        console.log('[Video Status] Video ready, processing:', {
           taskId,
           userId,
+          provider,
         });
 
         const videoUrl =
-          kieStatus.data?.result?.videoUrl || kieStatus.data?.result?.resultUrls?.[0];
+          (arkStatus ? getArkVideoUrl(arkStatus) : undefined) ||
+          kieStatus?.data?.result?.videoUrl ||
+          kieStatus?.data?.result?.resultUrls?.[0];
 
         if (!videoUrl) {
-          throw new Error('Video URL not found in KIE.ai response');
+          throw new Error(`Video URL not found in ${provider} response`);
         }
 
-        // Download video from KIE.ai
         const videoResponse = await fetch(videoUrl);
         if (!videoResponse.ok) {
           throw new Error(`Failed to download video: ${videoResponse.status}`);
@@ -292,7 +319,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       });
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-      console.error('[Video Status] Error checking KIE.ai status:', {
+      console.error('[Video Status] Error checking provider status:', {
         taskId,
         userId,
         error: errorMessage,

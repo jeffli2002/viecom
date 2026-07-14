@@ -26,6 +26,9 @@ export const env = createEnv({
     KIE_API_KEY: z.string(),
     KIE_IMAGE_T2I_MODEL: z.string().optional(),
     KIE_IMAGE_I2I_MODEL: z.string().optional(),
+    // Volcengine Ark (Seedance 2.0 Fast video generation)
+    ARK_API_KEY: z.string().optional(),
+    ARK_SEEDANCE_FAST_MODEL: z.string().optional(),
     // DeepSeek API (for prompt enhancement and brand analysis)
     DEEPSEEK_API_KEY: z.string().optional(),
     // Firecrawl API (for website scraping)
@@ -93,6 +96,8 @@ export const env = createEnv({
     KIE_API_KEY: process.env.KIE_API_KEY,
     KIE_IMAGE_T2I_MODEL: process.env.KIE_IMAGE_T2I_MODEL,
     KIE_IMAGE_I2I_MODEL: process.env.KIE_IMAGE_I2I_MODEL,
+    ARK_API_KEY: process.env.ARK_API_KEY,
+    ARK_SEEDANCE_FAST_MODEL: process.env.ARK_SEEDANCE_FAST_MODEL,
     DEEPSEEK_API_KEY: process.env.DEEPSEEK_API_KEY,
     FIRECRAWL_API_KEY: process.env.FIRECRAWL_API_KEY,
     OPENROUTER_API_KEY: process.env.OPENROUTER_API_KEY,

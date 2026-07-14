@@ -245,7 +245,7 @@ function DashboardPageContent() {
   };
 
   const imageCredits = creditsConfig.consumption.imageGeneration['nano-banana'];
-  const videoCredits = creditsConfig.consumption.videoGeneration['sora-2-720p-15s'];
+  const videoCredits = creditsConfig.consumption.videoGeneration['seedance-2-fast-720p-15s'];
 
   if (authLoading || isLoading || subLoading) {
     return (

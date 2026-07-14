@@ -61,6 +61,7 @@ interface GenerationResult {
 
 type GenerationMode = 'text-to-video' | 'image-to-video';
 const GENERATION_REQUEST_COOLDOWN_MS = 4000;
+const VIDEO_MODEL = 'seedance-2-fast' as const;
 
 export default function VideoGenerator() {
   const t = useTranslations('videoGeneration');
@@ -76,8 +77,7 @@ export default function VideoGenerator() {
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [aspectRatio, setAspectRatio] = useState<string>('16:9');
-  const [model, setModel] = useState<'sora-2' | 'sora-2-pro'>('sora-2');
-  const [quality, setQuality] = useState<'standard' | 'high'>('standard'); // Quality for Sora 2 Pro (720P/1080P)
+  const [quality, setQuality] = useState<'standard' | 'high'>('high'); // 480p / 720p
   const [videoStyle, setVideoStyle] = useState<string>('spoken-script'); // Video style selection
   const [duration, setDuration] = useState<10 | 15>(10); // Video duration selection
   const [isGenerating, setIsGenerating] = useState(false);
@@ -123,17 +123,10 @@ export default function VideoGenerator() {
 
   const maxPromptLength = 2000;
 
-  // Calculate video credit cost dynamically based on model, duration, and quality
-  const getVideoCreditCost = () => {
-    if (model === 'sora-2') {
-      return creditsConfig.consumption.videoGeneration[`sora-2-720p-${duration}s`];
-    }
-
-    const resolution = quality === 'standard' ? '720p' : '1080p';
-    return creditsConfig.consumption.videoGeneration[`sora-2-pro-${resolution}-${duration}s`];
-  };
-
-  const videoCreditCost = getVideoCreditCost();
+  // Seedance Fast pricing: 480p uses the draft tier and 720p is the production tier.
+  const videoResolution = quality === 'standard' ? '480p' : '720p';
+  const videoCreditCost =
+    creditsConfig.consumption.videoGeneration[`seedance-2-fast-${videoResolution}-${duration}s`];
   const textDefaultPrompt = t('textDefaultPrompt');
   const imageDefaultPrompt = t('imageDefaultPrompt');
   const effectiveCredits =
@@ -378,11 +371,11 @@ export default function VideoGenerator() {
 
       const requestBody: Record<string, unknown> = {
         prompt: finalPrompt,
-        model: model,
+        model: VIDEO_MODEL,
         aspect_ratio: aspectRatio,
         style: videoStyle, // Pass style to API
         duration: duration, // Pass video duration (10 or 15 seconds)
-        quality: model === 'sora-2-pro' ? quality : 'standard', // Pass quality (standard=720P, high=1080P)
+        resolution: quality === 'standard' ? '480p' : '720p',
         output_format: 'mp4', // Video output format (MP4 only)
       };
 
@@ -448,7 +441,7 @@ export default function VideoGenerator() {
               setResult({
                 videoUrl: statusData.videoUrl,
                 prompt: prompt,
-                model: model,
+                model: VIDEO_MODEL,
               });
 
               console.log('[Video Generator] Video generation completed:', {
@@ -488,7 +481,7 @@ export default function VideoGenerator() {
       setResult({
         videoUrl: data.videoUrl,
         prompt: prompt,
-        model: data.model ?? model,
+        model: data.model ?? VIDEO_MODEL,
       });
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
@@ -496,7 +489,7 @@ export default function VideoGenerator() {
       setResult({
         videoUrl: '',
         prompt: prompt,
-        model: model,
+        model: VIDEO_MODEL,
         error: errorMessage,
       });
     } finally {
@@ -1025,31 +1018,17 @@ export default function VideoGenerator() {
                   </Select>
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                   <div className="space-y-2">
                     <Label className="font-light text-slate-700 dark:text-slate-300 text-sm">
                       {t('model')}
                     </Label>
-                    <Select
-                      value={model}
-                      onValueChange={(value) => {
-                        setModel(value as 'sora-2' | 'sora-2-pro');
-                        // Reset quality to standard when switching models
-                        if (value === 'sora-2') {
-                          setQuality('standard');
-                        }
-                      }}
-                    >
+                    <Select value={VIDEO_MODEL} disabled>
                       <SelectTrigger className="border-slate-200 dark:border-slate-700 font-light">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="sora-2">
-                          {t('modelSora2', { credits: '15-20' })}
-                        </SelectItem>
-                        <SelectItem value="sora-2-pro">
-                          {t('modelSora2Pro', { credits: '45-130' })}
-                        </SelectItem>
+                        <SelectItem value="seedance-2-fast">Seedance 2.0 Fast</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -1070,70 +1049,67 @@ export default function VideoGenerator() {
                   </div>
                 </div>
 
-                {/* Quality Selector - Only show for Sora 2 Pro */}
-                {model === 'sora-2-pro' && (
-                  <div className="space-y-2">
-                    <Label className="font-light text-slate-700 dark:text-slate-300 text-sm">
-                      {t('quality')}
-                    </Label>
-                    <div className="grid grid-cols-2 gap-3">
-                      <button
-                        type="button"
-                        onClick={() => setQuality('standard')}
-                        className={`flex items-center justify-center rounded-lg border-2 py-3 px-4 text-sm font-medium transition-all ${
-                          quality === 'standard'
-                            ? 'border-teal-500 bg-teal-50 dark:bg-teal-900/20 text-slate-700 dark:text-slate-300'
-                            : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 hover:border-teal-400 dark:border-teal-600'
-                        }`}
-                      >
-                        <span>{t('qualityStandard')}</span>
-                        {quality === 'standard' && (
-                          <svg
-                            className="ml-2 h-4 w-4"
-                            fill="currentColor"
-                            viewBox="0 0 20 20"
-                            role="img"
-                            aria-label="Selected quality"
-                          >
-                            <title>Selected quality</title>
-                            <path
-                              fillRule="evenodd"
-                              d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                              clipRule="evenodd"
-                            />
-                          </svg>
-                        )}
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setQuality('high')}
-                        className={`flex items-center justify-center rounded-lg border-2 py-3 px-4 text-sm font-medium transition-all ${
-                          quality === 'high'
-                            ? 'border-teal-500 bg-teal-50 dark:bg-teal-900/20 text-slate-700 dark:text-slate-300'
-                            : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 hover:border-teal-400 dark:border-teal-600'
-                        }`}
-                      >
-                        <span>{t('qualityHigh')}</span>
-                        {quality === 'high' && (
-                          <svg
-                            className="ml-2 h-4 w-4"
-                            fill="currentColor"
-                            viewBox="0 0 20 20"
-                            role="img"
-                            aria-label="Selected quality"
-                          >
-                            <title>Selected quality</title>
-                            <path
-                              fillRule="evenodd"
-                              d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                              clipRule="evenodd"
-                            />
-                          </svg>
-                        )}
-                      </button>
-                    </div>
+                <div className="space-y-2">
+                  <Label className="font-light text-slate-700 dark:text-slate-300 text-sm">
+                    {t('quality')}
+                  </Label>
+                  <div className="grid grid-cols-2 gap-3">
+                    <button
+                      type="button"
+                      onClick={() => setQuality('standard')}
+                      className={`flex items-center justify-center rounded-lg border-2 py-3 px-4 text-sm font-medium transition-all ${
+                        quality === 'standard'
+                          ? 'border-teal-500 bg-teal-50 dark:bg-teal-900/20 text-slate-700 dark:text-slate-300'
+                          : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 hover:border-teal-400 dark:border-teal-600'
+                      }`}
+                    >
+                      <span>480P</span>
+                      {quality === 'standard' && (
+                        <svg
+                          className="ml-2 h-4 w-4"
+                          fill="currentColor"
+                          viewBox="0 0 20 20"
+                          role="img"
+                          aria-label="Selected quality"
+                        >
+                          <title>Selected quality</title>
+                          <path
+                            fillRule="evenodd"
+                            d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                            clipRule="evenodd"
+                          />
+                        </svg>
+                      )}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setQuality('high')}
+                      className={`flex items-center justify-center rounded-lg border-2 py-3 px-4 text-sm font-medium transition-all ${
+                        quality === 'high'
+                          ? 'border-teal-500 bg-teal-50 dark:bg-teal-900/20 text-slate-700 dark:text-slate-300'
+                          : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 hover:border-teal-400 dark:border-teal-600'
+                      }`}
+                    >
+                      <span>720P</span>
+                      {quality === 'high' && (
+                        <svg
+                          className="ml-2 h-4 w-4"
+                          fill="currentColor"
+                          viewBox="0 0 20 20"
+                          role="img"
+                          aria-label="Selected quality"
+                        >
+                          <title>Selected quality</title>
+                          <path
+                            fillRule="evenodd"
+                            d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                            clipRule="evenodd"
+                          />
+                        </svg>
+                      )}
+                    </button>
                   </div>
-                )}
+                </div>
 
                 <div className="space-y-2">
                   <Label className="font-light text-slate-700 dark:text-slate-300 text-sm">

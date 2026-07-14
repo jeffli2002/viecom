@@ -70,7 +70,7 @@ export default function UpgradePrompt({
 
   // Get configured credit costs (use cheapest options as baseline)
   const imageCreditCost = creditsConfig.consumption.imageGeneration['nano-banana'];
-  const videoCreditCost = creditsConfig.consumption.videoGeneration['sora-2-720p-10s'];
+  const videoCreditCost = creditsConfig.consumption.videoGeneration['seedance-2-fast-720p-10s'];
 
   // Determine which plan to recommend
   const targetPlan: 'pro' | 'proplus' = userPlanId === 'pro' ? 'proplus' : 'pro';
@@ -118,7 +118,7 @@ export default function UpgradePrompt({
 
   const _contentType = getContentType();
 
-  // Calculate approximate images and videos based on Nano Banana (5 credits) and Sora 2 720P 10s (15 credits)
+  // Calculate approximate images and videos based on Nano Banana and Seedance 720P 10s.
   const approxImages = Math.floor(targetPlanCredits / imageCreditCost);
   const approxVideos = Math.floor(targetPlanCredits / videoCreditCost);
 

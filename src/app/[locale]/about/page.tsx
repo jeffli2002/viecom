@@ -148,8 +148,9 @@ export default function AboutPage() {
           <CardContent className="text-gray-700 dark:text-slate-300 space-y-4">
             <p>
               We leverage state-of-the-art AI models including Google's Nano Banana for image
-              generation and Sora 2 for video generation. Our platform is built on modern web
-              technologies to ensure fast, reliable, and scalable service.
+              generation and ByteDance Seedance 2.0 Fast through Volcengine Ark for video
+              generation. Our platform is built on modern web technologies to ensure fast, reliable,
+              and scalable service.
             </p>
             <p>
               Every image and video is optimized for e-commerce use cases, with attention to product

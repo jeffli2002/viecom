@@ -13,7 +13,7 @@ export function getPricingFAQSchema() {
   const proplusPrice = proplusPlan?.price || 34.9;
 
   const minCreditCost = creditsConfig.consumption.imageGeneration['nano-banana'];
-  const maxCreditCost = creditsConfig.consumption.videoGeneration['sora-2-pro-1080p-15s'];
+  const maxCreditCost = creditsConfig.consumption.videoGeneration['seedance-2-fast-720p-15s'];
 
   return {
     '@context': 'https://schema.org',
@@ -71,9 +71,9 @@ export function getImageToVideoFAQSchema() {
   const proPrice = proPlan?.price || 19.9;
   const proCredits = proPlan?.credits.monthly || 500;
 
-  const sora2Cost = creditsConfig.consumption.videoGeneration['sora-2-720p-10s'];
-  const sora2ProMinCost = creditsConfig.consumption.videoGeneration['sora-2-pro-720p-10s'];
-  const sora2ProMaxCost = creditsConfig.consumption.videoGeneration['sora-2-pro-1080p-15s'];
+  const seedance480Cost = creditsConfig.consumption.videoGeneration['seedance-2-fast-480p-10s'];
+  const seedance720Cost = creditsConfig.consumption.videoGeneration['seedance-2-fast-720p-10s'];
+  const seedance720MaxCost = creditsConfig.consumption.videoGeneration['seedance-2-fast-720p-15s'];
 
   return {
     '@context': 'https://schema.org',
@@ -84,7 +84,7 @@ export function getImageToVideoFAQSchema() {
         name: 'How long does it take to convert an image to video?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: '720p videos take 2-3 minutes. 1080p videos take 5-7 minutes. We use a priority queue system to process 720p videos first for faster results.',
+          text: 'Seedance 2.0 Fast videos usually complete in a few minutes. We prioritize shorter and 480p tasks for faster results.',
         },
       },
       {
@@ -100,7 +100,7 @@ export function getImageToVideoFAQSchema() {
         name: 'Is there a free trial?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: `Yes! Get ${signupCredits} free credits on signup (no credit card required). This allows you to generate 1 Sora 2 video (or up to ${Math.floor(signupCredits / creditsConfig.consumption.imageGeneration['nano-banana'])} images) to test our platform. Pro plan costs $${proPrice}/month with ${proCredits} credits.`,
+          text: `Yes! Get ${signupCredits} free credits on signup (no credit card required). Credits can be used for Seedance 2.0 Fast videos or up to ${Math.floor(signupCredits / creditsConfig.consumption.imageGeneration['nano-banana'])} images. Pro plan costs $${proPrice}/month with ${proCredits} credits.`,
         },
       },
       {
@@ -108,7 +108,7 @@ export function getImageToVideoFAQSchema() {
         name: 'How many credits does image-to-video cost?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: `Sora 2 (720p): ${sora2Cost}-${creditsConfig.consumption.videoGeneration['sora-2-720p-15s']} credits per video. Sora 2 Pro (1080p): ${sora2ProMinCost}-${sora2ProMaxCost} credits per video depending on duration.`,
+          text: `Seedance 2.0 Fast: 480p videos cost from ${seedance480Cost} credits, while 720p videos cost ${seedance720Cost}-${seedance720MaxCost} credits depending on duration.`,
         },
       },
       {
@@ -150,12 +150,12 @@ export function getPricingData() {
     credits: {
       imageCostMin: creditsConfig.consumption.imageGeneration['nano-banana'],
       imageCostMax: creditsConfig.consumption.imageGeneration['nano-banana-pro'],
-      videoCostMin: creditsConfig.consumption.videoGeneration['sora-2-720p-10s'],
-      videoCostMax: creditsConfig.consumption.videoGeneration['sora-2-pro-1080p-15s'],
-      sora2_720p_10s: creditsConfig.consumption.videoGeneration['sora-2-720p-10s'],
-      sora2_720p_15s: creditsConfig.consumption.videoGeneration['sora-2-720p-15s'],
-      sora2Pro_720p_10s: creditsConfig.consumption.videoGeneration['sora-2-pro-720p-10s'],
-      sora2Pro_1080p_15s: creditsConfig.consumption.videoGeneration['sora-2-pro-1080p-15s'],
+      videoCostMin: creditsConfig.consumption.videoGeneration['seedance-2-fast-480p-10s'],
+      videoCostMax: creditsConfig.consumption.videoGeneration['seedance-2-fast-720p-15s'],
+      seedanceFast_480p_10s: creditsConfig.consumption.videoGeneration['seedance-2-fast-480p-10s'],
+      seedanceFast_480p_15s: creditsConfig.consumption.videoGeneration['seedance-2-fast-480p-15s'],
+      seedanceFast_720p_10s: creditsConfig.consumption.videoGeneration['seedance-2-fast-720p-10s'],
+      seedanceFast_720p_15s: creditsConfig.consumption.videoGeneration['seedance-2-fast-720p-15s'],
     },
     rewards: {
       dailyCheckin: creditsConfig.rewards.checkin.dailyCredits,

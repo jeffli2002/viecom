@@ -33,8 +33,8 @@ export default function DocsPage() {
   const proPlan = paymentConfig.plans.find((p) => p.id === 'pro');
   const nanoBananaCost = creditsConfig.consumption.imageGeneration['nano-banana'];
   const nanoBananaProCost = creditsConfig.consumption.imageGeneration['nano-banana-pro'];
-  const videoCostMin = creditsConfig.consumption.videoGeneration['sora-2-720p-10s'];
-  const videoCostMax = creditsConfig.consumption.videoGeneration['sora-2-pro-1080p-15s'];
+  const videoCostMin = creditsConfig.consumption.videoGeneration['seedance-2-fast-480p-10s'];
+  const videoCostMax = creditsConfig.consumption.videoGeneration['seedance-2-fast-720p-15s'];
   const dailyCheckin = creditsConfig.rewards.checkin.dailyCredits;
   const referralReward = creditsConfig.rewards.referral.creditsPerReferral;
 
@@ -322,15 +322,12 @@ export default function DocsPage() {
                     studio lighting")
                   </li>
                   <li>Choose video style (Spoken Script, Cinematic, Product Demo, etc.)</li>
-                  <li>
-                    Select model: <strong>Sora 2</strong> (economical) or{' '}
-                    <strong>Sora 2 Pro</strong> (premium quality)
-                  </li>
+                  <li>Select the Seedance 2.0 Fast model</li>
                   <li>Choose aspect ratio: Landscape (16:9) or Portrait (9:16)</li>
                   <li>
                     Select duration: <strong>10 seconds</strong> or <strong>15 seconds</strong>
                   </li>
-                  <li>For Sora 2 Pro, choose quality: Standard (720P) or High (1080P)</li>
+                  <li>Choose resolution: 480P for drafts or 720P for production output</li>
                   <li>
                     Click <strong>Generate Video</strong>
                   </li>
@@ -338,11 +335,8 @@ export default function DocsPage() {
                 </ol>
                 <div className="mt-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg p-3 border border-blue-200 dark:border-blue-800">
                   <p className="text-xs text-blue-800 dark:text-blue-200">
-                    <strong>💰 Credit Costs:</strong> Sora 2:{' '}
-                    {creditsConfig.consumption.videoGeneration['sora-2-720p-10s']}-
-                    {creditsConfig.consumption.videoGeneration['sora-2-720p-15s']} credits | Sora 2
-                    Pro: {creditsConfig.consumption.videoGeneration['sora-2-pro-720p-10s']}-
-                    {creditsConfig.consumption.videoGeneration['sora-2-pro-1080p-15s']} credits
+                    <strong>💰 Credit Costs:</strong> Seedance 2.0 Fast: {videoCostMin}-
+                    {videoCostMax} credits depending on resolution and duration
                   </p>
                 </div>
               </div>
@@ -529,13 +523,13 @@ export default function DocsPage() {
                   <li>Download and fill the template with video prompts</li>
                   <li>For Image-to-Video mode, include product image URLs in the template</li>
                   <li>Upload your completed file</li>
-                  <li>Configure model (Sora 2/Sora 2 Pro), duration (10s/15s), and quality</li>
+                  <li>Configure Seedance resolution (480P/720P) and duration (10s/15s)</li>
                   <li>The system will intelligently process videos based on priority</li>
-                  <li>Faster videos (Sora 2, 720P, 10s) are processed first</li>
+                  <li>Shorter and 480P videos are processed first</li>
                   <li>Download completed videos individually or in bulk</li>
                 </ol>
                 <p className="text-xs text-gray-600 dark:text-slate-400 mt-2">
-                  ⚡ Pro tip: Use Sora 2 for drafts, Sora 2 Pro 1080P for final deliverables
+                  ⚡ Pro tip: Use 480P for drafts and 720P for final deliverables
                 </p>
               </div>
 
@@ -672,7 +666,7 @@ export default function DocsPage() {
                   </div>
                   <div className="flex-1 text-sm text-gray-700 dark:text-slate-300">
                     For creators: {proPlan?.credits.monthly} credits/month (${proPlan?.price}/mo),
-                    Sora 2 & Sora 2 Pro access, batch generation (3 concurrent), commercial license,
+                    Seedance 2.0 Fast access, batch generation (3 concurrent), commercial license,
                     30 days asset display
                   </div>
                 </div>
@@ -701,9 +695,9 @@ export default function DocsPage() {
                 How long does it take to generate content?
               </h3>
               <p className="text-sm text-gray-700 dark:text-slate-300">
-                <strong>Images:</strong> 20-60 seconds | <strong>Videos:</strong> 2-3 minutes (Sora
-                2, 720P) to 8-13 minutes (Sora 2 Pro, 1080P). Batch generation processes multiple
-                items concurrently based on your plan.
+                <strong>Images:</strong> 20-60 seconds | <strong>Videos:</strong> Seedance 2.0 Fast
+                usually completes in a few minutes. Batch generation processes multiple items
+                concurrently based on your plan.
               </p>
             </div>
 
@@ -760,23 +754,20 @@ export default function DocsPage() {
 
             <div>
               <h3 className="font-semibold text-gray-900 dark:text-white mb-2">
-                How to choose between Sora 2 and Sora 2 Pro?
+                Which Seedance resolution should I choose?
               </h3>
               <p className="text-sm text-gray-700 dark:text-slate-300">
-                <strong>Sora 2 (720P):</strong> Best for drafts, iterations, and budget-conscious
-                projects. Costs {creditsConfig.consumption.videoGeneration['sora-2-720p-10s']}-
-                {creditsConfig.consumption.videoGeneration['sora-2-720p-15s']} credits, generates in
-                2-3 minutes.
+                <strong>480P:</strong> Best for drafts, iterations, and budget-conscious projects.
+                Costs {creditsConfig.consumption.videoGeneration['seedance-2-fast-480p-10s']}-
+                {creditsConfig.consumption.videoGeneration['seedance-2-fast-480p-15s']} credits.
                 <br />
                 <br />
-                <strong>Sora 2 Pro (720P/1080P):</strong> Premium quality for final deliverables.
-                Better physics, motion, and detail. Costs{' '}
-                {creditsConfig.consumption.videoGeneration['sora-2-pro-720p-10s']}-
-                {creditsConfig.consumption.videoGeneration['sora-2-pro-1080p-15s']} credits,
-                generates in 5-13 minutes.
+                <strong>720P:</strong> Recommended for final marketing deliverables. Costs{' '}
+                {creditsConfig.consumption.videoGeneration['seedance-2-fast-720p-10s']}-
+                {creditsConfig.consumption.videoGeneration['seedance-2-fast-720p-15s']} credits.
                 <br />
-                <br />💡 <strong>Pro Tip:</strong> Use Sora 2 for testing and previews, then upgrade
-                to Sora 2 Pro 1080P for final marketing materials.
+                <br />💡 <strong>Pro Tip:</strong> Validate the concept in 480P, then generate the
+                final marketing asset in 720P.
               </p>
             </div>
           </div>
@@ -819,7 +810,11 @@ export default function DocsPage() {
                         viecom: 'Nano Banana Pro (Proprietary)',
                         alt: 'Generic Models',
                       },
-                      { feature: 'Video Generation', viecom: '✅ Native (Sora 2)', alt: '❌ No' },
+                      {
+                        feature: 'Video Generation',
+                        viecom: '✅ Native (Seedance 2.0 Fast)',
+                        alt: '❌ No',
+                      },
                       {
                         feature: 'Batch Processing',
                         viecom: '✅ Excel/CSV Upload',
@@ -920,7 +915,7 @@ export default function DocsPage() {
                 Key Differentiators:
               </h4>
               <ul className="space-y-1 text-xs text-teal-800 dark:text-teal-200">
-                <li>✓ Native video generation (Sora 2) - most alternatives don't offer this</li>
+                <li>✓ Native Seedance 2.0 Fast video generation</li>
                 <li>✓ Advanced batch processing with CSV upload for enterprise scale</li>
                 <li>✓ Nano Banana Pro model ensures 100% product detail preservation</li>
                 <li>✓ Platform-specific compliance (Amazon, TikTok, Shopify) built-in</li>

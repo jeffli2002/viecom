@@ -33,7 +33,7 @@ const SHOPIFY_FAQ = [
   {
     question: 'Do you support Shopify product video generation?',
     answer:
-      'Yes! In addition to images, you can generate product videos optimized for Shopify. Videos help increase conversion rates and showcase products better.',
+      'Yes. Use Seedance 2.0 Fast to create 10s or 15s product videos from text or a product image. Choose 480p or 720p and review the exported MP4 against the requirements of your Shopify theme or sales channel.',
   },
 ];
 
@@ -54,7 +54,7 @@ export default function ShopifySolutionPage() {
       'Shopify variant support',
       'Structured ZIP export',
       'Product image optimization',
-      'Video generation',
+      'Seedance 2.0 Fast video generation',
       'Batch processing',
     ],
     '0'
@@ -111,8 +111,8 @@ export default function ShopifySolutionPage() {
           </span>
         </h1>
         <p className="text-xl text-slate-600 dark:text-slate-400 max-w-3xl mx-auto">
-          Generate product images and videos for Shopify stores. Bulk CSV upload for variants,
-          automated optimization, and seamless integration.
+          Generate product images and Seedance 2.0 Fast videos for Shopify stores. Use CSV batch
+          workflows for variants, with 480p or 720p videos in 10s or 15s durations.
         </p>
       </div>
 
@@ -228,9 +228,9 @@ export default function ShopifySolutionPage() {
                 <Check className="w-4 h-4" />
               </div>
               <div>
-                <h4 className="font-bold text-sm mb-1">Auto-Optimization</h4>
+                <h4 className="font-bold text-sm mb-1">Seedance Product Video</h4>
                 <p className="text-xs text-slate-500">
-                  Images automatically optimized for web performance and Shopify requirements.
+                  Turn product images into 10s or 15s videos in 480p or 720p.
                 </p>
               </div>
             </div>
@@ -258,6 +258,12 @@ export default function ShopifySolutionPage() {
             className="inline-flex items-center gap-2 px-8 py-4 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-bold rounded-xl transition-colors hover:bg-slate-50 dark:hover:bg-slate-700"
           >
             View Pricing
+          </Link>
+          <Link
+            href="/batch-video-generation"
+            className="inline-flex items-center gap-2 px-8 py-4 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-bold rounded-xl transition-colors hover:bg-slate-50 dark:hover:bg-slate-700"
+          >
+            Batch Seedance Videos
           </Link>
         </div>
         <div className="mt-6 text-sm text-slate-600 dark:text-slate-400">
