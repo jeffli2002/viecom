@@ -13,27 +13,27 @@ const TIKTOK_FAQ = [
   {
     question: 'Can I convert a landscape image to a TikTok vertical video?',
     answer:
-      'Yes. Use our "Outpainting" feature to extend the background of your horizontal image to 9:16 vertical, then apply the "Motion" filter to add camera movement and particle effects, creating a video ready for TikTok.',
+      'Yes. Select the 9:16 aspect ratio and use Seedance 2.0 Fast image-to-video. For the best framing, upload a portrait-oriented source image or leave enough space around the product for vertical composition.',
   },
   {
-    question: 'What video formats does TikTok Shop require?',
+    question: 'What video format does Viecom generate for TikTok workflows?',
     answer:
-      'TikTok Shop requires 9:16 vertical videos (1080x1920) in MP4 format. Our system automatically generates videos in the correct format and aspect ratio.',
+      'Viecom generates MP4 videos in a 9:16 aspect ratio at the selected 480p or 720p Seedance tier. Platform requirements can change, so review the current TikTok Shop specifications before publishing.',
   },
   {
     question: 'How long can TikTok product videos be?',
     answer:
-      'TikTok Shop supports videos up to 60 seconds, but shorter videos (15-30 seconds) typically perform better. Our system can generate videos in 10s or 15s durations.',
+      'Viecom currently generates 10s or 15s Seedance videos. You can combine multiple generated clips in your editor when a longer product story is needed.',
   },
   {
     question: 'Can I add motion effects to static product images?',
     answer:
-      'Yes! Our "Still-to-Motion" engine adds physics-based movement, water splashes, smoke, or floating effects to static items, making them perfect for TikTok engagement.',
+      'Yes. Describe camera motion, product movement, lighting, atmosphere, and audio intent in the prompt. Seedance 2.0 Fast uses the uploaded image as the first frame for image-to-video generation.',
   },
   {
     question: 'Do you support batch video generation for TikTok?',
     answer:
-      'Yes! Upload a CSV file with multiple product SKUs and our system will generate TikTok-ready 9:16 videos for all of them automatically.',
+      'Yes. Upload a CSV file with multiple product SKUs and prompts, select 9:16 plus your Seedance resolution and duration, and process them through the batch video queue.',
   },
 ];
 
@@ -51,10 +51,10 @@ export default function TikTokSolutionPage() {
     'TikTok Video Generator',
     [
       '9:16 vertical video format',
-      'Image to video conversion',
-      'Motion effects',
-      'TikTok Shop optimization',
-      'Viral content generation',
+      'Seedance 2.0 Fast image-to-video',
+      '480p and 720p output',
+      '10s and 15s duration',
+      'Generated audio',
       'Batch processing',
     ],
     '0'
@@ -67,22 +67,22 @@ export default function TikTokSolutionPage() {
     [
       {
         name: 'Upload Your Product Image',
-        text: 'Upload your product photo. The system will automatically prepare it for TikTok video conversion.',
+        text: 'Upload a portrait-oriented product photo with enough space for a 9:16 composition.',
       },
       {
         name: 'Select TikTok Platform',
-        text: 'Choose "TikTok" from the platform dropdown. This activates 9:16 vertical format and motion effects.',
+        text: 'Choose 9:16, then select 480p or 720p and a 10s or 15s duration.',
       },
       {
-        name: 'Add Motion Effects',
-        text: 'Our AI automatically adds physics-based movement, particle effects, and engaging visuals to make your product stand out.',
+        name: 'Write the Motion Prompt',
+        text: 'Describe camera movement, product action, lighting, pacing, and the desired generated audio.',
       },
       {
         name: 'Download TikTok-Ready Video',
-        text: 'Download your 9:16 vertical video optimized for TikTok Shop. Ready to upload and go viral!',
+        text: 'Review and download the Seedance MP4, then confirm it meets the current requirements for your TikTok placement before publishing.',
       },
     ],
-    'Step-by-step guide to creating viral 9:16 vertical videos for TikTok Shop from static product images.'
+    'Step-by-step guide to creating 9:16 Seedance product videos for TikTok Shop from static product images.'
   );
 
   return (
@@ -111,8 +111,8 @@ export default function TikTokSolutionPage() {
           </span>
         </h1>
         <p className="text-xl text-slate-600 dark:text-slate-400 max-w-3xl mx-auto">
-          Create viral 9:16 vertical videos for TikTok Shop. Convert static product images to
-          engaging videos with motion effects.
+          Create 9:16 product videos with Seedance 2.0 Fast. Convert a product image or text prompt
+          into a 10s or 15s MP4 in 480p or 720p with generated audio.
         </p>
       </div>
 
@@ -185,10 +185,12 @@ export default function TikTokSolutionPage() {
           <div className="w-12 h-12 bg-pink-500/10 rounded-xl flex items-center justify-center mb-6 text-pink-500 mx-auto">
             <Smartphone className="w-6 h-6" />
           </div>
-          <h2 className="text-3xl md:text-4xl font-bold text-center mb-6">Viral Ready</h2>
+          <h2 className="text-3xl md:text-4xl font-bold text-center mb-6">
+            Built for Vertical Video
+          </h2>
           <p className="text-slate-600 dark:text-slate-400 text-center mb-12 max-w-2xl mx-auto">
-            Static images don't convert on TikTok. Our "Still-to-Motion" engine adds physics-based
-            movement to stop the scroll.
+            Seedance 2.0 Fast turns product images into vertical clips with prompt-controlled
+            motion, pacing, lighting, and generated audio.
           </p>
           <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
             <div className="flex items-center gap-3 p-4 bg-slate-50 dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-800">
@@ -196,9 +198,9 @@ export default function TikTokSolutionPage() {
                 <Zap className="w-4 h-4" />
               </div>
               <div>
-                <h4 className="font-bold text-sm mb-1">9:16 Outpainting</h4>
+                <h4 className="font-bold text-sm mb-1">9:16 Composition</h4>
                 <p className="text-xs text-slate-500">
-                  Extends horizontal photos to vertical video formats seamlessly.
+                  Generate portrait video from a suitably framed source image or text prompt.
                 </p>
               </div>
             </div>
@@ -207,9 +209,9 @@ export default function TikTokSolutionPage() {
                 <Zap className="w-4 h-4" />
               </div>
               <div>
-                <h4 className="font-bold text-sm mb-1">Physics Simulation</h4>
+                <h4 className="font-bold text-sm mb-1">Prompted Motion</h4>
                 <p className="text-xs text-slate-500">
-                  Adds water splashes, smoke, or floating effects to static items.
+                  Describe camera movement, product action, atmosphere, and pacing.
                 </p>
               </div>
             </div>
@@ -218,9 +220,9 @@ export default function TikTokSolutionPage() {
                 <Check className="w-4 h-4" />
               </div>
               <div>
-                <h4 className="font-bold text-sm mb-1">Auto-Optimization</h4>
+                <h4 className="font-bold text-sm mb-1">480p or 720p</h4>
                 <p className="text-xs text-slate-500">
-                  Automatically optimizes for TikTok Shop requirements and best practices.
+                  Choose the resolution tier that fits drafting or final publishing workflows.
                 </p>
               </div>
             </div>
@@ -247,7 +249,7 @@ export default function TikTokSolutionPage() {
 
       <section className="py-20 bg-white dark:bg-slate-950 text-center">
         <h2 className="text-3xl md:text-4xl font-bold mb-8">
-          Ready to Create Viral TikTok Videos?
+          Ready to Create Seedance Videos for TikTok?
         </h2>
         <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
           <Link

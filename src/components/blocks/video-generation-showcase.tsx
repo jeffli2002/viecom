@@ -48,11 +48,11 @@ const DEFAULT_DEMOS: VideoDemo[] = [
 
 export function VideoGenerationShowcase() {
   const t = useTranslations('videoGenerationShowcase');
-  const [veoDemos, setVeoDemos] = useState<VideoDemo[]>(DEFAULT_DEMOS);
+  const [videoDemos, setVideoDemos] = useState<VideoDemo[]>(DEFAULT_DEMOS);
   const [isLoadingVideos, setIsLoadingVideos] = useState(true);
   const [activeCategory, setActiveCategory] = useState('Apparel');
   const [activeDemo, setActiveDemo] = useState<VideoDemo>(DEFAULT_DEMOS[0]);
-  const categories = Array.from(new Set(veoDemos.map((d) => d.category)));
+  const categories = Array.from(new Set(videoDemos.map((d) => d.category)));
   const videoRef = useRef<HTMLVideoElement>(null);
   const thumbnailCanvasRef = useRef<HTMLCanvasElement>(null);
   const videoContainerRef = useRef<HTMLDivElement>(null);
@@ -85,7 +85,7 @@ export function VideoGenerationShowcase() {
         const data = await response.json();
 
         if (data.success && data.videos && data.videos.length > 0) {
-          setVeoDemos(data.videos);
+          setVideoDemos(data.videos);
           // 设置第一个视频为活动演示项
           setActiveDemo(data.videos[0]);
           // 设置第一个分类为活动分类
@@ -93,12 +93,12 @@ export function VideoGenerationShowcase() {
           setActiveCategory(firstCategory);
         } else {
           console.warn('No videos found, using default demos');
-          setVeoDemos(DEFAULT_DEMOS);
+          setVideoDemos(DEFAULT_DEMOS);
         }
       } catch (error) {
         console.error('Failed to load videos:', error);
         // 使用默认演示项作为后备
-        setVeoDemos(DEFAULT_DEMOS);
+        setVideoDemos(DEFAULT_DEMOS);
       } finally {
         setIsLoadingVideos(false);
       }
@@ -109,11 +109,11 @@ export function VideoGenerationShowcase() {
 
   // 当视频列表更新时，更新活动演示项
   useEffect(() => {
-    if (veoDemos.length > 0 && !veoDemos.find((d) => d.id === activeDemo.id)) {
-      setActiveDemo(veoDemos[0]);
-      setActiveCategory(veoDemos[0]?.category || 'Apparel');
+    if (videoDemos.length > 0 && !videoDemos.find((d) => d.id === activeDemo.id)) {
+      setActiveDemo(videoDemos[0]);
+      setActiveCategory(videoDemos[0]?.category || 'Apparel');
     }
-  }, [activeDemo.id, veoDemos]);
+  }, [activeDemo.id, videoDemos]);
 
   // 截取视频第一帧作为缩略图
   const captureVideoThumbnail = useCallback(
@@ -221,10 +221,10 @@ export function VideoGenerationShowcase() {
 
   // 为所有视频截取缩略图（包括队列中的视频）
   useEffect(() => {
-    if (isLoadingVideos || veoDemos.length === 0) return;
+    if (isLoadingVideos || videoDemos.length === 0) return;
 
     // 为队列中的所有视频截取缩略图
-    veoDemos.forEach((demo) => {
+    videoDemos.forEach((demo) => {
       // 如果已经有缩略图或正在处理，跳过
       if (videoThumbnails[demo.id] || processingThumbnailsRef.current.has(demo.id)) {
         return;
@@ -440,7 +440,7 @@ export function VideoGenerationShowcase() {
         }
       }, 5000);
     });
-  }, [isLoadingVideos, veoDemos, videoThumbnails]); // 包含 videoThumbnails 以满足依赖检查
+  }, [isLoadingVideos, videoDemos, videoThumbnails]); // 包含 videoThumbnails 以满足依赖检查
 
   // 当当前视频加载完成时，为其截取缩略图
   useEffect(() => {
@@ -469,7 +469,7 @@ export function VideoGenerationShowcase() {
 
   const handleCategoryChange = (cat: string) => {
     setActiveCategory(cat);
-    const firstInCat = veoDemos.find((d) => d.category === cat);
+    const firstInCat = videoDemos.find((d) => d.category === cat);
     if (firstInCat) handleDemoChange(firstInCat);
   };
 
@@ -497,12 +497,12 @@ export function VideoGenerationShowcase() {
 
   // 获取当前视频在队列中的下一个视频
   const getNextVideo = () => {
-    const currentIndex = veoDemos.findIndex((d) => d.id === activeDemo.id);
+    const currentIndex = videoDemos.findIndex((d) => d.id === activeDemo.id);
     if (currentIndex === -1) return null;
 
     // 如果当前是最后一个，循环到第一个
-    const nextIndex = (currentIndex + 1) % veoDemos.length;
-    return veoDemos[nextIndex];
+    const nextIndex = (currentIndex + 1) % videoDemos.length;
+    return videoDemos[nextIndex];
   };
 
   // 处理视频播放结束
@@ -687,8 +687,7 @@ export function VideoGenerationShowcase() {
                   </div>
                   <div className="h-4 w-px bg-slate-800" />
                   <span className="text-xs font-mono text-slate-300 flex items-center gap-2">
-                    <Ratio className="w-3 h-3" />{' '}
-                    {activeDemo.ratio === '9:16' ? '1080x1920' : '1920x1080'}
+                    <Ratio className="w-3 h-3" /> 720p · {activeDemo.ratio}
                   </span>
                 </div>
                 <div className="text-xs font-mono text-slate-300 tabular-nums">
@@ -932,7 +931,7 @@ export function VideoGenerationShowcase() {
                   <Film className="w-3.5 h-3.5" /> {t('queue')}
                 </h3>
                 <span className="text-[10px] text-slate-300">
-                  {veoDemos.length} {t('items')}
+                  {videoDemos.length} {t('items')}
                 </span>
               </div>
 
@@ -942,7 +941,7 @@ export function VideoGenerationShowcase() {
                     <Loader2 className="w-6 h-6 animate-spin text-slate-300" />
                   </div>
                 ) : (
-                  veoDemos.map((demo) => (
+                  videoDemos.map((demo) => (
                     <button
                       type="button"
                       key={demo.id}

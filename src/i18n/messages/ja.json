@@ -93,12 +93,12 @@
     "generationTools": "ツール",
     "imageGeneration": "AI画像生成",
     "imageGenerationDesc": "テキストから画像、画像から画像",
-    "videoGeneration": "AI動画生成",
-    "videoGenerationDesc": "テキストから動画、画像から動画",
+    "videoGeneration": "Seedance AI動画",
+    "videoGenerationDesc": "Seedance 2.0 Fastでテキスト・画像から動画生成",
     "batchImageGeneration": "一括画像生成",
     "batchImageGenerationDesc": "複数の画像を一括生成",
-    "batchVideoGeneration": "一括動画生成",
-    "batchVideoGenerationDesc": "複数の動画を一括生成",
+    "batchVideoGeneration": "Seedance一括動画",
+    "batchVideoGenerationDesc": "480p・720pのSeedance動画を一括生成",
     "batchGeneration": "一括生成",
     "assets": "アセット",
     "dashboard": "ダッシュボード",
@@ -119,35 +119,35 @@
     "footerPrivacy": "プライバシーポリシー",
     "footerTerms": "利用規約",
     "footerRefund": "返金ポリシー",
-    "independenceDisclaimer": "独立性に関する免責事項: Viecomは、コンテンツ生成サービスを提供するために、サードパーティのAIモデル(Google Gemini、OpenAIのモデル、その他のAIサービスプロバイダーなど)を使用しています。これらのAIモデルは各所有者によって提供され、それぞれの利用規約の対象となります。Viecomは独立したサービスプロバイダーであり、当社のプラットフォーム、機能、サービスは独自の製品です。当社はこれらのAIモデルプロバイダーと提携、推奨、スポンサー関係にはありません。",
+    "independenceDisclaimer": "独立性に関する免責事項：Viecomは、画像ワークフローにGoogle Gemini、プロンプト処理にDeepSeek、動画生成にVolcengine Ark経由のByteDance Seedance 2.0 Fastなど、第三者のAIサービスを使用します。各サービスには所有者の規約が適用されます。Viecomは独立しており、これらの提供者との提携、推奨、スポンサー関係はありません。",
     "brandAnalysis": "ブランド分析",
     "brandAnalysisDesc": "AIによるブランドトーンとスタイル分析",
     "learn": "学ぶ",
     "pricing": "料金プラン",
     "settings": "設定",
-    "imageToVideoAI": "画像から動画AI",
-    "imageToVideoAIDesc": "商品写真を魅力的な動画に変換",
-    "freeAIVideoGenerator": "無料AIビデオジェネレーター",
-    "freeAIVideoGeneratorDesc": "30クレジット無料で開始、クレジットカード不要",
+    "imageToVideoAI": "Seedance画像から動画",
+    "imageToVideoAIDesc": "Seedanceで480p・720pの商品動画を作成",
+    "freeAIVideoGenerator": "Seedance動画ガイド",
+    "freeAIVideoGeneratorDesc": "設定、クレジット、無料報酬を解説",
     "videoEnhancer": "ビデオエンハンサー",
     "videoEnhancerDesc": "AIで動画を4K品質にアップスケール",
     "enhancingProductPhotos": "商品写真の強化",
     "enhancingProductPhotosDesc": "プロフェッショナルな画像編集サービスでEコマースの成功を促進",
     "footerLearn": "学ぶ",
     "documentation": "ドキュメント",
-    "documentationDesc": "完全なガイドとチュートリアル",
+    "documentationDesc": "Seedanceの設定、料金、ワークフローガイド",
     "nanoBananaPro": "Nano Banana Pro",
     "nanoBananaProDesc": "商品写真用AIモデル",
     "solutions": "ソリューション",
     "amazonSolutions": "Amazonソリューション",
-    "amazonSolutionsDesc": "Amazon準拠の商品画像",
+    "amazonSolutionsDesc": "Amazon画像とSeedance商品動画",
     "tiktokSolutions": "TikTokソリューション",
-    "tiktokSolutionsDesc": "TikTok Shop動画生成",
+    "tiktokSolutionsDesc": "TikTok Shop向け9:16 Seedance動画",
     "shopifySolutions": "Shopifyソリューション",
-    "shopifySolutionsDesc": "Shopify一括画像生成"
+    "shopifySolutionsDesc": "Shopify一括画像とSeedance動画"
   },
   "hero": {
-    "badge": "新機能: Nano Banana Pro 画像生成エンジン",
+    "badge": "新機能：Seedance 2.0 Fast動画生成",
     "titleLine1": "モダンEコマースのためのAIビジュアルエンジン",
     "titleLine2": "",
     "titleHighlight": "AIビジュアルエンジン",
@@ -161,12 +161,12 @@
     "descriptionSub": "ビジュアルを即座に一括生成し、Eコマースのクリエイティビティを拡大します。",
     "ctaLogin": "ログイン",
     "noCreditCard": "クレジットカード不要",
-    "freeCredits": "40クレジット無料",
+    "freeCredits": "15クレジット無料",
     "cancelAnytime": "いつでもキャンセル可能",
     "featureImage": "画像生成",
     "featureImageDesc": "ブランドトーン分析によるテキストから画像、画像から画像の生成",
     "featureVideo": "動画生成",
-    "featureVideoDesc": "複数の動画スタイルでテキストから動画、画像から動画の生成",
+    "featureVideoDesc": "Seedance 2.0 Fastでテキスト・画像から480p/720p動画を生成",
     "featureBatch": "一括処理",
     "featureBatchDesc": "Excel/CSVの一括アップロード、ワンクリックでEコマースプラットフォームへ生成・公開"
   },
@@ -439,14 +439,13 @@
     },
     "textDefaultPrompt": "モダンなスマートフォンが滑らかに回転し、洗練されたデザインとプレミアムな機能を強調するプロフェッショナルな商品動画、スタジオ照明、クリーンな背景",
     "imageDefaultPrompt": "この商品画像から動的な動画を作成、スムーズなトランジション、プロフェッショナルなプレゼンテーション",
-    "modelSora2": "Sora 2 - {credits} クレジット",
-    "modelSora2Pro": "Sora 2 Pro - {credits} クレジット",
+    "modelSeedanceFast": "Seedance 2.0 Fast - {credits} クレジット",
     "aspectRatioLandscape": "横長 (16:9)",
     "aspectRatioPortrait": "縦長 (9:16)",
     "duration10": "10秒",
     "duration15": "15秒",
-    "qualityStandard": "標準 (720P)",
-    "qualityHigh": "高画質 (1080P)"
+    "qualityStandard": "標準 (480P)",
+    "qualityHigh": "高画質 (720P)"
   },
   "batchGeneration": {
     "title": "一括生成",
@@ -736,15 +735,15 @@
     "subtitle": "Viecom AIについて知っておくべきすべてのこと",
     "q1": {
       "question": "クレジットシステムの仕組みは?",
-      "answer": "クレジットはAI生成に使用されます。画像生成はモデルによって5〜30クレジット(例: Nano Banana 5クレジット、Nano Banana Pro 30クレジット)かかります。動画はモデルと解像度によって15〜130クレジットかかります。無料ユーザーは登録時に30クレジットを獲得します。Proプランには月500〜900クレジットが含まれます。また、200クレジット9.90ドルから始まるクレジットパックを購入することもできます。"
+      "answer": "クレジットはAI生成に使用されます。画像は5〜30クレジット、Seedance 2.0 Fast動画は解像度と時間に応じて50〜150クレジットです。"
     },
     "q2": {
       "question": "無料プランには何が含まれますか?",
-      "answer": "無料ユーザーは登録時に30クレジット、毎日のチェックイン報酬(1日2クレジット)、紹介報酬(10クレジット)、ソーシャル共有報酬(2クレジット)を獲得できます。これらのクレジットを使用して画像や動画を生成でき、一括生成のサポート(1件の同時実行)と7日間のアセット表示が可能です。"
+      "answer": "無料ユーザーは登録時に15クレジット、毎日のチェックインで2クレジット、紹介で10クレジット、共有で2クレジットを獲得できます。画像・動画生成、同時実行1件の一括生成、7日間のアセット表示に利用できます。"
     },
     "q3": {
       "question": "利用可能な動画モデルと解像度は?",
-      "answer": "Sora 2(720pのみ、15〜20クレジット)とSora 2 Pro(720p/1080p、45〜130クレジット)を提供しており、10秒または15秒の動画に対応しています。Sora 2 Proは、より高品質で生成時間も短縮されています。すべてのプランでクレジットを使用して両方のモデルにアクセスできます。"
+      "answer": "ViecomはVolcengine Ark経由でByteDance Seedance 2.0 Fastを使用し、テキスト・画像から動画を生成します。10秒または15秒、480pは50〜75クレジット、720pは100〜150クレジットで、生成音声も有効です。"
     },
     "q4": {
       "question": "生成されたコンテンツを商業的に使用できますか?",
@@ -752,7 +751,7 @@
     },
     "q5": {
       "question": "一括生成の仕組みは?",
-      "answer": "複数の画像やプロンプトをアップロードして、コンテンツを一括生成できます。無料ユーザーは1件の同時タスクを処理でき、Proユーザーは3件の同時タスク、Pro+ユーザーは10件の同時タスクを取得できます。当社のスマートキューは、混在バッチでのより迅速なフィードバックのために720pタスクを優先します。"
+      "answer": "画像やプロンプトをアップロードして一括生成できます。無料は同時1件、Proは3件、Pro+は10件です。短時間・480pのタスクを優先し、より早く結果を返します。"
     },
     "q6": {
       "question": "ブランド分析とは何ですか、どのように役立ちますか?",
@@ -981,9 +980,9 @@
     "feature2Desc": "商品カタログ全体のスプレッドシートをアップロードし、AIに任せます。"
   },
   "videoGenerationShowcase": {
-    "title": "静止画から",
-    "titleHighlight": "シネマティックへ",
-    "description": "単一の商品画像から高忠実度の動画アセットを生成します。シンプルなテキストプロンプトでカメラモーション、照明、物理演算を制御します。",
+    "title": "商品画像から",
+    "titleHighlight": "Seedance動画へ",
+    "description": "画像またはプロンプトから10秒・15秒のSeedance 2.0 Fast動画を生成。480p/720p、横・縦、生成音声に対応します。",
     "source": "ソース",
     "ready": "準備完了",
     "prompt": "プロンプト",
@@ -1002,14 +1001,14 @@
     "disableAutoLoop": "自動ループを無効化",
     "enableAutoLoop": "自動ループを有効化",
     "autoLoop": "自動ループ",
-    "stageInitializing": "Veoへの接続を初期化中...",
-    "stageAnalyzing": "プロンプトとジオメトリを分析中...",
-    "stageGenerating": "キーフレームを生成中...",
-    "stageInterpolating": "モーションを補間中...",
-    "stageFinalizing": "4K出力を仕上げ中...",
-    "engineInitialized": "Veo_Engine_v3.1が初期化されました",
-    "geometryInference": "ジオメトリ推論: OK",
-    "physicsSimulation": "物理シミュレーション: アクティブ"
+    "stageInitializing": "Seedance 2.0 Fastへタスクを送信中...",
+    "stageAnalyzing": "プロンプトと元画像を分析中...",
+    "stageGenerating": "動画と音声を生成中...",
+    "stageInterpolating": "モーションとトランジションをレンダリング中...",
+    "stageFinalizing": "480pまたは720p出力を仕上げ中...",
+    "engineInitialized": "Seedance_2.0_Fastタスクを初期化しました",
+    "geometryInference": "元画像分析：OK",
+    "physicsSimulation": "音声生成：有効"
   },
   "showcaseGallery": {
     "title": "コミュニティ",

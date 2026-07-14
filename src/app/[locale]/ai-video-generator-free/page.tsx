@@ -22,140 +22,140 @@ export async function generateMetadata({
   const translations: Record<string, Metadata> = {
     en: {
       ...baseMetadata,
-      title: `Free AI Video Generator | ${signupBonus} Credits, No Credit Card Required`,
-      description: `Create AI videos for free. Get ${signupBonus} credits on signup, earn ${dailyCheckinCredits} credits daily, no credit card required. Sora 2 models, text-to-video, image-to-video. Start now!`,
+      title: 'Seedance 2.0 Fast Credit Guide | Earn Free Credits',
+      description: `Get ${signupBonus} credits on signup and earn ${dailyCheckinCredits} daily toward Seedance 2.0 Fast videos, which start at 50 credits.`,
       keywords: [
         'free ai video generator',
         'ai video generator free online',
         'free video ai',
         'no credit card ai video',
         'free ai video maker',
-        'free sora 2',
+        'free seedance 2.0 fast',
       ],
       openGraph: {
-        title: `Free AI Video Generator | ${signupBonus} Credits, No Credit Card`,
-        description: `Create AI videos for free. Get ${signupBonus} credits on signup, earn ${dailyCheckinCredits} credits daily, no credit card required.`,
+        title: 'Seedance 2.0 Fast Credit Guide',
+        description: `Start with ${signupBonus} credits and earn more toward Seedance videos starting at 50 credits.`,
         type: 'website',
       },
       twitter: {
         card: 'summary_large_image',
-        title: `Free AI Video Generator | ${signupBonus} Credits, No Credit Card`,
-        description: `Create AI videos for free. Get ${signupBonus} credits on signup, earn ${dailyCheckinCredits} credits daily, no credit card required.`,
+        title: 'Seedance 2.0 Fast Credit Guide',
+        description: `Start with ${signupBonus} credits and earn more toward Seedance videos starting at 50 credits.`,
       },
     },
     zh: {
       ...baseMetadata,
       title: `免费AI视频生成器 | 送${signupBonus}积分，无需信用卡`,
-      description: `免费创建AI视频。注册送${signupBonus}积分，每日签到送${dailyCheckinCredits}积分，无需信用卡。Sora 2模型，文字转视频，图片转视频。立即开始！`,
+      description: `注册送${signupBonus}积分，每日签到送${dailyCheckinCredits}积分，用于最低50积分起的 Seedance 2.0 Fast 视频。`,
       keywords: [
         '免费AI视频生成器',
         'AI视频生成器免费在线',
         '免费视频AI',
         '无需信用卡AI视频',
         '免费AI视频制作',
-        '免费Sora 2',
+        '免费 Seedance 2.0',
       ],
       openGraph: {
         title: `免费AI视频生成器 | 送${signupBonus}积分，无需信用卡`,
-        description: `免费创建AI视频。注册送${signupBonus}积分，每日签到送${dailyCheckinCredits}积分，无需信用卡。`,
+        description: `注册送${signupBonus}积分并继续赚取积分，Seedance 视频最低50积分起。`,
         type: 'website',
       },
       twitter: {
         card: 'summary_large_image',
         title: `免费AI视频生成器 | 送${signupBonus}积分，无需信用卡`,
-        description: `免费创建AI视频。注册送${signupBonus}积分，每日签到送${dailyCheckinCredits}积分，无需信用卡。`,
+        description: `注册送${signupBonus}积分并继续赚取积分，Seedance 视频最低50积分起。`,
       },
     },
     es: {
       ...baseMetadata,
       title: `Generador de Video IA Gratis | ${signupBonus} Créditos, Sin Tarjeta de Crédito`,
-      description: `Crea videos IA gratis. Obtén ${signupBonus} créditos al registrarte, gana ${dailyCheckinCredits} créditos diarios, sin tarjeta de crédito. Modelos Sora 2, texto a video, imagen a video. ¡Comienza ahora!`,
+      description: `Obtén ${signupBonus} créditos al registrarte y ${dailyCheckinCredits} diarios para videos Seedance 2.0 Fast, desde 50 créditos.`,
       keywords: [
         'generador video ia gratis',
         'generador video ia gratis online',
         'video ia gratis',
         'video ia sin tarjeta',
         'creador video ia gratis',
-        'sora 2 gratis',
+        'seedance 2.0 fast gratis',
       ],
       openGraph: {
         title: `Generador de Video IA Gratis | ${signupBonus} Créditos, Sin Tarjeta`,
-        description: `Crea videos IA gratis. Obtén ${signupBonus} créditos al registrarte, gana ${dailyCheckinCredits} créditos diarios, sin tarjeta de crédito.`,
+        description: `Empieza con ${signupBonus} créditos y gana más para videos Seedance desde 50 créditos.`,
         type: 'website',
       },
       twitter: {
         card: 'summary_large_image',
         title: `Generador de Video IA Gratis | ${signupBonus} Créditos, Sin Tarjeta`,
-        description: `Crea videos IA gratis. Obtén ${signupBonus} créditos al registrarte, gana ${dailyCheckinCredits} créditos diarios, sin tarjeta de crédito.`,
+        description: `Empieza con ${signupBonus} créditos y gana más para videos Seedance desde 50 créditos.`,
       },
     },
     fr: {
       ...baseMetadata,
       title: `Générateur de Vidéo IA Gratuit | ${signupBonus} Crédits, Sans Carte de Crédit`,
-      description: `Créez des vidéos IA gratuitement. Obtenez ${signupBonus} crédits à l'inscription, gagnez ${dailyCheckinCredits} crédits par jour, sans carte de crédit. Modèles Sora 2, texte en vidéo, image en vidéo. Commencez maintenant !`,
+      description: `Recevez ${signupBonus} crédits à l'inscription et ${dailyCheckinCredits} par jour pour les vidéos Seedance 2.0 Fast, à partir de 50 crédits.`,
       keywords: [
         'générateur vidéo ia gratuit',
         'générateur vidéo ia gratuit en ligne',
         'vidéo ia gratuite',
         'vidéo ia sans carte',
         'créateur vidéo ia gratuit',
-        'sora 2 gratuit',
+        'seedance 2.0 fast gratuit',
       ],
       openGraph: {
         title: `Générateur de Vidéo IA Gratuit | ${signupBonus} Crédits, Sans Carte`,
-        description: `Créez des vidéos IA gratuitement. Obtenez ${signupBonus} crédits à l'inscription, gagnez ${dailyCheckinCredits} crédits par jour, sans carte de crédit.`,
+        description: `Commencez avec ${signupBonus} crédits et gagnez-en plus pour les vidéos Seedance dès 50 crédits.`,
         type: 'website',
       },
       twitter: {
         card: 'summary_large_image',
         title: `Générateur de Vidéo IA Gratuit | ${signupBonus} Crédits, Sans Carte`,
-        description: `Créez des vidéos IA gratuitement. Obtenez ${signupBonus} crédits à l'inscription, gagnez ${dailyCheckinCredits} crédits par jour, sans carte de crédit.`,
+        description: `Commencez avec ${signupBonus} crédits et gagnez-en plus pour les vidéos Seedance dès 50 crédits.`,
       },
     },
     de: {
       ...baseMetadata,
       title: `Kostenloser KI-Videogenerator | ${signupBonus} Credits, Keine Kreditkarte`,
-      description: `Erstellen Sie kostenlos KI-Videos. Erhalten Sie ${signupBonus} Credits bei der Anmeldung, verdienen Sie täglich ${dailyCheckinCredits} Credits, keine Kreditkarte erforderlich. Sora 2 Modelle, Text zu Video, Bild zu Video. Jetzt starten!`,
+      description: `Erhalten Sie ${signupBonus} Credits bei der Anmeldung und täglich ${dailyCheckinCredits} für Seedance 2.0 Fast Videos ab 50 Credits.`,
       keywords: [
         'kostenloser ki videogenerator',
         'ki videogenerator kostenlos online',
         'kostenloses video ki',
         'video ki ohne kreditkarte',
         'kostenloser ki video ersteller',
-        'kostenloses sora 2',
+        'kostenloses seedance 2.0 fast',
       ],
       openGraph: {
         title: `Kostenloser KI-Videogenerator | ${signupBonus} Credits, Keine Kreditkarte`,
-        description: `Erstellen Sie kostenlos KI-Videos. Erhalten Sie ${signupBonus} Credits bei der Anmeldung, verdienen Sie täglich ${dailyCheckinCredits} Credits, keine Kreditkarte erforderlich.`,
+        description: `Starten Sie mit ${signupBonus} Credits und sammeln Sie mehr für Seedance Videos ab 50 Credits.`,
         type: 'website',
       },
       twitter: {
         card: 'summary_large_image',
         title: `Kostenloser KI-Videogenerator | ${signupBonus} Credits, Keine Kreditkarte`,
-        description: `Erstellen Sie kostenlos KI-Videos. Erhalten Sie ${signupBonus} Credits bei der Anmeldung, verdienen Sie täglich ${dailyCheckinCredits} Credits, keine Kreditkarte erforderlich.`,
+        description: `Starten Sie mit ${signupBonus} Credits und sammeln Sie mehr für Seedance Videos ab 50 Credits.`,
       },
     },
     ja: {
       ...baseMetadata,
       title: `無料AI動画生成器 | ${signupBonus}クレジット、クレジットカード不要`,
-      description: `無料でAI動画を作成。登録時に${signupBonus}クレジット、毎日${dailyCheckinCredits}クレジット獲得、クレジットカード不要。Sora 2モデル、テキストから動画、画像から動画。今すぐ始める！`,
+      description: `登録時に${signupBonus}クレジット、毎日${dailyCheckinCredits}クレジットを獲得。Seedance 2.0 Fast動画は50クレジットから。`,
       keywords: [
         '無料ai動画生成器',
         'ai動画生成器無料オンライン',
         '無料動画ai',
         'クレジットカード不要動画ai',
         '無料ai動画メーカー',
-        '無料sora 2',
+        '無料seedance 2.0 fast',
       ],
       openGraph: {
         title: `無料AI動画生成器 | ${signupBonus}クレジット、クレジットカード不要`,
-        description: `無料でAI動画を作成。登録時に${signupBonus}クレジット、毎日${dailyCheckinCredits}クレジット獲得、クレジットカード不要。`,
+        description: `${signupBonus}クレジットから始め、50クレジット以上のSeedance動画に向けて追加獲得。`,
         type: 'website',
       },
       twitter: {
         card: 'summary_large_image',
         title: `無料AI動画生成器 | ${signupBonus}クレジット、クレジットカード不要`,
-        description: `無料でAI動画を作成。登録時に${signupBonus}クレジット、毎日${dailyCheckinCredits}クレジット獲得、クレジットカード不要。`,
+        description: `${signupBonus}クレジットから始め、50クレジット以上のSeedance動画に向けて追加獲得。`,
       },
     },
   };
@@ -168,11 +168,11 @@ const freeFeatures = [
   'No hidden fees or charges',
   'No time limits',
   'No watermarks on all images/videos',
-  'Full access to Sora 2 models',
+  'Access to Seedance 2.0 Fast',
   'Text-to-video generation',
   'Image-to-video generation',
   'Download videos in MP4 format',
-  'Commercial use allowed',
+  'Commercial use on Pro and Pro+',
   'Upgrade anytime',
 ];
 
@@ -217,8 +217,8 @@ export default function FreeAIVideoGeneratorPage() {
   const proPlusPlan = paymentConfig.plans.find((p) => p.id === 'proplus');
 
   // Get video generation costs from config
-  const sora2MinCost = creditsConfig.consumption.videoGeneration['sora-2-720p-10s'];
-  const sora2MaxCost = creditsConfig.consumption.videoGeneration['sora-2-720p-15s'];
+  const seedanceMinCost = creditsConfig.consumption.videoGeneration['seedance-2-fast-480p-10s'];
+  const seedanceMaxCost = creditsConfig.consumption.videoGeneration['seedance-2-fast-720p-15s'];
 
   // Build comparison table dynamically from config
   // All plans get the same sign-up bonus
@@ -236,13 +236,13 @@ export default function FreeAIVideoGeneratorPage() {
       pro: String(proPlan?.credits.monthly || 0),
       proPlus: String(proPlusPlan?.credits.monthly || 0),
     },
-    { feature: 'Video Quality', free: '720p', pro: '720p/1080p', proPlus: '720p/1080p' },
-    { feature: 'AI Models', free: 'Sora 2', pro: 'Sora 2 & Pro', proPlus: 'Sora 2 & Pro' },
+    { feature: 'Video Quality', free: '480p/720p', pro: '480p/720p', proPlus: '480p/720p' },
+    { feature: 'AI Models', free: 'Seedance Fast', pro: 'Seedance Fast', proPlus: 'Seedance Fast' },
     { feature: 'Concurrent Videos', free: '1', pro: '3', proPlus: '5' },
     { feature: 'Priority Processing', free: '\u2717', pro: '\u2717', proPlus: '\u2713' },
     { feature: 'Batch Generation', free: '\u2713', pro: '\u2713', proPlus: '\u2713' },
     { feature: 'Brand Analysis', free: '\u2713', pro: '\u2713', proPlus: '\u2713' },
-    { feature: 'Commercial Use', free: '\u2713', pro: '\u2713', proPlus: '\u2713' },
+    { feature: 'Commercial Use', free: 'Personal/testing', pro: '\u2713', proPlus: '\u2713' },
     {
       feature: 'Monthly Price',
       free: `$${freePlan?.price || 0}`,
@@ -251,14 +251,12 @@ export default function FreeAIVideoGeneratorPage() {
     },
   ];
 
-  // Calculate video count range based on signup bonus and video costs
-  const minVideos = Math.floor(signupBonus / sora2MaxCost);
-  const maxVideos = Math.floor(signupBonus / sora2MinCost);
+  const creditsNeededForFirstVideo = Math.max(0, seedanceMinCost - signupBonus);
 
   const softwareSchema = {
     '@context': 'https://schema.org',
     '@type': 'SoftwareApplication',
-    name: 'Viecom Free AI Video Generator',
+    name: 'Viecom Seedance 2.0 Fast Credit Guide',
     applicationCategory: 'MultimediaApplication',
     operatingSystem: 'Web',
     offers: {
@@ -291,15 +289,15 @@ export default function FreeAIVideoGeneratorPage() {
         name: 'Do I need a credit card to sign up?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: `No credit card required. Simply create an account with your email and start generating videos immediately with ${signupBonus} free credits.`,
+          text: `No credit card is required. The ${signupBonus}-credit bonus does not by itself cover a Seedance video, which starts at ${seedanceMinCost} credits. Earn or purchase ${creditsNeededForFirstVideo} more credits for the first 480p 10s video.`,
         },
       },
       {
         '@type': 'Question',
-        name: `How many videos can I create with ${signupBonus} credits?`,
+        name: `Can I create a Seedance video with ${signupBonus} sign-up credits?`,
         acceptedAnswer: {
           '@type': 'Answer',
-          text: `With ${signupBonus} credits, you can create approximately ${minVideos}-${maxVideos} videos depending on settings. Sora 2 720p videos cost ${sora2MinCost}-${sora2MaxCost} credits each.`,
+          text: `Not with the sign-up bonus alone. Seedance videos cost ${seedanceMinCost}-${seedanceMaxCost} credits, so you need at least ${creditsNeededForFirstVideo} additional credits from rewards or a credit purchase.`,
         },
       },
       {
@@ -315,7 +313,7 @@ export default function FreeAIVideoGeneratorPage() {
         name: 'Can I use free AI videos commercially?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'Yes! All videos generated on our platform, including free tier, can be used for commercial purposes.',
+          text: 'Commercial-use rights are included with Pro and Pro+ plans. Review the current Terms of Service before publishing generated content commercially.',
         },
       },
     ],
@@ -339,28 +337,28 @@ export default function FreeAIVideoGeneratorPage() {
           <div className="inline-flex items-center gap-2 bg-gradient-to-r from-green-50 to-teal-50 dark:from-green-900/20 dark:to-teal-900/20 px-4 py-2 rounded-full border border-green-200 dark:border-green-800 mb-6">
             <Gift className="h-4 w-4 text-green-500" />
             <span className="text-sm font-medium text-green-900 dark:text-green-100">
-              100% Free - No Credit Card Required
+              Start with {signupBonus} Free Credits - No Credit Card Required
             </span>
           </div>
 
           <h1 className="h1-hero text-center mb-6">
             Create{' '}
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-green-600 to-teal-600">
-              Professional AI Videos
+              Seedance Product Videos
             </span>{' '}
-            for Free
+            with Flexible Credits
           </h1>
 
           <p className="text-xl text-slate-600 dark:text-slate-300 mb-8 leading-relaxed">
-            Start with {signupBonus} free credits sign-up bonus (one-time). No credit card, no
-            hidden fees, no time limits. Create videos with Sora 2 AI models and earn more credits
-            daily. Perfect for trying our platform risk-free.
+            Start with {signupBonus} free credits and earn more through check-ins, referrals, and
+            sharing. Seedance 2.0 Fast videos cost {seedanceMinCost}-{seedanceMaxCost} credits, so
+            the sign-up bonus alone does not cover a video.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
             <Link href="/video-generation">
               <Button size="lg" className="btn-primary text-lg px-8 py-6 group">
-                Start Creating Free Videos
+                Open Seedance Generator
                 <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
               </Button>
             </Link>
@@ -494,18 +492,19 @@ export default function FreeAIVideoGeneratorPage() {
                 Do I need a credit card to sign up?
               </h3>
               <p className="text-slate-600 dark:text-slate-300">
-                No credit card required. Simply create an account with your email and start
-                generating videos immediately with {signupBonus} free credits.
+                No credit card is required. Seedance videos start at {seedanceMinCost} credits, so
+                earn or purchase {creditsNeededForFirstVideo} more credits after the sign-up bonus
+                for your first 480p 10s video.
               </p>
             </div>
             <div>
               <h3 className="text-xl font-semibold mb-3 text-slate-900 dark:text-white">
-                How many videos can I create with {signupBonus} credits?
+                Can I create a Seedance video with {signupBonus} sign-up credits?
               </h3>
               <p className="text-slate-600 dark:text-slate-300">
-                With {signupBonus} credits, you can create approximately {minVideos}-{maxVideos}{' '}
-                videos depending on settings. Sora 2 720p videos cost {sora2MinCost}-{sora2MaxCost}{' '}
-                credits each.
+                Not with the sign-up bonus alone. Seedance 2.0 Fast videos cost {seedanceMinCost}-
+                {seedanceMaxCost} credits, so you need at least {creditsNeededForFirstVideo} more
+                credits from rewards or a credit purchase.
               </p>
             </div>
             <div>
@@ -522,8 +521,8 @@ export default function FreeAIVideoGeneratorPage() {
                 Can I use free AI videos commercially?
               </h3>
               <p className="text-slate-600 dark:text-slate-300">
-                Yes! All videos generated on our platform, including free tier, can be used for
-                commercial purposes.
+                Commercial-use rights are included with Pro and Pro+ plans. Review the current Terms
+                of Service before publishing generated content commercially.
               </p>
             </div>
             <div>

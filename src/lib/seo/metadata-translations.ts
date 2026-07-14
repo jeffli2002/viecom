@@ -43,9 +43,9 @@ export const seoTranslations: Record<PageType, Record<string, SEOTranslations>> 
   // Homepage / Landing Page
   landing: {
     en: {
-      title: 'AI Video Generator for E-commerce | Image to Video in Seconds',
+      title: 'Seedance 2.0 Fast AI Video Generator for E-commerce',
       description:
-        'Transform product photos into engaging videos with AI. Free trial with 15 credits. Sora 2 models, batch generation, 720p in minutes. No credit card required.',
+        'Transform product photos into engaging 480p or 720p videos with Seedance 2.0 Fast and batch generation.',
       keywords: [
         'ai video generator',
         'image to video ai',
@@ -54,7 +54,7 @@ export const seoTranslations: Record<PageType, Record<string, SEOTranslations>> 
         'e-commerce video ai',
         'batch video generation',
         'ai image generator',
-        'sora 2 video',
+        'seedance 2.0 fast video',
         'nano banana',
         'nano banana pro',
         'free nano banana image',
@@ -85,20 +85,17 @@ export const seoTranslations: Record<PageType, Record<string, SEOTranslations>> 
         'bulk ai image generator',
       ],
       openGraph: {
-        title: 'AI Video Generator for E-commerce | Image to Video in Seconds',
-        description:
-          'Transform product photos into engaging videos with AI. Free trial with 15 credits.',
+        title: 'Seedance 2.0 Fast AI Video Generator for E-commerce',
+        description: 'Create 10s or 15s product videos in 480p or 720p with Seedance 2.0 Fast.',
       },
       twitter: {
-        title: 'AI Video Generator for E-commerce | Image to Video in Seconds',
-        description:
-          'Transform product photos into engaging videos with AI. Free trial with 15 credits.',
+        title: 'Seedance 2.0 Fast AI Video Generator for E-commerce',
+        description: 'Create 10s or 15s product videos in 480p or 720p with Seedance 2.0 Fast.',
       },
     },
     zh: {
-      title: 'AI视频生成器 | 电商产品照片秒变视频',
-      description:
-        '用AI将产品照片转换为吸引人的视频。注册送30积分免费试用。Sora 2模型，批量生成，720p视频几分钟完成。无需信用卡。',
+      title: 'Seedance 2.0 Fast AI视频生成器 | 电商产品视频',
+      description: '使用 Seedance 2.0 Fast 将产品照片转换为 480p 或 720p 视频，支持批量生成。',
       keywords: [
         'AI视频生成器',
         '图片转视频',
@@ -107,7 +104,7 @@ export const seoTranslations: Record<PageType, Record<string, SEOTranslations>> 
         '电商视频AI',
         '批量视频生成',
         'AI图像生成器',
-        'Sora 2视频',
+        'Seedance 2.0 视频',
         'nano banana',
         'nano banana pro',
         'free nano banana image',
@@ -115,18 +112,18 @@ export const seoTranslations: Record<PageType, Record<string, SEOTranslations>> 
         'gemini 3 pro',
       ],
       openGraph: {
-        title: 'AI视频生成器 | 电商产品照片秒变视频',
-        description: '用AI将产品照片转换为吸引人的视频。注册送30积分免费试用。',
+        title: 'Seedance 2.0 Fast AI视频生成器 | 电商产品视频',
+        description: '使用 Seedance 2.0 Fast 创建 10 秒或 15 秒、480p 或 720p 产品视频。',
       },
       twitter: {
-        title: 'AI视频生成器 | 电商产品照片秒变视频',
-        description: '用AI将产品照片转换为吸引人的视频。注册送30积分免费试用。',
+        title: 'Seedance 2.0 Fast AI视频生成器 | 电商产品视频',
+        description: '使用 Seedance 2.0 Fast 创建 10 秒或 15 秒、480p 或 720p 产品视频。',
       },
     },
     es: {
-      title: 'Generador de Video IA para E-commerce | Imagen a Video en Segundos',
+      title: 'Generador Seedance 2.0 Fast para E-commerce',
       description:
-        'Transforma fotos de productos en videos atractivos con IA. Prueba gratuita con 30 créditos. Modelos Sora 2, generación por lotes, 720p en minutos. Sin tarjeta de crédito.',
+        'Transforma fotos de productos en videos 480p o 720p con Seedance 2.0 Fast y generación por lotes.',
       keywords: [
         'generador de video ia',
         'imagen a video ia',
@@ -135,23 +132,23 @@ export const seoTranslations: Record<PageType, Record<string, SEOTranslations>> 
         'video ia e-commerce',
         'generación de video por lotes',
         'generador de imagen ia',
-        'video sora 2',
+        'video seedance 2.0',
       ],
       openGraph: {
-        title: 'Generador de Video IA para E-commerce | Imagen a Video en Segundos',
+        title: 'Generador Seedance 2.0 Fast para E-commerce',
         description:
-          'Transforma fotos de productos en videos atractivos con IA. Prueba gratuita con 30 créditos.',
+          'Crea videos de producto de 10 o 15 segundos en 480p o 720p con Seedance 2.0 Fast.',
       },
       twitter: {
-        title: 'Generador de Video IA para E-commerce | Imagen a Video en Segundos',
+        title: 'Generador Seedance 2.0 Fast para E-commerce',
         description:
-          'Transforma fotos de productos en videos atractivos con IA. Prueba gratuita con 30 créditos.',
+          'Crea videos de producto de 10 o 15 segundos en 480p o 720p con Seedance 2.0 Fast.',
       },
     },
     fr: {
-      title: 'Générateur de Vidéo IA pour E-commerce | Image en Vidéo en Secondes',
+      title: 'Générateur Seedance 2.0 Fast pour E-commerce',
       description:
-        "Transformez les photos de produits en vidéos attrayantes avec l'IA. Essai gratuit avec 30 crédits. Modèles Sora 2, génération par lots, 720p en minutes. Aucune carte de crédit requise.",
+        'Transformez les photos de produits en vidéos 480p ou 720p avec Seedance 2.0 Fast et la génération par lots.',
       keywords: [
         'générateur de vidéo ia',
         'image en vidéo ia',
@@ -160,23 +157,23 @@ export const seoTranslations: Record<PageType, Record<string, SEOTranslations>> 
         'vidéo ia e-commerce',
         'génération de vidéo par lots',
         "générateur d'image ia",
-        'vidéo sora 2',
+        'vidéo seedance 2.0',
       ],
       openGraph: {
-        title: 'Générateur de Vidéo IA pour E-commerce | Image en Vidéo en Secondes',
+        title: 'Générateur Seedance 2.0 Fast pour E-commerce',
         description:
-          "Transformez les photos de produits en vidéos attrayantes avec l'IA. Essai gratuit avec 30 crédits.",
+          'Créez des vidéos produit de 10 ou 15 secondes en 480p ou 720p avec Seedance 2.0 Fast.',
       },
       twitter: {
-        title: 'Générateur de Vidéo IA pour E-commerce | Image en Vidéo en Secondes',
+        title: 'Générateur Seedance 2.0 Fast pour E-commerce',
         description:
-          "Transformez les photos de produits en vidéos attrayantes avec l'IA. Essai gratuit avec 30 crédits.",
+          'Créez des vidéos produit de 10 ou 15 secondes en 480p ou 720p avec Seedance 2.0 Fast.',
       },
     },
     de: {
-      title: 'KI-Videogenerator für E-Commerce | Bild zu Video in Sekunden',
+      title: 'Seedance 2.0 Fast Videogenerator für E-Commerce',
       description:
-        'Verwandeln Sie Produktfotos mit KI in ansprechende Videos. Kostenlose Testversion mit 15 Credits. Sora 2 Modelle, Batch-Generierung, 720p in Minuten. Keine Kreditkarte erforderlich.',
+        'Verwandeln Sie Produktfotos mit Seedance 2.0 Fast in 480p- oder 720p-Videos mit Batch-Generierung.',
       keywords: [
         'ki videogenerator',
         'bild zu video ki',
@@ -185,23 +182,23 @@ export const seoTranslations: Record<PageType, Record<string, SEOTranslations>> 
         'e-commerce video ki',
         'batch videogenerierung',
         'ki bildgenerator',
-        'sora 2 video',
+        'seedance 2.0 video',
       ],
       openGraph: {
-        title: 'KI-Videogenerator für E-Commerce | Bild zu Video in Sekunden',
+        title: 'Seedance 2.0 Fast Videogenerator für E-Commerce',
         description:
-          'Verwandeln Sie Produktfotos mit KI in ansprechende Videos. Kostenlose Testversion mit 15 Credits.',
+          'Erstellen Sie 10- oder 15-sekündige Produktvideos in 480p oder 720p mit Seedance 2.0 Fast.',
       },
       twitter: {
-        title: 'KI-Videogenerator für E-Commerce | Bild zu Video in Sekunden',
+        title: 'Seedance 2.0 Fast Videogenerator für E-Commerce',
         description:
-          'Verwandeln Sie Produktfotos mit KI in ansprechende Videos. Kostenlose Testversion mit 15 Credits.',
+          'Erstellen Sie 10- oder 15-sekündige Produktvideos in 480p oder 720p mit Seedance 2.0 Fast.',
       },
     },
     ja: {
-      title: 'Eコマース向けAI動画生成器 | 画像を数秒で動画に変換',
+      title: 'Eコマース向けSeedance 2.0 Fast動画生成器',
       description:
-        'AIで商品写真を魅力的な動画に変換。30クレジットの無料トライアル。Sora 2モデル、バッチ生成、720pを数分で。クレジットカード不要。',
+        'Seedance 2.0 Fastで商品写真を480pまたは720p動画に変換し、バッチ生成にも対応します。',
       keywords: [
         'ai動画生成器',
         '画像から動画ai',
@@ -210,15 +207,15 @@ export const seoTranslations: Record<PageType, Record<string, SEOTranslations>> 
         'eコマース動画ai',
         'バッチ動画生成',
         'ai画像生成器',
-        'sora 2動画',
+        'seedance 2.0動画',
       ],
       openGraph: {
-        title: 'Eコマース向けAI動画生成器 | 画像を数秒で動画に変換',
-        description: 'AIで商品写真を魅力的な動画に変換。30クレジットの無料トライアル。',
+        title: 'Eコマース向けSeedance 2.0 Fast動画生成器',
+        description: 'Seedance 2.0 Fastで10秒・15秒、480p・720pの商品動画を作成。',
       },
       twitter: {
-        title: 'Eコマース向けAI動画生成器 | 画像を数秒で動画に変換',
-        description: 'AIで商品写真を魅力的な動画に変換。30クレジットの無料トライアル。',
+        title: 'Eコマース向けSeedance 2.0 Fast動画生成器',
+        description: 'Seedance 2.0 Fastで10秒・15秒、480p・720pの商品動画を作成。',
       },
     },
   },
@@ -227,13 +224,14 @@ export const seoTranslations: Record<PageType, Record<string, SEOTranslations>> 
     en: {
       title: 'AI Video & Image Generator Tools | Free Trial Available',
       description:
-        'Professional AI tools for e-commerce: image generation, video generation, batch processing, and brand analysis. Free trial with 15 credits. No credit card required.',
+        'Professional e-commerce AI tools with Seedance 2.0 Fast video generation, image generation, batch processing, and brand analysis.',
       keywords: [
         'ai video generator',
         'ai image generator',
         'batch generation tool',
         'brand analysis ai',
         'e-commerce ai tools',
+        'seedance 2.0 fast',
       ],
       openGraph: {
         title: 'AI Video & Image Generator Tools | Free Trial Available',
@@ -355,7 +353,7 @@ export const seoTranslations: Record<PageType, Record<string, SEOTranslations>> 
         'AI image generator guide',
         'e-commerce product images',
         'batch image generation tutorial',
-        'Sora 2 Pro guide',
+        'Seedance 2.0 Fast guide',
       ],
       openGraph: {
         title: 'How to Use Viecom AI Generator - Complete Documentation',
@@ -376,7 +374,7 @@ export const seoTranslations: Record<PageType, Record<string, SEOTranslations>> 
         'AI图像生成器指南',
         '电商产品图像',
         '批量图像生成教程',
-        'Sora 2 Pro指南',
+        'Seedance 2.0 Fast指南',
       ],
       openGraph: {
         title: '如何使用Viecom AI生成器 - 完整文档',
@@ -397,7 +395,7 @@ export const seoTranslations: Record<PageType, Record<string, SEOTranslations>> 
         'guía generador imagen ia',
         'imágenes producto e-commerce',
         'tutorial generación imagen por lotes',
-        'guía sora 2 pro',
+        'guía seedance 2.0 fast',
       ],
       openGraph: {
         title: 'Cómo Usar el Generador IA de Viecom - Documentación Completa',
@@ -418,7 +416,7 @@ export const seoTranslations: Record<PageType, Record<string, SEOTranslations>> 
         'guide générateur image ia',
         'images produit e-commerce',
         'tutoriel génération image par lots',
-        'guide sora 2 pro',
+        'guide seedance 2.0 fast',
       ],
       openGraph: {
         title: 'Comment Utiliser le Générateur IA de Viecom - Documentation Complète',
@@ -439,7 +437,7 @@ export const seoTranslations: Record<PageType, Record<string, SEOTranslations>> 
         'ki bildgenerator anleitung',
         'e-commerce produktbilder',
         'batch bildgenerierung tutorial',
-        'sora 2 pro anleitung',
+        'seedance 2.0 fast anleitung',
       ],
       openGraph: {
         title: 'So Verwenden Sie den KI-Generator von Viecom - Vollständige Dokumentation',
@@ -460,7 +458,7 @@ export const seoTranslations: Record<PageType, Record<string, SEOTranslations>> 
         'ai画像生成器ガイド',
         'eコマース商品画像',
         'バッチ画像生成チュートリアル',
-        'sora 2 proガイド',
+        'seedance 2.0 fastガイド',
       ],
       openGraph: {
         title: 'Viecom AI生成器の使い方 - 完全ドキュメント',
@@ -608,7 +606,7 @@ export const seoTranslations: Record<PageType, Record<string, SEOTranslations>> 
     en: {
       title: 'E-commerce Platform Solutions | Amazon, TikTok & Shopify Optimization',
       description:
-        'Platform-specific solutions for Amazon compliant images, TikTok Shop videos, and Shopify bulk generation. Optimize your content for each marketplace.',
+        'Platform-specific workflows for Amazon images, TikTok Shop Seedance 2.0 Fast videos, and Shopify batch image and video generation.',
       keywords: [
         'amazon solutions',
         'tiktok solutions',
@@ -616,6 +614,7 @@ export const seoTranslations: Record<PageType, Record<string, SEOTranslations>> 
         'platform optimization',
         'e-commerce solutions',
         'marketplace compliance',
+        'seedance 2.0 fast ecommerce video',
       ],
       openGraph: {
         title: 'E-commerce Platform Solutions | Amazon, TikTok & Shopify',
@@ -629,7 +628,7 @@ export const seoTranslations: Record<PageType, Record<string, SEOTranslations>> 
     zh: {
       title: '电商平台解决方案 | Amazon、TikTok和Shopify优化',
       description:
-        '针对Amazon合规图像、TikTok Shop视频和Shopify批量生成的平台特定解决方案。为每个市场优化您的内容。',
+        '面向 Amazon 图片、TikTok Shop Seedance 2.0 Fast 视频和 Shopify 批量图片及视频生成的平台工作流。',
       keywords: [
         'amazon解决方案',
         'tiktok解决方案',
@@ -650,7 +649,7 @@ export const seoTranslations: Record<PageType, Record<string, SEOTranslations>> 
     es: {
       title: 'Soluciones para Plataformas E-commerce | Optimización Amazon, TikTok y Shopify',
       description:
-        'Soluciones específicas para imágenes compatibles con Amazon, videos de TikTok Shop y generación masiva para Shopify. Optimice su contenido para cada marketplace.',
+        'Flujos para imágenes Amazon, videos Seedance 2.0 Fast de TikTok Shop y generación masiva de imágenes y videos para Shopify.',
       keywords: [
         'soluciones amazon',
         'soluciones tiktok',
@@ -671,7 +670,7 @@ export const seoTranslations: Record<PageType, Record<string, SEOTranslations>> 
     fr: {
       title: 'Solutions pour Plateformes E-commerce | Optimisation Amazon, TikTok et Shopify',
       description:
-        'Solutions spécifiques pour images conformes Amazon, vidéos TikTok Shop et génération en masse Shopify. Optimisez votre contenu pour chaque marketplace.',
+        'Workflows pour images Amazon, vidéos Seedance 2.0 Fast TikTok Shop et génération en lot d’images et vidéos Shopify.',
       keywords: [
         'solutions amazon',
         'solutions tiktok',
@@ -692,7 +691,7 @@ export const seoTranslations: Record<PageType, Record<string, SEOTranslations>> 
     de: {
       title: 'E-Commerce-Plattform-Lösungen | Amazon, TikTok & Shopify Optimierung',
       description:
-        'Plattformspezifische Lösungen für Amazon-konforme Bilder, TikTok Shop Videos und Shopify Massengenerierung. Optimieren Sie Ihre Inhalte für jeden Marktplatz.',
+        'Workflows für Amazon-Bilder, Seedance 2.0 Fast TikTok-Shop-Videos und Shopify Stapelgenerierung von Bildern und Videos.',
       keywords: [
         'amazon lösungen',
         'tiktok lösungen',
@@ -713,7 +712,7 @@ export const seoTranslations: Record<PageType, Record<string, SEOTranslations>> 
     ja: {
       title: 'Eコマースプラットフォームソリューション | Amazon、TikTok、Shopify最適化',
       description:
-        'Amazon準拠画像、TikTok Shop動画、Shopify一括生成のためのプラットフォーム固有のソリューション。各マーケットプレイス向けにコンテンツを最適化。',
+        'Amazon画像、TikTok Shop向けSeedance 2.0 Fast動画、Shopify向け画像・動画一括生成のワークフロー。',
       keywords: [
         'amazonソリューション',
         'tiktokソリューション',

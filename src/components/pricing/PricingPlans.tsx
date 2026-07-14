@@ -201,7 +201,7 @@ export function PricingPlans({ plans, creditPacks }: PricingPlansProps) {
                       ) {
                         const yearlyCapacity = calculateGenerationCapacity(plan.yearlyCredits);
                         const maxImages = yearlyCapacity.images.nanoBanana;
-                        const maxVideos = yearlyCapacity.videos.sora2_720p_10s;
+                        const maxVideos = yearlyCapacity.videos.seedanceFast_720p_10s;
                         displayFeature = `${plan.yearlyCredits.toLocaleString()} credits/year (up to ${maxImages} images or ${maxVideos} videos)`;
                       }
                     }

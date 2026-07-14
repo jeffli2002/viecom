@@ -18,9 +18,9 @@ export async function generateMetadata({
   const translations: Record<string, Metadata> = {
     en: {
       ...baseMetadata,
-      title: 'Image to Video AI Free | Product Photos to Videos in 60 Seconds',
+      title: 'Seedance Image to Video | 10s or 15s Product Videos',
       description:
-        'Transform product images into engaging videos with AI. Upload photos, get professional videos instantly. Sora 2 models, 720p/1080p quality. Free trial with 15 credits sign-up bonus.',
+        'Transform product images into engaging videos with AI. Upload photos and create professional Seedance 2.0 Fast videos in 480p or 720p.',
       keywords: [
         'image to video',
         'image to video ai',
@@ -44,9 +44,9 @@ export async function generateMetadata({
     },
     zh: {
       ...baseMetadata,
-      title: '图片转视频AI工具免费 | 产品照片60秒变视频',
+      title: 'Seedance 图片转视频 | 10秒或15秒产品视频',
       description:
-        '用AI将产品图片转换为吸引人的视频。上传照片，立即获得专业视频。Sora 2模型，720p/1080p质量。注册送30积分免费试用。',
+        '用 AI 将产品图片转换为吸引人的视频。上传照片，使用 Seedance 2.0 Fast 生成 480p 或 720p 专业视频。',
       keywords: [
         '图片转视频',
         '图片转视频AI',
@@ -57,20 +57,20 @@ export async function generateMetadata({
       ],
       openGraph: {
         title: '图片转视频AI工具免费 | 产品照片转视频',
-        description: '用AI将产品图片转换为吸引人的视频。注册送30积分免费试用。',
+        description: '使用 Seedance 2.0 Fast 创建 10 秒或 15 秒、480p 或 720p 产品视频。',
         type: 'website',
       },
       twitter: {
         card: 'summary_large_image',
         title: '图片转视频AI工具免费 | 产品照片转视频',
-        description: '用AI将产品图片转换为吸引人的视频。注册送30积分免费试用。',
+        description: '使用 Seedance 2.0 Fast 创建 10 秒或 15 秒、480p 或 720p 产品视频。',
       },
     },
     es: {
       ...baseMetadata,
-      title: 'Imagen a Video IA Gratis | Fotos de Productos a Videos en 60 Segundos',
+      title: 'Seedance Imagen a Video | Videos de Producto de 10 o 15s',
       description:
-        'Transforma imágenes de productos en videos atractivos con IA. Sube fotos, obtén videos profesionales al instante. Modelos Sora 2, calidad 720p/1080p. Prueba gratuita con 30 créditos.',
+        'Transforma imágenes de productos en videos atractivos con Seedance 2.0 Fast en calidad 480p o 720p.',
       keywords: [
         'imagen a video',
         'imagen a video ia',
@@ -82,21 +82,21 @@ export async function generateMetadata({
       openGraph: {
         title: 'Imagen a Video IA Gratis | Fotos de Productos a Videos',
         description:
-          'Transforma imágenes de productos en videos atractivos con IA. Prueba gratuita con 30 créditos.',
+          'Crea videos de producto de 10 o 15 segundos en 480p o 720p con Seedance 2.0 Fast.',
         type: 'website',
       },
       twitter: {
         card: 'summary_large_image',
         title: 'Imagen a Video IA Gratis | Fotos de Productos a Videos',
         description:
-          'Transforma imágenes de productos en videos atractivos con IA. Prueba gratuita con 30 créditos.',
+          'Crea videos de producto de 10 o 15 segundos en 480p o 720p con Seedance 2.0 Fast.',
       },
     },
     fr: {
       ...baseMetadata,
-      title: 'Image en Vidéo IA Gratuit | Photos Produit en Vidéos en 60 Secondes',
+      title: 'Seedance Image en Vidéo | Vidéos Produit de 10 ou 15s',
       description:
-        "Transformez des images de produits en vidéos attrayantes avec l'IA. Téléchargez des photos, obtenez des vidéos professionnelles instantanément. Modèles Sora 2, qualité 720p/1080p. Essai gratuit avec 30 crédits.",
+        'Transformez des images de produits en vidéos attrayantes avec Seedance 2.0 Fast, en qualité 480p ou 720p.',
       keywords: [
         'image en vidéo',
         'image en vidéo ia',
@@ -108,21 +108,21 @@ export async function generateMetadata({
       openGraph: {
         title: 'Image en Vidéo IA Gratuit | Photos Produit en Vidéos',
         description:
-          "Transformez des images de produits en vidéos attrayantes avec l'IA. Essai gratuit avec 30 crédits.",
+          'Créez des vidéos produit de 10 ou 15 secondes en 480p ou 720p avec Seedance 2.0 Fast.',
         type: 'website',
       },
       twitter: {
         card: 'summary_large_image',
         title: 'Image en Vidéo IA Gratuit | Photos Produit en Vidéos',
         description:
-          "Transformez des images de produits en vidéos attrayantes avec l'IA. Essai gratuit avec 30 crédits.",
+          'Créez des vidéos produit de 10 ou 15 secondes en 480p ou 720p avec Seedance 2.0 Fast.',
       },
     },
     de: {
       ...baseMetadata,
-      title: 'Bild zu Video KI Kostenlos | Produktfotos zu Videos in 60 Sekunden',
+      title: 'Seedance Bild zu Video | 10- oder 15-Sekunden-Produktvideos',
       description:
-        'Verwandeln Sie Produktbilder mit KI in ansprechende Videos. Laden Sie Fotos hoch, erhalten Sie sofort professionelle Videos. Sora 2 Modelle, 720p/1080p Qualität. Kostenlose Testversion mit 15 Credits.',
+        'Verwandeln Sie Produktbilder mit Seedance 2.0 Fast in professionelle Videos in 480p oder 720p.',
       keywords: [
         'bild zu video',
         'bild zu video ki',
@@ -146,9 +146,8 @@ export async function generateMetadata({
     },
     ja: {
       ...baseMetadata,
-      title: '画像から動画AI 無料 | 商品写真を60秒で動画に変換',
-      description:
-        'AIで商品画像を魅力的な動画に変換。写真をアップロードして、すぐにプロフェッショナルな動画を取得。Sora 2モデル、720p/1080p品質。30クレジットの無料トライアル。',
+      title: 'Seedance画像から動画 | 10秒・15秒の商品動画',
+      description: 'Seedance 2.0 Fastで商品画像を魅力的な480pまたは720p動画に変換します。',
       keywords: [
         '画像から動画',
         '画像から動画ai',
@@ -159,13 +158,13 @@ export async function generateMetadata({
       ],
       openGraph: {
         title: '画像から動画AI 無料 | 商品写真から動画',
-        description: 'AIで商品画像を魅力的な動画に変換。30クレジットの無料トライアル。',
+        description: 'Seedance 2.0 Fastで10秒・15秒、480p・720pの商品動画を作成。',
         type: 'website',
       },
       twitter: {
         card: 'summary_large_image',
         title: '画像から動画AI 無料 | 商品写真から動画',
-        description: 'AIで商品画像を魅力的な動画に変換。30クレジットの無料トライアル。',
+        description: 'Seedance 2.0 Fastで10秒・15秒、480p・720pの商品動画を作成。',
       },
     },
   };
@@ -194,8 +193,8 @@ const useCases = [
 
 const features = [
   'Upload product images (PNG, JPG, WebP)',
-  '720p videos in 2-3 minutes',
-  '1080p videos in 5-7 minutes (Sora 2 Pro)',
+  '480p or 720p video output',
+  'Seedance 2.0 Fast with synchronized audio',
   'Multiple video styles and effects',
   'Batch generation (up to 5 videos simultaneously)',
   'No video editing skills required',
@@ -205,13 +204,12 @@ const features = [
 
 const getPricingComparison = () => {
   const pricing = getPricingData();
-  const sora2Cost = pricing.credits.sora2_720p_10s;
+  const seedanceCost = pricing.credits.seedanceFast_720p_10s;
   const imageCount = Math.floor(pricing.free.signupCredits / pricing.credits.imageCostMin);
-  const proVideoCount = Math.floor(pricing.pro.monthlyCredits / sora2Cost);
-  const proplusVideoCount = Math.floor(pricing.proplus.monthlyCredits / sora2Cost);
+  const proVideoCount = Math.floor(pricing.pro.monthlyCredits / seedanceCost);
+  const proplusVideoCount = Math.floor(pricing.proplus.monthlyCredits / seedanceCost);
 
-  // Free plan: 15 credits can only generate images (3 images), not videos (minimum 25 credits needed)
-  const freeCanGenerateVideo = pricing.free.signupCredits >= sora2Cost;
+  const freeCanGenerateVideo = pricing.free.signupCredits >= pricing.credits.videoCostMin;
 
   return [
     {
@@ -222,8 +220,8 @@ const getPricingComparison = () => {
         : `Up to ${imageCount} images`,
       price: '$0',
       features: [
-        '720p quality',
-        'Sora 2 model',
+        '480p/720p quality',
+        'Seedance 2.0 Fast',
         `${pricing.free.batchSize} video at a time`,
         'No watermark',
       ],
@@ -234,8 +232,8 @@ const getPricingComparison = () => {
       videos: `Up to ${proVideoCount} videos`,
       price: `$${pricing.pro.price}`,
       features: [
-        '720p/1080p quality',
-        'Sora 2 & 2 Pro',
+        '480p/720p quality',
+        'Seedance 2.0 Fast',
         `${pricing.pro.batchSize} videos at once`,
         'No watermark',
       ],
@@ -247,7 +245,7 @@ const getPricingComparison = () => {
       videos: `Up to ${proplusVideoCount} videos`,
       price: `$${pricing.proplus.price}`,
       features: [
-        '720p/1080p quality',
+        '480p/720p quality',
         'Priority processing',
         `${pricing.proplus.batchSize} videos at once`,
         'No watermark',
@@ -260,8 +258,8 @@ const pricingComparison = getPricingComparison();
 
 export default function ImageToVideoAIPage() {
   const pricing = getPricingData();
-  const sora2Cost = `${pricing.credits.sora2_720p_10s}-${pricing.credits.sora2_720p_15s}`;
-  const sora2ProCost = `${pricing.credits.sora2Pro_720p_10s}-${pricing.credits.sora2Pro_1080p_15s}`;
+  const seedance480Cost = `${pricing.credits.seedanceFast_480p_10s}-${pricing.credits.seedanceFast_480p_15s}`;
+  const seedance720Cost = `${pricing.credits.seedanceFast_720p_10s}-${pricing.credits.seedanceFast_720p_15s}`;
   const imageCount = Math.floor(pricing.free.signupCredits / pricing.credits.imageCostMin);
 
   const howItWorksSchema = {
@@ -279,7 +277,7 @@ export default function ImageToVideoAIPage() {
       {
         '@type': 'HowToStep',
         name: 'Choose Video Settings',
-        text: 'Select video resolution (720p or 1080p), duration (5-15 seconds), and style preferences.',
+        text: 'Select video resolution (480p or 720p), duration (10 or 15 seconds), and style preferences.',
         position: 2,
       },
       {
@@ -405,7 +403,7 @@ export default function ImageToVideoAIPage() {
                   Choose Settings
                 </h3>
                 <p className="text-slate-600 dark:text-slate-300">
-                  Select resolution (720p/1080p), duration (5-15s), and video style preferences.
+                  Select resolution (480p/720p), duration (10s/15s), and video style preferences.
                 </p>
               </div>
               <div className="text-center">
@@ -416,7 +414,7 @@ export default function ImageToVideoAIPage() {
                   Generate & Download
                 </h3>
                 <p className="text-slate-600 dark:text-slate-300">
-                  Wait 2-7 minutes and download your professional video in MP4 format.
+                  Wait a few minutes and download your professional video in MP4 format.
                 </p>
               </div>
             </div>
@@ -519,8 +517,8 @@ export default function ImageToVideoAIPage() {
                 How long does it take to convert an image to video?
               </h3>
               <p className="text-slate-600 dark:text-slate-300">
-                720p videos take 2-3 minutes. 1080p videos take 5-7 minutes. We use a priority queue
-                system to process 720p videos first for faster results.
+                Seedance 2.0 Fast videos usually complete in a few minutes. Shorter and 480p tasks
+                receive priority in batch processing.
               </p>
             </div>
             <div>
@@ -548,8 +546,8 @@ export default function ImageToVideoAIPage() {
                 How many credits does image-to-video cost?
               </h3>
               <p className="text-slate-600 dark:text-slate-300">
-                Sora 2 (720p): {sora2Cost} credits per video. Sora 2 Pro (1080p): {sora2ProCost}{' '}
-                credits per video depending on duration.
+                Seedance 2.0 Fast 480p: {seedance480Cost} credits. 720p: {seedance720Cost} credits,
+                depending on duration.
               </p>
             </div>
             <div>

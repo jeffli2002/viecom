@@ -12,16 +12,16 @@ import {
 } from '@/config/batch.config';
 import { getVideoModelInfo } from '@/config/credits.config';
 import { creditService } from '@/lib/credits';
-import { getKieApiService } from '@/lib/kie/kie-api';
 import { r2StorageService } from '@/lib/storage/r2';
+import { getArkVideoApiService, getArkVideoUrl } from '@/lib/volcengine/ark-video-api';
 import { db } from '@/server/db';
 import { batchGenerationJob, generatedAsset } from '@/server/db/schema';
 import { eq } from 'drizzle-orm';
 
 export interface VideoTask {
   rowIndex: number;
-  model: 'sora-2' | 'sora-2-pro';
-  resolution: '720p' | '1080p';
+  model: 'seedance-2-fast';
+  resolution: '480p' | '720p';
   duration: 10 | 15;
   prompt: string;
   enhancedPrompt: string;
@@ -60,7 +60,7 @@ export class PriorityQueueProcessor {
   private userId: string;
   private jobId: string;
   private config: ReturnType<typeof getBatchConfig>;
-  private kieApiService: ReturnType<typeof getKieApiService>;
+  private arkVideoApiService: ReturnType<typeof getArkVideoApiService>;
 
   // 错误fallback配置
   private maxRetries = 3;
@@ -73,7 +73,7 @@ export class PriorityQueueProcessor {
     this.jobId = jobId;
     this.userPlan = isPaidPlan(userPlan) ? userPlan : 'free';
     this.config = getBatchConfig(this.userPlan);
-    this.kieApiService = getKieApiService();
+    this.arkVideoApiService = getArkVideoApiService();
   }
 
   /**
@@ -175,10 +175,8 @@ export class PriorityQueueProcessor {
     const slow: VideoTask[] = [];
 
     for (const task of tasks) {
-      // 720P 或 1080P 10秒 = 快速
-      // 1080P 15秒 = 慢速
-      const isFast =
-        task.resolution === '720p' || (task.resolution === '1080p' && task.duration === 10);
+      // 480p and short 720p tasks receive the fast queue.
+      const isFast = task.resolution === '480p' || task.duration === 10;
 
       if (isFast) {
         fast.push(task);
@@ -284,7 +282,7 @@ export class PriorityQueueProcessor {
   private calculateChunkConcurrency(chunk: VideoTask[]): number {
     // 获取这批任务的主要特征
     const resolution720Count = chunk.filter((t) => t.resolution === '720p').length;
-    const avgResolution = resolution720Count > chunk.length / 2 ? '720p' : '1080p';
+    const avgResolution = resolution720Count > chunk.length / 2 ? '720p' : '480p';
 
     const avgDuration = Math.round(chunk.reduce((sum, t) => sum + t.duration, 0) / chunk.length) as
       | 10
@@ -382,20 +380,12 @@ export class PriorityQueueProcessor {
 
     // 2. 创建生成任务
     const mode = task.imageUrl ? 'i2v' : 't2v';
-    const aspectRatioMap: Record<string, 'square' | 'portrait' | 'landscape'> = {
-      '1:1': 'square',
-      '9:16': 'portrait',
-      '16:9': 'landscape',
-      '4:3': 'landscape',
-      '3:4': 'portrait',
-    };
-    const kieAspectRatio = aspectRatioMap[task.aspectRatio || '16:9'] || 'landscape';
-
-    const taskResponse = await this.kieApiService.generateVideo({
+    const taskResponse = await this.arkVideoApiService.createVideoTask({
       prompt: task.enhancedPrompt,
-      imageUrls: task.imageUrl ? [task.imageUrl] : undefined,
-      aspectRatio: kieAspectRatio,
-      quality: task.resolution === '1080p' ? 'high' : 'standard',
+      imageUrl: task.imageUrl,
+      ratio: task.aspectRatio || '16:9',
+      resolution: task.resolution,
+      duration: task.duration,
     });
 
     // 3. 轮询结果（带智能间隔）
@@ -403,7 +393,7 @@ export class PriorityQueueProcessor {
     const pollConfig = getPollingConfig(this.userPlan, task.resolution);
 
     const videoResult = await this.pollWithAdaptiveInterval(
-      taskResponse.data.taskId,
+      taskResponse.id,
       task.resolution,
       pollConfig.timeout,
       startTime
@@ -474,24 +464,24 @@ export class PriorityQueueProcessor {
    */
   private async pollWithAdaptiveInterval(
     taskId: string,
-    resolution: '720p' | '1080p',
+    resolution: '480p' | '720p',
     timeout: number,
     startTime: number
   ): Promise<{ videoUrl?: string; status: string }> {
     const maxAttempts = Math.floor(timeout / 3000);
 
     for (let attempt = 0; attempt < maxAttempts; attempt++) {
-      const status = await this.kieApiService.getTaskStatus(taskId);
+      const status = await this.arkVideoApiService.getVideoTask(taskId);
 
-      if (status.data?.status === 'completed' || status.data?.state === 'success') {
-        const videoUrl = status.data?.result?.videoUrl || status.data?.result?.resultUrls?.[0];
+      if (status.status === 'succeeded') {
+        const videoUrl = getArkVideoUrl(status);
         if (videoUrl) {
           return { videoUrl, status: 'completed' };
         }
       }
 
-      if (status.data?.status === 'failed' || status.data?.state === 'fail') {
-        throw new Error(status.data?.error || status.data?.failMsg || 'Task failed');
+      if (['failed', 'expired', 'canceled'].includes(status.status)) {
+        throw new Error(typeof status.error === 'string' ? status.error : 'Task failed');
       }
 
       // 计算智能间隔

@@ -211,7 +211,7 @@ const proPlan = paymentConfig.plans.find((p) => p.id === 'pro');
 const proplusPlan = paymentConfig.plans.find((p) => p.id === 'proplus');
 
 // Use the cheapest video generation cost as capacity baseline
-const baseVideoCreditCost = creditsConfig.consumption.videoGeneration['sora-2-720p-10s'];
+const baseVideoCreditCost = creditsConfig.consumption.videoGeneration['seedance-2-fast-720p-10s'];
 
 const pricingTiers = [
   {

@@ -93,12 +93,12 @@
     "generationTools": "Herramientas",
     "imageGeneration": "Imagen IA",
     "imageGenerationDesc": "Texto a Imagen e Imagen a Imagen",
-    "videoGeneration": "Video IA",
-    "videoGenerationDesc": "Texto a Video e Imagen a Video",
+    "videoGeneration": "Video IA Seedance",
+    "videoGenerationDesc": "Seedance 2.0 Fast de texto o imagen a video",
     "batchImageGeneration": "Imágenes por lotes",
     "batchImageGenerationDesc": "Generación de imágenes por lotes",
-    "batchVideoGeneration": "Videos por lotes",
-    "batchVideoGenerationDesc": "Generación de videos por lotes",
+    "batchVideoGeneration": "Videos Seedance por lotes",
+    "batchVideoGenerationDesc": "Videos Seedance 480p y 720p por lotes",
     "batchGeneration": "Generación por lotes",
     "assets": "Recursos",
     "dashboard": "Panel",
@@ -119,35 +119,35 @@
     "footerPrivacy": "Política de privacidad",
     "footerTerms": "Términos de servicio",
     "footerRefund": "Política de reembolso",
-    "independenceDisclaimer": "Aviso de independencia: Viecom utiliza modelos de IA de terceros (como Gemini de Google, modelos de OpenAI y otros proveedores de servicios de IA) para impulsar nuestros servicios de generación de contenido. Estos modelos de IA son proporcionados por sus respectivos propietarios y están sujetos a sus propios términos y condiciones. Viecom es un proveedor de servicios independiente y nuestra plataforma, características y servicios son nuestros propios productos propietarios. No estamos afiliados, respaldados ni patrocinados por estos proveedores de modelos de IA.",
+    "independenceDisclaimer": "Aviso de independencia: Viecom utiliza servicios de IA de terceros, incluidos Google Gemini para flujos de imagen, DeepSeek para procesar prompts y ByteDance Seedance 2.0 Fast mediante Volcengine Ark para generar video. Cada servicio está sujeto a los términos de su propietario. Viecom es independiente y no está afiliado, respaldado ni patrocinado por estos proveedores.",
     "brandAnalysis": "Análisis de marca",
     "brandAnalysisDesc": "Análisis de tono y estilo de marca con IA",
     "learn": "Aprender",
     "pricing": "Precios",
     "settings": "Configuración",
-    "imageToVideoAI": "Imagen a Video IA",
-    "imageToVideoAIDesc": "Transforma fotos de productos en videos atractivos",
-    "freeAIVideoGenerator": "Generador de video IA gratis",
-    "freeAIVideoGeneratorDesc": "Comienza con 30 créditos gratis, sin tarjeta de crédito",
+    "imageToVideoAI": "Seedance de imagen a video",
+    "imageToVideoAIDesc": "Crea videos de producto 480p o 720p con Seedance",
+    "freeAIVideoGenerator": "Guía de video Seedance",
+    "freeAIVideoGeneratorDesc": "Ajustes, créditos y recompensas de Seedance",
     "videoEnhancer": "Mejorador de video",
     "videoEnhancerDesc": "Escala videos a calidad 4K con IA",
     "enhancingProductPhotos": "Mejora de fotos de productos",
     "enhancingProductPhotosDesc": "Impulsa tu éxito en e-commerce con servicios profesionales de edición de imágenes",
     "footerLearn": "Aprender",
     "documentation": "Documentación",
-    "documentationDesc": "Guías y tutoriales completos",
+    "documentationDesc": "Ajustes, precios y flujos de video Seedance",
     "nanoBananaPro": "Nano Banana Pro",
     "nanoBananaProDesc": "Modelo IA para fotografía de productos",
     "solutions": "Soluciones",
     "amazonSolutions": "Soluciones Amazon",
-    "amazonSolutionsDesc": "Imágenes de productos compatibles con Amazon",
+    "amazonSolutionsDesc": "Imágenes Amazon y videos de producto Seedance",
     "tiktokSolutions": "Soluciones TikTok",
-    "tiktokSolutionsDesc": "Generación de videos para TikTok Shop",
+    "tiktokSolutionsDesc": "Videos Seedance 9:16 para TikTok Shop",
     "shopifySolutions": "Soluciones Shopify",
-    "shopifySolutionsDesc": "Generación masiva de imágenes para Shopify"
+    "shopifySolutionsDesc": "Imágenes masivas y videos Seedance para Shopify"
   },
   "hero": {
-    "badge": "Nuevo: Motor de generación de imágenes Nano Banana Pro",
+    "badge": "Nuevo: Generación de video Seedance 2.0 Fast",
     "titleLine1": "Motor Visual de IA para E-commerce Moderno",
     "titleLine2": "",
     "titleHighlight": "Motor Visual de IA",
@@ -161,12 +161,12 @@
     "descriptionSub": "Genera contenido visual por lotes al instante y escala tu creatividad en e-commerce.",
     "ctaLogin": "Iniciar sesión",
     "noCreditCard": "Sin tarjeta de crédito",
-    "freeCredits": "40 créditos gratis",
+    "freeCredits": "15 créditos gratis",
     "cancelAnytime": "Cancela en cualquier momento",
     "featureImage": "Generación de imágenes",
     "featureImageDesc": "Texto a Imagen e Imagen a Imagen con análisis de tono de marca",
     "featureVideo": "Generación de videos",
-    "featureVideoDesc": "Texto a Video e Imagen a Video con múltiples estilos de video",
+    "featureVideoDesc": "Seedance 2.0 Fast de texto o imagen a video en 480p o 720p",
     "featureBatch": "Procesamiento por lotes",
     "featureBatchDesc": "Carga por lotes de Excel/CSV, generación con un clic y publicación en plataformas de e-commerce"
   },
@@ -439,14 +439,13 @@
     },
     "textDefaultPrompt": "Un video profesional de producto mostrando un smartphone moderno girando suavemente, destacando su diseño elegante y características premium, iluminación de estudio, fondo limpio",
     "imageDefaultPrompt": "Crea un video dinámico de esta imagen de producto, transiciones suaves, presentación profesional",
-    "modelSora2": "Sora 2 - {credits} créditos",
-    "modelSora2Pro": "Sora 2 Pro - {credits} créditos",
+    "modelSeedanceFast": "Seedance 2.0 Fast - {credits} créditos",
     "aspectRatioLandscape": "Panorámico (16:9)",
     "aspectRatioPortrait": "Retrato (9:16)",
     "duration10": "10 segundos",
     "duration15": "15 segundos",
-    "qualityStandard": "Estándar (720P)",
-    "qualityHigh": "Alta (1080P)"
+    "qualityStandard": "Estándar (480P)",
+    "qualityHigh": "Alta (720P)"
   },
   "batchGeneration": {
     "title": "Generación por lotes",
@@ -736,15 +735,15 @@
     "subtitle": "Todo lo que necesitas saber sobre Viecom AI",
     "q1": {
       "question": "¿Cómo funciona el sistema de créditos?",
-      "answer": "Los créditos se usan para generaciones con IA. La generación de imágenes cuesta 5-30 créditos dependiendo del modelo (ej., Nano Banana 5 créditos, Nano Banana Pro 30 créditos). Los videos cuestan 15-130 créditos dependiendo del modelo y resolución. Los usuarios gratuitos obtienen 30 créditos al registrarse. Los planes Pro incluyen 500-900 créditos mensuales. También puedes comprar paquetes de créditos desde $9.90 por 200 créditos."
+      "answer": "Los créditos se usan para generaciones con IA. Las imágenes cuestan 5-30 créditos y los videos Seedance 2.0 Fast cuestan 50-150 créditos según resolución y duración."
     },
     "q2": {
       "question": "¿Qué incluye el plan gratuito?",
-      "answer": "Los usuarios gratuitos obtienen 30 créditos al registrarse, recompensas de registro diario (2 créditos/día), recompensas de referidos (10 créditos) y recompensas por compartir en redes sociales (2 créditos). Puedes generar imágenes y videos usando estos créditos, con soporte de generación por lotes (1 concurrente) y visualización de recursos por 7 días."
+      "answer": "Los usuarios gratuitos obtienen 15 créditos al registrarse, recompensas diarias (2 créditos/día), recompensas de referidos (10 créditos) y por compartir (2 créditos). Puedes generar imágenes y videos, con generación por lotes (1 concurrente) y recursos visibles durante 7 días."
     },
     "q3": {
       "question": "¿Qué modelos de video y resoluciones están disponibles?",
-      "answer": "Ofrecemos Sora 2 (solo 720p, 15-20 créditos) y Sora 2 Pro (720p/1080p, 45-130 créditos) para videos de 10s o 15s. Sora 2 Pro entrega mayor calidad con tiempos de generación más rápidos. Todos los planes pueden acceder a ambos modelos usando créditos."
+      "answer": "Viecom usa ByteDance Seedance 2.0 Fast mediante Volcengine Ark para texto o imagen a video. Elige 10 o 15 segundos: 480p cuesta 50-75 créditos y 720p cuesta 100-150. El audio generado está activado."
     },
     "q4": {
       "question": "¿Puedo usar el contenido generado comercialmente?",
@@ -752,7 +751,7 @@
     },
     "q5": {
       "question": "¿Cómo funciona la generación por lotes?",
-      "answer": "Carga múltiples imágenes o prompts para generar contenido por lotes. Los usuarios gratuitos pueden procesar 1 tarea concurrente, los usuarios Pro obtienen 3 tareas concurrentes y los usuarios Pro+ obtienen 10. Nuestra cola inteligente prioriza las tareas de 720p para obtener retroalimentación más rápida en lotes mixtos."
+      "answer": "Carga imágenes o prompts para generar por lotes. El plan gratuito procesa 1 tarea concurrente, Pro 3 y Pro+ 10. La cola prioriza tareas más cortas y de 480p para devolver resultados antes."
     },
     "q6": {
       "question": "¿Qué es el análisis de marca y cómo ayuda?",
@@ -981,9 +980,9 @@
     "feature2Desc": "Carga la hoja de cálculo completa de tu catálogo de productos y deja que la IA haga el resto."
   },
   "videoGenerationShowcase": {
-    "title": "De estático a",
-    "titleHighlight": "cinematográfico",
-    "description": "Genera recursos de video de alta fidelidad desde una sola imagen de producto. Controla el movimiento de cámara, iluminación y física con simples prompts de texto.",
+    "title": "De imagen de producto a",
+    "titleHighlight": "video Seedance",
+    "description": "Convierte una imagen o prompt en un video Seedance 2.0 Fast de 10 o 15 segundos. Elige 480p o 720p, horizontal o vertical, con audio generado.",
     "source": "Fuente",
     "ready": "LISTO",
     "prompt": "Prompt",
@@ -1002,14 +1001,14 @@
     "disableAutoLoop": "Desactivar reproducción automática",
     "enableAutoLoop": "Activar reproducción automática",
     "autoLoop": "REPRO-AUTO",
-    "stageInitializing": "Inicializando conexión a Veo...",
-    "stageAnalyzing": "Analizando prompt y geometría...",
-    "stageGenerating": "Generando fotogramas clave...",
-    "stageInterpolating": "Interpolando movimiento...",
-    "stageFinalizing": "Finalizando salida 4K...",
-    "engineInitialized": "Veo_Engine_v3.1 inicializado",
-    "geometryInference": "Inferencia de geometría: OK",
-    "physicsSimulation": "Simulación física: ACTIVA"
+    "stageInitializing": "Enviando tarea a Seedance 2.0 Fast...",
+    "stageAnalyzing": "Analizando prompt e imagen de origen...",
+    "stageGenerating": "Generando video y audio...",
+    "stageInterpolating": "Renderizando movimiento y transiciones...",
+    "stageFinalizing": "Finalizando salida 480p o 720p...",
+    "engineInitialized": "Tarea Seedance_2.0_Fast inicializada",
+    "geometryInference": "Análisis de imagen de origen: OK",
+    "physicsSimulation": "Generación de audio: ACTIVA"
   },
   "showcaseGallery": {
     "title": "Galería de",

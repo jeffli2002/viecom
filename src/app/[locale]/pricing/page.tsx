@@ -31,7 +31,7 @@ export default async function PricingPage() {
     proplusCredits: proplusPlan?.credits.monthly || 900,
     proplusPrice: proplusPlan?.price || 34.9,
     minCost: creditsConfig.consumption.imageGeneration['nano-banana'],
-    maxCost: creditsConfig.consumption.videoGeneration['sora-2-pro-1080p-15s'],
+    maxCost: creditsConfig.consumption.videoGeneration['seedance-2-fast-720p-15s'],
   };
 
   const plans = paymentConfig.plans.map((plan) => {
@@ -49,7 +49,7 @@ export default async function PricingPage() {
 
     if (monthlyCredits > 0 && features.length > 0 && features[0].includes('credits')) {
       const maxImages = monthlyCapacity.images.nanoBanana;
-      const maxVideos = monthlyCapacity.videos.sora2_720p_10s;
+      const maxVideos = monthlyCapacity.videos.seedanceFast_720p_10s;
 
       features[0] = `${monthlyCredits.toLocaleString()} credits/month (up to ${maxImages} images or ${maxVideos} videos)`;
     } else if (plan.id === 'free' && plan.credits.onSignup) {

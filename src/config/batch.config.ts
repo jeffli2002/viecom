@@ -15,12 +15,14 @@ export interface QualityConfig {
 export interface InternalConfig {
   // 基于模型类型的并发调整
   modelConcurrency: {
+    'seedance-2-fast': number;
     'sora-2': number;
     'sora-2-pro': number;
   };
   
   // 基于分辨率的权重（乘数）
   resolutionWeight: {
+    '480p': number;
     '720p': number;
     '1080p': number;
   };
@@ -33,6 +35,7 @@ export interface InternalConfig {
   
   // 轮询配置
   polling: {
+    '480p': QualityConfig;
     '720p': QualityConfig;
     '1080p': QualityConfig;
   };
@@ -63,11 +66,13 @@ export const BATCH_CONFIG: Record<string, VideoBatchConfig> = {
     
     internal: {
       modelConcurrency: {
+        'seedance-2-fast': 1,
         'sora-2': 1,
         'sora-2-pro': 1,
       },
       
       resolutionWeight: {
+        '480p': 1.1,
         '720p': 1.0,
         '1080p': 1.0,
       },
@@ -78,6 +83,10 @@ export const BATCH_CONFIG: Record<string, VideoBatchConfig> = {
       },
       
       polling: {
+        '480p': {
+          timeout: 600000,
+          interval: 5000,
+        },
         '720p': {
           timeout: 300000,      // 5分钟
           interval: 3000,       // 3秒
@@ -99,11 +108,13 @@ export const BATCH_CONFIG: Record<string, VideoBatchConfig> = {
     
     internal: {
       modelConcurrency: {
+        'seedance-2-fast': 3,
         'sora-2': 4,           // Sora 2 实际可以4个并发
         'sora-2-pro': 3,       // Sora 2 Pro 保守3个
       },
       
       resolutionWeight: {
+        '480p': 1.1,
         '720p': 1.0,           // 720P不降速
         '1080p': 0.65,         // 1080P降速35%（因为7-13分钟 vs 2-3分钟）
       },
@@ -114,6 +125,17 @@ export const BATCH_CONFIG: Record<string, VideoBatchConfig> = {
       },
       
       polling: {
+        '480p': {
+          timeout: 600000,
+          interval: 5000,
+          adaptivePolling: {
+            enabled: true,
+            stages: [
+              { until: 180000, interval: 5000 },
+              { until: 999999, interval: 8000 },
+            ],
+          },
+        },
         '720p': {
           timeout: 300000,     // 5分钟
           interval: 3000,      // 3秒
@@ -151,11 +173,13 @@ export const BATCH_CONFIG: Record<string, VideoBatchConfig> = {
     
     internal: {
       modelConcurrency: {
+        'seedance-2-fast': 5,
         'sora-2': 7,           // Sora 2 实际可以7个并发
         'sora-2-pro': 5,       // Sora 2 Pro 保守5个
       },
       
       resolutionWeight: {
+        '480p': 1.1,
         '720p': 1.0,
         '1080p': 0.65,
       },
@@ -166,6 +190,17 @@ export const BATCH_CONFIG: Record<string, VideoBatchConfig> = {
       },
       
       polling: {
+        '480p': {
+          timeout: 600000,
+          interval: 5000,
+          adaptivePolling: {
+            enabled: true,
+            stages: [
+              { until: 180000, interval: 5000 },
+              { until: 999999, interval: 8000 },
+            ],
+          },
+        },
         '720p': {
           timeout: 300000,
           interval: 3000,
@@ -208,8 +243,8 @@ export function getBatchConfig(userPlan: string): VideoBatchConfig {
  */
 export function calculateActualConcurrency(
   userPlan: 'free' | 'pro' | 'proplus',
-  model: 'sora-2' | 'sora-2-pro',
-  resolution: '720p' | '1080p',
+  model: 'seedance-2-fast' | 'sora-2' | 'sora-2-pro',
+  resolution: '480p' | '720p' | '1080p',
   duration: 10 | 15
 ): number {
   const config = BATCH_CONFIG[userPlan];
@@ -232,7 +267,7 @@ export function calculateActualConcurrency(
  */
 export function getPollingConfig(
   userPlan: 'free' | 'pro' | 'proplus',
-  resolution: '720p' | '1080p',
+  resolution: '480p' | '720p' | '1080p',
   elapsedMs?: number
 ): { timeout: number; interval: number } {
   const config = BATCH_CONFIG[userPlan];

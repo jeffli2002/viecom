@@ -35,6 +35,11 @@ const AMAZON_FAQ = [
     answer:
       'Yes! You can upload a CSV file with multiple product SKUs and our system will generate Amazon-compliant images for all of them automatically.',
   },
+  {
+    question: 'Can I turn an Amazon product image into a video?',
+    answer:
+      'Yes. After preparing the product image, use Seedance 2.0 Fast to create a 10s or 15s product video in 480p or 720p. Review the final asset against the requirements of the Amazon placement where you plan to use it.',
+  },
 ];
 
 export async function generateMetadata({
@@ -55,6 +60,7 @@ export default function AmazonSolutionPage() {
       'Text overlay removal',
       'Amazon compliance check',
       'Batch processing',
+      'Seedance 2.0 Fast product video generation',
       'Marketplace safe',
     ],
     '0'
@@ -111,8 +117,8 @@ export default function AmazonSolutionPage() {
           </span>
         </h1>
         <p className="text-xl text-slate-600 dark:text-slate-400 max-w-3xl mx-auto">
-          Generate Amazon-ready product images with pure white backgrounds. Automated compliance
-          ensures your listings stay ranked.
+          Generate Amazon-ready product images with pure white backgrounds, then turn approved
+          source images into 10s or 15s Seedance 2.0 Fast product videos.
         </p>
       </div>
 
@@ -247,7 +253,7 @@ export default function AmazonSolutionPage() {
 
       <section className="py-20 bg-white dark:bg-slate-950 text-center">
         <h2 className="text-3xl md:text-4xl font-bold mb-8">
-          Ready to Generate Amazon-Compliant Images?
+          Ready to Generate Amazon Product Images and Videos?
         </h2>
         <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
           <Link
@@ -261,6 +267,12 @@ export default function AmazonSolutionPage() {
             className="inline-flex items-center gap-2 px-8 py-4 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-bold rounded-xl transition-colors hover:bg-slate-50 dark:hover:bg-slate-700"
           >
             View Pricing
+          </Link>
+          <Link
+            href="/video-generation"
+            className="inline-flex items-center gap-2 px-8 py-4 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-bold rounded-xl transition-colors hover:bg-slate-50 dark:hover:bg-slate-700"
+          >
+            Create Seedance Video
           </Link>
         </div>
         <div className="mt-6 text-sm text-slate-600 dark:text-slate-400">

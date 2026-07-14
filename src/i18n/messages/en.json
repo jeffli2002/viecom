@@ -93,12 +93,12 @@
     "generationTools": "Tools",
     "imageGeneration": "AI Image",
     "imageGenerationDesc": "Text-to-Image and Image-to-Image",
-    "videoGeneration": "AI Video",
-    "videoGenerationDesc": "Text-to-Video and Image-to-Video",
+    "videoGeneration": "Seedance AI Video",
+    "videoGenerationDesc": "Seedance 2.0 Fast text and image to video",
     "batchImageGeneration": "Batch Images",
     "batchImageGenerationDesc": "Batch image generation",
-    "batchVideoGeneration": "Batch Videos",
-    "batchVideoGenerationDesc": "Batch video generation",
+    "batchVideoGeneration": "Batch Seedance Videos",
+    "batchVideoGenerationDesc": "Batch 480p and 720p Seedance videos",
     "batchGeneration": "Batch Generation",
     "assets": "Assets",
     "dashboard": "Dashboard",
@@ -119,35 +119,35 @@
     "footerPrivacy": "Privacy Policy",
     "footerTerms": "Terms of Service",
     "footerRefund": "Refund Policy",
-    "independenceDisclaimer": "Independence Disclaimer: Viecom uses third-party AI models (such as Google's Gemini, OpenAI's models, and other AI service providers) to power our content generation services. These AI models are provided by their respective owners and are subject to their own terms and conditions. Viecom is an independent service provider and our platform, features, and services are our own proprietary products. We are not affiliated with, endorsed by, or sponsored by these AI model providers.",
+    "independenceDisclaimer": "Independence Disclaimer: Viecom uses third-party AI services, including Google Gemini for image workflows, DeepSeek for prompt processing, and ByteDance Seedance 2.0 Fast through Volcengine Ark for video generation. Each service is provided under its owner's terms. Viecom is independent and is not affiliated with, endorsed by, or sponsored by these providers.",
     "brandAnalysis": "Brand Analysis",
     "brandAnalysisDesc": "AI-powered brand tone and style analysis",
     "learn": "Learn",
     "pricing": "Pricing",
     "settings": "Settings",
-    "imageToVideoAI": "Image to Video AI",
-    "imageToVideoAIDesc": "Transform product photos into engaging videos",
-    "freeAIVideoGenerator": "Free AI Video Generator",
-    "freeAIVideoGeneratorDesc": "Start with 15 free credits, no credit card",
+    "imageToVideoAI": "Seedance Image to Video",
+    "imageToVideoAIDesc": "Create 480p or 720p product videos with Seedance",
+    "freeAIVideoGenerator": "Seedance Video Generator",
+    "freeAIVideoGeneratorDesc": "Learn Seedance settings, credits, and free rewards",
     "videoEnhancer": "Video Enhancer",
     "videoEnhancerDesc": "Upscale videos to 4K quality with AI",
     "enhancingProductPhotos": "Enhancing Product Photos",
     "enhancingProductPhotosDesc": "Boost your e-commerce success with professional image editing services",
     "footerLearn": "Learn",
     "documentation": "Documentation",
-    "documentationDesc": "Complete guides and tutorials",
+    "documentationDesc": "Seedance video settings, pricing, and workflow guides",
     "nanoBananaPro": "Nano Banana Pro",
     "nanoBananaProDesc": "AI model for product photography",
     "solutions": "Solutions",
     "amazonSolutions": "Amazon Solutions",
-    "amazonSolutionsDesc": "Amazon-compliant product images",
+    "amazonSolutionsDesc": "Amazon images and Seedance product videos",
     "tiktokSolutions": "TikTok Solutions",
-    "tiktokSolutionsDesc": "TikTok Shop video generation",
+    "tiktokSolutionsDesc": "9:16 Seedance videos for TikTok Shop",
     "shopifySolutions": "Shopify Solutions",
-    "shopifySolutionsDesc": "Bulk image generation for Shopify"
+    "shopifySolutionsDesc": "Bulk images and Seedance videos for Shopify"
   },
   "hero": {
-    "badge": "New: Nano Banana Pro Image Generation Engine",
+    "badge": "New: Seedance 2.0 Fast Video Generation",
     "titleLine1": "AI Visual Engine for Modern E-commerce",
     "titleLine2": "",
     "titleHighlight": "AI Visual",
@@ -161,12 +161,12 @@
     "descriptionSub": "Batch generate visuals instantly and scale your e-commerce creativity.",
     "ctaLogin": "Login",
     "noCreditCard": "No credit card",
-    "freeCredits": "40 free credits",
+    "freeCredits": "15 free credits",
     "cancelAnytime": "Cancel anytime",
     "featureImage": "Image Generation",
     "featureImageDesc": "Text-to-Image and Image-to-Image with brand tone analysis",
     "featureVideo": "Video Generation",
-    "featureVideoDesc": "Text-to-Video and Image-to-Video with multiple video styles",
+    "featureVideoDesc": "Seedance 2.0 Fast text-to-video and image-to-video in 480p or 720p",
     "featureBatch": "Batch Processing",
     "featureBatchDesc": "Excel/CSV batch upload, one-click generation and publishing to e-commerce platforms"
   },
@@ -439,14 +439,13 @@
     },
     "textDefaultPrompt": "A professional product video showcasing a modern smartphone rotating smoothly, highlighting its sleek design and premium features, studio lighting, clean background",
     "imageDefaultPrompt": "Create a dynamic video from this product image, smooth transitions, professional presentation",
-    "modelSora2": "Sora 2 - {credits} credits",
-    "modelSora2Pro": "Sora 2 Pro - {credits} credits",
+    "modelSeedanceFast": "Seedance 2.0 Fast - {credits} credits",
     "aspectRatioLandscape": "Landscape (16:9)",
     "aspectRatioPortrait": "Portrait (9:16)",
     "duration10": "10 seconds",
     "duration15": "15 seconds",
-    "qualityStandard": "Standard (720P)",
-    "qualityHigh": "High (1080P)"
+    "qualityStandard": "Standard (480P)",
+    "qualityHigh": "High (720P)"
   },
   "batchGeneration": {
     "title": "Batch Generation",
@@ -736,7 +735,7 @@
     "subtitle": "Everything you need to know about Viecom AI",
     "q1": {
       "question": "How does the credit system work?",
-      "answer": "Credits are used for AI generations. Image generation costs 5-30 credits depending on the model (e.g., Nano Banana 5 credits, Nano Banana Pro 30 credits). Videos cost 15-130 credits depending on model and resolution. Free users get 15 signup credits. Pro plans include 500-900 monthly credits. You can also purchase credit packs starting at $9.90 for 200 credits."
+      "answer": "Credits are used for AI generations. Images cost 5-30 credits. Seedance 2.0 Fast videos cost 50-150 credits depending on resolution and duration. Free users get 15 signup credits, and Pro plans include 500-900 monthly credits."
     },
     "q2": {
       "question": "What's included in the Free plan?",
@@ -744,7 +743,7 @@
     },
     "q3": {
       "question": "What video models and resolutions are available?",
-      "answer": "We offer Sora 2 (720p only, 15-20 credits) and Sora 2 Pro (720p/1080p, 45-130 credits) for 10s or 15s videos. Sora 2 Pro delivers higher quality with faster generation times. All plans can access both models using credits."
+      "answer": "Viecom uses ByteDance Seedance 2.0 Fast through Volcengine Ark for text-to-video and image-to-video. Choose 10s or 15s, 480p for 50-75 credits, or 720p for 100-150 credits. Generated audio is enabled."
     },
     "q4": {
       "question": "Can I use generated content commercially?",
@@ -752,7 +751,7 @@
     },
     "q5": {
       "question": "How does batch generation work?",
-      "answer": "Upload multiple images or prompts to generate content in batches. Free users can process 1 concurrent task, Pro users get 3 concurrent tasks, and Pro+ users get 10. Our smart queue prioritizes 720p tasks for faster feedback on mixed batches."
+      "answer": "Upload multiple images or prompts to generate content in batches. Free users can process 1 concurrent task, Pro users get 3 concurrent tasks, and Pro+ users get 10. Our smart queue prioritizes shorter and 480p tasks for faster feedback."
     },
     "q6": {
       "question": "What is brand analysis and how does it help?",
@@ -981,9 +980,9 @@
     "feature2Desc": "Upload your entire product catalog spreadsheet and let AI do the rest."
   },
   "videoGenerationShowcase": {
-    "title": "Static to",
-    "titleHighlight": "Cinematic",
-    "description": "Generate high-fidelity video assets from a single product image. Control camera motion, lighting, and physics with simple text prompts.",
+    "title": "Product Images to",
+    "titleHighlight": "Seedance Video",
+    "description": "Turn a product image or text prompt into a 10s or 15s Seedance 2.0 Fast video. Choose 480p or 720p, landscape or portrait, with generated audio.",
     "source": "Source",
     "ready": "READY",
     "prompt": "Prompt",
@@ -1002,14 +1001,14 @@
     "disableAutoLoop": "Disable auto-loop",
     "enableAutoLoop": "Enable auto-loop",
     "autoLoop": "AUTO-LOOP",
-    "stageInitializing": "Initializing connection to Veo...",
-    "stageAnalyzing": "Analyzing prompt & geometry...",
-    "stageGenerating": "Generating keyframes...",
-    "stageInterpolating": "Interpolating motion...",
-    "stageFinalizing": "Finalizing 4K output...",
-    "engineInitialized": "Veo_Engine_v3.1 initialized",
-    "geometryInference": "Geometry inference: OK",
-    "physicsSimulation": "Physics simulation: ACTIVE"
+    "stageInitializing": "Submitting task to Seedance 2.0 Fast...",
+    "stageAnalyzing": "Analyzing prompt and source image...",
+    "stageGenerating": "Generating video and audio...",
+    "stageInterpolating": "Rendering motion and transitions...",
+    "stageFinalizing": "Finalizing 480p or 720p output...",
+    "engineInitialized": "Seedance_2.0_Fast task initialized",
+    "geometryInference": "Source image analysis: OK",
+    "physicsSimulation": "Audio generation: ACTIVE"
   },
   "showcaseGallery": {
     "title": "Community",

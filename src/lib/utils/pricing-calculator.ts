@@ -8,12 +8,10 @@ export interface GenerationCapacity {
     flux11Ultra: number;
   };
   videos: {
-    sora2_720p_10s: number;
-    sora2_720p_15s: number;
-    sora2Pro_720p_10s: number;
-    sora2Pro_720p_15s: number;
-    sora2Pro_1080p_10s: number;
-    sora2Pro_1080p_15s: number;
+    seedanceFast_480p_10s: number;
+    seedanceFast_480p_15s: number;
+    seedanceFast_720p_10s: number;
+    seedanceFast_720p_15s: number;
   };
 }
 
@@ -28,19 +26,25 @@ export function calculateGenerationCapacity(credits: number): GenerationCapacity
       flux11Ultra: Math.floor(credits / consumption.imageGeneration['flux-1.1-ultra']),
     },
     videos: {
-      sora2_720p_10s: Math.floor(credits / consumption.videoGeneration['sora-2-720p-10s']),
-      sora2_720p_15s: Math.floor(credits / consumption.videoGeneration['sora-2-720p-15s']),
-      sora2Pro_720p_10s: Math.floor(credits / consumption.videoGeneration['sora-2-pro-720p-10s']),
-      sora2Pro_720p_15s: Math.floor(credits / consumption.videoGeneration['sora-2-pro-720p-15s']),
-      sora2Pro_1080p_10s: Math.floor(credits / consumption.videoGeneration['sora-2-pro-1080p-10s']),
-      sora2Pro_1080p_15s: Math.floor(credits / consumption.videoGeneration['sora-2-pro-1080p-15s']),
+      seedanceFast_480p_10s: Math.floor(
+        credits / consumption.videoGeneration['seedance-2-fast-480p-10s']
+      ),
+      seedanceFast_480p_15s: Math.floor(
+        credits / consumption.videoGeneration['seedance-2-fast-480p-15s']
+      ),
+      seedanceFast_720p_10s: Math.floor(
+        credits / consumption.videoGeneration['seedance-2-fast-720p-10s']
+      ),
+      seedanceFast_720p_15s: Math.floor(
+        credits / consumption.videoGeneration['seedance-2-fast-720p-15s']
+      ),
     },
   };
 }
 
 export function formatCapacityRange(capacity: GenerationCapacity): string {
   const maxImages = capacity.images.nanoBanana;
-  const maxVideos = capacity.videos.sora2_720p_10s;
+  const maxVideos = capacity.videos.seedanceFast_720p_10s;
 
   return `up to ${maxImages} images or ${maxVideos} videos`;
 }

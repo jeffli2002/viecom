@@ -293,7 +293,11 @@ export class WorkflowEngine {
     const creditCost =
       type === 'image'
         ? getModelCost('imageGeneration', model)
-        : getModelCost('videoGeneration', 'sora-2');
+        : (await import('@/config/credits.config')).getVideoModelInfo({
+            model: 'seedance-2-fast',
+            resolution: '720p',
+            duration: 10,
+          }).credits;
 
     const hasCredits = await creditService.hasEnoughCredits(userId, creditCost);
 
@@ -316,7 +320,7 @@ export class WorkflowEngine {
       );
     }
 
-    return await this.generateVideo(userId, prompt, mode, creditCost, baseImage);
+    return await this.generateVideo(userId, prompt, mode, creditCost, baseImage, aspectRatio);
   }
 
   /**
@@ -433,43 +437,47 @@ export class WorkflowEngine {
   }
 
   /**
-   * Generate video using KIE API
+   * Generate video using Volcengine Ark Seedance.
    */
   private async generateVideo(
     userId: string,
     prompt: string,
     mode: 't2v' | 'i2v',
     creditCost: number,
-    baseImage?: string
+    baseImage?: string,
+    aspectRatio = '16:9'
   ): Promise<WorkflowResult['generatedAssets'][0] & { creditsSpent: number }> {
-    const { getKieApiService } = await import('@/lib/kie/kie-api');
-    const kieApiService = getKieApiService();
+    const { getArkVideoApiService, getArkVideoUrl } = await import(
+      '@/lib/volcengine/ark-video-api'
+    );
+    const arkVideoApiService = getArkVideoApiService();
     const { r2StorageService } = await import('@/lib/storage/r2');
     const { randomUUID } = await import('node:crypto');
 
     // Create video generation task
-    const taskResponse = await kieApiService.generateVideo({
+    const taskResponse = await arkVideoApiService.createVideoTask({
       prompt,
-      imageUrls: mode === 'i2v' && baseImage ? [baseImage] : undefined,
-      aspectRatio: 'landscape', // Default, can be made configurable
-      quality: 'standard',
+      imageUrl: mode === 'i2v' ? baseImage : undefined,
+      ratio: aspectRatio,
+      resolution: '720p',
+      duration: 10,
     });
 
-    const taskId = taskResponse.data.taskId;
+    const taskId = taskResponse.id;
 
     // Poll for task completion
-    let status = 'pending';
+    let status = 'queued';
     let attempts = 0;
     const maxAttempts = 120; // Wait up to 10 minutes
 
-    while (status === 'pending' || status === 'processing') {
+    while (status === 'queued' || status === 'running') {
       await new Promise((resolve) => setTimeout(resolve, 5000)); // Wait 5 seconds
 
-      const statusResponse = await kieApiService.getTaskStatus(taskId);
-      status = statusResponse.data.status;
+      const statusResponse = await arkVideoApiService.getVideoTask(taskId);
+      status = statusResponse.status;
 
-      if (status === 'completed') {
-        const videoUrl = statusResponse.data.result?.videoUrl;
+      if (status === 'succeeded') {
+        const videoUrl = getArkVideoUrl(statusResponse);
         if (!videoUrl) {
           throw new Error('Video generation completed but no video URL found');
         }
@@ -519,8 +527,12 @@ export class WorkflowEngine {
         };
       }
 
-      if (status === 'failed') {
-        throw new Error(statusResponse.data.error || 'Video generation failed');
+      if (['failed', 'expired', 'canceled'].includes(status)) {
+        throw new Error(
+          typeof statusResponse.error === 'string'
+            ? statusResponse.error
+            : 'Video generation failed'
+        );
       }
 
       attempts++;
@@ -688,7 +700,7 @@ export class WorkflowEngine {
             mode: mode as 't2i' | 'i2i' | 't2v' | 'i2v',
             type: generationType,
             baseImage: row.baseImageUrl,
-            model: row.model || (generationType === 'image' ? 'nano-banana' : 'sora-2'),
+            model: row.model || (generationType === 'image' ? 'nano-banana' : 'seedance-2-fast'),
             aspectRatio,
           },
           options?.jobId || 'batch-job'

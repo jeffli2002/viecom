@@ -22,6 +22,8 @@ export const metadata: Metadata = {
 export default function RefundPolicyPage() {
   const freePlan = paymentConfig.plans.find((p) => p.id === 'free');
   const socialShareCredits = creditsConfig.rewards.socialShare.creditsPerShare;
+  const seedanceMinimumCredits =
+    creditsConfig.consumption.videoGeneration['seedance-2-fast-480p-10s'];
   return (
     <div className="container mx-auto px-4 py-12 max-w-4xl">
       <h1 className="mb-8 text-4xl font-bold text-gray-900 dark:text-white">Refund Policy</h1>
@@ -48,9 +50,7 @@ export default function RefundPolicyPage() {
 
         <Card>
           <CardContent className="pt-6 space-y-4">
-            <p className="text-sm text-gray-500 dark:text-slate-400">
-              Last updated: November 12, 2025
-            </p>
+            <p className="text-sm text-gray-500 dark:text-slate-400">Last updated: July 14, 2026</p>
 
             <p>
               This Refund Policy outlines our policies and procedures regarding refunds for Viecom's
@@ -101,6 +101,17 @@ export default function RefundPolicyPage() {
               The service has been delivered and computational resources have been consumed.
               Therefore, we cannot offer refunds for digital services that have been accessed or
               utilized.
+            </p>
+
+            <h3 className="text-lg font-semibold text-gray-800 dark:text-slate-200 mt-4">
+              Failed or Cancelled Video Tasks
+            </h3>
+            <p>
+              Seedance 2.0 Fast video credits are temporarily reserved while an asynchronous task is
+              processing. If the provider reports that the task failed, expired, or was cancelled
+              before completion, the reservation is normally released and the completed-generation
+              charge is not applied. This credit release is an account balance correction, not a
+              cash refund.
             </p>
           </CardContent>
         </Card>
@@ -201,8 +212,10 @@ export default function RefundPolicyPage() {
             </ul>
 
             <p className="mt-4">
-              These free credits allow you to test image and video generation quality before
-              committing to a paid plan.
+              The sign-up bonus can be used to test image generation and explore the video workflow.
+              Seedance 2.0 Fast videos currently start at {seedanceMinimumCredits} credits, so video
+              generation may require earned rewards or purchased credits in addition to the sign-up
+              bonus.
             </p>
           </CardContent>
         </Card>

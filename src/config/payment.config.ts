@@ -173,7 +173,7 @@ export const paymentConfig: PaymentConfig = {
         '500 credits/month',
         'Everything in Free plan',
         'All image generation features',
-        'Sora 2 & Sora 2 Pro video models',
+        'Seedance 2.0 Fast video generation',
         'Nano Banana Pro 4K resolution support',
         'Batch generation (3 concurrent)',
         'No watermarks',
@@ -309,5 +309,4 @@ export const paymentConfig: PaymentConfig = {
     webhooks: true,
   },
 };
-
 

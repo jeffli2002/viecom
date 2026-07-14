@@ -26,6 +26,11 @@ export interface CreditsConfig {
       'stable-diffusion': number;
     };
     videoGeneration: {
+      // Seedance 2.0 Fast (Ark)
+      'seedance-2-fast-480p-10s': number;
+      'seedance-2-fast-480p-15s': number;
+      'seedance-2-fast-720p-10s': number;
+      'seedance-2-fast-720p-15s': number;
       // Sora 2 (仅720P)
       'sora-2-720p-10s': number;
       'sora-2-720p-15s': number;
@@ -111,6 +116,11 @@ export const creditsConfig: CreditsConfig = {
       'stable-diffusion': 5,
     },
     videoGeneration: {
+      // Seedance 2.0 Fast: prices preserve a >=50% margin after payment, retry, FX, and storage reserve.
+      'seedance-2-fast-480p-10s': 50,
+      'seedance-2-fast-480p-15s': 75,
+      'seedance-2-fast-720p-10s': 100,
+      'seedance-2-fast-720p-15s': 150,
       // Sora 2 (仅720P, 2-3分钟生成)
       'sora-2-720p-10s': 25,
       'sora-2-720p-15s': 30,
@@ -204,11 +214,21 @@ export function getModelCost(
  * 根据视频参数获取模型key和积分消耗
  */
 export function getVideoModelInfo(params: {
-  model: 'sora-2' | 'sora-2-pro';
-  resolution: '720p' | '1080p';
+  model: 'seedance-2-fast' | 'sora-2' | 'sora-2-pro';
+  resolution: '480p' | '720p' | '1080p';
   duration: 10 | 15;
 }): { modelKey: string; credits: number; apiModel: string } {
   const { model, resolution, duration } = params;
+
+  if (model === 'seedance-2-fast') {
+    const normalizedResolution = resolution === '480p' ? '480p' : '720p';
+    const key = `seedance-2-fast-${normalizedResolution}-${duration}s` as const;
+    return {
+      modelKey: key,
+      credits: creditsConfig.consumption.videoGeneration[key],
+      apiModel: 'doubao-seedance-2-0-fast-260128',
+    };
+  }
   
   // Sora 2 只支持720P
   if (model === 'sora-2') {
@@ -221,7 +241,8 @@ export function getVideoModelInfo(params: {
   }
   
   // Sora 2 Pro 支持720P和1080P
-  const key = `sora-2-pro-${resolution}-${duration}s` as const;
+  const legacyResolution = resolution === '1080p' ? '1080p' : '720p';
+  const key = `sora-2-pro-${legacyResolution}-${duration}s` as const;
   return {
     modelKey: key,
     credits: creditsConfig.consumption.videoGeneration[key] || 25,
