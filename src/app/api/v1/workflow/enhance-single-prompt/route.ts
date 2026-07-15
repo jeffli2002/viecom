@@ -1,3 +1,4 @@
+import { applyGenerationStyle } from '@/config/styles.config';
 import { auth } from '@/lib/auth/auth';
 import { type NextRequest, NextResponse } from 'next/server';
 
@@ -32,28 +33,20 @@ export async function POST(request: NextRequest) {
     const { deepSeekService } = await import('@/lib/ai/deepseek');
 
     try {
-      let promptToEnhance = prompt;
-
       // Parse product selling points
       const sellingPointsArray = productSellingPoints
         ?.split(',')
         .map((s) => s.trim())
         .filter(Boolean);
 
-      // Add style enhancement if provided (before DeepSeek enhancement)
-      if (style) {
-        const { getImageStyle, getVideoStyle } = await import('@/config/styles.config');
-        const styleConfig =
-          generationType === 'image' ? getImageStyle(style) : getVideoStyle(style);
-        if (styleConfig?.promptEnhancement) {
-          promptToEnhance = `${promptToEnhance}, ${styleConfig.promptEnhancement}`;
-        }
-      }
-
       // Enhance prompt using DeepSeek
-      const enhancedPrompt = await deepSeekService.enhancePrompt(promptToEnhance, generationType, {
-        productSellingPoints: sellingPointsArray,
-      });
+      const enhancedPrompt = applyGenerationStyle(
+        await deepSeekService.enhancePrompt(prompt, generationType, {
+          productSellingPoints: sellingPointsArray,
+        }),
+        style,
+        generationType
+      );
 
       return NextResponse.json({
         success: true,

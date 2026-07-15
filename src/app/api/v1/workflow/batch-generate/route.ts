@@ -1,5 +1,10 @@
 import { randomUUID } from 'node:crypto';
+import { applyGenerationStyle } from '@/config/styles.config';
 import { auth } from '@/lib/auth/auth';
+import {
+  type BatchGenerateRequest,
+  batchGenerateRequestSchema,
+} from '@/lib/workflow/batch-generation-schema';
 import { templateGenerator } from '@/lib/workflow/template-generator';
 import { db } from '@/server/db';
 import { batchGenerationJob, generatedAsset } from '@/server/db/schema';
@@ -8,42 +13,16 @@ import { type NextRequest, NextResponse } from 'next/server';
 
 export const dynamic = 'force-dynamic';
 
-interface BatchGenerateRequest {
-  rows: Array<{
-    rowIndex: number;
-    productName?: string;
-    productDescription?: string;
-    prompt: string;
-    enhancedPrompt: string;
-    baseImageUrl?: string; // Can be HTTP/HTTPS URL or base64 image
-    productSellingPoints?: string;
-    // 新增视频参数
-    model?: 'seedance-2-fast';
-    resolution?: '480p' | '720p';
-    duration?: 10 | 15;
-  }>;
-  generationType: 'image' | 'video';
-  mode: 't2i' | 'i2i' | 't2v' | 'i2v'; // Default mode, will be auto-determined per row if baseImageUrl exists
-  aspectRatio: string;
-  style?: string;
-  // 批量视频参数
-  defaultModel?: 'seedance-2-fast';
-  defaultResolution?: '480p' | '720p';
-  defaultDuration?: 10 | 15;
-}
-
 const MAX_RETRIES = 3;
 
 /**
  * Generate a single asset with retry logic
  */
-async function generateAssetWithRetry(
+async function generateImageAssetWithRetry(
   userId: string,
   params: {
     prompt: string;
     enhancedPrompt: string;
-    mode: 't2i' | 'i2i' | 't2v' | 'i2v'; // Default mode, will be auto-determined if baseImage exists
-    type: 'image' | 'video';
     baseImage?: string; // Can be HTTP/HTTPS URL or base64 image
     aspectRatio?: string;
     productName?: string;
@@ -53,41 +32,26 @@ async function generateAssetWithRetry(
   rowIndex: number
 ): Promise<{ success: boolean; assetId?: string; assetUrl?: string; error?: string }> {
   const { getKieApiService } = await import('@/lib/kie/kie-api');
-  const { getArkVideoApiService, getArkVideoUrl } = await import('@/lib/volcengine/ark-video-api');
   const { r2StorageService } = await import('@/lib/storage/r2');
   const { creditsConfig } = await import('@/config/credits.config');
   const { creditService } = await import('@/lib/credits/credit-service');
 
   type KieApiService = ReturnType<typeof getKieApiService>;
   const kieApiService: KieApiService = getKieApiService();
-  const arkVideoApiService = getArkVideoApiService();
   type ImageTaskResponse = Awaited<ReturnType<KieApiService['generateImage']>>;
-  type VideoTaskResponse = Awaited<ReturnType<typeof arkVideoApiService.createVideoTask>>;
 
   let lastError: Error | null = null;
 
   for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
     try {
       // Auto-determine mode based on baseImage presence
-      const actualMode: 't2i' | 'i2i' | 't2v' | 'i2v' = params.baseImage?.trim()
-        ? params.type === 'image'
-          ? 'i2i'
-          : 'i2v'
-        : params.type === 'image'
-          ? 't2i'
-          : 't2v';
+      const actualMode: 't2i' | 'i2i' = params.baseImage?.trim() ? 'i2i' : 't2i';
 
       console.log(
-        `[Job ${jobId}] Row ${rowIndex}, Attempt ${attempt}/${MAX_RETRIES}: Generating ${params.type} (mode: ${actualMode})`
+        `[Job ${jobId}] Row ${rowIndex}, Attempt ${attempt}/${MAX_RETRIES}: Generating image (mode: ${actualMode})`
       );
 
-      // Determine model based on mode
-      const model =
-        params.type === 'image'
-          ? actualMode === 'i2i'
-            ? 'google/nano-banana-edit'
-            : 'google/nano-banana'
-          : 'seedance-2-fast';
+      const model = actualMode === 'i2i' ? 'google/nano-banana-edit' : 'google/nano-banana';
 
       // Check credits before generation
       const creditAccount = await creditService.getCreditAccount(userId);
@@ -96,11 +60,9 @@ async function generateAssetWithRetry(
       }
 
       const creditCost =
-        params.type === 'image'
-          ? creditsConfig.consumption.imageGeneration[
-              model as keyof typeof creditsConfig.consumption.imageGeneration
-            ] || 10
-          : creditsConfig.consumption.videoGeneration['seedance-2-fast-720p-10s'];
+        creditsConfig.consumption.imageGeneration[
+          model as keyof typeof creditsConfig.consumption.imageGeneration
+        ] || 10;
 
       if (creditAccount.balance < creditCost) {
         throw new Error(
@@ -151,93 +113,45 @@ async function generateAssetWithRetry(
         }
       }
 
-      // Generate asset
-      let taskResponse: ImageTaskResponse | VideoTaskResponse | undefined;
-      let assetUrl: string;
+      // Generate image asset
       const assetId = randomUUID();
+      const aspectRatioMap: Record<string, '1:1' | '9:16' | '16:9' | '3:4' | '4:3'> = {
+        '1:1': '1:1',
+        '9:16': '9:16',
+        '16:9': '16:9',
+        '4:3': '4:3',
+        '3:4': '3:4',
+      };
+      const imageSize = aspectRatioMap[params.aspectRatio || '1:1'] || '1:1';
 
-      if (params.type === 'image') {
-        // Image generation
-        const aspectRatioMap: Record<string, '1:1' | '9:16' | '16:9' | '3:4' | '4:3'> = {
-          '1:1': '1:1',
-          '9:16': '9:16',
-          '16:9': '16:9',
-          '4:3': '4:3',
-          '3:4': '3:4',
-        };
-        const imageSize = aspectRatioMap[params.aspectRatio || '1:1'] || '1:1';
+      const taskResponse: ImageTaskResponse = await kieApiService.generateImage({
+        prompt: params.enhancedPrompt,
+        imageUrl: processedImageUrl,
+        imageSize,
+        outputFormat: 'jpeg',
+      });
 
-        taskResponse = await kieApiService.generateImage({
-          prompt: params.enhancedPrompt,
-          imageUrl: processedImageUrl, // Use processed URL (R2 URL for base64, or original HTTP URL)
-          imageSize,
-          outputFormat: 'jpeg',
-        });
-
-        // Poll for image result
-        const imageResult = await kieApiService.pollTaskStatus(taskResponse.data.taskId, 'image');
-        if (!imageResult.imageUrl) {
-          throw new Error('Image generation failed: No image URL in response');
-        }
-
-        assetUrl = imageResult.imageUrl;
-
-        // Download and upload to R2
-        const imageResponse = await fetch(assetUrl);
-        const imageBuffer = Buffer.from(await imageResponse.arrayBuffer());
-        const r2Result = await r2StorageService.uploadAsset(
-          imageBuffer,
-          `batch-${jobId}-${rowIndex}-${assetId}.jpg`,
-          'image/jpeg',
-          'image'
-        );
-        assetUrl = r2Result.url;
-      } else {
-        // Video generation
-        taskResponse = await arkVideoApiService.createVideoTask({
-          prompt: params.enhancedPrompt,
-          imageUrl: processedImageUrl,
-          ratio: params.aspectRatio || '16:9',
-          resolution: '720p',
-          duration: 10,
-        });
-
-        let videoUrl: string | undefined;
-        for (let attempt = 0; attempt < 120; attempt++) {
-          await new Promise((resolve) => setTimeout(resolve, 5000));
-          const videoTask = await arkVideoApiService.getVideoTask(taskResponse.id);
-          if (videoTask.status === 'succeeded') {
-            videoUrl = getArkVideoUrl(videoTask);
-            break;
-          }
-          if (['failed', 'expired', 'canceled'].includes(videoTask.status)) {
-            throw new Error(
-              typeof videoTask.error === 'string' ? videoTask.error : 'Video generation failed'
-            );
-          }
-        }
-
-        if (!videoUrl) throw new Error('Video generation timed out or returned no video URL');
-        assetUrl = videoUrl;
-
-        // Download and upload to R2
-        const videoResponse = await fetch(assetUrl);
-        const videoBuffer = Buffer.from(await videoResponse.arrayBuffer());
-        const r2Result = await r2StorageService.uploadAsset(
-          videoBuffer,
-          `batch-${jobId}-${rowIndex}-${assetId}.mp4`,
-          'video/mp4',
-          'video'
-        );
-        assetUrl = r2Result.url;
+      const imageResult = await kieApiService.pollTaskStatus(taskResponse.data.taskId, 'image');
+      if (!imageResult.imageUrl) {
+        throw new Error('Image generation failed: No image URL in response');
       }
+
+      const imageResponse = await fetch(imageResult.imageUrl);
+      const imageBuffer = Buffer.from(await imageResponse.arrayBuffer());
+      const r2Result = await r2StorageService.uploadAsset(
+        imageBuffer,
+        `batch-${jobId}-${rowIndex}-${assetId}.jpg`,
+        'image/jpeg',
+        'image'
+      );
+      const assetUrl = r2Result.url;
 
       // Deduct credits
       await creditService.spendCredits({
         userId,
         amount: creditCost,
         source: 'generation',
-        description: `Batch ${params.type} generation - Row ${rowIndex}`,
+        description: `Batch image generation - Row ${rowIndex}`,
         referenceId: `batch-${jobId}-${rowIndex}`,
       });
 
@@ -252,7 +166,7 @@ async function generateAssetWithRetry(
         id: assetId,
         userId,
         batchJobId: jobId,
-        assetType: params.type,
+        assetType: 'image',
         generationMode: actualMode, // Use auto-determined mode
         prompt: params.prompt,
         enhancedPrompt: params.enhancedPrompt,
@@ -265,7 +179,7 @@ async function generateAssetWithRetry(
         metadata,
       });
 
-      console.log(`[Job ${jobId}] Row ${rowIndex}: Successfully generated ${params.type}`);
+      console.log(`[Job ${jobId}] Row ${rowIndex}: Successfully generated image`);
 
       return {
         success: true,
@@ -309,12 +223,22 @@ export async function POST(request: NextRequest) {
     }
 
     const userId = session.user.id;
-    const body: BatchGenerateRequest = await request.json();
-    const { rows, generationType, mode, aspectRatio, style } = body;
-
-    if (!rows || !Array.isArray(rows) || rows.length === 0) {
-      return NextResponse.json({ error: 'Rows are required' }, { status: 400 });
+    const parsedBody = batchGenerateRequestSchema.safeParse(await request.json());
+    if (!parsedBody.success) {
+      return NextResponse.json(
+        {
+          error: 'Invalid batch generation parameters',
+          details: parsedBody.error.issues.map((issue) => ({
+            path: issue.path.join('.'),
+            message: issue.message,
+          })),
+        },
+        { status: 400 }
+      );
     }
+
+    const body = parsedBody.data;
+    const { rows, generationType, mode, aspectRatio, style } = body;
 
     // Create batch job record
     const jobId = randomUUID();
@@ -340,6 +264,8 @@ export async function POST(request: NextRequest) {
       defaultModel: body.defaultModel,
       defaultResolution: body.defaultResolution,
       defaultDuration: body.defaultDuration,
+      generateAudio: body.generateAudio,
+      videoInputEnabled: body.videoInputEnabled,
     }).catch((error) => {
       console.error('Background batch generation error:', error);
     });
@@ -377,6 +303,8 @@ async function processBatchVideoGeneration(
     defaultModel?: 'seedance-2-fast';
     defaultResolution?: '480p' | '720p';
     defaultDuration?: 10 | 15;
+    generateAudio: boolean;
+    videoInputEnabled: boolean;
   }
 ) {
   try {
@@ -408,9 +336,12 @@ async function processBatchVideoGeneration(
       resolution: row.resolution || options.defaultResolution || '720p',
       duration: row.duration || options.defaultDuration || 15,
       prompt: row.prompt,
-      enhancedPrompt: row.enhancedPrompt,
+      enhancedPrompt: applyGenerationStyle(row.enhancedPrompt, options.style, 'video'),
       imageUrl: row.baseImageUrl,
+      referenceVideoUrl: options.videoInputEnabled ? row.referenceVideoUrl : undefined,
+      referenceVideoDuration: options.videoInputEnabled ? row.referenceVideoDuration : undefined,
       aspectRatio: options.aspectRatio,
+      generateAudio: options.generateAudio,
       productName: row.productName,
       productDescription: row.productDescription,
     }));
@@ -446,6 +377,8 @@ async function processBatchGeneration(
     defaultModel?: 'seedance-2-fast';
     defaultResolution?: '480p' | '720p';
     defaultDuration?: 10 | 15;
+    generateAudio: boolean;
+    videoInputEnabled: boolean;
   }
 ) {
   // 对于视频，使用优先队列处理器
@@ -463,14 +396,11 @@ async function processBatchGeneration(
     // Process rows sequentially to avoid overwhelming the API
     for (const row of rows) {
       try {
-        // Mode will be auto-determined in generateAssetWithRetry based on baseImageUrl
-        const result = await generateAssetWithRetry(
+        const result = await generateImageAssetWithRetry(
           userId,
           {
             prompt: row.prompt,
-            enhancedPrompt: row.enhancedPrompt,
-            mode: options.mode, // Default mode, will be overridden if baseImageUrl exists
-            type: options.generationType,
+            enhancedPrompt: applyGenerationStyle(row.enhancedPrompt, options.style, 'image'),
             baseImage: row.baseImageUrl,
             aspectRatio: options.aspectRatio,
             productName: row.productName,

@@ -20,7 +20,8 @@ export async function POST(request: NextRequest) {
   try {
     const formData = await request.formData();
     const file = formData.get('file') as File | null;
-    const _generationType = (formData.get('generationType') as 'image' | 'video') || 'image';
+    const generationType = (formData.get('generationType') as 'image' | 'video') || 'image';
+    const videoInputEnabled = formData.get('videoInputEnabled') === 'true';
 
     if (!file) {
       return NextResponse.json({ error: 'File is required' }, { status: 400 });
@@ -60,6 +61,47 @@ export async function POST(request: NextRequest) {
             message: 'baseImageUrl必须是有效的HTTP/HTTPS URL或base64图片（data:image/...）',
           });
         }
+      }
+
+      const referenceVideoUrl = row.referenceVideoUrl?.trim();
+      const referenceVideoDuration = row.referenceVideoDuration;
+
+      if (generationType === 'video' && videoInputEnabled) {
+        if (!referenceVideoUrl) {
+          rowErrors.push({
+            row: rowNumber,
+            field: 'referenceVideoUrl',
+            message: '启用视频输入后，referenceVideoUrl 是必需字段',
+          });
+        }
+        if (referenceVideoDuration === undefined) {
+          rowErrors.push({
+            row: rowNumber,
+            field: 'referenceVideoDuration',
+            message: '启用视频输入后，referenceVideoDuration 是必需字段',
+          });
+        }
+      }
+
+      if (referenceVideoUrl && !referenceVideoUrl.startsWith('https://')) {
+        rowErrors.push({
+          row: rowNumber,
+          field: 'referenceVideoUrl',
+          message: 'referenceVideoUrl 必须是有效的 HTTPS URL',
+        });
+      }
+
+      if (
+        referenceVideoDuration !== undefined &&
+        (!Number.isInteger(referenceVideoDuration) ||
+          referenceVideoDuration < 2 ||
+          referenceVideoDuration > 15)
+      ) {
+        rowErrors.push({
+          row: rowNumber,
+          field: 'referenceVideoDuration',
+          message: 'referenceVideoDuration 必须是 2 到 15 之间的整数秒',
+        });
       }
 
       // Validate aspectRatio if provided

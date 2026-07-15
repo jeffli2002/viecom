@@ -3,17 +3,23 @@
  * 实现智能并发控制、优先级调度和错误fallback
  */
 
-// @ts-nocheck
 import { randomUUID } from 'node:crypto';
 import {
   calculateActualConcurrency,
   getBatchConfig,
   getPollingConfig,
 } from '@/config/batch.config';
-import { getVideoModelInfo } from '@/config/credits.config';
+import {
+  calculateSeedanceFastCreditsFromTokenUsage,
+  getVideoModelInfo,
+} from '@/config/credits.config';
 import { creditService } from '@/lib/credits';
 import { r2StorageService } from '@/lib/storage/r2';
-import { getArkVideoApiService, getArkVideoUrl } from '@/lib/volcengine/ark-video-api';
+import {
+  getArkVideoApiService,
+  getArkVideoTokenUsage,
+  getArkVideoUrl,
+} from '@/lib/volcengine/ark-video-api';
 import { db } from '@/server/db';
 import { batchGenerationJob, generatedAsset } from '@/server/db/schema';
 import { eq } from 'drizzle-orm';
@@ -23,9 +29,12 @@ export interface VideoTask {
   model: 'seedance-2-fast';
   resolution: '480p' | '720p';
   duration: 10 | 15;
+  generateAudio: boolean;
   prompt: string;
   enhancedPrompt: string;
   imageUrl?: string;
+  referenceVideoUrl?: string;
+  referenceVideoDuration?: number;
   aspectRatio?: string;
   productName?: string;
   productDescription?: string;
@@ -200,6 +209,7 @@ export class PriorityQueueProcessor {
         model: task.model,
         resolution: task.resolution,
         duration: task.duration,
+        referenceVideoDuration: task.referenceVideoUrl ? 15 : undefined,
       });
       return sum + credits;
     }, 0);
@@ -366,16 +376,23 @@ export class PriorityQueueProcessor {
    * 处理单个任务
    */
   private async processTask(task: VideoTask): Promise<TaskResult> {
-    const { modelKey, credits } = getVideoModelInfo({
+    const { modelKey, credits: estimatedCredits } = getVideoModelInfo({
       model: task.model,
       resolution: task.resolution,
       duration: task.duration,
+      referenceVideoDuration: task.referenceVideoDuration,
     });
+    const maximumCredits = getVideoModelInfo({
+      model: task.model,
+      resolution: task.resolution,
+      duration: task.duration,
+      referenceVideoDuration: task.referenceVideoUrl ? 15 : undefined,
+    }).credits;
 
     // 1. 检查积分
-    const hasCredits = await creditService.hasEnoughCredits(this.userId, credits);
+    const hasCredits = await creditService.hasEnoughCredits(this.userId, maximumCredits);
     if (!hasCredits) {
-      throw new Error(`Insufficient credits: ${credits} required`);
+      throw new Error(`Insufficient credits: ${maximumCredits} required`);
     }
 
     // 2. 创建生成任务
@@ -383,9 +400,11 @@ export class PriorityQueueProcessor {
     const taskResponse = await this.arkVideoApiService.createVideoTask({
       prompt: task.enhancedPrompt,
       imageUrl: task.imageUrl,
+      videoUrl: task.referenceVideoUrl,
       ratio: task.aspectRatio || '16:9',
       resolution: task.resolution,
       duration: task.duration,
+      generateAudio: task.generateAudio,
     });
 
     // 3. 轮询结果（带智能间隔）
@@ -402,6 +421,15 @@ export class PriorityQueueProcessor {
     if (!videoResult.videoUrl) {
       throw new Error('Video generation failed: No video URL');
     }
+
+    const credits = videoResult.totalTokens
+      ? calculateSeedanceFastCreditsFromTokenUsage({
+          resolution: task.resolution,
+          outputDuration: task.duration,
+          totalTokens: videoResult.totalTokens,
+          hasVideoInput: Boolean(task.referenceVideoUrl),
+        })
+      : estimatedCredits;
 
     // 4. 下载并上传到 R2
     const videoResponse = await fetch(videoResult.videoUrl);
@@ -429,6 +457,12 @@ export class PriorityQueueProcessor {
       rowIndex: task.rowIndex,
       resolution: task.resolution,
       duration: task.duration,
+      generateAudio: task.generateAudio,
+      referenceVideoUrl: task.referenceVideoUrl,
+      referenceVideoDuration: task.referenceVideoDuration,
+      providerTotalTokens: videoResult.totalTokens,
+      estimatedCredits,
+      actualCredits: credits,
       productName: task.productName,
       productDescription: task.productDescription,
     };
@@ -467,7 +501,7 @@ export class PriorityQueueProcessor {
     resolution: '480p' | '720p',
     timeout: number,
     startTime: number
-  ): Promise<{ videoUrl?: string; status: string }> {
+  ): Promise<{ videoUrl?: string; status: string; totalTokens?: number }> {
     const maxAttempts = Math.floor(timeout / 3000);
 
     for (let attempt = 0; attempt < maxAttempts; attempt++) {
@@ -476,7 +510,11 @@ export class PriorityQueueProcessor {
       if (status.status === 'succeeded') {
         const videoUrl = getArkVideoUrl(status);
         if (videoUrl) {
-          return { videoUrl, status: 'completed' };
+          return {
+            videoUrl,
+            status: 'completed',
+            totalTokens: getArkVideoTokenUsage(status),
+          };
         }
       }
 

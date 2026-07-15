@@ -1,6 +1,7 @@
 import {
   type ArkVideoApiError,
   ArkVideoApiService,
+  getArkVideoTokenUsage,
   getArkVideoUrl,
 } from '@/lib/volcengine/ark-video-api';
 
@@ -76,6 +77,49 @@ describe('ArkVideoApiService', () => {
     });
   });
 
+  it('can request a silent Seedance video', async () => {
+    mockFetch.mockResolvedValue({
+      ok: true,
+      status: 200,
+      text: async () => JSON.stringify({ id: 'task-silent', status: 'queued' }),
+    });
+
+    await new ArkVideoApiService().createVideoTask({
+      prompt: 'A silent product turntable shot',
+      resolution: '480p',
+      ratio: 'adaptive',
+      duration: 10,
+      generateAudio: false,
+    });
+
+    const body = JSON.parse(mockFetch.mock.calls[0][1].body as string);
+    expect(body.generate_audio).toBe(false);
+    expect(body.ratio).toBe('adaptive');
+  });
+
+  it('adds a reference video for multimodal Seedance generation', async () => {
+    mockFetch.mockResolvedValue({
+      ok: true,
+      status: 200,
+      text: async () => JSON.stringify({ id: 'task-reference-video', status: 'queued' }),
+    });
+
+    await new ArkVideoApiService().createVideoTask({
+      prompt: 'Follow the camera movement from the reference video',
+      resolution: '720p',
+      ratio: 'adaptive',
+      duration: 10,
+      videoUrl: 'https://cdn.example.com/reference.mp4',
+    });
+
+    const body = JSON.parse(mockFetch.mock.calls[0][1].body as string);
+    expect(body.content[1]).toEqual({
+      type: 'video_url',
+      video_url: { url: 'https://cdn.example.com/reference.mp4' },
+      role: 'reference_video',
+    });
+  });
+
   it('queries task status and extracts the generated video URL', async () => {
     const response = {
       id: 'task-123',
@@ -93,6 +137,16 @@ describe('ArkVideoApiService', () => {
       'https://ark.cn-beijing.volces.com/api/v3/contents/generations/tasks/task-123'
     );
     expect(getArkVideoUrl(task)).toBe('https://cdn.example.com/video.mp4');
+  });
+
+  it('extracts billed token usage from a completed task', () => {
+    expect(
+      getArkVideoTokenUsage({
+        id: 'task-usage',
+        status: 'succeeded',
+        usage: { total_tokens: 432000, completion_tokens: 432000 },
+      })
+    ).toBe(432000);
   });
 
   it('surfaces Ark error messages', async () => {

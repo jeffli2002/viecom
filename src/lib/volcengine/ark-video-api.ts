@@ -11,6 +11,8 @@ export interface ArkVideoGenerationParams {
   ratio: string;
   duration: ArkVideoDuration;
   imageUrl?: string;
+  videoUrl?: string;
+  generateAudio?: boolean;
   safetyIdentifier?: string;
 }
 
@@ -19,6 +21,10 @@ export interface ArkVideoTask {
   status: 'queued' | 'running' | 'succeeded' | 'failed' | 'expired' | 'canceled' | string;
   content?: unknown;
   error?: unknown;
+  usage?: {
+    total_tokens?: number;
+    completion_tokens?: number;
+  };
 }
 
 export class ArkVideoApiError extends Error {
@@ -83,6 +89,13 @@ export const getArkVideoUrl = (task: ArkVideoTask): string | undefined => {
   return undefined;
 };
 
+export const getArkVideoTokenUsage = (task: ArkVideoTask): number | undefined => {
+  const tokenCount = task.usage?.total_tokens ?? task.usage?.completion_tokens;
+  return typeof tokenCount === 'number' && Number.isFinite(tokenCount) && tokenCount > 0
+    ? tokenCount
+    : undefined;
+};
+
 export class ArkVideoApiService {
   private get apiKey() {
     if (!env.ARK_API_KEY) {
@@ -113,6 +126,14 @@ export class ArkVideoApiService {
       });
     }
 
+    if (params.videoUrl) {
+      content.push({
+        type: 'video_url',
+        video_url: { url: params.videoUrl },
+        role: 'reference_video',
+      });
+    }
+
     const response = await fetch(`${ARK_BASE_URL}/contents/generations/tasks`, {
       method: 'POST',
       headers: this.headers,
@@ -122,7 +143,7 @@ export class ArkVideoApiService {
         resolution: params.resolution,
         ratio: params.ratio,
         duration: params.duration,
-        generate_audio: true,
+        generate_audio: params.generateAudio ?? true,
         execution_expires_after: 3600,
         ...(params.safetyIdentifier ? { safety_identifier: params.safetyIdentifier } : {}),
       }),

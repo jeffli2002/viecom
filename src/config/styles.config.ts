@@ -100,6 +100,23 @@ export function getVideoStyle(styleId: string): StyleConfig | undefined {
   return VIDEO_STYLES.find((style) => style.id === styleId);
 }
 
+export function applyGenerationStyle(
+  prompt: string,
+  styleId: string | undefined,
+  generationType: 'image' | 'video'
+): string {
+  const normalizedPrompt = prompt.trim();
+  if (!styleId) return normalizedPrompt;
+
+  const style = generationType === 'image' ? getImageStyle(styleId) : getVideoStyle(styleId);
+  const enhancement = style?.promptEnhancement?.trim();
+  if (!enhancement || normalizedPrompt.toLowerCase().includes(enhancement.toLowerCase())) {
+    return normalizedPrompt;
+  }
+
+  return `${normalizedPrompt}, ${enhancement}`;
+}
+
 /**
  * Get default style
  */

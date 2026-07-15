@@ -16,9 +16,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
 import { getBatchConfig } from '@/config/batch.config';
-import { creditsConfig } from '@/config/credits.config';
+import { creditsConfig, getVideoModelInfo } from '@/config/credits.config';
 import { IMAGE_STYLES, VIDEO_STYLES } from '@/config/styles.config';
 import { useSubscription } from '@/hooks/use-subscription';
 import { useUpgradePrompt } from '@/hooks/use-upgrade-prompt';
@@ -46,6 +47,8 @@ interface RowData {
   productDescription?: string;
   prompt: string;
   baseImageUrl?: string;
+  referenceVideoUrl?: string;
+  referenceVideoDuration?: number;
   productSellingPoints?: string;
   enhancedPrompt?: string;
   isSelected: boolean;
@@ -125,6 +128,8 @@ export function BatchGenerationFlow({ generationType }: BatchGenerationFlowProps
   // Video-specific settings
   const [videoDuration, setVideoDuration] = useState<10 | 15>(10);
   const [videoQuality, setVideoQuality] = useState<'standard' | 'high'>('high');
+  const [generateAudio, setGenerateAudio] = useState(true);
+  const [videoInputEnabled, setVideoInputEnabled] = useState(false);
   const [pollingInterval, setPollingInterval] = useState<NodeJS.Timeout | null>(null);
   const [generationProgress, setGenerationProgress] = useState<{ current: number; total: number }>({
     current: 0,
@@ -186,10 +191,27 @@ export function BatchGenerationFlow({ generationType }: BatchGenerationFlowProps
 
   // Seedance Fast: standard selects 480p and high selects 720p.
   const videoResolution = videoQuality === 'standard' ? '480p' : '720p';
-  const videoCreditCost =
+  const baseVideoCreditCost =
     creditsConfig.consumption.videoGeneration[
       `seedance-2-fast-${videoResolution}-${videoDuration}s`
     ];
+  const getVideoCreditCostForRow = (row: RowData) =>
+    getVideoModelInfo({
+      model: VIDEO_MODEL,
+      resolution: videoResolution,
+      duration: videoDuration,
+      referenceVideoDuration: videoInputEnabled ? row.referenceVideoDuration : undefined,
+    }).credits;
+  const getCreditCostForRow = (row: RowData) =>
+    generationType === 'image'
+      ? creditsConfig.consumption.imageGeneration['nano-banana'] || 5
+      : getVideoCreditCostForRow(row);
+  const selectedVideoCreditTotal = rows
+    .filter((row) => row.isSelected)
+    .reduce((total, row) => total + getVideoCreditCostForRow(row), 0);
+  const hasCompleteReferenceVideoData = rows
+    .filter((row) => row.isSelected)
+    .every((row) => row.referenceVideoUrl && row.referenceVideoDuration !== undefined);
   const [brandInfo, setBrandInfo] = useState<{
     brandName?: string;
     selectedStyle?: string;
@@ -417,6 +439,7 @@ export function BatchGenerationFlow({ generationType }: BatchGenerationFlowProps
       const formData = new FormData();
       formData.append('file', file);
       formData.append('generationType', generationType);
+      formData.append('videoInputEnabled', String(videoInputEnabled));
 
       const response = await fetch('/api/v1/workflow/validate', {
         method: 'POST',
@@ -446,6 +469,8 @@ export function BatchGenerationFlow({ generationType }: BatchGenerationFlowProps
         productDescription: row.productDescription ?? '',
         prompt: row.prompt ?? '',
         baseImageUrl: row.baseImageUrl,
+        referenceVideoUrl: row.referenceVideoUrl,
+        referenceVideoDuration: row.referenceVideoDuration,
         productSellingPoints: row.productSellingPoints,
         publishPlatforms: row.publishPlatforms,
         publishMode: row.publishMode,
@@ -477,7 +502,7 @@ export function BatchGenerationFlow({ generationType }: BatchGenerationFlowProps
     } finally {
       setIsValidating(false);
     }
-  }, [file, generationType]);
+  }, [file, generationType, videoInputEnabled]);
 
   // Auto-validate when file is selected
   useEffect(() => {
@@ -614,13 +639,20 @@ export function BatchGenerationFlow({ generationType }: BatchGenerationFlowProps
       return;
     }
 
-    // Calculate total credit cost using the selected Seedance resolution and duration.
-    const creditCostPerItem =
-      generationType === 'image'
-        ? creditsConfig.consumption.imageGeneration['nano-banana'] || 5
-        : videoCreditCost;
+    if (generationType === 'video' && videoInputEnabled) {
+      const invalidRow = selectedRows.find(
+        (row) => !row.referenceVideoUrl || row.referenceVideoDuration === undefined
+      );
+      if (invalidRow) {
+        alert(t('referenceVideoRequired', { row: invalidRow.rowIndex }));
+        return;
+      }
+    }
 
-    const totalCreditCost = selectedRows.length * creditCostPerItem;
+    const totalCreditCost = selectedRows.reduce(
+      (total, row) => total + getCreditCostForRow(row),
+      0
+    );
 
     // Check user credits
     console.log('Checking credits:', {
@@ -670,6 +702,11 @@ export function BatchGenerationFlow({ generationType }: BatchGenerationFlowProps
             // Use enhanced prompt if available, otherwise use original prompt
             enhancedPrompt: row.enhancedPrompt || row.prompt,
             baseImageUrl: row.baseImageUrl,
+            ...(generationType === 'video' &&
+              videoInputEnabled && {
+                referenceVideoUrl: row.referenceVideoUrl,
+                referenceVideoDuration: row.referenceVideoDuration,
+              }),
             productSellingPoints: row.productSellingPoints,
           })),
           generationType,
@@ -686,6 +723,8 @@ export function BatchGenerationFlow({ generationType }: BatchGenerationFlowProps
             defaultModel: VIDEO_MODEL,
             defaultResolution: videoQuality === 'standard' ? '480p' : '720p',
             defaultDuration: videoDuration,
+            generateAudio,
+            videoInputEnabled,
           }),
         }),
         credentials: 'include',
@@ -715,22 +754,18 @@ export function BatchGenerationFlow({ generationType }: BatchGenerationFlowProps
     const selectedRows = rows.filter((row) => row.isSelected);
     if (selectedRows.length === 0) return;
 
-    // Calculate credit cost per item.
-    const creditCostPerItem =
-      generationType === 'image'
-        ? creditsConfig.consumption.imageGeneration['nano-banana'] || 5
-        : videoCreditCost;
+    let runningCost = 0;
+    const affordableRows = selectedRows.filter((row) => {
+      const rowCost = getCreditCostForRow(row);
+      if (runningCost + rowCost > userCredits) return false;
+      runningCost += rowCost;
+      return true;
+    });
 
-    // Calculate how many items can be generated with available credits
-    const maxAffordableItems = Math.floor(userCredits / creditCostPerItem);
-
-    if (maxAffordableItems === 0) {
+    if (affordableRows.length === 0) {
       alert('积分不足，无法生成任何内容');
       return;
     }
-
-    // Limit rows to what can be afforded
-    const affordableRows = selectedRows.slice(0, maxAffordableItems);
 
     if (affordableRows.length < selectedRows.length) {
       const confirmMessage = `您的积分只能生成 ${affordableRows.length} 个内容（共选择了 ${selectedRows.length} 个）。是否继续？`;
@@ -939,6 +974,7 @@ export function BatchGenerationFlow({ generationType }: BatchGenerationFlowProps
       'productDescription',
       'prompt',
       'baseImageUrl',
+      ...(generationType === 'video' ? ['referenceVideoUrl', 'referenceVideoDuration'] : []),
       'productSellingPoints',
       'enhancedPrompt',
       generationType === 'image' ? 'generatedImageUrl' : 'generatedVideoUrl',
@@ -950,6 +986,9 @@ export function BatchGenerationFlow({ generationType }: BatchGenerationFlowProps
       row.productDescription || '',
       row.prompt,
       row.baseImageUrl || '',
+      ...(generationType === 'video'
+        ? [row.referenceVideoUrl || '', row.referenceVideoDuration || '']
+        : []),
       row.productSellingPoints || '',
       row.enhancedPrompt || '',
       row.assetUrl || '',
@@ -965,6 +1004,12 @@ export function BatchGenerationFlow({ generationType }: BatchGenerationFlowProps
       { wch: 50 }, // productDescription
       { wch: 50 }, // prompt
       { wch: 50 }, // baseImageUrl
+      ...(generationType === 'video'
+        ? [
+            { wch: 50 }, // referenceVideoUrl
+            { wch: 24 }, // referenceVideoDuration
+          ]
+        : []),
       { wch: 40 }, // productSellingPoints
       { wch: 50 }, // enhancedPrompt
       { wch: 50 }, // generatedImageUrl/generatedVideoUrl
@@ -1164,6 +1209,7 @@ export function BatchGenerationFlow({ generationType }: BatchGenerationFlowProps
                           </>
                         ) : (
                           <>
+                            <SelectItem value="adaptive">{t('aspectRatioAdaptive')}</SelectItem>
                             <SelectItem value="16:9">{t('aspectRatio16:9')}</SelectItem>
                             <SelectItem value="9:16">{t('aspectRatio9:16')}</SelectItem>
                           </>
@@ -1273,7 +1319,10 @@ export function BatchGenerationFlow({ generationType }: BatchGenerationFlowProps
                           </SelectTrigger>
                           <SelectContent>
                             <SelectItem value="seedance-2-fast">
-                              Seedance 2.0 Fast - {videoCreditCost} credits
+                              Seedance 2.0 Fast -{' '}
+                              {videoInputEnabled
+                                ? t('videoInputDynamicCredits')
+                                : `${baseVideoCreditCost} credits`}
                             </SelectItem>
                           </SelectContent>
                         </Select>
@@ -1370,6 +1419,51 @@ export function BatchGenerationFlow({ generationType }: BatchGenerationFlowProps
                         </button>
                       </div>
                     </div>
+
+                    <div className="flex min-h-11 items-center justify-between border-t border-slate-200 pt-4 dark:border-slate-700">
+                      <div className="min-w-0 pr-4">
+                        <Label htmlFor="batch-reference-video" className="text-sm font-medium">
+                          {t('referenceVideoInput')}
+                        </Label>
+                        {videoInputEnabled && rows.length > 0 && (
+                          <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+                            {hasCompleteReferenceVideoData
+                              ? t('estimatedVideoCredits', { credits: selectedVideoCreditTotal })
+                              : t('referenceVideoDataRequired')}
+                          </p>
+                        )}
+                      </div>
+                      <div className="flex shrink-0 items-center gap-2">
+                        <span className="text-xs text-slate-500 dark:text-slate-400">
+                          {videoInputEnabled ? t('videoInputOn') : t('videoInputOff')}
+                        </span>
+                        <Switch
+                          id="batch-reference-video"
+                          checked={videoInputEnabled}
+                          onCheckedChange={setVideoInputEnabled}
+                          disabled={isGenerating}
+                          aria-label={t('referenceVideoInput')}
+                        />
+                      </div>
+                    </div>
+
+                    <div className="flex min-h-11 items-center justify-between border-t border-slate-200 pt-4 dark:border-slate-700">
+                      <Label htmlFor="batch-generate-audio" className="text-sm font-medium">
+                        {t('generateAudio')}
+                      </Label>
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs text-slate-500 dark:text-slate-400">
+                          {generateAudio ? t('audioOn') : t('audioOff')}
+                        </span>
+                        <Switch
+                          id="batch-generate-audio"
+                          checked={generateAudio}
+                          onCheckedChange={setGenerateAudio}
+                          disabled={isGenerating}
+                          aria-label={t('generateAudio')}
+                        />
+                      </div>
+                    </div>
                   </>
                 )}
               </div>
@@ -1377,11 +1471,11 @@ export function BatchGenerationFlow({ generationType }: BatchGenerationFlowProps
               {/* Template Download */}
               <div className="border rounded-lg p-4 bg-slate-50 dark:bg-slate-900">
                 <Label className="text-sm font-medium mb-3 block">{t('downloadTemplate')}</Label>
-                <div className="flex gap-3">
+                <div className="flex flex-col gap-3 sm:flex-row">
                   <Button
                     variant="outline"
                     onClick={() => handleDownloadTemplate('excel')}
-                    className="flex items-center gap-2"
+                    className="h-auto min-h-10 w-full items-center justify-center gap-2 whitespace-normal px-3 py-2 text-center leading-tight sm:w-auto sm:whitespace-nowrap"
                   >
                     <FileSpreadsheet className="w-4 h-4" />
                     {t('downloadExcel')}
@@ -1389,7 +1483,7 @@ export function BatchGenerationFlow({ generationType }: BatchGenerationFlowProps
                   <Button
                     variant="outline"
                     onClick={() => handleDownloadTemplate('csv')}
-                    className="flex items-center gap-2"
+                    className="h-auto min-h-10 w-full items-center justify-center gap-2 whitespace-normal px-3 py-2 text-center leading-tight sm:w-auto sm:whitespace-nowrap"
                   >
                     <FileText className="w-4 h-4" />
                     {t('downloadCSV')}
@@ -1407,6 +1501,11 @@ export function BatchGenerationFlow({ generationType }: BatchGenerationFlowProps
                         {t('importantNotice')}
                       </h4>
                       <p className="text-amber-800 text-xs leading-relaxed">{t('i2vWarning')}</p>
+                      {aspectRatio !== 'adaptive' && (
+                        <p className="mt-2 text-xs leading-relaxed text-amber-800">
+                          {t('aspectRatioCropWarning')}
+                        </p>
+                      )}
                     </div>
                   </div>
                 </div>

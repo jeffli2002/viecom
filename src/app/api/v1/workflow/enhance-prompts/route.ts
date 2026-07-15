@@ -1,3 +1,4 @@
+import { applyGenerationStyle } from '@/config/styles.config';
 import { auth } from '@/lib/auth/auth';
 import { type NextRequest, NextResponse } from 'next/server';
 
@@ -43,31 +44,19 @@ export async function POST(request: NextRequest) {
 
     for (const row of rows) {
       try {
-        let promptToEnhance = row.prompt;
-
         // Parse product selling points
         const sellingPointsArray = row.productSellingPoints
           ?.split(',')
           .map((s) => s.trim())
           .filter(Boolean);
 
-        // Add style enhancement if provided (before DeepSeek enhancement)
-        if (style) {
-          const { getImageStyle, getVideoStyle } = await import('@/config/styles.config');
-          const styleConfig =
-            generationType === 'image' ? getImageStyle(style) : getVideoStyle(style);
-          if (styleConfig?.promptEnhancement) {
-            promptToEnhance = `${promptToEnhance}, ${styleConfig.promptEnhancement}`;
-          }
-        }
-
         // Enhance prompt using DeepSeek
-        const enhancedPrompt = await deepSeekService.enhancePrompt(
-          promptToEnhance,
-          generationType,
-          {
+        const enhancedPrompt = applyGenerationStyle(
+          await deepSeekService.enhancePrompt(row.prompt, generationType, {
             productSellingPoints: sellingPointsArray,
-          }
+          }),
+          style,
+          generationType
         );
 
         enhancedPrompts.push({
@@ -80,7 +69,7 @@ export async function POST(request: NextRequest) {
         enhancedPrompts.push({
           rowIndex: row.rowIndex,
           originalPrompt: row.prompt,
-          enhancedPrompt: row.prompt, // Fallback to original prompt
+          enhancedPrompt: applyGenerationStyle(row.prompt, style, generationType),
           error: error instanceof Error ? error.message : 'Failed to enhance prompt',
         });
       }

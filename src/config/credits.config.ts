@@ -217,15 +217,28 @@ export function getVideoModelInfo(params: {
   model: 'seedance-2-fast' | 'sora-2' | 'sora-2-pro';
   resolution: '480p' | '720p' | '1080p';
   duration: 10 | 15;
+  referenceVideoDuration?: number;
 }): { modelKey: string; credits: number; apiModel: string } {
-  const { model, resolution, duration } = params;
+  const { model, resolution, duration, referenceVideoDuration } = params;
 
   if (model === 'seedance-2-fast') {
     const normalizedResolution = resolution === '480p' ? '480p' : '720p';
     const key = `seedance-2-fast-${normalizedResolution}-${duration}s` as const;
+    const baseCredits = creditsConfig.consumption.videoGeneration[key];
+    const hasVideoInput = referenceVideoDuration !== undefined;
+    const credits = hasVideoInput
+      ? calculateSeedanceFastVideoCredits({
+          resolution: normalizedResolution,
+          outputDuration: duration,
+          referenceVideoDuration,
+        })
+      : baseCredits;
+
     return {
-      modelKey: key,
-      credits: creditsConfig.consumption.videoGeneration[key],
+      modelKey: hasVideoInput
+        ? `${key}-video-input-${referenceVideoDuration}s`
+        : key,
+      credits,
       apiModel: 'doubao-seedance-2-0-fast-260128',
     };
   }
@@ -248,4 +261,79 @@ export function getVideoModelInfo(params: {
     credits: creditsConfig.consumption.videoGeneration[key] || 25,
     apiModel: 'sora-2-pro-text-to-video', // 或 sora-2-pro-image-to-video
   };
+}
+
+const SEEDANCE_FAST_TOKENS_PER_SECOND = {
+  '480p': 10044,
+  '720p': 21600,
+} as const;
+
+const SEEDANCE_FAST_PRICE_CNY_PER_MILLION_TOKENS = {
+  withoutVideoInput: 37,
+  withVideoInput: 22,
+} as const;
+
+export function estimateSeedanceFastProviderCostCny(params: {
+  resolution: '480p' | '720p';
+  outputDuration: 10 | 15;
+  referenceVideoDuration?: number;
+}): number {
+  const { resolution, outputDuration, referenceVideoDuration } = params;
+  const tokensPerSecond = SEEDANCE_FAST_TOKENS_PER_SECOND[resolution];
+  const hasVideoInput = referenceVideoDuration !== undefined;
+  const billableDuration = outputDuration + (referenceVideoDuration ?? 0);
+  const tokenPrice = hasVideoInput
+    ? SEEDANCE_FAST_PRICE_CNY_PER_MILLION_TOKENS.withVideoInput
+    : SEEDANCE_FAST_PRICE_CNY_PER_MILLION_TOKENS.withoutVideoInput;
+
+  return (tokensPerSecond * billableDuration * tokenPrice) / 1_000_000;
+}
+
+export function calculateSeedanceFastVideoCredits(params: {
+  resolution: '480p' | '720p';
+  outputDuration: 10 | 15;
+  referenceVideoDuration?: number;
+}): number {
+  const { resolution, outputDuration, referenceVideoDuration } = params;
+  const baseKey = `seedance-2-fast-${resolution}-${outputDuration}s` as const;
+  const baseCredits = creditsConfig.consumption.videoGeneration[baseKey];
+
+  if (referenceVideoDuration === undefined) {
+    return baseCredits;
+  }
+
+  const baseProviderCost = estimateSeedanceFastProviderCostCny({
+    resolution,
+    outputDuration,
+  });
+  const providerCostWithVideo = estimateSeedanceFastProviderCostCny({
+    resolution,
+    outputDuration,
+    referenceVideoDuration,
+  });
+
+  // Preserve the existing >=50% margin buffer while reflecting Ark's lower
+  // per-token rate and additional billed input-video seconds.
+  return Math.ceil((baseCredits * providerCostWithVideo) / baseProviderCost / 5) * 5;
+}
+
+export function calculateSeedanceFastCreditsFromTokenUsage(params: {
+  resolution: '480p' | '720p';
+  outputDuration: 10 | 15;
+  totalTokens: number;
+  hasVideoInput: boolean;
+}): number {
+  const { resolution, outputDuration, totalTokens, hasVideoInput } = params;
+  const baseKey = `seedance-2-fast-${resolution}-${outputDuration}s` as const;
+  const baseCredits = creditsConfig.consumption.videoGeneration[baseKey];
+  const baseProviderCost = estimateSeedanceFastProviderCostCny({
+    resolution,
+    outputDuration,
+  });
+  const tokenPrice = hasVideoInput
+    ? SEEDANCE_FAST_PRICE_CNY_PER_MILLION_TOKENS.withVideoInput
+    : SEEDANCE_FAST_PRICE_CNY_PER_MILLION_TOKENS.withoutVideoInput;
+  const actualProviderCost = (totalTokens * tokenPrice) / 1_000_000;
+
+  return Math.ceil((baseCredits * actualProviderCost) / baseProviderCost / 5) * 5;
 }

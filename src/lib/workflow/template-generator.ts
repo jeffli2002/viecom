@@ -7,6 +7,8 @@ export interface BatchTemplateRow {
   prompt: string; // Required: Generation prompt
   generationMode: 't2i' | 'i2i' | 't2v' | 'i2v'; // Required: Generation mode
   baseImageUrl?: string; // Optional: For i2i/i2v modes, URL or base64 of source image
+  referenceVideoUrl?: string; // Optional: HTTPS URL for Seedance 2.0 reference video input
+  referenceVideoDuration?: number; // Required with referenceVideoUrl, billed seconds (2-15)
   model?: string; // Optional: Model name (default: nano-banana)
   aspectRatio?: string; // Optional: Aspect ratio (default: 1:1)
   count?: number; // Optional: Number of variations (default: 1)
@@ -52,6 +54,7 @@ export class TemplateGenerator {
       'productDescription', // Product description (second column)
       'prompt',
       'baseImageUrl', // Optional: For i2i/i2v modes, can be HTTP/HTTPS URL, base64 image, or embed image directly in Excel cell
+      ...(generationType === 'video' ? ['referenceVideoUrl', 'referenceVideoDuration'] : []),
       'productSellingPoints', // Optional: Product selling points
     ];
 
@@ -80,6 +83,8 @@ export class TemplateGenerator {
               'Professional video showcasing product features and benefits',
               'Professional product video showcasing the features',
               '',
+              '',
+              '',
               'Premium design, User-friendly',
             ],
             [
@@ -87,6 +92,8 @@ export class TemplateGenerator {
               'Create engaging video from product image',
               'Create a dynamic video from this product image',
               'https://example.com/base-image.jpg',
+              'https://example.com/reference-video.mp4',
+              '10',
               'Dynamic, Engaging',
             ],
           ];
@@ -110,6 +117,7 @@ export class TemplateGenerator {
       'productDescription', // Product description (second column)
       'prompt',
       'baseImageUrl', // Optional: For i2i/i2v modes, can be HTTP/HTTPS URL, base64 image, or embed image directly in Excel cell
+      ...(generationType === 'video' ? ['referenceVideoUrl', 'referenceVideoDuration'] : []),
       'productSellingPoints', // Optional: Product selling points
     ];
 
@@ -141,6 +149,8 @@ export class TemplateGenerator {
               'Professional video showcasing product features and benefits',
               'Professional product video showcasing the features',
               '',
+              '',
+              '',
               'Premium design, User-friendly',
             ],
             [
@@ -148,6 +158,8 @@ export class TemplateGenerator {
               'Create engaging video from product image',
               'Create a dynamic video from this product image',
               'https://example.com/base-image.jpg',
+              'https://example.com/reference-video.mp4',
+              '10',
               'Dynamic, Engaging',
             ],
           ];
@@ -163,6 +175,12 @@ export class TemplateGenerator {
       { wch: 50 }, // productDescription
       { wch: 50 }, // prompt
       { wch: 50 }, // baseImageUrl (longer for URLs/base64)
+      ...(generationType === 'video'
+        ? [
+            { wch: 50 }, // referenceVideoUrl
+            { wch: 24 }, // referenceVideoDuration
+          ]
+        : []),
       { wch: 40 }, // productSellingPoints
     ];
     worksheet['!cols'] = colWidths;
@@ -352,6 +370,10 @@ export class TemplateGenerator {
           | 't2v'
           | 'i2v',
         baseImageUrl,
+        referenceVideoUrl: String(row.referenceVideoUrl ?? '').trim() || undefined,
+        referenceVideoDuration: row.referenceVideoDuration
+          ? Number.parseInt(String(row.referenceVideoDuration), 10)
+          : undefined,
         model: String(row.model ?? '').trim() || undefined,
         aspectRatio: String(row.aspectRatio ?? '').trim() || undefined,
         count: row.count ? Number.parseInt(String(row.count)) : undefined,
