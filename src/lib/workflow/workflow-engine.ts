@@ -1,5 +1,5 @@
 import { randomUUID } from 'node:crypto';
-import { env } from '@/env';
+import { createChatCompletionWithFallback } from '@/lib/ai/chat-completion';
 import { analyzeBrandTone } from '@/lib/brand/brand-tone-analyzer';
 import { creditService } from '@/lib/credits';
 import type { EcommercePlatform, PublishResult } from '@/lib/publishing/platform-service';
@@ -204,66 +204,47 @@ export class WorkflowEngine {
     _productImage?: string,
     variationIndex = 0
   ): Promise<string> {
-    const deepseekKey = env.DEEPSEEK_API_KEY;
+    const contextInfo: string[] = [];
 
-    if (!deepseekKey) {
-      return basePrompt;
+    if (brandAnalysis) {
+      if (brandAnalysis.brandTone?.length > 0) {
+        contextInfo.push(`Brand tone: ${brandAnalysis.brandTone.join(', ')}`);
+      }
+      if (brandAnalysis.styleKeywords?.length > 0) {
+        contextInfo.push(`Style: ${brandAnalysis.styleKeywords.join(', ')}`);
+      }
+      if (brandAnalysis.colorPalette?.length > 0) {
+        contextInfo.push(`Colors: ${brandAnalysis.colorPalette.join(', ')}`);
+      }
+      if (brandAnalysis.productFeatures?.length > 0) {
+        contextInfo.push(`Product features: ${brandAnalysis.productFeatures.join(', ')}`);
+      }
     }
 
+    const contextString = contextInfo.length > 0 ? `\n\nContext:\n${contextInfo.join('\n')}` : '';
+    const variationNote =
+      variationIndex > 0
+        ? `\n\nGenerate variation ${variationIndex + 1} with slight differences.`
+        : '';
+
     try {
-      const contextInfo: string[] = [];
-
-      if (brandAnalysis) {
-        if (brandAnalysis.brandTone?.length > 0) {
-          contextInfo.push(`Brand tone: ${brandAnalysis.brandTone.join(', ')}`);
-        }
-        if (brandAnalysis.styleKeywords?.length > 0) {
-          contextInfo.push(`Style: ${brandAnalysis.styleKeywords.join(', ')}`);
-        }
-        if (brandAnalysis.colorPalette?.length > 0) {
-          contextInfo.push(`Colors: ${brandAnalysis.colorPalette.join(', ')}`);
-        }
-        if (brandAnalysis.productFeatures?.length > 0) {
-          contextInfo.push(`Product features: ${brandAnalysis.productFeatures.join(', ')}`);
-        }
-      }
-
-      const contextString = contextInfo.length > 0 ? `\n\nContext:\n${contextInfo.join('\n')}` : '';
-      const variationNote =
-        variationIndex > 0
-          ? `\n\nGenerate variation ${variationIndex + 1} with slight differences.`
-          : '';
-
-      const response = await fetch('https://api.deepseek.com/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${deepseekKey}`,
-        },
-        body: JSON.stringify({
-          model: 'deepseek-chat',
-          messages: [
-            {
-              role: 'system',
-              content:
-                'You are an expert AI prompt engineer for e-commerce product image/video generation. Enhance prompts with vivid artistic direction, lighting, composition, and camera/style cues. Incorporate brand tone and product features naturally. Only return the enhanced prompt text.',
-            },
-            {
-              role: 'user',
-              content: `Enhance this e-commerce product generation prompt:${contextString}${variationNote}\n\nPrompt: ${basePrompt}\n\nRespond with the enhanced prompt only.`,
-            },
-          ],
-          temperature: 0.7,
-        }),
+      const data = await createChatCompletionWithFallback({
+        messages: [
+          {
+            role: 'system',
+            content:
+              'You are an expert AI prompt engineer for e-commerce product image/video generation. Enhance prompts with vivid artistic direction, lighting, composition, and camera/style cues. Incorporate brand tone and product features naturally. Only return the enhanced prompt text.',
+          },
+          {
+            role: 'user',
+            content: `Enhance this e-commerce product generation prompt:${contextString}${variationNote}\n\nPrompt: ${basePrompt}\n\nRespond with the enhanced prompt only.`,
+          },
+        ],
+        temperature: 0.7,
       });
 
-      if (!response.ok) {
-        return basePrompt;
-      }
-
-      const data = await response.json();
-      const enhanced = data.choices?.[0]?.message?.content?.trim() || basePrompt;
-      return enhanced;
+      const enhanced = data.choices?.[0]?.message?.content;
+      return typeof enhanced === 'string' && enhanced.trim() ? enhanced.trim() : basePrompt;
     } catch (error) {
       console.error('Prompt enhancement error:', error);
       return basePrompt;

@@ -1,4 +1,8 @@
 import { env } from '@/env';
+import {
+  type ChatCompletionMessage,
+  createChatCompletionWithFallback,
+} from '@/lib/ai/chat-completion';
 import { type NextRequest, NextResponse } from 'next/server';
 
 export const dynamic = 'force-dynamic';
@@ -42,10 +46,8 @@ export async function POST(request: NextRequest) {
     const generationContext =
       typeof context === 'string' && context.trim().length > 0 ? context.trim() : 'image';
 
-    const deepseekKey = env.DEEPSEEK_API_KEY;
-
-    if (!deepseekKey) {
-      return NextResponse.json({ error: 'DeepSeek API key not configured' }, { status: 500 });
+    if (!env.OPENROUTER_API_KEY && !env.DEEPSEEK_API_KEY) {
+      return NextResponse.json({ error: 'AI provider API key not configured' }, { status: 500 });
     }
 
     // Build context information for enhancement
@@ -83,7 +85,11 @@ export async function POST(request: NextRequest) {
 
     const contextString = contextInfo.length > 0 ? `\n\nContext:\n${contextInfo.join('\n')}` : '';
 
-    const buildMessages = (promptText: string, generationContext: string, contextStr: string) => {
+    const buildMessages = (
+      promptText: string,
+      generationContext: string,
+      contextStr: string
+    ): ChatCompletionMessage[] => {
       // Image generation system prompt
       const imageSystemPrompt = `You are a professional e-commerce website designer and creative director, specialized in creating high-converting product showcase images for online stores.
 
@@ -170,22 +176,6 @@ Optimize the video for the user's selected aspect ratio and style preference. Na
       ];
     };
 
-    const fetchWithTimeout = async (input: RequestInfo | URL, init: RequestInit = {}) => {
-      const controller = new AbortController();
-      const timeout = Number(process.env.AI_ENHANCER_TIMEOUT_MS || 15000);
-      const timeoutId = setTimeout(() => controller.abort(), timeout);
-
-      try {
-        const response = await fetch(input, {
-          ...init,
-          signal: controller.signal,
-        });
-        return response;
-      } finally {
-        clearTimeout(timeoutId);
-      }
-    };
-
     const extractContent = (rawContent: unknown) => {
       if (!rawContent) return null;
       if (typeof rawContent === 'string') {
@@ -213,29 +203,11 @@ Optimize the video for the user's selected aspect ratio and style preference. Na
     };
 
     try {
-      const response = await fetchWithTimeout('https://api.deepseek.com/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${deepseekKey}`,
-        },
-        body: JSON.stringify({
-          model: 'deepseek-chat',
-          messages: buildMessages(sanitizedPrompt, generationContext, contextString),
-          temperature: 0.7,
-        }),
+      const data = await createChatCompletionWithFallback({
+        messages: buildMessages(sanitizedPrompt, generationContext, contextString),
+        temperature: 0.7,
+        timeoutMs: Number(process.env.AI_ENHANCER_TIMEOUT_MS || 15000),
       });
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        console.error('DeepSeek enhance error:', errorData);
-        return NextResponse.json(
-          { error: 'Failed to enhance prompt' },
-          { status: response.status }
-        );
-      }
-
-      const data = await response.json();
       let enhancedPrompt = extractContent(data.choices?.[0]?.message?.content) || sanitizedPrompt;
 
       // For video generation, prepend the professional role prefix
@@ -248,7 +220,7 @@ Optimize the video for the user's selected aspect ratio and style preference. Na
         originalPrompt: sanitizedPrompt,
       });
     } catch (error) {
-      console.error('DeepSeek enhance request failed:', error);
+      console.error('AI enhance request failed:', error);
       return NextResponse.json(
         { error: 'Prompt enhancement temporarily unavailable. Please try again shortly.' },
         { status: 502 }

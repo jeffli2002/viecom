@@ -1,4 +1,5 @@
 import { env } from '@/env';
+import { createChatCompletionWithFallback } from '@/lib/ai/chat-completion';
 import Firecrawl from '@mendable/firecrawl-js';
 
 type FirecrawlScrapeOptions = {
@@ -42,38 +43,29 @@ export interface BrandToneAnalysis {
 }
 
 /**
- * Analyze brand tone and product features from website URL using Firecrawl and DeepSeek AI
+ * Analyze brand tone and product features from website URL using Firecrawl and an AI provider.
  */
 export async function analyzeBrandTone(
   websiteUrl: string,
   locale = 'en'
 ): Promise<BrandToneAnalysis> {
   const isZh = locale === 'zh';
-  const deepseekKey = env.DEEPSEEK_API_KEY;
   const firecrawlKey = env.FIRECRAWL_API_KEY;
 
-  if (!deepseekKey) {
-    throw new Error('DeepSeek API key not configured');
+  if (!env.OPENROUTER_API_KEY && !env.DEEPSEEK_API_KEY) {
+    throw new Error('AI provider API key not configured');
   }
 
   try {
     // Fetch website content using Firecrawl (better scraping with JS support)
     const websiteContent = await fetchWebsiteContentWithFirecrawl(websiteUrl, firecrawlKey);
 
-    // Use DeepSeek to analyze brand tone
-    const response = await fetch('https://api.deepseek.com/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${deepseekKey}`,
-      },
-      body: JSON.stringify({
-        model: 'deepseek-chat',
-        messages: [
-          {
-            role: 'system',
-            content: isZh
-              ? `你是一位品牌分析与创意策略专家。结合提供的网页内容与公开品牌认知，完成以下任务：
+    const data = await createChatCompletionWithFallback({
+      messages: [
+        {
+          role: 'system',
+          content: isZh
+            ? `你是一位品牌分析与创意策略专家。结合提供的网页内容与公开品牌认知，完成以下任务：
 1. 提取品牌调性（3-6个关键词，描述品牌个性）
 2. 提炼核心产品/服务特性与独特卖点
 3. 识别目标受众（列出关键人群分层/场景）
@@ -105,7 +97,7 @@ export async function analyzeBrandTone(
 }
 
 所有字段必须使用中文。`
-              : `You are a brand analyst and creative strategist. Using both the provided website content and any generally known brand context, complete the following:
+            : `You are a brand analyst and creative strategist. Using both the provided website content and any generally known brand context, complete the following:
 1. Extract brand tone (3-6 keywords describing personality)
 2. Identify core product/service features and value propositions
 3. Describe the target audience (list key segments or scenarios)
@@ -137,23 +129,14 @@ Return a JSON object with the following exact keys:
 }
 
 All text must be in English.`,
-          },
-          {
-            role: 'user',
-            content: `Analyze this website content and extract brand tone and product information:\n\nURL: ${websiteUrl}\n\nContent:\n${websiteContent.substring(0, 8000)}`,
-          },
-        ],
-        temperature: 0.7,
-      }),
+        },
+        {
+          role: 'user',
+          content: `Analyze this website content and extract brand tone and product information:\n\nURL: ${websiteUrl}\n\nContent:\n${websiteContent.substring(0, 8000)}`,
+        },
+      ],
+      temperature: 0.7,
     });
-
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      console.error('DeepSeek brand analysis error:', errorData);
-      throw new Error('Failed to analyze brand tone');
-    }
-
-    const data = await response.json();
     const content = data.choices?.[0]?.message?.content;
 
     if (!content) {
@@ -222,7 +205,6 @@ All text must be in English.`,
       );
 
       const enhancement = await enhanceAnalysisWithDeepseek({
-        deepseekKey,
         locale,
         websiteUrl,
         websiteContent,
@@ -317,7 +299,6 @@ async function fetchBrandSearchContext(query: string): Promise<string> {
 }
 
 interface DeepseekEnhancementInput {
-  deepseekKey: string;
   locale: string;
   websiteUrl: string;
   websiteContent: string;
@@ -331,7 +312,6 @@ async function enhanceAnalysisWithDeepseek(
   input: DeepseekEnhancementInput
 ): Promise<Partial<BrandToneAnalysis> | null> {
   const {
-    deepseekKey,
     locale,
     websiteUrl,
     websiteContent,
@@ -394,35 +374,19 @@ Ground your reasoning in the brand tone, color palette, audience insights, websi
     searchContext: searchContext.substring(0, 4000),
   };
 
-  const response = await fetch('https://api.deepseek.com/v1/chat/completions', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${deepseekKey}`,
-    },
-    body: JSON.stringify({
-      model: 'deepseek-chat',
-      messages: [
-        {
-          role: 'system',
-          content: instruction,
-        },
-        {
-          role: 'user',
-          content: JSON.stringify(payload, null, 2),
-        },
-      ],
-      temperature: 0.5,
-    }),
+  const data = await createChatCompletionWithFallback({
+    messages: [
+      {
+        role: 'system',
+        content: instruction,
+      },
+      {
+        role: 'user',
+        content: JSON.stringify(payload, null, 2),
+      },
+    ],
+    temperature: 0.5,
   });
-
-  if (!response.ok) {
-    const errorBody = await response.json().catch(() => ({}));
-    console.error('DeepSeek enhancement error:', errorBody);
-    return null;
-  }
-
-  const data = await response.json();
   const content = data.choices?.[0]?.message?.content;
 
   if (!content) {
@@ -435,7 +399,7 @@ Ground your reasoning in the brand tone, color palette, audience insights, websi
     const parsed = JSON.parse(jsonString) as Partial<BrandToneAnalysis>;
     return parsed;
   } catch (error) {
-    console.warn('Failed to parse DeepSeek enhancement JSON:', error);
+    console.warn('Failed to parse AI enhancement JSON:', error);
     return null;
   }
 }

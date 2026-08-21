@@ -8,7 +8,7 @@ E-commerce AI Content Studio - A Next.js 15 platform for generating product imag
 
 **Tech Stack**: Next.js 15, TypeScript, PostgreSQL (Neon), Drizzle ORM, Better Auth, Tailwind CSS, Zustand, Cloudflare R2
 
-**AI Services**: KIE API (image/video), DeepSeek AI (prompt enhancement/brand analysis), OpenRouter (Gemini)
+**AI Services**: KIE API (image/video), OpenRouter (primary prompt enhancement/brand analysis), DeepSeek AI (fallback)
 
 ## Essential Commands
 
@@ -289,7 +289,8 @@ NEXT_PUBLIC_APP_URL          # App URL
 DATABASE_URL                 # PostgreSQL connection string
 BETTER_AUTH_SECRET           # Auth secret key
 KIE_API_KEY                  # Image/video generation
-DEEPSEEK_API_KEY             # Prompt enhancement/brand analysis
+OPENROUTER_API_KEY           # Primary prompt enhancement/brand analysis provider
+DEEPSEEK_API_KEY             # Fallback prompt enhancement/brand analysis provider
 R2_*                         # Cloudflare R2 credentials
 CREEM_API_KEY                # Payment provider (creem_test_* for test, creem_* for prod)
 CREEM_WEBHOOK_SECRET         # Webhook validation
@@ -305,7 +306,6 @@ No manual `CREEM_API_URL` configuration needed.
 ```bash
 GOOGLE_CLIENT_ID/SECRET      # Google OAuth
 RESEND_API_KEY               # Email service
-OPENROUTER_API_KEY           # Alternative AI provider
 ADMIN_EMAILS                 # Admin user emails
 ```
 

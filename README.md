@@ -238,10 +238,10 @@ BETTER_AUTH_SECRET="your-secret-key"
 GOOGLE_CLIENT_ID="your-google-client-id"
 GOOGLE_CLIENT_SECRET="your-google-client-secret"
 
-# AI 服务
+# AI 服务（OpenRouter 主调用，DeepSeek 回退）
 KIE_API_KEY="your-kie-api-key"
-DEEPSEEK_API_KEY="your-deepseek-api-key"
 OPENROUTER_API_KEY="your-openrouter-api-key"
+DEEPSEEK_API_KEY="your-deepseek-api-key"
 
 # 存储
 R2_BUCKET_NAME="your-bucket-name"

@@ -50,10 +50,10 @@ R2_SECRET_ACCESS_KEY="your-r2-secret-key"
 R2_ENDPOINT="https://your-account-id.r2.cloudflarestorage.com"
 R2_PUBLIC_URL="https://storage.viecom.pro"
 
-# AI Services (optional)
+# AI Services (optional; OpenRouter is primary, DeepSeek is fallback)
+OPENROUTER_API_KEY="sk-or-your-openrouter-key"
 DEEPSEEK_API_KEY="sk-your-deepseek-api-key"
 FIRECRAWL_API_KEY="fc-your-firecrawl-api-key"
-OPENROUTER_API_KEY="sk-or-your-openrouter-key"
 
 # Cron Jobs Security
 CRON_SECRET="your-cron-secret-key"

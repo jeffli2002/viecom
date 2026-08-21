@@ -29,11 +29,11 @@ export const env = createEnv({
     // Volcengine Ark (Seedance 2.0 Fast video generation)
     ARK_API_KEY: z.string().optional(),
     ARK_SEEDANCE_FAST_MODEL: z.string().optional(),
-    // DeepSeek API (for prompt enhancement and brand analysis)
+    // AI provider keys: OpenRouter is primary, DeepSeek is fallback.
     DEEPSEEK_API_KEY: z.string().optional(),
     // Firecrawl API (for website scraping)
     FIRECRAWL_API_KEY: z.string().optional(),
-    // OpenRouter API (for image generation with Gemini)
+    // OpenRouter API (primary provider for prompt enhancement and brand analysis)
     OPENROUTER_API_KEY: z.string().optional(),
     // Admin Configuration
     ADMIN_EMAILS: z.string().optional().default(''),

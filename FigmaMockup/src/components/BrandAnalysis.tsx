@@ -488,23 +488,16 @@ const response = await fetch('https://api.firecrawl.dev/v0/scrape', {
               </pre>
             </div>
             <div className="space-y-2">
-              <h4 className="text-slate-900">2. DeepSeek AI 分析</h4>
-              <p>使用 DeepSeek AI 分析品牌内容：</p>
+              <h4 className="text-slate-900">2. OpenRouter AI 分析</h4>
+              <p>优先使用 OpenRouter 分析品牌内容，失败时回退到 DeepSeek：</p>
               <pre className="p-3 rounded-lg bg-slate-900 text-slate-100 overflow-x-auto">
 {`// Backend API endpoint
-const aiResponse = await fetch('https://api.deepseek.com/v1/chat/completions', {
-  method: 'POST',
-  headers: {
-    'Authorization': 'Bearer YOUR_DEEPSEEK_API_KEY',
-    'Content-Type': 'application/json'
-  },
-  body: JSON.stringify({
-    model: 'deepseek-chat',
-    messages: [{
-      role: 'user',
-      content: '分析以下品牌网站内容...'
-    }]
-  })
+// OpenRouter (stealth/ox-alpha) first, DeepSeek fallback on failure
+const aiResponse = await createChatCompletionWithFallback({
+  messages: [{
+    role: 'user',
+    content: '分析以下品牌网站内容...'
+  }]
 });`}
               </pre>
             </div>

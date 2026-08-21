@@ -192,11 +192,11 @@ your generation requests. Your prompts are sent to these services for processing
 ### 后端保持不变
 ```typescript
 // src/lib/brand/brand-tone-analyzer.ts
-const response = await fetch('https://api.deepseek.com/v1/chat/completions', {
-  body: JSON.stringify({
-    model: 'deepseek-chat',  // ✅ 后端继续使用
+const response = await createChatCompletionWithFallback({
+  messages: [
+    // OpenRouter (stealth/ox-alpha) is tried first; DeepSeek V4 Flash is the fallback.
     // ...
-  })
+  ]
 });
 ```
 

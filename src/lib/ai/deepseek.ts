@@ -1,15 +1,6 @@
-import { env } from '@/env';
+import { createChatCompletionWithFallback } from '@/lib/ai/chat-completion';
 
 export class DeepSeekService {
-  private apiKey: string;
-
-  constructor() {
-    this.apiKey = env.DEEPSEEK_API_KEY;
-    if (!this.apiKey) {
-      throw new Error('DeepSeek API key not configured');
-    }
-  }
-
   /**
    * Enhance a prompt for image or video generation
    */
@@ -49,35 +40,19 @@ export class DeepSeekService {
           ? 'You are an expert AI prompt engineer for e-commerce product image generation. Enhance prompts with vivid artistic direction, lighting, composition, and camera/style cues. Incorporate brand tone and product features naturally. Only return the enhanced prompt text.'
           : 'You are an expert AI prompt engineer for e-commerce product video generation. Enhance prompts with vivid descriptions of motion, camera movements, transitions, and visual storytelling. Incorporate brand tone and product features naturally. Only return the enhanced prompt text.';
 
-      const response = await fetch('https://api.deepseek.com/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${this.apiKey}`,
-        },
-        body: JSON.stringify({
-          model: 'deepseek-chat',
-          messages: [
-            {
-              role: 'system',
-              content: systemPrompt,
-            },
-            {
-              role: 'user',
-              content: `Enhance this e-commerce product ${generationType} generation prompt:${contextString}\n\nPrompt: ${prompt.trim()}\n\nRespond with the enhanced prompt only.`,
-            },
-          ],
-          temperature: 0.7,
-        }),
+      const data = await createChatCompletionWithFallback({
+        messages: [
+          {
+            role: 'system',
+            content: systemPrompt,
+          },
+          {
+            role: 'user',
+            content: `Enhance this e-commerce product ${generationType} generation prompt:${contextString}\n\nPrompt: ${prompt.trim()}\n\nRespond with the enhanced prompt only.`,
+          },
+        ],
+        temperature: 0.7,
       });
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        console.error('DeepSeek enhance error:', errorData);
-        throw new Error('Failed to enhance prompt');
-      }
-
-      const data = await response.json();
       const enhancedPrompt = data.choices?.[0]?.message?.content?.trim() || prompt.trim();
 
       // Extract content if wrapped in markdown code blocks
@@ -88,7 +63,7 @@ export class DeepSeekService {
 
       return enhancedPrompt;
     } catch (error) {
-      console.error('DeepSeek enhance request failed:', error);
+      console.error('AI enhance request failed:', error);
       throw error;
     }
   }

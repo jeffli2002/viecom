@@ -420,7 +420,7 @@ See `env.example` for complete list. Key variables:
 - `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` - Google OAuth
 - `CREEM_API_KEY` / `CREEM_WEBHOOK_SECRET` - Creem payment
 - `DEEPSEEK_API_KEY` - DeepSeek AI for prompt enhancement and brand analysis
-- `OPENROUTER_API_KEY` - OpenRouter for image generation (Gemini)
+- `OPENROUTER_API_KEY` - Primary OpenRouter provider for prompt enhancement, brand analysis, and image generation
 - `KIE_API_KEY` - KIE API for image/video generation
 - `R2_*` - Cloudflare R2 storage configuration
 
